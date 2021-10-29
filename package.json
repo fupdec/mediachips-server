@@ -4,7 +4,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "server": "npm run start"
   },
   "main": "server.js",
   "dependencies": {
@@ -12,6 +13,7 @@
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
     "express": "^4.17.1",
+    "sqlite3": "^5.0.2",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3"
   },
@@ -43,8 +45,10 @@
     "last 2 versions",
     "not dead"
   ],
-  "bin" : "server.js",
+  "bin": "server.js",
   "pkg": {
-    "assets": ["/dist/**/*"]
+    "assets": [
+      "/dist/**/*"
+    ]
   }
 }
