@@ -5,9 +5,18 @@ const app = express()
 // const fs = require("fs")
 const sqlite3 = require('sqlite3').verbose()
 const db = new sqlite3.Database('db.sqlite')
+const { Sequelize } = require('sequelize')
 
 let create = 'CREATE TABLE IF NOT EXISTS contacts  (userId INTEGER AUTO_INCREMENT PRIMARY KEY, firstName TEXT NOT NULL, lastName TEXT NOT NULL, email TEXT NOT NULL UNIQUE, phone TEXT NOT NULL UNIQUE);'
 db.run(create)
+
+const sequelize = new Sequelize({ dialect: 'sqlite', storage: 'db.sqlite' })
+try {
+  sequelize.authenticate()
+  console.log('DB connected')
+} catch (e) {
+  console.log('DB connection error: ', e)
+}
 
 // using vue's built as static files
 const src = path.join(__dirname, 'dist') 

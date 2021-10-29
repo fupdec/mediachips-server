@@ -1,16 +1,26 @@
 <template>
   <div id="app">
-    <h1>Первое приложение!</h1>
-    <button @click="getDb">Get contacts</button>
-    <button @click="createContact">Create contact</button>
+    <v-app>
+      <v-navigation-drawer v-model="drawer" app/>
 
-    <p>
-      <router-link to="/foo">Перейти к Foo</router-link>
-      <router-link to="/bar">Перейти к Bar</router-link>
-    </p>
-    <router-view></router-view>
-    
-    <img alt="Vue logo" src="./assets/logo.png">
+      <v-app-bar app>
+        <v-app-bar-nav-icon @click="drawer = !drawer"><v-icon>mdi-menu</v-icon></v-app-bar-nav-icon>
+        <v-toolbar-title>Application</v-toolbar-title>
+      </v-app-bar>
+
+      <v-main>
+        <v-btn color="success" @click="getDb">Get contacts</v-btn>
+        <v-btn color="success" @click="createContact">Create contact</v-btn>
+
+        <p>
+          <router-link to="/foo">Перейти к Foo</router-link>
+          <router-link to="/bar">Перейти к Bar</router-link>
+        </p>
+        <router-view></router-view>
+        
+        <img alt="Vue logo" src="./assets/logo.png">
+      </v-main>
+    </v-app>
   </div>
 </template>
 
@@ -27,7 +37,7 @@ export default {
   },
   data: () => ({
     apiUrl: 'http://localhost:5555',
-    db: null,
+    drawer: null
   }),
   computed: {},
   methods: {
