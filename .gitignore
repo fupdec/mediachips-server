@@ -3,6 +3,7 @@ node_modules
 /dist
 server.log
 db.sqlite
+mediachips.exe
 
 # local env files
 .env.local

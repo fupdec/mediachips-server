@@ -5,7 +5,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "npm run start"
+    "server": "npm run start",
+    "pkg": "pkg -t win package.json"
   },
   "main": "server.js",
   "dependencies": {
