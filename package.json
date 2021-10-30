@@ -9,6 +9,7 @@
   },
   "main": "server.js",
   "dependencies": {
+    "@mdi/font": "^6.4.95",
     "axios": "^0.24.0",
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
