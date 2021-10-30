@@ -5,20 +5,24 @@
 
       <v-app-bar app>
         <v-app-bar-nav-icon @click="drawer = !drawer"><v-icon>mdi-menu</v-icon></v-app-bar-nav-icon>
-        <v-toolbar-title>Application</v-toolbar-title>
+        <v-toolbar-title>mediaChips</v-toolbar-title>
       </v-app-bar>
 
       <v-main>
-        <v-btn color="success" @click="getDb">Get contacts</v-btn>
-        <v-btn color="success" @click="createContact">Create contact</v-btn>
+        <v-btn color="success" @click="getDb">Get videos</v-btn>
+        <v-btn color="success" @click="createVideo">Create video</v-btn>
 
-        <p>
+        <v-card v-for="v,i in videos" :key="i">
+          {{v.path}}
+        </v-card>
+
+        <!-- <p>
           <router-link to="/foo">Перейти к Foo</router-link>
           <router-link to="/bar">Перейти к Bar</router-link>
         </p>
-        <router-view></router-view>
+        <router-view></router-view> -->
         
-        <img alt="Vue logo" src="./assets/logo.png">
+        <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
       </v-main>
     </v-app>
   </div>
@@ -32,29 +36,30 @@ export default {
   components: {
   },
   mounted() {
-    this.$nextTick(function () {
+    this.$nextTick(() => {
     })
   },
   data: () => ({
     apiUrl: 'http://localhost:5555',
-    drawer: null
+    drawer: false,
+    videos: [],
   }),
   computed: {},
   methods: {
     getDb() {
       axios.get(this.apiUrl + '/api/db')
         .then(response => {
-          console.log('Get all contacts')
           console.log(response.data)
+          this.videos = response.data
         })
         .catch(e => {
           console.log(e)
         })
     },
-    createContact() {
+    createVideo() {
       axios.post(this.apiUrl + '/api/db')
         .then(response => {
-          console.log('Create contact')
+          console.log('Create video')
           console.log(response.data)
         })
         .catch(e => {

@@ -2,13 +2,7 @@ const express = require('express')
 const path = require('path')
 const history = require('connect-history-api-fallback')
 const app = express()
-// const fs = require("fs")
-const sqlite3 = require('sqlite3').verbose()
-const db = new sqlite3.Database('db.sqlite')
-const { Sequelize } = require('sequelize')
-
-let create = 'CREATE TABLE IF NOT EXISTS contacts  (userId INTEGER AUTO_INCREMENT PRIMARY KEY, firstName TEXT NOT NULL, lastName TEXT NOT NULL, email TEXT NOT NULL UNIQUE, phone TEXT NOT NULL UNIQUE);'
-db.run(create)
+const { Sequelize, DataTypes } = require('sequelize')
 
 const sequelize = new Sequelize({ dialect: 'sqlite', storage: 'db.sqlite' })
 try {
@@ -17,6 +11,19 @@ try {
 } catch (e) {
   console.log('DB connection error: ', e)
 }
+
+const Video = sequelize.define(
+  'Video', {
+    path: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    size: {
+      type: DataTypes.INTEGER,
+    },
+  }
+)
+sequelize.sync()
 
 // using vue's built as static files
 const src = path.join(__dirname, 'dist') 
@@ -38,14 +45,13 @@ app.use(staticFileMiddleware)
 // })
 
 // REST api
-app.get('/api/db', (req, res) => {
-  let contacts = 'SELECT * FROM contacts'
-  res.status(201).send({message: db.run(contacts)});
+app.get('/api/db', async (req, res) => {
+  const allVideos = await Video.findAll()
+  res.status(201).send(allVideos)
 })
-app.post('/api/db', (req, res) => {
-  let insert = 'INSERT INTO contacts (firstName, lastName, email, phone) VALUES( Lolik,	Bolik, as@ca.com, 214124124);'
-  db.run(insert)
-  res.status(201).send({message: "Added new contact"})
+app.post('/api/db', async (req, res) => {
+  await Video.create({ path: 'defpath' })
+  res.status(201).send({message: "Added new video"})
 })
 
 // starting server

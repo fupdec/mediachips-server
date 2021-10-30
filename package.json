@@ -12,7 +12,6 @@
     "axios": "^0.24.0",
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
-    "deepmerge": "^4.2.2",
     "express": "^4.17.1",
     "sequelize": "^6.8.0",
     "sqlite3": "^5.0.2",
