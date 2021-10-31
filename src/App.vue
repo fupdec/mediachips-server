@@ -1,27 +1,34 @@
 <template>
-  <v-app id="app">
-    <v-navigation-drawer v-model="drawer" app/>
-
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click="drawer = !drawer"><v-icon>mdi-menu</v-icon></v-app-bar-nav-icon>
-      <v-toolbar-title>mediaChips</v-toolbar-title>
+  <v-app>
+    <v-app-bar app dense clipped-left extension-height="28">
+      <v-toolbar-title>Vuedia</v-toolbar-title>
     </v-app-bar>
 
-    <v-main>
+    <v-navigation-drawer app permanent mini-variant expand-on-hover clipped>
+      <v-list nav dense>
+        <v-list-item link to="/" color="secondary" draggable="false"> 
+          <v-list-item-icon>
+            <v-icon>mdi-home-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Home</v-list-item-title>
+        </v-list-item>
+        <v-list-item link to="/videos" color="secondary" draggable="false"> 
+          <v-list-item-icon>
+            <v-icon>mdi-video-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>Videos</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main app>
+      <!-- <router-view :key="$route.fullPath" /> -->
       <v-btn color="success" @click="getDb">Get videos</v-btn>
       <v-btn color="success" @click="createVideo">Create video</v-btn>
 
       <v-card v-for="v,i in videos" :key="i">
         {{v.path}}
       </v-card>
-
-      <!-- <p>
-        <router-link to="/foo">Перейти к Foo</router-link>
-        <router-link to="/bar">Перейти к Bar</router-link>
-      </p>
-      <router-view></router-view> -->
-      
-      <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     </v-main>
   </v-app>
 </template>
@@ -39,7 +46,6 @@ export default {
   },
   data: () => ({
     apiUrl: 'http://localhost:5555',
-    drawer: false,
     videos: [],
   }),
   computed: {},
@@ -67,14 +73,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
