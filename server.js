@@ -2,7 +2,10 @@ const express = require('express')
 const path = require('path')
 const history = require('connect-history-api-fallback')
 const app = express()
+const cors = require('cors')
 const { Sequelize, DataTypes } = require('sequelize')
+
+app.use(cors())
 
 const sequelize = new Sequelize({ dialect: 'sqlite', storage: 'db.sqlite' })
 try {

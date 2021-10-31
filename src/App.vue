@@ -1,31 +1,29 @@
 <template>
-  <div id="app">
-    <v-app>
-      <v-navigation-drawer v-model="drawer" app/>
+  <v-app id="app">
+    <v-navigation-drawer v-model="drawer" app/>
 
-      <v-app-bar app>
-        <v-app-bar-nav-icon @click="drawer = !drawer"><v-icon>mdi-menu</v-icon></v-app-bar-nav-icon>
-        <v-toolbar-title>mediaChips</v-toolbar-title>
-      </v-app-bar>
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"><v-icon>mdi-menu</v-icon></v-app-bar-nav-icon>
+      <v-toolbar-title>mediaChips</v-toolbar-title>
+    </v-app-bar>
 
-      <v-main>
-        <v-btn color="success" @click="getDb">Get videos</v-btn>
-        <v-btn color="success" @click="createVideo">Create video</v-btn>
+    <v-main>
+      <v-btn color="success" @click="getDb">Get videos</v-btn>
+      <v-btn color="success" @click="createVideo">Create video</v-btn>
 
-        <v-card v-for="v,i in videos" :key="i">
-          {{v.path}}
-        </v-card>
+      <v-card v-for="v,i in videos" :key="i">
+        {{v.path}}
+      </v-card>
 
-        <!-- <p>
-          <router-link to="/foo">Перейти к Foo</router-link>
-          <router-link to="/bar">Перейти к Bar</router-link>
-        </p>
-        <router-view></router-view> -->
-        
-        <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-      </v-main>
-    </v-app>
-  </div>
+      <!-- <p>
+        <router-link to="/foo">Перейти к Foo</router-link>
+        <router-link to="/bar">Перейти к Bar</router-link>
+      </p>
+      <router-view></router-view> -->
+      
+      <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
+    </v-main>
+  </v-app>
 </template>
 
 <script>
