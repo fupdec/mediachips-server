@@ -4,7 +4,7 @@ const path = require('path')
 const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
-const { Sequelize, DataTypes, Op } = require('sequelize')
+const { Sequelize, DataTypes } = require('sequelize')
 
 app.use(express.json({limit: '100mb'}))
 app.use(cors())
@@ -26,6 +26,155 @@ try {
 } catch (e) {
   console.log('DB connection error: ', e)
 }
+
+const Settings = sequelize.define(
+  'Settings', {
+    passwordProtection: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    phrase: DataTypes.TEXT,
+    passwordHint: DataTypes.TEXT,
+    videoPreviewEnabled: DataTypes.BOOLEAN,
+    videoPreviewStatic: {
+      type: DataTypes.TEXT,
+      defaultValue: 'thumb'
+    },
+    videoPreviewHover: {
+      type: DataTypes.TEXT,
+      defaultValue: 'video'
+    },
+    delayVideoPreview: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    appColorLightPrimary: {
+      type: DataTypes.TEXT,
+      defaultValue: '#FFB526'
+    },
+    appColorLightSecondary: {
+      type: DataTypes.TEXT,
+      defaultValue: '#098DFF'
+    },
+    appColorLightAccent: {
+      type: DataTypes.TEXT,
+      defaultValue: '#FF427F'
+    },
+    appColorLightHeader: {
+      type: DataTypes.TEXT,
+      defaultValue: '#FFE8F0'
+    },
+    appColorDarkPrimary: {
+      type: DataTypes.TEXT,
+      defaultValue: '#D37816'
+    },
+    appColorDarkSecondary: {
+      type: DataTypes.TEXT,
+      defaultValue: '#347EC5'
+    },
+    appColorDarkAccent: {
+      type: DataTypes.TEXT,
+      defaultValue: '#B8164A'
+    },
+    appColorDarkHeader: {
+      type: DataTypes.TEXT,
+      defaultValue: '#13505C'
+    },
+    headerGradientLight: {
+      type: DataTypes.TEXT,
+      defaultValue: 'linear-gradient(to right,#FFA400,#FF00C1)'
+    },
+    headerGradientDark: {
+      type: DataTypes.TEXT,
+      defaultValue: 'linear-gradient(to right,#0E227C,#910C3E)'
+    },
+    darkMode: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    headerGradient: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    colorScroll: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    textFont: {
+      type: DataTypes.TEXT,
+      defaultValue: 'Roboto'
+    },
+    headerFont: {
+      type: DataTypes.TEXT,
+      defaultValue: 'Roboto'
+    },
+    navigationSide: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    numberOfPagesLimit: {
+      type: DataTypes.INTEGER,
+      defaultValue: 7
+    },
+    gapSize: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2
+    },
+    isPlayVideoInSystemPlayer: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    typingFiltersDefault: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    watchFolders: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    selectedDisk: DataTypes.TEXT,
+    zoom: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
+    },
+    checkForUpdatesAtStartup: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    showIconsOfMetaInEditingDialog: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    showEmptyMetaValueInCard: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    showIconsInsteadTextOnFiltersChips: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    showHeaderImageAboveProfile: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    showExperimentalFeatures: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    showSavedFilters: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    showAdultContent: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    registration: DataTypes.TEXT,
+    databaseVersion: DataTypes.TEXT,
+  }, {
+    timestamps: false
+  }
+)
 
 const MediaTypes = sequelize.define(
   'MediaTypes', {
@@ -59,7 +208,7 @@ const Media = sequelize.define(
       defaultValue: 0
     },
     favorite: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       defaultValue: 0
     },
     bookmark: DataTypes.TEXT,
@@ -117,6 +266,49 @@ VideoMetadata.removeAttribute('id')
 Media.hasOne(VideoMetadata, { onDelete: "cascade", foreignKey: 'mediaId' })
 VideoMetadata.belongsTo(Media, { foreignKey: 'mediaId' })
 
+const Playlists = sequelize.define(
+  'Playlists', {
+    name: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      unique: true,
+    },
+    favorite: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0
+    },
+    views: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    oldId: {
+      type: DataTypes.TEXT,
+      unique: true,
+    },
+    viewedAt: DataTypes.DATE,
+  }, {
+    name: {
+      singular: 'Playlist',
+      plural: 'Playlists',
+    },
+  }
+)
+
+const VideosInPlaylist = sequelize.define(
+  'VideosInPlaylist', null, {
+    name: {
+      singular: 'VideosInPlaylist',
+      plural: 'VideosInPlaylist',
+    },
+    timestamps: false
+  }
+)
+VideosInPlaylist.removeAttribute('id')
+Playlists.hasMany(VideosInPlaylist, { onDelete: "cascade", foreignKey: 'playlistId' })
+VideosInPlaylist.belongsTo(Playlists, { foreignKey: 'playlistId' })
+Media.hasMany(VideosInPlaylist, { onDelete: "cascade", foreignKey: 'mediaId' })
+VideosInPlaylist.belongsTo(Media, { foreignKey: 'mediaId' })
+
 const Meta = sequelize.define(
   'Meta', {
     oldId: {
@@ -151,72 +343,72 @@ const Meta = sequelize.define(
 const MetaSettings = sequelize.define(
   'MetaSettings', {
     synonyms: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     hidden: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     nested: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     markers: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     bookmark: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     parser: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     country: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     career: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     scraper: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     rating: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     favorite: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     chipOutlined: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     chipLabel: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     color: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
@@ -278,8 +470,12 @@ MetaState.removeAttribute('id')
 Meta.hasOne(MetaState, { foreignKey: 'metaId', onDelete: "cascade" })
 MetaState.belongsTo(Meta, { foreignKey: 'metaId' })
 
-const MetaItems = sequelize.define(
-  'MetaItems', {
+const MetaInMediaTypes = sequelize.define('MetaInMediaTypes', null, {timestamps: false})
+MetaInMediaTypes.removeAttribute('id')
+MediaTypes.belongsToMany(Meta, { through: MetaInMediaTypes, foreignKey: 'typeId', otherKey: 'metaId', unique: false })
+
+const Items = sequelize.define(
+  'Items', {
     oldId: {
       type: DataTypes.TEXT,
       unique: true,
@@ -295,12 +491,13 @@ const MetaItems = sequelize.define(
       defaultValue: 0,
     },
     favorite: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: 0,
     },
     bookmark: DataTypes.TEXT,
     country: DataTypes.TEXT,
+    color: DataTypes.TEXT,
     views: {
       type: DataTypes.INTEGER,
       defaultValue: 0
@@ -308,53 +505,67 @@ const MetaItems = sequelize.define(
     viewedAt: DataTypes.DATE,
   }
 )
-Meta.hasOne(MetaItems, { foreignKey: 'metaId', onDelete: "cascade" })
-MetaItems.belongsTo(Meta, { foreignKey: 'metaId' })
+Meta.hasOne(Items, { foreignKey: 'metaId', onDelete: "cascade" })
+Items.belongsTo(Meta, { foreignKey: 'metaId' })
 
-const MetaItemsInMedia = sequelize.define('MetaItemsInMedia', null, { timestamps: false })
-MetaItemsInMedia.removeAttribute('id')
-MetaItems.hasMany(MetaItemsInMedia, { foreignKey: 'itemId', onDelete: "cascade" })
-MetaItemsInMedia.belongsTo(MetaItems, { foreignKey: 'itemId' })
-Media.hasMany(MetaItemsInMedia, { foreignKey: 'mediaId', onDelete: "cascade" })
-MetaItemsInMedia.belongsTo(Media, { foreignKey: 'mediaId' })
+const ItemsInMedia = sequelize.define('ItemsInMedia', null, { timestamps: false })
+ItemsInMedia.removeAttribute('id')
+Items.hasMany(ItemsInMedia, { foreignKey: 'itemId', onDelete: "cascade" })
+ItemsInMedia.belongsTo(Items, { foreignKey: 'itemId' })
+Media.hasMany(ItemsInMedia, { foreignKey: 'mediaId', onDelete: "cascade" })
+ItemsInMedia.belongsTo(Media, { foreignKey: 'mediaId' })
 
-const MetaValuesForMedia = sequelize.define('MetaValuesForMedia', {value:DataTypes.TEXT}, {timestamps: false})
-MetaValuesForMedia.removeAttribute('id')
-Media.belongsToMany(Meta, { through: MetaValuesForMedia, foreignKey: 'mediaId', otherKey: 'metaId', unique: false })
+const ValuesForMedia = sequelize.define('ValuesForMedia', {value:DataTypes.TEXT}, {timestamps: false})
+ValuesForMedia.removeAttribute('id')
+Media.belongsToMany(Meta, { through: ValuesForMedia, foreignKey: 'mediaId', otherKey: 'metaId', unique: false })
 
-// TODO fix it
-const MetaItemsInMetaItems = sequelize.define('MetaItemsInMetaItems', null, { timestamps: false })
-MetaItemsInMetaItems.removeAttribute('id')
-Meta.belongsToMany(MetaItems, { through: MetaItemsInMetaItems, foreignKey: 'metaId', unique: false })
-MetaItems.belongsToMany(Meta, { through: MetaItemsInMetaItems, foreignKey: 'itemId', unique: false })
-Meta.belongsToMany(MetaItems, { through: MetaItemsInMetaItems, foreignKey: 'childMetaId', unique: false })
-MetaItems.belongsToMany(Meta, { through: MetaItemsInMetaItems, foreignKey: 'childItemId', unique: false })
+const ItemsInItems = sequelize.define('ItemsInItems', null, { timestamps: false })
+ItemsInItems.removeAttribute('id')
+Items.hasMany(ItemsInItems, { foreignKey: 'itemId', onDelete: "cascade" })
+ItemsInItems.belongsTo(Items, { foreignKey: 'itemId' })
+Items.hasMany(ItemsInItems, { foreignKey: 'childItemId', onDelete: "cascade" })
+ItemsInItems.belongsTo(Items, { foreignKey: 'childItemId' })
 
-const MetaValuesForMetaItems = sequelize.define('MetaValuesForMetaItems', {value: DataTypes.TEXT}, {timestamps: false})
-MetaValuesForMetaItems.removeAttribute('id')
-MetaItems.belongsToMany(Meta, { through: MetaValuesForMetaItems, foreignKey: 'itemId', otherKey: 'metaId', unique: false })
+const ValuesForItems = sequelize.define('ValuesForItems', {value: DataTypes.TEXT}, {timestamps: false})
+ValuesForItems.removeAttribute('id')
+Items.belongsToMany(Meta, { through: ValuesForItems, foreignKey: 'itemId', otherKey: 'metaId', unique: false })
 
 const Markers = sequelize.define(
   'Markers', {
     type: DataTypes.TEXT,
-    name: DataTypes.TEXT,
+    text: DataTypes.TEXT,
     time: DataTypes.INTEGER,
   }, {
     timestamps: false
   }
 )
-Markers.removeAttribute('id')
-MetaItems.belongsToMany(Media, { through: Markers, foreignKey: 'itemId', otherKey: 'mediaId', unique: false })
+Items.hasMany(Markers, { foreignKey: 'itemId', onDelete: "cascade" })
+Markers.belongsTo(Items, { foreignKey: 'itemId' })
+Media.hasMany(Markers, { foreignKey: 'mediaId', onDelete: "cascade" })
+Markers.belongsTo(Media, { foreignKey: 'mediaId' })
 
+const ChildMeta = sequelize.define('ChildMeta', {scraperField: DataTypes.TEXT,}, {timestamps: false})
+ChildMeta.removeAttribute('id')
+Meta.hasMany(ChildMeta, { foreignKey: 'metaId', onDelete: "cascade" })
+ChildMeta.belongsTo(Meta, { foreignKey: 'metaId' })
+Meta.hasMany(ChildMeta, { foreignKey: 'childMetaId', onDelete: "cascade" })
+ChildMeta.belongsTo(Meta, { foreignKey: 'childMetaId' })
 
-sequelize.sync().then(()=>{
+sequelize.sync().then(async ()=>{
   // create media type: videos
-  MediaTypes.findOrCreate({
+  await MediaTypes.findOrCreate({
     where: {
       type: 'Video',
     },
     defaults: {
       extensions: '.mp4'
+    }
+  })
+  await Settings.findOrCreate({
+    where: {
+      id: 1,
+    },
+    defaults: {
     }
   })
 })
@@ -377,7 +588,7 @@ app.get('/api/db', async (req, res) => {
     },
     limit: 100,
     offset: 0,
-    include: { all: true, nested: true }
+    include: { all: true }
   })
   res.status(201).send(allVideos)
 })
@@ -397,6 +608,8 @@ app.post('/api/import', jsonParser, async (req, res) => {
     //   else await VideoMetadata.create({...{mediaId:media.id}, ...video})
     // }
   }).then(async () => { 
+    await Settings.update(req.body.settings, { where: { id: 1 }})
+  }).then(async () => { 
     await Meta.bulkCreate(req.body.meta)
     for (let items of req.body.items) {
       for (let i in items) {
@@ -404,43 +617,102 @@ app.post('/api/import', jsonParser, async (req, res) => {
         if (metaId === null) continue
         else {
           let newItems = items[i].map(it=>({...{metaId:metaId.id}, ...it}))
-          await MetaItems.bulkCreate(newItems)
+          await Items.bulkCreate(newItems)
         }
       }
     }
-    // res.status(201).send(allVideos)
   }).then(async () => { 
+    await Playlists.bulkCreate(req.body.playlists)
+  }).then(async () => { 
+    for (let playlist of req.body.playlists) {
+      const p = await Playlists.findOne({ where: { oldId: playlist.oldId } })
+      if (p === null) continue
+      for (let i of playlist.videos) {
+        const media = await Media.findOne({ where: { oldId: i } })
+        if (media === null) continue
+        else await VideosInPlaylist.create({playlistId: p.id, mediaId: media.id})
+      }
+    }
+  }).then(async () => { 
+    for (let marker of req.body.markers) {
+      const media = await Media.findOne({ where: { oldId: marker.videoId } })
+      if (media === null) continue
+      else marker.mediaId = media.id
+      if (marker.type === 'meta') {
+        const metaItem = await Items.findOne({ where: { oldId: marker.oldItemId } })
+        if (media === null) continue
+        else marker.itemId = metaItem.id
+      }
+      await Markers.create(marker)
+    }
+  }).then(async () => { // meta in videos
     for (let videoMeta of req.body.onlyMeta) {
-      let obj = {}
-      
       const mVideo = await Media.findOne({ where: { oldId: videoMeta.id } })
       if (mVideo === null) continue
-      else obj.mediaId = mVideo.id
   
       let onlyMetaFields = Object.fromEntries(Object.entries(videoMeta).filter(([key]) => !key.includes('id')))
       for (let fieldName in onlyMetaFields) {
         const m = await Meta.findOne({ where: { oldId: fieldName } })
         if (m === null) continue
         else {
-          obj.metaId = m.id
+          let val = onlyMetaFields[fieldName]
           if (m.dataType === 'array') {
-            for (let item of onlyMetaFields[fieldName]) {
-              const metaItem = await MetaItems.findOne({ where: { oldId: item } })
+            for (let item of val) {
+              const metaItem = await Items.findOne({ where: { oldId: item } })
               if (metaItem === null) continue
               else {
-                obj.itemId = metaItem.id
-                try { await MetaItemsInMedia.create(obj)} 
+                try { await ItemsInMedia.create({
+                  metaId: m.id,
+                  mediaId: mVideo.id,
+                  itemId: metaItem.id
+                })} 
                 catch (e) { console.log('Query error: ', e) }
               } 
             }
           } else {
-            obj.value = onlyMetaFields[fieldName]
-            try { await MetaValuesForMedia.create(obj)} 
+            try { await ValuesForMedia.create({
+              value: val,
+              metaId: m.id,
+              mediaId: mVideo.id,
+            })} 
             catch (e) { console.log('Query error: ', e) }
           }
         }
       }
     }
+  }).then(async () => { // meta in metaItems
+    for (let card of req.body.metaInItems) {
+      for (let cardId in card) {
+        const metaItem = await Items.findOne({ where: { oldId: cardId } })
+        if (metaItem === null) continue
+        for (let key in card[cardId]) {
+          const metaOfItem = await Meta.findOne({ where: { oldId: key } })
+          if (metaOfItem === null) continue
+          let val = card[cardId][key]
+          if (metaOfItem.dataType === 'array') {
+            for (let itemOldId of val) {
+              const childItem = await Items.findOne({ where: { oldId: itemOldId } })
+              if (childItem === null) continue
+              else {
+                try { await ItemsInItems.create({
+                  itemId: metaItem.id,
+                  childItemId: childItem.id
+                })} 
+                catch (e) { console.log('Query error: ', e) }
+              } 
+            }
+          } else {
+            try { await ValuesForItems.create({
+              value: val,
+              metaId: metaOfItem.id,
+              itemId: metaItem.id
+            })} 
+            catch (e) { console.log('Query error: ', e) }
+          }
+        }
+      }
+    }
+    res.status(201).send({message: "All data has been successfully imported."})
   }).catch(e => { console.log(e) } )
 })
 

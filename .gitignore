@@ -4,6 +4,8 @@ node_modules
 server.log
 db.sqlite
 mediachips.exe
+.project
+db.vuerd.json
 
 # local env files
 .env.local
