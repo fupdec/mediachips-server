@@ -4,7 +4,7 @@ const path = require('path')
 const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
-const { Sequelize, DataTypes } = require('sequelize')
+const { Sequelize, DataTypes, Op } = require('sequelize')
 
 app.use(express.json({limit: '100mb'}))
 app.use(cors())
@@ -515,9 +515,9 @@ ItemsInMedia.belongsTo(Items, { foreignKey: 'itemId' })
 Media.hasMany(ItemsInMedia, { foreignKey: 'mediaId', onDelete: "cascade" })
 ItemsInMedia.belongsTo(Media, { foreignKey: 'mediaId' })
 
-const ValuesForMedia = sequelize.define('ValuesForMedia', {value:DataTypes.TEXT}, {timestamps: false})
-ValuesForMedia.removeAttribute('id')
-Media.belongsToMany(Meta, { through: ValuesForMedia, foreignKey: 'mediaId', otherKey: 'metaId', unique: false })
+const ValuesInMedia = sequelize.define('ValuesInMedia', {value:DataTypes.TEXT}, {timestamps: false})
+ValuesInMedia.removeAttribute('id')
+Media.belongsToMany(Meta, { through: ValuesInMedia, foreignKey: 'mediaId', otherKey: 'metaId', unique: false })
 
 const ItemsInItems = sequelize.define('ItemsInItems', null, { timestamps: false })
 ItemsInItems.removeAttribute('id')
@@ -526,9 +526,9 @@ ItemsInItems.belongsTo(Items, { foreignKey: 'itemId' })
 Items.hasMany(ItemsInItems, { foreignKey: 'childItemId', onDelete: "cascade" })
 ItemsInItems.belongsTo(Items, { foreignKey: 'childItemId' })
 
-const ValuesForItems = sequelize.define('ValuesForItems', {value: DataTypes.TEXT}, {timestamps: false})
-ValuesForItems.removeAttribute('id')
-Items.belongsToMany(Meta, { through: ValuesForItems, foreignKey: 'itemId', otherKey: 'metaId', unique: false })
+const ValuesInItems = sequelize.define('ValuesInItems', {value: DataTypes.TEXT}, {timestamps: false})
+ValuesInItems.removeAttribute('id')
+Items.belongsToMany(Meta, { through: ValuesInItems, foreignKey: 'itemId', otherKey: 'metaId', unique: false })
 
 const Markers = sequelize.define(
   'Markers', {
@@ -551,6 +551,7 @@ ChildMeta.belongsTo(Meta, { foreignKey: 'metaId' })
 Meta.hasMany(ChildMeta, { foreignKey: 'childMetaId', onDelete: "cascade" })
 ChildMeta.belongsTo(Meta, { foreignKey: 'childMetaId' })
 
+// sequelize.sync({force: true}) // drop existing tables on start
 sequelize.sync().then(async ()=>{
   // create media type: videos
   await MediaTypes.findOrCreate({
@@ -579,18 +580,42 @@ app.use(history({ disableDotRule: true, verbose: true }))
 app.use(staticFileMiddleware)
 
 
+const getPagination = (page, size) => {
+  const limit = size ? +size : 20
+  const offset = page ? page * limit : 0
+
+  return { limit, offset }
+}
+const getPagingData = (data, page, limit) => {
+  const { count: totalMedia, rows: media } = data
+  const currentPage = page ? +page : 0
+  const totalPages = Math.ceil(totalMedia / limit)
+
+  return { totalMedia, media, totalPages, currentPage }
+}
+
 // REST api
-app.get('/api/db', async (req, res) => {
+app.get('/api/media', (req, res) => {
   if(!req.body) return res.sendStatus(400)
-  const allVideos = await Media.findAll({
+
+  const { page, size, type, query } = req.query
+  const { limit, offset } = getPagination(page, size)
+  
+  Media.findAndCountAll({ limit, offset,
     where: {
-      typeId: 1,
+      typeId: type || 1,
+      path: { [Op.like]: `%${query}%` },
     },
-    limit: 100,
-    offset: 0,
-    include: { all: true }
+    // include: { all: true }
+    include: [VideoMetadata]
+  }).then(data => {
+    const response = getPagingData(data, page, limit)
+    res.status(201).send(response)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
   })
-  res.status(201).send(allVideos)
 })
 app.post('/api/db', async (req, res) => {
   // await Media.create({ path: 'defpath' })
@@ -670,7 +695,7 @@ app.post('/api/import', jsonParser, async (req, res) => {
               } 
             }
           } else {
-            try { await ValuesForMedia.create({
+            try { await ValuesInMedia.create({
               value: val,
               metaId: m.id,
               mediaId: mVideo.id,
@@ -702,7 +727,7 @@ app.post('/api/import', jsonParser, async (req, res) => {
               } 
             }
           } else {
-            try { await ValuesForItems.create({
+            try { await ValuesInItems.create({
               value: val,
               metaId: metaOfItem.id,
               itemId: metaItem.id

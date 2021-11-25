@@ -23,19 +23,31 @@
 
     <v-main app>
       <!-- <router-view :key="$route.fullPath" /> -->
-      <v-btn color="success" class="ma-2" @click="getDb">Get videos</v-btn>
-      <!-- <v-btn color="success" class="ma-2" @click="createVideo">Create video</v-btn> -->
-
-      <hr>
-
-      <v-btn color="success" class="ma-2" @click="importData">Import database</v-btn>
+      <div>Media total: {{totalMedia}}</div>
+      <div class="d-flex justify-space-between align-center pa-2">
+        <div class="d-flex">
+          <v-text-field v-model="queryString" label="Search in path" dense hide-details/>
+          <v-btn @click="getMedia" class="ml-2" rounded color="primary"> 
+            <v-icon>mdi-magnify</v-icon></v-btn>
+        </div>
+        <!-- <v-btn color="success" class="ma-2" @click="getMedia">Get videos</v-btn> -->
+        <!-- <v-btn color="success" class="ma-2" @click="createVideo">Create video</v-btn> -->
+        <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
+          <v-icon>mdi-database-import</v-icon>
+        </v-btn>
+      </div>
+      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="7"/>
 
       <Loading v-show="isQueryRun"/>
 
-      <v-container fluid class="card-grid">
-        <VideoCard v-for="v in videos" :key="v.id" :video="v"/>
+      <v-container fluid class="card-grid wide-image videos-selection">
+        <VideoCard v-for="i in media" :key="i.id" :video="i" @openPlayer="openPlayer($event)"/>
       </v-container>
     </v-main>
+
+    <v-dialog v-model="dialogPlayer">
+      <video :src="src" controls></video>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -57,23 +69,31 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      // console.log(Videos)
+      this.getMedia()
     })
   },
   data: () => ({
     apiUrl: 'http://localhost:5555',
-    videos: [],
+    media: [],
+    totalMedia: 0,
+    totalPages: 0,
+    page: 1,
     isQueryRun: false,
+    queryString: '',
+    dialogPlayer: false,
+    src: '',
   }),
   computed: {},
   methods: {
-    getDb() {
+    getMedia() {
       this.isQueryRun = true
-      axios.get(this.apiUrl + '/api/db')
+      let url = `/api/media?type=1&page=${this.page}&size=20&query=${this.queryString}`
+      axios.get(this.apiUrl + url)
         .then(response => {
           this.isQueryRun = false
-          console.log(response.data)
-          this.videos = response.data.slice(0,100)
+          this.media = response.data.media
+          this.totalMedia = response.data.totalMedia
+          this.totalPages = response.data.totalPages
         })
         .catch(e => {
           this.isQueryRun = false
@@ -190,10 +210,19 @@ export default {
       console.log(Settings)
       axios.post(this.apiUrl + '/api/import', obj).then(()=> { this.isQueryRun = false })
     },
+    openPlayer(e) {
+      this.dialogPlayer = true
+      this.src = e
+    },
   }
 }
 </script>
 
+
+<style lang="sass">
+  @import '@/assets/styles/app.scss'
+  // @import '@/styles/variables.scss'
+</style>
 
 <style lang="scss">
 .card-grid {

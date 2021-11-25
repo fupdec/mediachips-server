@@ -1,7 +1,9 @@
 <template>
   <v-lazy>
-    <v-card v-ripple="{ class: 'accent--text' }" :class="{favorite: isFavorite}" outlined hover>
+    <v-card @click="openPlayer" v-ripple="{ class: 'accent--text' }" :class="{favorite: isFavorite}" outlined hover
+      class="video-card meta-card">
       <v-responsive>
+        <v-img :src="getImg" :aspect-ratio="16/9"/>
         <v-rating  
           :value="video.rating" @input="changeRating($event, video.id)"
           class="rating rating-wrapper"
@@ -19,15 +21,17 @@
 
         <div label outlined class="resolution">
           <div class="text text-no-wrap" :class="video.VideoMetadata.height">
-            {{video.VideoMetadata.height}}
+            HD
           </div>
           <div class="value">
-            <span>{{video.VideoMetadata.width+'x'+video.VideoMetadata.height}}</span>
+            <span>{{video.VideoMetadata.height}}</span>
           </div>
         </div>
+        
+        <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
 
-      <div class="video-card-title" :title="fileName" v-html="fileName"/>
+      <!-- <div class="video-card-title" :title="fileName" v-html="fileName"/> -->
 
       <!-- Video meta -->
       <v-chip label class="props px-2 py-1 mt-0 mx-1">
@@ -96,6 +100,8 @@
 // import LabelFunctions from '@/mixins/LabelFunctions'
 // import { ipcRenderer } from 'electron'
 // import MetaGetters from '@/mixins/MetaGetters'
+// const express = require("express")
+// const app = express()
 
 export default {
   name: 'VideoCard',
@@ -104,7 +110,7 @@ export default {
   },
   // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
   mounted() {
-    this.$nextTick(function () {
+    this.$nextTick(() => {
     })
   },
   destroyed() {
@@ -116,6 +122,7 @@ export default {
     fileName() { return this.video.path },
     fileExtension() { return this.video.path },
     isFavorite() { return this.video.favorite === 1 ? true : false },
+    getImg() { return '/images/media/thumbs/' + this.video.oldId + '.jpg' },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
     // visibility() { return this.$store.state.Settings.videoVisibility },
@@ -129,6 +136,12 @@ export default {
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
+    // mountSrc() {
+    //   this.$refs.video.src = this.video.path 
+    // },
+    openPlayer() {
+      this.$emit('openPlayer', this.video.path)
+    },
     calcSize(size) {
       if (size > 1000000000000) size = (size/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'
       else if (size > 1000000000) size = (size/1024/1024/1024-0.01).toFixed(2) + ' GB'
