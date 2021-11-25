@@ -1,7 +1,8 @@
 <template>
   <div class="loader">
     <svg viewBox="0 0 640 640" style="width: 20%;">
-      <path class="logo" d="M300.5,600.5C125,600.5.5,476,.5,300.5S90,.5,150.5.5s89.5,150,150,150S390,.5,450.5.5s150,124.5,150,300S476,600.5,300.5,600.5Zm150-400c-115,0-58.5,200-150,200-88.5,0-29-200-150-200-150,0-150,400,150,400S601.5,200.5,450.5,200.5Z"/>
+      <path class="logo m" d="M600.5,300.5C600.5,125,511,.5,450.5.5s-89.5,150-150,150S211,.5,150.5.5.5,125,.5,300.5s124.5,300,300,300S600.5,476,600.5,300.5Z"/>
+      <path class="logo c" d="M440.5,240.5c-107.52,0-54.45,150-140,150-82.75,0-26.86-150-140-150-140.25,0-140.49,360,140,360S581.68,240.5,440.5,240.5Z"/>
     </svg>
   </div>
 </template>
@@ -17,9 +18,16 @@
   fill: none;
   stroke-width: 3px;
   stroke: #9189ff; 
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 2000;
-  animation: dash 4s linear forwards infinite;
+  &.m {
+    stroke-dasharray: 1040;
+    stroke-dashoffset: 2000;
+    animation: dash 4s linear forwards infinite;
+  }
+  &.c {
+    stroke-dasharray: 850;
+    stroke-dashoffset: 2000;
+    animation: dash 4s linear forwards infinite;
+  }
 }
 @keyframes dash {
   to {
