@@ -1,6 +1,8 @@
 const express = require('express')
+const router = express.Router()
 const jsonParser = express.json()
 const path = require('path')
+const fs = require('fs')
 const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
@@ -8,6 +10,7 @@ const { Sequelize, DataTypes, Op } = require('sequelize')
 
 app.use(express.json({limit: '100mb'}))
 app.use(cors())
+app.use(router)
 
 const sequelize = new Sequelize({ 
   dialect: 'sqlite', 
@@ -617,11 +620,45 @@ app.get('/api/media', (req, res) => {
     })
   })
 })
-app.post('/api/db', async (req, res) => {
-  // await Media.create({ path: 'defpath' })
-  res.status(201).send({message: "Added new video"})
+router.get('/api/video/:id', async (req, res) => {
+  const video = await Media.findOne({where: {id:req.params.id}})
+  if (video === null) {
+    console.log('404')
+    res.status(404).send({message: "The video was not found in the database."})
+    return
+  }
+  const videoPath = video.path
+  if (!fs.existsSync(videoPath)) {
+    console.log('404')
+    res.status(404).send({message: "Video doesn't exists."})
+    return
+  }
+  const videoStat = fs.statSync(videoPath)
+  const fileSize = videoStat.size
+  const videoRange = req.headers.range
+  if (videoRange) {
+    const parts = videoRange.replace(/bytes=/, "").split("-")
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1
+    const chunksize = (end-start) + 1
+    const file = fs.createReadStream(videoPath, {start, end})
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    }
+    res.writeHead(206, head)
+    file.pipe(res)
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    }
+    res.writeHead(200, head)
+    fs.createReadStream(videoPath).pipe(res)
+  }
 })
-
 // importing videos from JSON
 app.post('/api/import', jsonParser, async (req, res) => {
   if(!req.body) return res.sendStatus(400)

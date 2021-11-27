@@ -5,7 +5,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "npm run start",
+    "server": "nodemon server.js",
     "electron": "electron ./electron.js",
     "pkg": "pkg -t win package.json"
   },
@@ -19,35 +19,20 @@
     "electron": "^15.3.0",
     "express": "^4.17.1",
     "sequelize": "^6.8.0",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^4.2.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
     "vuetify": "^2.5.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
+    "nodemon": "^2.0.15",
     "sass": "~1.32",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
   },
   "browserslist": [
     "> 1%",

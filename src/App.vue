@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dense clipped-left extension-height="28">
+      <img src="../public/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
     </v-app-bar>
 
@@ -46,7 +47,7 @@
     </v-main>
 
     <v-dialog v-model="dialogPlayer">
-      <video :src="src" controls></video>
+      <video :src="src" autoplay controls />
     </v-dialog>
   </v-app>
 </template>
@@ -69,6 +70,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
+      this.applyTheme()
       this.getMedia()
     })
   },
@@ -81,10 +83,19 @@ export default {
     isQueryRun: false,
     queryString: '',
     dialogPlayer: false,
-    src: '',
+    src: '../soul.mp4',
   }),
   computed: {},
   methods: {
+    applyTheme() {
+      // this.$vuetify.theme.dark = true
+      this.$vuetify.theme.themes.light.primary = '#7059b7'
+      this.$vuetify.theme.themes.light.secondary = '#7059b7'
+      this.$vuetify.theme.themes.light.accent = '#7059b7'
+      this.$vuetify.theme.themes.dark.primary = '#7059b7'
+      this.$vuetify.theme.themes.dark.secondary = '#7059b7'
+      this.$vuetify.theme.themes.dark.accent = '#7059b7'
+    },
     getMedia() {
       this.isQueryRun = true
       let url = `/api/media?type=1&page=${this.page}&size=20&query=${this.queryString}`
@@ -210,9 +221,9 @@ export default {
       console.log(Settings)
       axios.post(this.apiUrl + '/api/import', obj).then(()=> { this.isQueryRun = false })
     },
-    openPlayer(e) {
+    openPlayer(e) { 
       this.dialogPlayer = true
-      this.src = e
+      this.src = this.apiUrl+'/api/video/'+e 
     },
   }
 }

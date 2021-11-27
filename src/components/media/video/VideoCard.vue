@@ -30,8 +30,8 @@
         
         <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
-
-      <!-- <div class="video-card-title" :title="fileName" v-html="fileName"/> -->
+      <div>VideoID: {{video.id}}</div>
+      <div class="video-card-title caption" :title="fileName" v-html="fileName"/>
 
       <!-- Video meta -->
       <v-chip label class="props px-2 py-1 mt-0 mx-1">
@@ -140,7 +140,7 @@ export default {
     //   this.$refs.video.src = this.video.path 
     // },
     openPlayer() {
-      this.$emit('openPlayer', this.video.path)
+      this.$emit('openPlayer', this.video.id)
     },
     calcSize(size) {
       if (size > 1000000000000) size = (size/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'
