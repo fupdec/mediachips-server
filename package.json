@@ -5,7 +5,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "nodemon server.js",
+    "server": "nodemon --watch server.js server.js",
     "electron": "electron ./electron.js",
     "pkg": "pkg -t win package.json"
   },

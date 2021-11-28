@@ -1,11 +1,11 @@
 <template>
   <v-app>
     <v-app-bar app dense clipped-left extension-height="28">
-      <img src="../public/icon.png" width="32" class="mx-3">
+      <img @click="navbar=!navbar" src="../public/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
     </v-app-bar>
 
-    <v-navigation-drawer app permanent mini-variant expand-on-hover clipped>
+    <v-navigation-drawer v-model="navbar" app mini-variant expand-on-hover clipped>
       <v-list nav dense>
         <v-list-item link to="/" color="secondary" draggable="false"> 
           <v-list-item-icon>
@@ -60,7 +60,7 @@ import Markers from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases
 import Meta from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases/meta.json'
 import Settings from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/dbs.json'
 import VideoCard from '@/components/media/video/VideoCard.vue'
-import Loading from './components/elements/Loading.vue'
+import Loading from '@/components/elements/Loading.vue'
 
 export default {
   name: 'App',
@@ -82,8 +82,9 @@ export default {
     page: 1,
     isQueryRun: false,
     queryString: '',
+    navbar: false,
     dialogPlayer: false,
-    src: '../soul.mp4',
+    src: '',
   }),
   computed: {},
   methods: {
@@ -200,7 +201,7 @@ export default {
             favorite: i.meta.favorite || false,
             bookmark: i.meta.bookmark || null,
             country: i.meta.country ? i.meta.country.join() : null,
-            color: i.color || null,
+            color: i.meta.color || null,
             views: i.views || 0,
             createdAt: (new Date(i.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
             updatedAt: (new Date(i.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),

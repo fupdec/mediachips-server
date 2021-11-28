@@ -14,7 +14,7 @@ app.use(router)
 
 const sequelize = new Sequelize({ 
   dialect: 'sqlite', 
-  storage: 'db.sqlite',
+  storage: path.join(__dirname, 'db.sqlite'),
   dialectOptions: {
     multipleStatements: true
   },
@@ -617,6 +617,24 @@ app.get('/api/media', (req, res) => {
   }).catch(err => {
     res.status(500).send({
       message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+})
+app.get('/api/meta-for-media', (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+
+  ItemsInMedia.findAll({ 
+    where: { mediaId: req.query.mediaId },
+    include: [{
+      model: Items,
+      attributes: ['name','color'],
+    }],
+    raw: true
+  }).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
     })
   })
 })

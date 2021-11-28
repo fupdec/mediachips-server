@@ -49,6 +49,10 @@
         </div>
       </v-chip>
 
+      <v-chip v-for="i in meta" :key="i.itemId" :color="i['Item.color']">
+        {{ i['Item.name'] }} 
+      </v-chip>
+
       <!-- Parse meta -->
       <!-- <div v-for="(m,i) in metaAssignedToVideos" :key="i">
         <div v-if="visibility[m.id]&&checkShowEmptyValue(m)" class="meta-in-card">
@@ -86,6 +90,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 // const { dialog } = require('electron').remote
 // const { clipboard } = require('electron')
 // const shell = require('electron').shell
@@ -111,11 +116,14 @@ export default {
   // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
   mounted() {
     this.$nextTick(() => {
+      this.getMeta()
     })
   },
   destroyed() {
   },
   data: () => ({
+    apiUrl: 'http://localhost:5555',
+    meta: [],
   }),
   computed: {
     videoPath() { return this.video.path },
@@ -139,6 +147,16 @@ export default {
     // mountSrc() {
     //   this.$refs.video.src = this.video.path 
     // },
+    getMeta() {
+      let url = `/api/meta-for-media?mediaId=${this.video.id}`
+      axios.get(this.apiUrl + url)
+        .then(response => {
+          this.meta = response.data
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
     openPlayer() {
       this.$emit('openPlayer', this.video.id)
     },
