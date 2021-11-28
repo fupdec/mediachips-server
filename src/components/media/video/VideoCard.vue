@@ -30,7 +30,7 @@
         
         <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
-      <div>VideoID: {{video.id}}</div>
+      <!-- <div>VideoID: {{video.id}}</div> -->
       <div class="video-card-title caption" :title="fileName" v-html="fileName"/>
 
       <!-- Video meta -->
@@ -122,7 +122,7 @@ export default {
   destroyed() {
   },
   data: () => ({
-    apiUrl: 'http://localhost:5555',
+    apiUrl: 'http://192.168.1.120:5555',
     meta: [],
   }),
   computed: {

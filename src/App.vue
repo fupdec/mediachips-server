@@ -46,7 +46,7 @@
       </v-container>
     </v-main>
 
-    <v-dialog v-model="dialogPlayer">
+    <v-dialog v-if="dialogPlayer" v-model="dialogPlayer">
       <video :src="src" autoplay controls />
     </v-dialog>
   </v-app>
@@ -75,7 +75,7 @@ export default {
     })
   },
   data: () => ({
-    apiUrl: 'http://localhost:5555',
+    apiUrl: 'http://192.168.1.120.:5555',
     media: [],
     totalMedia: 0,
     totalPages: 0,
