@@ -6,10 +6,12 @@ import 'vuetify/dist/vuetify.min.css'
 Vue.use(Vuetify)
 
 export default new Vuetify({
-  options: {
-    customProperties: true,
-  },
-  icons: {
-    iconfont: 'mdi', // default - only for display purposes
+  theme: {
+    options: {
+      customProperties: true,
+    },
+    icons: {
+      iconfont: 'mdi', // default - only for display purposes
+    },
   },
 })

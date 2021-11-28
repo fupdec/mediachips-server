@@ -1,11 +1,11 @@
 <template>
   <v-app>
     <v-app-bar app dense clipped-left extension-height="28">
-      <img @click="navbar=!navbar" src="../public/icon.png" width="32" class="mx-3">
+      <img src="../public/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="navbar" app mini-variant expand-on-hover clipped>
+    <v-navigation-drawer permanent app mini-variant expand-on-hover clipped>
       <v-list nav dense>
         <v-list-item link to="/" color="secondary" draggable="false"> 
           <v-list-item-icon>
@@ -27,8 +27,8 @@
       <div>Media total: {{totalMedia}}</div>
       <div class="d-flex justify-space-between align-center pa-2">
         <div class="d-flex">
-          <v-text-field v-model="queryString" label="Search in path" dense hide-details/>
-          <v-btn @click="getMedia" class="ml-2" rounded color="primary"> 
+          <v-text-field v-model="queryString" @keyup.enter="getMedia" label="Search in path" outlined dense hide-details/>
+          <v-btn @click="getMedia" height="40" color="primary"> 
             <v-icon>mdi-magnify</v-icon></v-btn>
         </div>
         <!-- <v-btn color="success" class="ma-2" @click="getMedia">Get videos</v-btn> -->
@@ -82,7 +82,6 @@ export default {
     page: 1,
     isQueryRun: false,
     queryString: '',
-    navbar: false,
     dialogPlayer: false,
     src: '',
   }),
