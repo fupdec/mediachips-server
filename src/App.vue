@@ -3,6 +3,10 @@
     <v-app-bar app dense clipped-left extension-height="28">
       <img src="../public/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
+        <v-icon left>mdi-database-import</v-icon> Import DB
+      </v-btn>
     </v-app-bar>
 
     <v-navigation-drawer permanent app mini-variant expand-on-hover clipped>
@@ -13,17 +17,18 @@
           </v-list-item-icon>
           <v-list-item-title>Home</v-list-item-title>
         </v-list-item>
-        <v-list-item link to="/videos" color="secondary" draggable="false"> 
+        <v-list-item link to="/settings" color="secondary" draggable="false"> 
           <v-list-item-icon>
-            <v-icon>mdi-video-outline</v-icon>
+            <v-icon>mdi-cog-outline</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Videos</v-list-item-title>
+          <v-list-item-title>Settings</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
     <v-main app>
-      <!-- <router-view :key="$route.fullPath" /> -->
+      <router-view :key="$route.fullPath" />
+
       <div>Media total: {{totalMedia}}</div>
       <div class="d-flex justify-space-between align-center pa-2">
         <div class="d-flex">
@@ -31,19 +36,17 @@
           <v-btn @click="getMedia" height="40" color="primary"> 
             <v-icon>mdi-magnify</v-icon></v-btn>
         </div>
-        <!-- <v-btn color="success" class="ma-2" @click="getMedia">Get videos</v-btn> -->
-        <!-- <v-btn color="success" class="ma-2" @click="createVideo">Create video</v-btn> -->
-        <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
-          <v-icon>mdi-database-import</v-icon>
-        </v-btn>
       </div>
-      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="7"/>
+
+      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="5"/>
 
       <Loading v-show="isQueryRun"/>
 
       <v-container fluid class="card-grid wide-image videos-selection">
         <VideoCard v-for="i in media" :key="i.id" :video="i" @openPlayer="openPlayer($event)"/>
       </v-container>
+
+      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="5"/>
     </v-main>
 
     <v-dialog v-if="dialogPlayer" v-model="dialogPlayer">
@@ -90,10 +93,10 @@ export default {
     applyTheme() {
       // this.$vuetify.theme.dark = true
       this.$vuetify.theme.themes.light.primary = '#7059b7'
-      this.$vuetify.theme.themes.light.secondary = '#7059b7'
+      this.$vuetify.theme.themes.light.secondary = '#e98700'
       this.$vuetify.theme.themes.light.accent = '#7059b7'
       this.$vuetify.theme.themes.dark.primary = '#7059b7'
-      this.$vuetify.theme.themes.dark.secondary = '#7059b7'
+      this.$vuetify.theme.themes.dark.secondary = '#e98700'
       this.$vuetify.theme.themes.dark.accent = '#7059b7'
     },
     getMedia() {
@@ -218,7 +221,6 @@ export default {
       obj.onlyMeta = Videos.videos.slice(0,100).map(i=>
         Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
       )
-      console.log(Settings)
       axios.post(this.apiUrl + '/api/import', obj).then(()=> { this.isQueryRun = false })
     },
     openPlayer(e) { 

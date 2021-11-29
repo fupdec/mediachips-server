@@ -702,6 +702,12 @@ app.post('/api/import', jsonParser, async (req, res) => {
       }
     }
   }).then(async () => { 
+    for (let i of req.body.settings.metaAssignedToVideos) {
+      const meta = await Meta.findOne({ where: { oldId: i.id } })
+      if (meta === null) continue
+      else await MetaInMediaTypes.create({typeId:1, metaId:meta.id})
+    }
+  }).then(async () => { 
     await Playlists.bulkCreate(req.body.playlists)
   }).then(async () => { 
     for (let playlist of req.body.playlists) {
@@ -794,6 +800,19 @@ app.post('/api/import', jsonParser, async (req, res) => {
     }
     res.status(201).send({message: "All data has been successfully imported."})
   }).catch(e => { console.log(e) } )
+})
+app.get('/api/meta-in-mediatypes', async (req, res) => {
+  let response = {}
+  MediaTypes.findAll({ include: { model: Meta }, raw:true})
+    .then(async data => {
+      response.assigned = data
+      response.meta = await Meta.findAll()
+      res.status(201).send(response)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
 })
 
 // starting server
