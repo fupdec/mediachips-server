@@ -181,15 +181,13 @@ const Settings = sequelize.define(
 
 const MediaTypes = sequelize.define(
   'MediaTypes', {
-    type: {
+    name: {
       type: DataTypes.TEXT,
       allowNull: false,
       unique: true,
     },
-    extensions: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
+    icon: DataTypes.TEXT,
+    extensions: DataTypes.TEXT,
   }, {
     timestamps: false
   }
@@ -212,7 +210,7 @@ const Media = sequelize.define(
     },
     favorite: {
       type: DataTypes.BOOLEAN,
-      defaultValue: 0
+      defaultValue: false
     },
     bookmark: DataTypes.TEXT,
     views: {
@@ -278,7 +276,7 @@ const Playlists = sequelize.define(
     },
     favorite: {
       type: DataTypes.BOOLEAN,
-      defaultValue: 0
+      defaultValue: false
     },
     views: {
       type: DataTypes.INTEGER,
@@ -348,77 +346,76 @@ const MetaSettings = sequelize.define(
     synonyms: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     hidden: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     nested: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     markers: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     bookmark: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     parser: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     country: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     career: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     scraper: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     rating: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     favorite: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: true,
     },
     chipOutlined: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     chipLabel: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     color: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     imageTypes: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      defaultValue: '["main"]',
+      defaultValue: 'main',
     },
     imageAspectRatio: {
       type: DataTypes.FLOAT,
@@ -496,7 +493,7 @@ const Items = sequelize.define(
     favorite: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     bookmark: DataTypes.TEXT,
     country: DataTypes.TEXT,
@@ -559,9 +556,10 @@ sequelize.sync().then(async ()=>{
   // create media type: videos
   await MediaTypes.findOrCreate({
     where: {
-      type: 'Video',
+      name: 'Video',
     },
     defaults: {
+      icon: 'video-outline',
       extensions: '.mp4'
     }
   })
@@ -590,11 +588,11 @@ const getPagination = (page, size) => {
   return { limit, offset }
 }
 const getPagingData = (data, page, limit) => {
-  const { count: totalMedia, rows: media } = data
+  const { count: totalItems, rows: items } = data
   const currentPage = page ? +page : 0
-  const totalPages = Math.ceil(totalMedia / limit)
+  const totalPages = Math.ceil(totalItems / limit)
 
-  return { totalMedia, media, totalPages, currentPage }
+  return { totalItems, items, totalPages, currentPage }
 }
 
 // REST api
@@ -611,6 +609,26 @@ app.get('/api/media', (req, res) => {
     },
     // include: { all: true }
     include: [VideoMetadata]
+  }).then(data => {
+    const response = getPagingData(data, page, limit)
+    res.status(201).send(response)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+})
+app.get('/api/items', (req, res) => {
+  if(!req.body) return res.sendStatus(400)
+
+  const { page, size, metaId, query } = req.query
+  const { limit, offset } = getPagination(page, size)
+  
+  Items.findAndCountAll({ limit, offset,
+    where: {
+      metaId: metaId,
+      name: { [Op.like]: `%${query}%` },
+    },
   }).then(data => {
     const response = getPagingData(data, page, limit)
     res.status(201).send(response)
@@ -691,12 +709,15 @@ app.post('/api/import', jsonParser, async (req, res) => {
     await Settings.update(req.body.settings, { where: { id: 1 }})
   }).then(async () => { 
     await Meta.bulkCreate(req.body.meta)
+    for (let m of req.body.metaSettings) {
+      const foundMeta = await Meta.findOne({ where: { oldId: m.oldId } })
+      if (foundMeta) await MetaSettings.create({...m, ...{metaId:foundMeta.id}})
+    }
     for (let items of req.body.items) {
       for (let i in items) {
-        const metaId = await Meta.findOne({ where: { oldId: i } })
-        if (metaId === null) continue
-        else {
-          let newItems = items[i].map(it=>({...{metaId:metaId.id}, ...it}))
+        const meta = await Meta.findOne({ where: { oldId: i } })
+        if (meta) {
+          let newItems = items[i].map(it=>({...{metaId:meta.id}, ...it}))
           await Items.bulkCreate(newItems)
         }
       }
@@ -808,6 +829,26 @@ app.get('/api/meta-in-mediatypes', async (req, res) => {
       response.assigned = data
       response.meta = await Meta.findAll()
       res.status(201).send(response)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+})
+app.get('/api/meta', async (req, res) => {
+  Meta.findAll({ include: { model: MetaSettings } })
+    .then(data => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+})
+app.get('/api/mediaTypes', async (req, res) => {
+  MediaTypes.findAll({ raw:true })
+    .then(data => {
+      res.status(201).send(data)
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while performing query."

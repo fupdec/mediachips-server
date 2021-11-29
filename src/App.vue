@@ -9,51 +9,14 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer permanent app mini-variant expand-on-hover clipped>
-      <v-list nav dense>
-        <v-list-item link to="/" color="secondary" draggable="false"> 
-          <v-list-item-icon>
-            <v-icon>mdi-home-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Home</v-list-item-title>
-        </v-list-item>
-        <v-list-item link to="/settings" color="secondary" draggable="false"> 
-          <v-list-item-icon>
-            <v-icon>mdi-cog-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Settings</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <SideBar />
 
     <v-main app>
       <router-view :key="$route.fullPath" />
-
-      <div>Media total: {{totalMedia}}</div>
-      <div class="d-flex justify-space-between align-center pa-2">
-        <div class="d-flex">
-          <v-text-field v-model="queryString" @keyup.enter="getMedia" label="Search in path" outlined dense hide-details/>
-          <v-btn @click="getMedia" height="40" color="primary"> 
-            <v-icon>mdi-magnify</v-icon></v-btn>
-        </div>
-      </div>
-
-      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="5"/>
-
-      <Loading v-show="isQueryRun"/>
-
-      <v-container fluid class="card-grid wide-image videos-selection">
-        <VideoCard v-for="i in media" :key="i.id" :video="i" @openPlayer="openPlayer($event)"/>
-      </v-container>
-
-      <v-pagination v-model="page" @input="getMedia" :length="totalPages-1" total-visible="5"/>
     </v-main>
-
-    <v-dialog v-if="dialogPlayer" v-model="dialogPlayer">
-      <video :src="src" autoplay controls />
-    </v-dialog>
   </v-app>
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -62,31 +25,19 @@ import Playlists from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databas
 import Markers from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases/dbm.json'
 import Meta from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases/meta.json'
 import Settings from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/dbs.json'
-import VideoCard from '@/components/media/video/VideoCard.vue'
-import Loading from '@/components/elements/Loading.vue'
 
 export default {
   name: 'App',
   components: { 
-    VideoCard,
-    Loading,
+    SideBar: () => import('@/components/app/SideBar.vue'),
   },
   mounted() {
     this.$nextTick(() => {
       this.applyTheme()
-      this.getMedia()
     })
   },
   data: () => ({
-    apiUrl: 'http://192.168.1.120.:5555',
-    media: [],
-    totalMedia: 0,
-    totalPages: 0,
-    page: 1,
-    isQueryRun: false,
-    queryString: '',
-    dialogPlayer: false,
-    src: '',
+    apiUrl: 'http://192.168.1.120:5555',
   }),
   computed: {},
   methods: {
@@ -99,34 +50,8 @@ export default {
       this.$vuetify.theme.themes.dark.secondary = '#e98700'
       this.$vuetify.theme.themes.dark.accent = '#7059b7'
     },
-    getMedia() {
-      this.isQueryRun = true
-      let url = `/api/media?type=1&page=${this.page}&size=20&query=${this.queryString}`
-      axios.get(this.apiUrl + url)
-        .then(response => {
-          this.isQueryRun = false
-          this.media = response.data.media
-          this.totalMedia = response.data.totalMedia
-          this.totalPages = response.data.totalPages
-        })
-        .catch(e => {
-          this.isQueryRun = false
-          console.log(e)
-        })
-    },
-    createVideo() {
-      axios.post(this.apiUrl + '/api/db')
-        .then(response => {
-          console.log('Create video')
-          console.log(response.data)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    },
     importData() {
-      this.isQueryRun = true
-      let obj = { meta: [], items: [], videos: [],  videoMetadata: [], playlists: [], markers: [], onlyMeta: [], metaInItems: [], settings: Settings }
+      let obj = { meta: [], metaSettings: [], items: [], videos: [],  videoMetadata: [], playlists: [], markers: [], onlyMeta: [], metaInItems: [], settings: Settings }
       obj.videos = Videos.videos.map(i=>({
         oldId: i.id,
         path: i.path,
@@ -182,6 +107,25 @@ export default {
               name: i.name,
             }))
             obj.items.push({[m.id]: items})
+            obj.metaSettings.push({
+              "oldId": m.id,
+              "hidden": true,
+              "parser": false,
+              "imageAspectRatio": 1,
+              "imageTypes": "main",
+              "chipLabel": false,
+              "chipOutlined": false,
+              "color": false,
+              "favorite": true,
+              "rating": false,
+              "synonyms": false,
+              "bookmark": false,
+              "country": false,
+              "career": false,
+              "scraper": false,
+              "nested": false,
+              "markers": false,
+            })
           }
         } else if (m.type === 'complex') {
           let cm = {
@@ -195,6 +139,12 @@ export default {
             updatedAt: (new Date(m.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
           }
           obj.meta.push(cm)
+          let metaSettings = m.settings
+          delete metaSettings.metaInCard
+          metaSettings.oldId = m.id
+          let imageTypes = metaSettings.imageTypes ? metaSettings.imageTypes.join() : "main"
+          metaSettings.imageTypes = imageTypes
+          obj.metaSettings.push(metaSettings)
           let cards = Meta.cards.filter(card=>card.metaId==m.id).map(i=>({
             oldId: i.id,
             name: i.meta.name,
@@ -221,11 +171,7 @@ export default {
       obj.onlyMeta = Videos.videos.slice(0,100).map(i=>
         Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
       )
-      axios.post(this.apiUrl + '/api/import', obj).then(()=> { this.isQueryRun = false })
-    },
-    openPlayer(e) { 
-      this.dialogPlayer = true
-      this.src = this.apiUrl+'/api/video/'+e 
+      axios.post(this.apiUrl + '/api/import', obj)
     },
   }
 }
@@ -235,12 +181,4 @@ export default {
 <style lang="sass">
   @import '@/assets/styles/app.scss'
   // @import '@/styles/variables.scss'
-</style>
-
-<style lang="scss">
-.card-grid {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-}
 </style>

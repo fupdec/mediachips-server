@@ -3,7 +3,24 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify.js'
 import App from './App.vue'
+import vuescroll from 'vuescroll'
 
+Vue.use(vuescroll, {
+  ops: {
+    rail: {
+      size: '14px',
+      specifyBorderRadius: '0',
+      gutterOfEnds: '0',
+      gutterOfSide: '0',
+    },
+    bar: {
+      background: '#555',
+      opacity: 0.6,
+      minSize: 0.2,
+      size: '14px',
+    }
+  }
+})
 Vue.config.productionTip = false
 
 new Vue({

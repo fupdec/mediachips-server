@@ -129,7 +129,7 @@ export default {
     videoPath() { return this.video.path },
     fileName() { return this.video.path },
     fileExtension() { return this.video.path },
-    isFavorite() { return this.video.favorite === 1 ? true : false },
+    isFavorite() { return this.video.favorite },
     getImg() { return '/images/media/thumbs/' + this.video.oldId + '.jpg' },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
@@ -150,8 +150,8 @@ export default {
     getMeta() {
       let url = `/api/meta-for-media?mediaId=${this.video.id}`
       axios.get(this.apiUrl + url)
-        .then(response => {
-          this.meta = response.data
+        .then(res => {
+          this.meta = res.data
         })
         .catch(e => {
           console.log(e)

@@ -57,7 +57,6 @@ export default {
       axios.get(this.apiUrl + url)
         .then(res => {
           this.isQueryRun = false
-          console.log(res.data)
           this.metaInMediaTypes = res.data.assigned
           this.metaAll = res.data.meta
         })
