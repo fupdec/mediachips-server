@@ -11,7 +11,7 @@
 
         <v-divider v-if="mediaTypes.length>0" class="my-1"/>
 
-        <v-list-item v-for="media in mediaTypes" :key="media.id"
+        <v-list-item v-for="media in mediaTypes" :key="media.name+media.id"
           link exact :to="`/media/?mediaId=${media.id}&tabId=default`" color="secondary" draggable="false">
           <v-list-item-icon>
             <v-icon>mdi-{{media.icon}}</v-icon>
