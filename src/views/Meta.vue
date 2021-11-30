@@ -13,7 +13,7 @@
 
   <Loading v-show="isQueryRun"/>
 
-  <v-container fluid class="card-grid wide-image card-size-1">
+  <v-container fluid class="card-grid card-size-1">
     <ItemCard v-for="i in items" :key="i.id" :item="i" :meta="meta"/>
   </v-container>
 
