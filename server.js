@@ -856,8 +856,25 @@ app.get('/api/mediaTypes', async (req, res) => {
     })
 })
 
+const { networkInterfaces } = require('os')
+const nets = networkInterfaces()
+const results = Object.create(null)
+for (const name of Object.keys(nets)) {
+  for (const net of nets[name]) {
+    if (net.family === 'IPv4' && !net.internal) {
+      if (!results[name]) {
+          results[name] = [];
+      }
+      results[name].push(net.address);
+    }
+  }
+}
+const ip = results.Ethernet[0]
+// const sysinfo = path.join(__dirname, 'src', 'sysinfo.txt')
+// fs.writeFileSync(sysinfo, ip)
+
 // starting server
 const port = 5555
 app.listen(port, () => {
-  console.info(`App started. Open in browser: http://localhost:${port}`);
+  console.info(`App started. Open in browser: http://${ip}:${port}`);
 })

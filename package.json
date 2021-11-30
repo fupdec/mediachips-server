@@ -16,7 +16,7 @@
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
-    "electron": "^15.3.0",
+    "electron": "^16.0.2",
     "express": "^4.17.1",
     "sequelize": "^6.8.0",
     "sqlite3": "^4.2.0",
