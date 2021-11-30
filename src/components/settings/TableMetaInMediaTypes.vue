@@ -5,8 +5,8 @@
         <tr>
           <th class="diagonal">
             <div>
-              <div class="bottom">meta</div>
-              <div class="top">media</div>
+              <div class="bottom">Meta</div>
+              <div class="top">Media</div>
             </div>
           </th>
           <th><span>Videos</span></th>
@@ -16,8 +16,13 @@
       <tbody>
         <tr v-for="i of metaAll" :key="i.id">
           <td>
-            <v-icon left>mdi-{{i.icon}}</v-icon>
-            {{i.name}}
+            <div class="d-flex justify-space-between align-center">
+              <span>
+                <v-icon left>mdi-{{i.icon}}</v-icon>
+                {{i.name}}
+              </span>
+              <v-icon left :title="i.dataType">mdi-{{getIcon(i.dataType)}}</v-icon>
+            </div>
           </td>
           <th>
             <v-icon v-if="isMetaAssigned(i.id)" color="success">mdi-checkbox-marked-circle</v-icon>
@@ -68,6 +73,16 @@ export default {
     isMetaAssigned(metaId) {
       let assigned = this.metaInMediaTypes.map(i=>i['Meta.id'])
       return assigned.includes(metaId)
+    },
+    getIcon(type) {
+      if (type === 'string') return 'alphabetical'
+      if (type === 'date') return 'calendar'
+      if (type === 'number') return 'numeric'
+      if (type === 'array') return 'code-array'
+      if (type === 'boolean') return 'toggle-switch'
+      if (type === 'rating') return 'star'
+      if (type === 'cards') return 'card-bulleted'
+      return 'shape'
     },
   }
 }
