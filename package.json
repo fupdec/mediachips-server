@@ -6,20 +6,18 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "server": "nodemon --watch server.js server.js",
-    "electron": "electron ./electron.js",
-    "pkg": "pkg -t win package.json"
+    "electron": "electron ."
   },
-  "main": "server.js",
+  "main": "main.js",
   "dependencies": {
     "@mdi/font": "^6.4.95",
     "axios": "^0.24.0",
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
-    "electron": "^16.0.2",
+    "electron": "^16.0.3",
     "express": "^4.17.1",
-    "sequelize": "^6.8.0",
-    "sqlite3": "^4.2.0",
+    "sequelize": "^6.11.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
     "vuescroll": "^4.17.3",
@@ -31,20 +29,16 @@
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
+    "electron-builder": "^22.14.5",
     "nodemon": "^2.0.15",
     "sass": "~1.32",
     "sass-loader": "^8.0.2",
+    "sqlite3": "^5.0.2",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not dead"
-  ],
-  "bin": "server.js",
-  "pkg": {
-    "assets": [
-      "/dist/**/*"
-    ]
-  }
+  ]
 }
