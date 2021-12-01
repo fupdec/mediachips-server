@@ -17,14 +17,21 @@
         </v-btn>
       </v-responsive>
       <!-- <div>ItemID: {{item.id}}</div> -->
-      <div class="caption" v-html="item.name"/>
-      
+      <div> {{item.name}}
+        <v-chip outlined>
+          <v-icon class="mr-1">mdi-video-outline</v-icon> {{numberOfMedia}}
+        </v-chip>
+        <v-chip outlined>
+          <v-icon class="mr-1">mdi-eye-outline</v-icon> {{item.views}}
+        </v-chip>
+      </div>  
       <v-icon v-if="item.bookmark" class="bookmark" color="red" :title="item.bookmark">mdi-bookmark</v-icon>
     </v-card>
   </v-lazy>
 </template>
 
 <script>
+import axios from 'axios'
 
 export default {
   name: 'ItemCard',
@@ -34,18 +41,28 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
+      this.countMediaInItem()
     })
   },
-  destroyed() {
-  },
   data: () => ({
+    apiUrl: 'http://192.168.1.120:5555',
+    numberOfMedia: 0,
   }),
   computed: {
     isFavorite() { return this.item.favorite },
     getImg() { return '/images/meta/' + this.meta.oldId + '/' + this.item.oldId + '_main.jpg' },
   },
   methods: {
-    // TODO create function for count number of media with this item
+    countMediaInItem() {
+      let url = `/api/count-media-in-item?typeId=1&itemId=${this.item.id}`
+      axios.get(this.apiUrl + url)
+        .then(res => {
+          this.numberOfMedia = res.data.count
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
   },
   watch: {
   }

@@ -855,6 +855,24 @@ app.get('/api/mediaTypes', async (req, res) => {
       })
     })
 })
+app.get('/api/count-media-in-item', (req, res) => {
+  Media.count({ 
+    where: { 
+      typeId: req.query.typeId,
+    }, 
+    include: [{
+      model: ItemsInMedia, 
+      where: { itemId: req.query.itemId },
+      required: true
+    }]
+  }).then(number => {
+    res.status(201).send({count: number})
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+})
 
 const { networkInterfaces } = require('os')
 const nets = networkInterfaces()
@@ -862,10 +880,8 @@ const results = Object.create(null)
 for (const name of Object.keys(nets)) {
   for (const net of nets[name]) {
     if (net.family === 'IPv4' && !net.internal) {
-      if (!results[name]) {
-          results[name] = [];
-      }
-      results[name].push(net.address);
+      if (!results[name]) results[name] = []
+      results[name].push(net.address)
     }
   }
 }
