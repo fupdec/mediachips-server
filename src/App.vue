@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dense clipped-left extension-height="28">
-      <img src="../public/icon.png" width="32" class="mx-3">
+      <img src="../public/icons/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
@@ -26,7 +26,7 @@ import Markers from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases
 import Meta from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases/meta.json'
 import Settings from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/dbs.json'
 
-const {sysinfo} = require('../sysinfo.js')
+const config = require('../config.json')
 
 export default {
   name: 'App',
@@ -34,7 +34,7 @@ export default {
     SideBar: () => import('@/components/app/SideBar.vue'),
   },
   beforeMount() {
-    this.$store.state.localhost = `http://${sysinfo.ip}:${sysinfo.port}`
+    this.$store.state.localhost = `http://${config.ip}:${config.port}`
   },
   mounted() {
     this.$nextTick(() => {
