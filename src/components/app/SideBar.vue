@@ -75,7 +75,6 @@ export default {
     })
   },
   data: () => ({
-    apiUrl: 'http://192.168.1.120.:5555',
     ops: {
       scrollPanel: { scrollingX: false },
       rail: { size: '4px', }
@@ -85,7 +84,9 @@ export default {
     hiddenMetaList: [],
     showHidden: false,
   }),
-  computed: {},
+  computed: {
+    apiUrl() { return this.$store.state.localhost },
+  },
   methods: {
     getMediaList() {
       axios.get(this.apiUrl + '/api/mediaTypes')

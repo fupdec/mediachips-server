@@ -886,11 +886,12 @@ for (const name of Object.keys(nets)) {
   }
 }
 const ip = results.Ethernet[0]
-// const sysinfo = path.join(__dirname, 'src', 'sysinfo.txt')
-// fs.writeFileSync(sysinfo, ip)
+const sysInfoPath = path.join(__dirname, 'sysinfo.js')
+const sysInfo = { ip, port: '5555' }
+
+fs.writeFileSync(sysInfoPath, 'const sysinfo=' + JSON.stringify(sysInfo) + ';export {sysinfo};')
 
 // starting server
-const port = 5555
-app.listen(port, () => {
-  console.info(`App started. Open in browser: http://${ip}:${port}`);
+app.listen(sysInfo.port, () => {
+  console.info(`App started. Open in browser: http://${sysInfo.ip}:${sysInfo.port}`);
 })

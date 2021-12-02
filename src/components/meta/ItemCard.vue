@@ -45,10 +45,10 @@ export default {
     })
   },
   data: () => ({
-    apiUrl: 'http://192.168.1.120:5555',
     numberOfMedia: 0,
   }),
   computed: {
+    apiUrl() { return this.$store.state.localhost },
     isFavorite() { return this.item.favorite },
     getImg() { return '/images/meta/' + this.meta.oldId + '/' + this.item.oldId + '_main.jpg' },
   },

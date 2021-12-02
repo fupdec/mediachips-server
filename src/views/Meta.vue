@@ -40,7 +40,6 @@ export default {
     })
   },
   data: ()=>({
-    apiUrl: 'http://192.168.1.120.:5555',
     meta: null,
     items: [],
     totalItems: 0,
@@ -52,6 +51,7 @@ export default {
     src: '',
   }),
   computed: {
+    apiUrl() { return this.$store.state.localhost },
   },
   methods: {
     async getMeta() {

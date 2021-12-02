@@ -26,10 +26,15 @@ import Markers from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases
 import Meta from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/databases/meta.json'
 import Settings from 'C:/Users/vit/AppData/Roaming/mediaChips/userfiles/dbs.json'
 
+const {sysinfo} = require('../sysinfo.js')
+
 export default {
   name: 'App',
   components: { 
     SideBar: () => import('@/components/app/SideBar.vue'),
+  },
+  beforeMount() {
+    this.$store.state.localhost = `http://${sysinfo.ip}:${sysinfo.port}`
   },
   mounted() {
     this.$nextTick(() => {
@@ -37,7 +42,6 @@ export default {
     })
   },
   data: () => ({
-    apiUrl: 'http://192.168.1.120:5555',
   }),
   computed: {},
   methods: {
@@ -171,7 +175,7 @@ export default {
       obj.onlyMeta = Videos.videos.slice(0,100).map(i=>
         Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
       )
-      axios.post(this.apiUrl + '/api/import', obj)
+      axios.post(this.$store.state.localhost + '/api/import', obj)
     },
   }
 }

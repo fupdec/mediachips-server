@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: () => ({
+    localhost: 'http://localhost:5555',
     scan: {
       folders: [],
       files: [],

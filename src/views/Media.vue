@@ -43,7 +43,6 @@ export default {
     })
   },
   data: ()=>({
-    apiUrl: 'http://192.168.1.120.:5555',
     media: [],
     totalMedia: 0,
     totalPages: 0,
@@ -54,6 +53,7 @@ export default {
     src: '',
   }),
   computed: {
+    apiUrl() { return this.$store.state.localhost },
   },
   methods: {
     getMedia() {

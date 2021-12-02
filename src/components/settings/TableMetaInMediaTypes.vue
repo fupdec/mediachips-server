@@ -50,11 +50,12 @@ export default {
     })
   },
   data: () => ({
-    apiUrl: 'http://192.168.1.120.:5555',
     metaInMediaTypes: [],
     metaAll: [],
   }),
-  computed: {},
+  computed: {
+    apiUrl() { return this.$store.state.localhost },
+  },
   methods: {
     getMetaInMediaTypes() {
       this.isQueryRun = true
