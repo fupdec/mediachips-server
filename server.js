@@ -25,9 +25,9 @@ const sequelize = new Sequelize({
 
 try {
   sequelize.authenticate()
-  console.log('DB connected')
+  console.log('\x1b[36m%s\x1b[0m','Sequelize successfully connected')
 } catch (e) {
-  console.log('DB connection error: ', e)
+  console.log('\x1b[31m%s\x1b[0m','Sequelize connection error: ', e)
 }
 
 const Settings = sequelize.define(
@@ -874,6 +874,20 @@ app.get('/api/count-media-in-item', (req, res) => {
   })
 })
 
+
+// creating default config
+const configPath = './config.json'
+let defaultConfig = {
+  port: 5555
+}
+try {
+  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), { flag: 'wx' })
+} catch(e) {
+  if (e.code == 'EEXIST') console.log('\x1b[33m%s\x1b[0m', 'Server configuration loaded')
+  else console.log('\x1b[31m%s\x1b[0m', e)
+}
+
+// getting IP of localhost
 const { networkInterfaces } = require('os')
 const nets = networkInterfaces()
 const results = Object.create(null)
@@ -886,12 +900,15 @@ for (const name of Object.keys(nets)) {
   }
 }
 const ip = results.Ethernet[0]
-const sysInfoPath = path.join(__dirname, 'sysinfo.js')
-const sysInfo = { ip, port: '5555' }
+let config = require(configPath)
+config.ip = ip
 
-fs.writeFileSync(sysInfoPath, 'const sysinfo=' + JSON.stringify(sysInfo) + ';export {sysinfo};')
+fs.writeFileSync(configPath, JSON.stringify(config, null, 2), function writeJSON(err) {
+  if (err) return console.log(err)
+})
+
 
 // starting server
-app.listen(sysInfo.port, () => {
-  console.info(`App started. Open in browser: http://${sysInfo.ip}:${sysInfo.port}`);
+app.listen(config.port, () => {
+  console.info('\x1b[7m%s\x1b[0m', `App started. Open in browser: http://${ip}:${config.port}`);
 })

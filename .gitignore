@@ -4,7 +4,7 @@ node_modules
 /public/images
 server.log
 db.sqlite
-/sysinfo.js
+/config.json
 .project
 db.vuerd.json
 
