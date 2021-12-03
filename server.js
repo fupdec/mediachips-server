@@ -873,6 +873,9 @@ app.get('/api/count-media-in-item', (req, res) => {
     })
   })
 })
+app.post('/api/get-file', jsonParser, (req, res) => {
+  res.sendFile(req.body.url, {root:__dirname})
+})
 
 
 // creating default config

@@ -17,7 +17,7 @@
     <ItemCard v-for="i in items" :key="i.id" :item="i" :meta="meta"/>
   </v-container>
 
-  <v-pagination v-model="page" @input="getItems" :length="totalPages" total-visible="5"/>
+  <v-pagination v-model="page" @input="getItems" :length="totalPages" total-visible="5" class="pb-10"/>
 </vuescroll>
 </template>
 

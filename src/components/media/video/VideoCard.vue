@@ -3,7 +3,7 @@
     <v-card @click="openPlayer" v-ripple="{ class: 'accent--text' }" :class="{favorite: isFavorite}" outlined hover
       class="video-card meta-card">
       <v-responsive>
-        <v-img :src="getImg" :aspect-ratio="16/9"/>
+        <v-img :src="thumb" :aspect-ratio="16/9"/>
         <v-rating  
           :value="video.rating" @input="changeRating($event, video.id)"
           class="rating rating-wrapper"
@@ -91,6 +91,8 @@
 
 <script>
 import axios from 'axios'
+
+const path = require('path')
 // const { dialog } = require('electron').remote
 // const { clipboard } = require('electron')
 // const shell = require('electron').shell
@@ -107,7 +109,7 @@ import axios from 'axios'
 // import MetaGetters from '@/mixins/MetaGetters'
 // const express = require("express")
 // const app = express()
-
+// TODO rename videocard to video item
 export default {
   name: 'VideoCard',
   props: {
@@ -117,12 +119,14 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.getMeta()
+      this.getImg()
     })
   },
   destroyed() {
   },
   data: () => ({
     meta: [],
+    thumb: null,
   }),
   computed: {
     apiUrl() { return this.$store.state.localhost },
@@ -130,7 +134,6 @@ export default {
     fileName() { return this.video.path },
     fileExtension() { return this.video.path },
     isFavorite() { return this.video.favorite },
-    getImg() { return '/images/media/thumbs/' + this.video.oldId + '.jpg' },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
     // visibility() { return this.$store.state.Settings.videoVisibility },
@@ -144,6 +147,24 @@ export default {
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
+    getImg() { 
+      let url = `/api/get-file`
+      let imgPath = path.join(__dirname, '/userfiles/media/thumbs/', this.video.oldId + '.jpg') 
+      axios({
+        method: 'post',
+        url: this.apiUrl + url,
+        responseType: 'blob',
+        data: {
+          url: imgPath,
+        }
+      })
+        .then(res => {
+          this.thumb = URL.createObjectURL(res.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
     // mountSrc() {
     //   this.$refs.video.src = this.video.path 
     // },

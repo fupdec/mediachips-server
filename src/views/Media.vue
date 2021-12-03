@@ -17,7 +17,7 @@
     <VideoCard v-for="i in media" :key="i.id" :video="i" @openPlayer="openPlayer($event)"/>
   </v-container>
 
-  <v-pagination v-model="page" @input="getMedia" :length="totalPages" total-visible="5"/>
+  <v-pagination v-model="page" @input="getMedia" :length="totalPages" total-visible="5" class="pb-10"/>
 
   <v-dialog v-if="dialogPlayer" v-model="dialogPlayer">
     <video :src="src" autoplay controls />
