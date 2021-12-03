@@ -162,6 +162,7 @@ export default {
           this.thumb = URL.createObjectURL(res.data)
         })
         .catch(e => {
+          this.thumb = path.join(__dirname, '/images/ghost.png') 
           console.log(e)
         })
     },

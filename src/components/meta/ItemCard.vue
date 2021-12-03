@@ -71,6 +71,7 @@ export default {
           this.imgMain = URL.createObjectURL(res.data)
         })
         .catch(e => {
+          this.imgMain = path.join(__dirname, '/images/ghost.png') 
           console.log(e)
         })
     },
