@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="isPlayerActive" eager @input="closePlayer">
-    <div ref="player" class="player" :class="{fullscreen}"
+    <div ref="player" class="player" :class="{fullscreen}" id="player"
       @mousedown="stopSmoothScroll($event)" @mousemove="moveOverPlayer">
       <div class="player-wrapper">
         <div class="canvas-wrapper"
@@ -21,13 +21,13 @@
               @start="startSeeking($event)" @end="seek($event)" @mousedown="handleMouseSeek($event)"/>
           </v-card-actions>
           <v-card-actions class="buttons pa-1">
-            <v-btn-toggle class="remove-active">
+            <v-btn-toggle class="remove-active compact">
               <v-btn @click="paused?play():pause()" small class="ml-1" :title="paused?'Play':'Pause'">
                 <v-icon v-if="paused">mdi-play</v-icon>
                 <v-icon v-else>mdi-pause</v-icon>
               </v-btn>
             </v-btn-toggle>
-            <v-btn-toggle class="mx-2 remove-active">
+            <v-btn-toggle class="mx-2 remove-active compact">
               <v-btn @click="prev" small :disabled="isPrevDisabled" title="Previous Video">
                 <v-icon>mdi-skip-previous</v-icon>
               </v-btn>
@@ -38,24 +38,27 @@
                 <v-icon>mdi-skip-next</v-icon>
               </v-btn>
             </v-btn-toggle>
-            <v-btn-toggle class="remove-active">
+            <v-btn-toggle class="remove-active compact">
               <v-btn @click="toggleFullscreen" small :title="fullscreen?'Exit Fullscreen':'Fullscreen'">
                 <v-icon v-if="fullscreen">mdi-fullscreen-exit</v-icon>
                 <v-icon v-else>mdi-fullscreen</v-icon>
               </v-btn>
+              <v-btn @click="togglePictureInPicture" small title="Picture-in-Picture Mode">
+                <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
+              </v-btn>
             </v-btn-toggle>
             <v-btn-toggle class="ml-4 remove-active compact">
               <v-btn @click="jumpToSeconds(-5)" small title="- 5 seconds">
-                <v-icon>mdi-step-backward-2</v-icon>
+                <v-icon small>mdi-step-backward-2</v-icon>
               </v-btn>
               <v-btn @click="jumpToSeconds(-2)" small title="- 2 seconds">
-                <v-icon>mdi-step-backward</v-icon>
+                <v-icon small>mdi-step-backward</v-icon>
               </v-btn>
               <v-btn @click="jumpToSeconds(2)" small title="+ 2 seconds">
-                <v-icon>mdi-step-forward</v-icon>
+                <v-icon small>mdi-step-forward</v-icon>
               </v-btn>
               <v-btn @click="jumpToSeconds(5)" small title="+ 5 seconds">
-                <v-icon>mdi-step-forward-2</v-icon>
+                <v-icon small>mdi-step-forward-2</v-icon>
               </v-btn>
             </v-btn-toggle>
             <v-spacer></v-spacer>
@@ -204,10 +207,17 @@ export default {
       return hms.startsWith("00") ? hms.substr(1) : hms;
     },
     toggleFullscreen() {
-      this.$emit("toggleFullscreen")
+      if (this.fullscreen) document.exitFullscreen()
+      else document.getElementById('player').requestFullscreen()
+      this.fullscreen = !this.fullscreen
       setTimeout(() => { this.getCanvasSizes() }, 100)
       setTimeout(() => { this.getCanvasSizes() }, 500)
       setTimeout(() => { this.getCanvasSizes() }, 1000)
+    },
+    async togglePictureInPicture() {
+      if (this.player !== document.pictureInPictureElement) {
+        await this.player.requestPictureInPicture()
+      } else await document.exitPictureInPicture()
     },
     setAsThumb() {
       let video = this.videos[this.playIndex]
@@ -551,6 +561,7 @@ export default {
     display: flex;
   }
   .volume {
+    min-width: 60px;
     max-width: 100px;
     .v-input__prepend-outer {
       margin-right: 0;
