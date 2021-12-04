@@ -17,14 +17,14 @@
         > <v-icon :color="isFavorite===false?'grey':'pink'">mdi-heart-outline</v-icon>
         </v-btn>
         
-        <div class="duration">{{calcDur(video.VideoMetadata.duration)}}</div>
+        <div class="duration">{{duration}}</div>
 
         <div label outlined class="resolution">
-          <div class="text text-no-wrap" :class="video.VideoMetadata.height">
-            HD
+          <div class="text text-no-wrap" :class="quality.toLowerCase()">
+            {{quality}}
           </div>
           <div class="value">
-            <span>{{video.VideoMetadata.height}}</span>
+            <span>{{height}}</span>
           </div>
         </div>
         
@@ -45,7 +45,7 @@
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-harddisk</v-icon>
-          {{calcSize(video.filesize)}}
+          {{filesize}}
         </div>
       </v-chip>
 
@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 
 const path = require('path')
@@ -114,6 +115,7 @@ export default {
   name: 'VideoCard',
   props: {
     video: Object,
+    media: Array,
   },
   // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
   mounted() {
@@ -130,6 +132,10 @@ export default {
   }),
   computed: {
     apiUrl() { return this.$store.state.localhost },
+    quality() { return Vue.getReadableVideoQuality(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
+    height() { return Vue.getReadableVideoHeight(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
+    filesize() { return Vue.getReadableFileSize(this.video.filesize) },
+    duration() { return Vue.getReadableDuration(this.video.VideoMetadata.duration) },
     videoPath() { return this.video.path },
     fileName() { return this.video.path },
     fileExtension() { return this.video.path },
@@ -147,24 +153,24 @@ export default {
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
-    getImg() { 
-      let url = `/api/get-file`
+    async getImg() { 
       let imgPath = path.join(__dirname, '/userfiles/media/thumbs/', this.video.oldId + '.jpg') 
-      axios({
-        method: 'post',
-        url: this.apiUrl + url,
-        responseType: 'blob',
-        data: {
-          url: imgPath,
-        }
-      })
-        .then(res => {
-          this.thumb = URL.createObjectURL(res.data)
-        })
-        .catch(e => {
-          this.thumb = path.join(__dirname, '/images/ghost.png') 
-          console.log(e)
-        })
+      this.thumb = await Vue.prototype.$getLocalImage(imgPath)
+      // axios({
+      //   method: 'post',
+      //   url: this.apiUrl + url,
+      //   responseType: 'blob',
+      //   data: {
+      //     url: imgPath,
+      //   }
+      // })
+      //   .then(res => {
+      //     this.thumb = URL.createObjectURL(res.data)
+      //   })
+      //   .catch(e => {
+      //     this.thumb = path.join(__dirname, '/images/ghost.png') 
+      //     console.log(e)
+      //   })
     },
     // mountSrc() {
     //   this.$refs.video.src = this.video.path 
@@ -180,28 +186,8 @@ export default {
         })
     },
     openPlayer() {
-      this.$store.state.isPlayerActive = true
-      this.$root.$emit('playVideo', this.video )
-    },
-    calcSize(size) {
-      if (size > 1000000000000) size = (size/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'
-      else if (size > 1000000000) size = (size/1024/1024/1024-0.01).toFixed(2) + ' GB'
-      else if (size > 1000000) size = (size/1024/1024-0.01).toFixed(0) + ' MB'
-      else if (size > 1000) size = (size/1024-0.01).toFixed(0) + ' KB'
-      else size += ' B'
-      return size
-    },
-    calcDur(duration) {
-      let sec = Math.floor(duration);
-      let h = sec / 3600 ^ 0 
-      let m = (sec - h * 3600) / 60 ^ 0 
-      let s = sec - h * 3600 - m * 60 
-      h = h < 10 ? "0" + h + ":" : h
-      if (h === "00:") h = ""
-      m = m < 10 ? "0" + m : m
-      s = s < 10 ? "0" + s : s
-      let total = h + m + ":" + s
-      return total
+      this.$store.state.player.active = true
+      this.$root.$emit('playVideo', this.video, this.media )
     },
   },
   watch: {

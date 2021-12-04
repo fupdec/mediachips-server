@@ -46,7 +46,7 @@ export default {
   data: () => ({
   }),
   computed: {
-    isPlayerActive() { return this.$store.state.isPlayerActive },
+    isPlayerActive() { return this.$store.state.player.active },
   },
   methods: {
     applyTheme() {

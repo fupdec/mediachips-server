@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="isPlayerActive" eager @input="closePlayer">
+  <v-dialog :value="isPlayerActive" @input="closePlayer" eager>
     <div ref="player" class="player" :class="{fullscreen}" id="player"
       @mousedown="stopSmoothScroll($event)" @mousemove="moveOverPlayer">
       <div class="player-wrapper">
@@ -47,7 +47,7 @@
                 <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
               </v-btn>
             </v-btn-toggle>
-            <v-btn-toggle class="ml-4 remove-active compact">
+            <v-btn-toggle class="mx-4 remove-active compact">
               <v-btn @click="jumpToSeconds(-5)" small title="- 5 seconds">
                 <v-icon small>mdi-step-backward-2</v-icon>
               </v-btn>
@@ -61,6 +61,11 @@
                 <v-icon small>mdi-step-forward-2</v-icon>
               </v-btn>
             </v-btn-toggle>
+            <v-btn-toggle class="remove-active compact">
+              <v-btn @click="togglePlaylist" :color="isPlaylistVisible?'primary':''" small title="Playlist">
+                <v-icon>mdi-format-list-bulleted</v-icon>
+              </v-btn>
+            </v-btn-toggle>
             <v-spacer></v-spacer>
             <div class="duration mx-2">
               <div class="time-start">{{ msToTime(currentTime * 1000) }}</div>
@@ -72,6 +77,7 @@
           </v-card-actions>
         </v-card>
       </div>
+      <Playlist :videos="videos" @play="playFromPlaylist($event)"/>
     </div>
   </v-dialog>
 </template>
@@ -86,6 +92,7 @@ import vuescroll from 'vuescroll'
 export default {
   name: "Player",
   components: {
+    Playlist: () => import('@/components/app/player/Playlist.vue'),
     vuescroll,
   },
   mounted() {
@@ -94,7 +101,8 @@ export default {
     document.addEventListener("mousemove", this.controlsMove, false)
     document.addEventListener("mouseup", this.controlsUp, false)
     window.addEventListener('resize', this.getCanvasSizes)
-    this.$root.$on('playVideo', video => {
+    this.$root.$on('playVideo', (video, videos) => {
+      this.videos = videos.map(i=>({...i,...{thumb:path.join(__dirname, '/images/ghost.png')}}))
       this.videoMetadata = video
       let id = video.id
       this.loadSrc(this.apiUrl+'/api/video/'+ id)
@@ -111,6 +119,7 @@ export default {
     statusText: '',
     statusTextTimeout: null,
     videoMetadata: null,
+    videos: [],
     // video properties 
     duration: 1,
     volume: 1,
@@ -134,13 +143,29 @@ export default {
       if (this.volume > 0.3) return 'mdi-volume-medium'
       return 'mdi-volume-low'
     },
-    isPlayerActive() { return this.$store.state.isPlayerActive },
+    isPlayerActive: {
+      get() { return this.$store.state.player.active },
+      set(value) { this.$store.state.player.active = value },
+    },
+    isPlaylistVisible: {
+      get() { return this.$store.state.player.playlist },
+      set(value) { this.$store.state.player.playlist = value },
+    },
+    nowPlaying: {
+      get() { return this.$store.state.player.nowPlaying },
+      set(value) { this.$store.state.player.nowPlaying = value },
+    },
   },
   methods: {
     closePlayer() {
       this.player.src = null
       this.currentTime = 0
-      this.$store.state.isPlayerActive = false
+      this.isPlayerActive = false
+    },
+    playFromPlaylist(video) {
+      this.videoMetadata = video
+      let id = video.id
+      this.loadSrc(this.apiUrl+'/api/video/'+ id)
     },
     initPlayer() {
       this.player.addEventListener('loadedmetadata', () => { 
@@ -150,8 +175,8 @@ export default {
       //   if (this.playlistMode.includes('autoplay')) this.next()
       // })
       // this.player.addEventListener('error', (event) => {
-      //   this.$emit("nowPlaying", _.cloneDeep(this.videos[this.playIndex]))
-      //   if (fs.existsSync(this.videos[this.playIndex].path)) {
+      //   this.$emit("nowPlaying", _.cloneDeep(this.videos[this.nowPlaying]))
+      //   if (fs.existsSync(this.videos[this.nowPlaying].path)) {
       //     this.isVideoFormatNotSupported = true
       //     this.isVideoNotExist = false
       //   } else {
@@ -164,18 +189,17 @@ export default {
       this.player.src = src
       this.trackCurrentTime()
       clearTimeout(this.statusTextTimeout)
-      console.log(this.videoMetadata)
-      this.statusText = this.videoMetadata.path
+      this.statusText = this.videoMetadata.path.replace(/^.*[\\\/]/, '')
       return
-      this.statusText = `${this.playIndex+1}. ${this.getFileNameFromPath(this.videos[this.playIndex].path)}`
+      this.statusText = `${this.nowPlaying+1}. ${this.getFileNameFromPath(this.videos[this.nowPlaying].path)}`
       this.statusTextTimeout = setTimeout(() => {this.statusText = ''}, 3000)
-      this.$emit("nowPlaying", _.cloneDeep(this.videos[this.playIndex]))
+      this.$emit("nowPlaying", _.cloneDeep(this.videos[this.nowPlaying]))
       this.isVideoFormatNotSupported = false
       this.isVideoNotExist = false
       this.duration = this.player.duration
       this.trackCurrentTime()
       this.getMarkers()
-      if (!this.reg && this.playIndex>4) this.player.src = ''
+      if (!this.reg && this.nowPlaying>4) this.player.src = ''
     },
     getCanvasSizes() {
       let windowWidth = document.documentElement.clientWidth
@@ -190,8 +214,8 @@ export default {
     },
     updateVideoPlayer(data) {
       this.videos = data.videos
-      this.playIndex = _.findIndex(data.videos, {id: data.id})
-      this.player.src = path.join('file://', this.videos[this.playIndex].path)
+      this.nowPlaying = _.findIndex(data.videos, {id: data.id})
+      this.player.src = path.join('file://', this.videos[this.nowPlaying].path)
       this.player.play()
     }, 
     moveOverPlayer(e) {
@@ -220,7 +244,7 @@ export default {
       } else await document.exitPictureInPicture()
     },
     setAsThumb() {
-      let video = this.videos[this.playIndex]
+      let video = this.videos[this.nowPlaying]
       let imgPath = path.join(this.pathToUserData, `/media/thumbs/${video.id}.jpg`)
       let specificTime = new Date(this.currentTime*1000).toISOString().substr(11, 8)
       this.createMarkerThumb(specificTime, video.path, imgPath, 320)
@@ -232,7 +256,7 @@ export default {
       if (this.duration > 200) timeout = 1000
       this.currentTimeTracker = setInterval(() => {this.currentTime = this.player.currentTime}, timeout)
     },
-    playVideoInSystemPlayer() { shell.openPath(this.videos[this.playIndex].path) },
+    playVideoInSystemPlayer() { shell.openPath(this.videos[this.nowPlaying].path) },
     playVideo(video) {
       this.player.src = video.path
       this.player.play()
@@ -263,17 +287,17 @@ export default {
       let isLoopMode = this.playlistMode.includes('loop')
 
       if (this.playlistMode.includes('shuffle')) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.playIndex)
+        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying)
         shuffleIndex = shuffleIndex - 1
         if (isLoopMode && shuffleIndex < 0) shuffleIndex = this.videos.length-1 // if loop mode
-        this.playIndex = this.playlistShuffle[shuffleIndex]
+        this.nowPlaying = this.playlistShuffle[shuffleIndex]
       } else {
-        this.playIndex = this.playIndex - 1
-        if (isLoopMode && this.playIndex < 0) this.playIndex = this.videos.length-1 // if loop
+        this.nowPlaying = this.nowPlaying - 1
+        if (isLoopMode && this.nowPlaying < 0) this.nowPlaying = this.videos.length-1 // if loop
       }
-      this.playVideo(this.videos[this.playIndex])
+      this.playVideo(this.videos[this.nowPlaying])
       if (!this.isPlaylistVisible) return // scroll to now playing in playlist
-      const height = `${this.playIndex * document.documentElement.clientWidth / 10}`
+      const height = `${this.nowPlaying * document.documentElement.clientWidth / 10}`
       this.$refs.playlist.scrollTo({ y: height }, 50)
     },
     next() {
@@ -281,18 +305,18 @@ export default {
       let isLoopMode = this.playlistMode.includes('loop')
 
       if (this.playlistMode.includes('shuffle')) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.playIndex)
+        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying)
         shuffleIndex = shuffleIndex + 1
         if (isLoopMode && shuffleIndex == this.videos.length) shuffleIndex = 0 // if loop mode
-        this.playIndex = this.playlistShuffle[shuffleIndex]
+        this.nowPlaying = this.playlistShuffle[shuffleIndex]
       } else {
-        this.playIndex = this.playIndex + 1
-        if (isLoopMode && this.playIndex > this.videos.length-1) this.playIndex = 0 // if loop mode
+        this.nowPlaying = this.nowPlaying + 1
+        if (isLoopMode && this.nowPlaying > this.videos.length-1) this.nowPlaying = 0 // if loop mode
       }
-      this.playVideo(this.videos[this.playIndex])
+      this.playVideo(this.videos[this.nowPlaying])
 
       if (!this.isPlaylistVisible) return  // scroll to now playing in playlist
-      const height = `${this.playIndex * document.documentElement.clientWidth / 10}`
+      const height = `${this.nowPlaying * document.documentElement.clientWidth / 10}`
       this.$refs.playlist.scrollTo({ y: height }, 50)
     },
     startSeeking(e) {
@@ -394,6 +418,13 @@ export default {
         case 3: this.jumpToPrevMarker(); break
         case 4: this.jumpToNextMarker(); break
       }
+    },
+    togglePlaylist() {
+      this.isPlaylistVisible=!this.isPlaylistVisible
+      setTimeout(() => { this.getCanvasSizes() }, 100)
+      if (!this.isPlaylistVisible) return
+      // const height = `${this.nowPlaying * document.documentElement.clientWidth / 10}`
+      // this.$refs.playlist.scrollTo({ y: height }, 50)
     },
   },
   watch: {
@@ -591,78 +622,6 @@ export default {
   .v-slider__thumb:before,
   .v-slider__thumb:after {
     display: none;
-  }
-}
-.playlist-wrapper {
-  min-width: 18vw;
-  box-shadow: none !important;
-  .items {
-    height: calc(100vh - 116px) !important;
-  }
-  .v-card__title {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-  }
-  .video-item {
-    position: relative;
-    overflow: hidden;
-    height: 10vw;
-  }
-  .video-name {
-    font-size: 1vw;
-    line-height: 1.2;
-    word-break: keep-all;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    overflow: hidden;
-    .path {
-      padding-left: 4px;
-      position: absolute;
-    }
-  }
-  .play-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    line-height: 1;
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    z-index: 1;
-    &::before {
-      content: '';
-      position: absolute;
-      background-color: currentColor;
-      width: 100%;
-      height: 100%;
-      border-radius: 50px;
-      filter: invert(1);
-      z-index: -1;
-    }
-    .text {
-      font-size: 1vw;
-    }
-  }
-  .thumb {
-    position: absolute;
-    min-height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), transparent);
-  }
-  .toggle {
-    width: 100%;
-    .v-btn {
-      min-width: 30px;
-      width: 33.33%;
-      padding: 0;
-    }
   }
 }
 .markers-wrapper {

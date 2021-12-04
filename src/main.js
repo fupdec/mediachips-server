@@ -3,6 +3,7 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify.js'
 import Readable from './plugins/readable.js'
+import ApiCalls from './plugins/api-calls.js'
 import App from './App.vue'
 import vuescroll from 'vuescroll'
 
@@ -25,6 +26,7 @@ Vue.use(vuescroll, {
 Vue.config.productionTip = false
 
 Vue.use(Readable)
+Vue.use(ApiCalls, { store })
 
 new Vue({
   router,

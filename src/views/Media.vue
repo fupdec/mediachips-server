@@ -14,7 +14,7 @@
   <Loading v-show="isQueryRun"/>
 
   <v-container fluid class="card-grid wide-image videos-selection">
-    <VideoCard v-for="i in media" :key="i.id" :video="i"/>
+    <VideoCard v-for="i in media" :key="i.id" :video="i" :media="media"/>
   </v-container>
 
   <v-pagination v-model="page" @input="getMedia" :length="totalPages" total-visible="5" class="pb-10"/>

@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 
 const path = require('path')
@@ -60,29 +61,16 @@ export default {
     isFavorite() { return this.item.favorite },
   },
   methods: {
-    getImages() {
+    async getImages() {
       const imageTypes = ['main','alt','custom1','custom2']
       const settings = this.meta.MetaSetting.imageTypes
       for (let i of imageTypes) {
-        if (settings.includes(i)) this.getImg(i)
+        if (!settings.includes(i)) continue
+        let imgPath = path.join(__dirname, '/userfiles/media/meta/', this.meta.oldId, `${this.item.oldId}_${i}.jpg`)
+        let src = await Vue.getLocalImage(imgPath)
+        if (i!=='main' && src.includes('ghost.png')) this.images[i] = null
+        else this.images[i] = src
       }
-    },
-    getImg(imgType) { 
-      axios({
-        method: 'post',
-        url: this.apiUrl + '/api/get-file',
-        responseType: 'blob',
-        data: {
-          url: path.join(__dirname, '/userfiles/media/meta/', this.meta.oldId, `${this.item.oldId}_${imgType}.jpg`),
-        }
-      })
-        .then(res => {
-          this.images[imgType] = URL.createObjectURL(res.data)
-        })
-        .catch(e => {
-          if (imgType=='main') this.images[imgType] = path.join(__dirname, '/images/ghost.png') 
-          // console.log(e)
-        })
     },
     countMediaInItem() {
       let url = `/api/count-media-in-item?typeId=1&itemId=${this.item.id}`

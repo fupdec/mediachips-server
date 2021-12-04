@@ -6,7 +6,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: () => ({
     localhost: 'http://localhost:5555',
-    isPlayerActive: false,
+    player: {
+      active: false,
+      playlist: false,
+      markers: false,
+      nowPlaying: 0,
+    },
     scan: {
       folders: [],
       files: [],
