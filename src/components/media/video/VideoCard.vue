@@ -180,7 +180,8 @@ export default {
         })
     },
     openPlayer() {
-      this.$emit('openPlayer', this.video.id)
+      this.$store.state.isPlayerActive = true
+      this.$root.$emit('playVideo', this.video )
     },
     calcSize(size) {
       if (size > 1000000000000) size = (size/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'

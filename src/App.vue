@@ -10,6 +10,7 @@
     </v-app-bar>
 
     <SideBar />
+    <Player v-show="isPlayerActive" />
 
     <v-main app>
       <router-view :key="$route.fullPath" />
@@ -32,6 +33,7 @@ export default {
   name: 'App',
   components: { 
     SideBar: () => import('@/components/app/SideBar.vue'),
+    Player: () => import('@/components/app/Player.vue'),
   },
   beforeMount() {
     this.$store.state.localhost = `http://${config.ip}:${config.port}`
@@ -43,7 +45,9 @@ export default {
   },
   data: () => ({
   }),
-  computed: {},
+  computed: {
+    isPlayerActive() { return this.$store.state.isPlayerActive },
+  },
   methods: {
     applyTheme() {
       // this.$vuetify.theme.dark = true

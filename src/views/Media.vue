@@ -14,14 +14,10 @@
   <Loading v-show="isQueryRun"/>
 
   <v-container fluid class="card-grid wide-image videos-selection">
-    <VideoCard v-for="i in media" :key="i.id" :video="i" @openPlayer="openPlayer($event)"/>
+    <VideoCard v-for="i in media" :key="i.id" :video="i"/>
   </v-container>
 
   <v-pagination v-model="page" @input="getMedia" :length="totalPages" total-visible="5" class="pb-10"/>
-
-  <v-dialog v-if="dialogPlayer" v-model="dialogPlayer">
-    <video :src="src" autoplay controls />
-  </v-dialog>
 </vuescroll>
 </template>
 
@@ -49,8 +45,6 @@ export default {
     page: 1,
     isQueryRun: false,
     queryString: '',
-    dialogPlayer: false,
-    src: '',
   }),
   computed: {
     apiUrl() { return this.$store.state.localhost },
@@ -80,10 +74,6 @@ export default {
         .catch(e => {
           console.log(e)
         })
-    },
-    openPlayer(e) { 
-      this.dialogPlayer = true
-      this.src = this.apiUrl+'/api/video/'+e 
     },
   },
   watch: {
