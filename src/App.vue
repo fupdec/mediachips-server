@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dense clipped-left extension-height="28">
-      <img src="../public/icons/icon.png" width="32" class="mx-3">
+      <img @click="toggleDarkMode" src="../public/icons/icon.png" width="32" class="mx-3">
       <v-toolbar-title>mediaChips</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
@@ -57,6 +57,9 @@ export default {
       this.$vuetify.theme.themes.dark.primary = '#7059b7'
       this.$vuetify.theme.themes.dark.secondary = '#e98700'
       this.$vuetify.theme.themes.dark.accent = '#7059b7'
+    },
+    toggleDarkMode() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
     },
     importData() {
       let obj = { meta: [], metaSettings: [], items: [], videos: [],  videoMetadata: [], playlists: [], markers: [], onlyMeta: [], metaInItems: [], settings: Settings }
