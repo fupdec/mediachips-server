@@ -57,7 +57,7 @@
               <img :src="video.thumb" class="thumb" />
               <span class="video-name">
                 <b>{{ i + 1 }}.</b>
-                <span class="path">{{ video.path }}</span>
+                <span class="path">{{ getFileName(video.path) }}</span>
               </span>
               <div v-if="!reg && i > 4" class="reg-playlist">
                 App not registered
@@ -139,6 +139,9 @@ export default {
       //     this.$refs.playlist.scrollTo({ y: height }, 50)
       //   }
       // } else this.playVideo(this.videos[this.playIndex])
+    },
+    getFileName(filePath) {
+      return Vue.prototype.$getFileNameFromPath(filePath)
     },
   },
   watch: {

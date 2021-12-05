@@ -67,7 +67,7 @@ export default {
       for (let i of imageTypes) {
         if (!settings.includes(i)) continue
         let imgPath = path.join(__dirname, '/userfiles/media/meta/', this.meta.oldId, `${this.item.oldId}_${i}.jpg`)
-        let src = await Vue.getLocalImage(imgPath)
+        let src = await Vue.prototype.$getLocalImage(imgPath)
         if (i!=='main' && src.includes('ghost.png')) this.images[i] = null
         else this.images[i] = src
       }

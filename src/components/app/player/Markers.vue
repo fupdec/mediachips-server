@@ -141,12 +141,12 @@ export default {
     },
     getColor(mark) { 
       let color = 'primary'
-      if (mark.type == 'favorite') color = 'pink'
-      else if (mark.type == 'bookmark') color = 'red'
+      if (mark.type == 'favorite') color = '#e91e63'
+      else if (mark.type == 'bookmark') color = '#f44336'
       else if (mark.type == 'meta') color = mark['Item.color']
       return color
     },
-    getDuration(duration) { return Vue.getReadableDuration(duration) },
+    getDuration(duration) { return Vue.prototype.$getReadableDuration(duration) },
     jumpTo(time) {
       this.$emit("jumpTo", time)
     },

@@ -31,13 +31,17 @@
         <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
       <!-- <div>VideoID: {{video.id}}</div> -->
-      <div class="video-card-title caption" :title="fileName" v-html="fileName"/>
+      <div class="video-card-title" :title="fileName" v-html="fileName"/>
 
       <!-- Video meta -->
       <v-chip label class="props px-2 py-1 mt-0 mx-1">
         <div label outlined class="prop" :title="video.path">
           <v-icon>mdi-folder-outline</v-icon>
           <span class="value">Path</span>
+        </div>
+        <div label outlined class="prop">
+          <v-icon>mdi-file-video</v-icon>
+          {{fileExtension}}
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-monitor-screenshot</v-icon>
@@ -132,13 +136,12 @@ export default {
   }),
   computed: {
     apiUrl() { return this.$store.state.localhost },
-    quality() { return Vue.getReadableVideoQuality(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
-    height() { return Vue.getReadableVideoHeight(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
-    filesize() { return Vue.getReadableFileSize(this.video.filesize) },
-    duration() { return Vue.getReadableDuration(this.video.VideoMetadata.duration) },
-    videoPath() { return this.video.path },
-    fileName() { return this.video.path },
-    fileExtension() { return this.video.path },
+    quality() { return Vue.prototype.$getReadableVideoQuality(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
+    height() { return Vue.prototype.$getReadableVideoHeight(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
+    filesize() { return Vue.prototype.$getReadableFileSize(this.video.filesize) },
+    duration() { return Vue.prototype.$getReadableDuration(this.video.VideoMetadata.duration) },
+    fileName() { return Vue.prototype.$getFileNameFromPath(this.video.path) },
+    fileExtension() { return Vue.prototype.$getFileExtensionFromPath(this.video.path) },
     isFavorite() { return this.video.favorite },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },

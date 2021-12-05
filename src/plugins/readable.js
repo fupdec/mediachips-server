@@ -1,6 +1,6 @@
 const Readable = {
   install(Vue, options) {
-    Vue.getReadableFileSize = function (bytes) {
+    Vue.prototype.$getReadableFileSize = function (bytes) {
       if (bytes > 1000000000000) bytes = (bytes/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'
       else if (bytes > 1000000000) bytes = (bytes/1024/1024/1024-0.01).toFixed(2) + ' GB'
       else if (bytes > 1000000) bytes = (bytes/1024/1024-0.01).toFixed(0) + ' MB'
@@ -8,7 +8,7 @@ const Readable = {
       else bytes += ' B'
       return bytes
     }
-    Vue.getReadableDuration = function (duration) {
+    Vue.prototype.$getReadableDuration = function (duration) {
       let sec = Math.floor(duration)
       let h = sec / 3600 ^ 0 
       let m = (sec - h * 3600) / 60 ^ 0 
@@ -20,13 +20,13 @@ const Readable = {
       let total = h + m + ":" + s
       return total
     }
-    Vue.getReadableBitrate = function (value) {
+    Vue.prototype.$getReadableBitrate = function (value) {
       if (value > 1000000) value = (value/1024/1024-0.01).toFixed(0) + ' Mbps'
       else if (value > 1000) value = (value/1024-0.01).toFixed(0) + ' Kbps'
       else value += ' bps'
       return value
     }
-    Vue.getReadableVideoQuality = function (width, height) {
+    Vue.prototype.$getReadableVideoQuality = function (width, height) {
       if (width > height) {
         if (height < 720) return 'SD'
         else if (height >= 720 && height < 1080) return 'HD'
@@ -34,9 +34,15 @@ const Readable = {
         else if (height >= 1800) return 'UHD'
       } else return 'Phone'
     }
-    Vue.getReadableVideoHeight = function (width, height) {
+    Vue.prototype.$getReadableVideoHeight = function (width, height) {
       if (height > 1800 && width > height) return '4K'
       else return height + 'p'
+    }
+    Vue.prototype.$getFileNameFromPath = function (fullPath) {
+      return fullPath.split('\\').pop().split('/').pop().replace(/\.[^/.]+$/, "")
+    }
+    Vue.prototype.$getFileExtensionFromPath = function (fullPath) {
+      return fullPath.split('.').pop().toLowerCase()
     }
   }
 }

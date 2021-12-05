@@ -45,12 +45,12 @@ export default {
     },
     color() {
       let color = "primary";
-      if (this.mark.type == "favorite") color = "pink";
-      else if (this.mark.type == "bookmark") color = "red";
+      if (this.mark.type == "favorite") color = "#e91e63";
+      else if (this.mark.type == "bookmark") color = "#f44336";
       else if (this.mark.type == "meta") color = this.mark["Item.color"];
       return color;
     },
-    duration() { return Vue.getReadableDuration(this.mark.time) },
+    duration() { return Vue.prototype.$getReadableDuration(this.mark.time) },
   },
   methods: {
     async getImg() {

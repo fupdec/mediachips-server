@@ -121,6 +121,7 @@
 const fs = require("fs")
 const path = require('path')
 
+import Vue from 'vue'
 import axios from 'axios'
 import vuescroll from 'vuescroll'
 
@@ -230,7 +231,7 @@ export default {
       this.getMarkers(video)
       this.trackCurrentTime()
       clearTimeout(this.statusTextTimeout)
-      let fileName = video.path.replace(/^.*[\\\/]/, '')
+      let fileName = Vue.prototype.$getFileNameFromPath(video.path)
       this.statusText = `${this.nowPlaying+1}. ${fileName}`
       this.statusTextTimeout = setTimeout(() => {this.statusText = ''}, 3000)
       // this.isVideoFormatNotSupported = false
