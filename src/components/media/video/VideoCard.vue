@@ -156,21 +156,6 @@ export default {
     async getImg() { 
       let imgPath = path.join(__dirname, '/userfiles/media/thumbs/', this.video.oldId + '.jpg') 
       this.thumb = await Vue.prototype.$getLocalImage(imgPath)
-      // axios({
-      //   method: 'post',
-      //   url: this.apiUrl + url,
-      //   responseType: 'blob',
-      //   data: {
-      //     url: imgPath,
-      //   }
-      // })
-      //   .then(res => {
-      //     this.thumb = URL.createObjectURL(res.data)
-      //   })
-      //   .catch(e => {
-      //     this.thumb = path.join(__dirname, '/images/ghost.png') 
-      //     console.log(e)
-      //   })
     },
     // mountSrc() {
     //   this.$refs.video.src = this.video.path 

@@ -607,6 +607,7 @@ app.get('/api/media', (req, res) => {
       typeId: type || 1,
       path: { [Op.like]: `%${query}%` },
     },
+    order: [['rating', 'DESC']],
     // include: { all: true }
     include: [VideoMetadata]
   }).then(data => {
@@ -872,6 +873,33 @@ app.get('/api/count-media-in-item', (req, res) => {
       message: err.message || "Some error occurred while performing query."
     })
   })
+})
+app.get('/api/markers/:id', (req, res) => {
+  Markers.findAll({
+    where: {
+      mediaId:req.params.id
+    }, 
+    order: [['time', 'ASC']],
+    include: [Items],
+    raw: true
+  })
+    .then(async markers => {
+      for (let marker of markers) {
+        let meta = await Meta.findOne({
+          where: {
+            id: marker['Item.metaId']
+          },
+          include: [MetaSettings],
+          raw: true
+        })
+        marker.meta = meta
+      }
+      res.status(201).send(markers)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
 })
 app.post('/api/get-file', jsonParser, (req, res) => {
   res.sendFile(req.body.url, {root:__dirname})

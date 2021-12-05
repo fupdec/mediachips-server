@@ -8,8 +8,9 @@ export default new Vuex.Store({
     localhost: 'http://localhost:5555',
     player: {
       active: false,
-      playlist: false,
-      markers: false,
+      playlistVisible: false,
+      markersVisible: false,
+      markers: [],
       nowPlaying: 0,
     },
     scan: {

@@ -101,8 +101,8 @@ export default {
   }),
   computed: {
     isPlaylistVisible: {
-      get() { return this.$store.state.player.playlist },
-      set(value) { this.$store.state.player.playlist = value },
+      get() { return this.$store.state.player.playlistVisible },
+      set(value) { this.$store.state.player.playlistVisible = value },
     },
     nowPlaying: {
       get() { return this.$store.state.player.nowPlaying },

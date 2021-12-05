@@ -19,6 +19,9 @@
             <v-slider :value="seeking?seekTime:currentTime" 
               hide-details min="0" step="0.1" :max="duration" 
               @start="startSeeking($event)" @end="seek($event)" @mousedown="handleMouseSeek($event)"/>
+            <Mark v-for="(mark,i) in markers" :key="i" :mark="mark" 
+              :position="`left: ${mark.time/duration*100}%;`"
+              @jumpTo="jumpTo($event)"/>
           </v-card-actions>
           <v-card-actions class="buttons pa-1">
             <v-btn-toggle class="remove-active compact">
@@ -47,7 +50,7 @@
                 <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
               </v-btn>
             </v-btn-toggle>
-            <v-btn-toggle class="mx-4 remove-active compact">
+            <v-btn-toggle class="ml-4 remove-active compact">
               <v-btn @click="jumpToSeconds(-5)" small title="- 5 seconds">
                 <v-icon small>mdi-step-backward-2</v-icon>
               </v-btn>
@@ -60,6 +63,36 @@
               <v-btn @click="jumpToSeconds(5)" small title="+ 5 seconds">
                 <v-icon small>mdi-step-forward-2</v-icon>
               </v-btn>
+            </v-btn-toggle>
+            <v-btn-toggle class="mx-4 remove-active marker-buttons compact">
+              <v-btn @click="toggleMarkers" :color="isMarkersVisible? 'primary':''" small title="Markers List">
+                <v-icon>mdi-map-marker</v-icon>
+              </v-btn>
+              <v-btn @click="jumpToPrevMarker" small class="marker-prev" title="Previous Marker">
+                <v-icon>mdi-chevron-left</v-icon>
+              </v-btn>
+              <v-btn @click="jumpToNextMarker" small class="marker-next" title="Next Marker">
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+              <v-menu offset-y nudge-top="40" nudge-right="400" attach=".controls">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" v-on="on" small title="Add Marker">
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </template>
+                
+                <!-- <v-btn-toggle class="remove-active">
+                  <v-btn @click="addMarker('favorite')" title="Favorite">
+                    <v-icon size="20">mdi-heart</v-icon> 
+                  </v-btn>
+                  <v-btn @click="openDialogMarkerBookmark" title="Bookmark">
+                    <v-icon size="20">mdi-bookmark</v-icon> 
+                  </v-btn>
+                  <v-btn v-for="m in metaMarkers" :key="m.id" :value="m.id" @click="openDialogMarkerMeta(m.id)" :title="m.settings.name">
+                    <v-icon size="20">mdi-{{m.settings.icon}}</v-icon>
+                  </v-btn>
+                </v-btn-toggle> -->
+              </v-menu>
             </v-btn-toggle>
             <v-btn-toggle class="remove-active compact">
               <v-btn @click="togglePlaylist" :color="isPlaylistVisible?'primary':''" small title="Playlist">
@@ -78,6 +111,7 @@
         </v-card>
       </div>
       <Playlist :videos="videos" @play="playFromPlaylist($event)"/>
+      <Markers @jumpTo="jumpTo($event)"/>
     </div>
   </v-dialog>
 </template>
@@ -87,12 +121,15 @@
 const fs = require("fs")
 const path = require('path')
 
+import axios from 'axios'
 import vuescroll from 'vuescroll'
 
 export default {
   name: "Player",
   components: {
     Playlist: () => import('@/components/app/player/Playlist.vue'),
+    Markers: () => import('@/components/app/player/Markers.vue'),
+    Mark: () => import('@/components/app/player/Mark.vue'),
     vuescroll,
   },
   mounted() {
@@ -103,9 +140,7 @@ export default {
     window.addEventListener('resize', this.getCanvasSizes)
     this.$root.$on('playVideo', (video, videos) => {
       this.videos = videos.map(i=>({...i,...{thumb:path.join(__dirname, '/images/ghost.png')}}))
-      this.videoMetadata = video
-      let id = video.id
-      this.loadSrc(this.apiUrl+'/api/video/'+ id)
+      this.loadSrc(video)
     })
   },
   data: () => ({
@@ -118,7 +153,6 @@ export default {
     mouseOverControls: false,
     statusText: '',
     statusTextTimeout: null,
-    videoMetadata: null,
     videos: [],
     // video properties 
     duration: 1,
@@ -148,8 +182,16 @@ export default {
       set(value) { this.$store.state.player.active = value },
     },
     isPlaylistVisible: {
-      get() { return this.$store.state.player.playlist },
-      set(value) { this.$store.state.player.playlist = value },
+      get() { return this.$store.state.player.playlistVisible },
+      set(value) { this.$store.state.player.playlistVisible = value },
+    },
+    isMarkersVisible: {
+      get() { return this.$store.state.player.markersVisible },
+      set(value) { this.$store.state.player.markersVisible = value },
+    },
+    markers: {
+      get() { return this.$store.state.player.markers },
+      set(value) { this.$store.state.player.markers = value },
     },
     nowPlaying: {
       get() { return this.$store.state.player.nowPlaying },
@@ -162,10 +204,8 @@ export default {
       this.currentTime = 0
       this.isPlayerActive = false
     },
-    playFromPlaylist(video) {
-      this.videoMetadata = video
-      let id = video.id
-      this.loadSrc(this.apiUrl+'/api/video/'+ id)
+    playFromPlaylist(video) { 
+      this.loadSrc(video)
     },
     initPlayer() {
       this.player.addEventListener('loadedmetadata', () => { 
@@ -185,21 +225,35 @@ export default {
       //   }
       // })
     },
-    loadSrc(src) {
-      this.player.src = src
+    loadSrc(video) {
+      this.player.src = this.apiUrl+'/api/video/'+ video.id
+      this.getMarkers(video)
       this.trackCurrentTime()
       clearTimeout(this.statusTextTimeout)
-      this.statusText = this.videoMetadata.path.replace(/^.*[\\\/]/, '')
-      return
-      this.statusText = `${this.nowPlaying+1}. ${this.getFileNameFromPath(this.videos[this.nowPlaying].path)}`
+      let fileName = video.path.replace(/^.*[\\\/]/, '')
+      this.statusText = `${this.nowPlaying+1}. ${fileName}`
       this.statusTextTimeout = setTimeout(() => {this.statusText = ''}, 3000)
-      this.$emit("nowPlaying", _.cloneDeep(this.videos[this.nowPlaying]))
-      this.isVideoFormatNotSupported = false
-      this.isVideoNotExist = false
-      this.duration = this.player.duration
-      this.trackCurrentTime()
-      this.getMarkers()
-      if (!this.reg && this.nowPlaying>4) this.player.src = ''
+      // this.isVideoFormatNotSupported = false
+      // this.isVideoNotExist = false
+      // if (!this.reg && this.nowPlaying>4) this.player.src = ''
+    },
+    async getMarkers(video) {
+      await axios.get(this.apiUrl + '/api/markers/' + video.id)
+        .then(res => {
+          this.markers = res.data
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      // create marker thumb
+      // for (let i=0; i<markers.length; i++) {
+      //   let imgPath = path.join(this.pathToUserData, `/media/markers/${markers[i].id}.jpg`)
+      //   if (fs.existsSync(imgPath)) continue
+      //   let specificTime = new Date(1000*markers[i].time).toISOString().substr(11, 8)
+      //   this.createMarkerThumb(specificTime, video.path, imgPath, 180)
+      //     .then(result => { /*console.log('thumb created')*/ })
+      //     .catch(error => { /*console.log(error)*/ })
+      // }
     },
     getCanvasSizes() {
       let windowWidth = document.documentElement.clientWidth
@@ -419,6 +473,9 @@ export default {
         case 4: this.jumpToNextMarker(); break
       }
     },
+    toggleMarkers() {
+      this.isMarkersVisible=!this.isMarkersVisible
+    },
     togglePlaylist() {
       this.isPlaylistVisible=!this.isPlaylistVisible
       setTimeout(() => { this.getCanvasSizes() }, 100)
@@ -564,29 +621,6 @@ export default {
     .v-slider {
       margin: 0;
     }
-    .marker {
-      cursor: pointer;
-      position: absolute;
-      width: 3px;
-      height: 10px;
-      background-color: #777;
-      transition: .2s all ease;
-      &:hover {
-        .tooltip {
-          display: block;
-        }
-      }
-    }
-    .tooltip {
-      position: absolute;
-      bottom: 10px;
-      width: 10vw;
-      left: -4vw;
-      display: none;
-      background-color: rgba(10, 10, 10, 0.75);
-      border-radius: 2px 2px 0 0;
-      font-size: 12px;
-    }
   }
   .duration {
     display: flex;
@@ -622,70 +656,6 @@ export default {
   .v-slider__thumb:before,
   .v-slider__thumb:after {
     display: none;
-  }
-}
-.markers-wrapper {
-  min-width: 18vw;
-  border-left: 1px solid #5c5c5c;
-  box-shadow: none !important;
-  .items {
-    height: calc(100vh - 116px) !important;
-  }
-  .v-card__title {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-  }
-  .marker {
-    cursor: pointer;
-    &-wrapper {
-      position: relative;
-      &:hover {
-        .delete {
-          opacity: 1;
-        }
-      }
-    }
-    .thumb {
-      width: 100%;
-      background-color: rgb(38, 50, 61);
-    }
-    .name {
-      position: absolute;
-      font-size: 1vw;
-      display: flex;
-      align-items: center;
-      left: 5px;
-      top: 1px;
-    }
-    .time {
-      position: absolute;
-      bottom: 1px;
-      right: 1px;
-      line-height: 1;
-      padding: 2px;
-      border-radius: 2px;
-      font-size: 1vw;
-      background-color: rgba(17, 17, 17, 0.6);
-    }
-  }
-  .toggle {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    .v-btn {
-      min-width: 30px;
-      padding: 0;
-    }
-  }
-  .delete {
-    opacity: 0;
-    transition: .3s;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    padding: 1.5vw;
-    border-radius: 0 5px 0 0;
-    background-color: rgba(0, 0, 0, 0.5);
   }
 }
 .theme--light {
