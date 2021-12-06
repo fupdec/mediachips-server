@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 const Home = () => import('../views/Home.vue')
-const Media = () => import('../views/Media.vue')
-const Meta = () => import('../views/Meta.vue')
+const ItemsAppbar = () => import('@/components/app/appbar/ItemsAppbar.vue')
+const Items = () => import('../views/Items.vue')
 const Settings = () => import('../views/Settings.vue')
 
 Vue.use(VueRouter)
@@ -17,16 +17,11 @@ const routes = [
   },
   {
     path: '/media',
-    name: 'Media',
+    alias: '/meta',
+    name: 'Items',
     components: {
-      default: Media,
-    }
-  },
-  {
-    path: '/meta',
-    name: 'Meta',
-    components: {
-      default: Meta,
+      default: Items,
+      appbar: ItemsAppbar,
     }
   },
   {

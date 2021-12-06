@@ -114,9 +114,8 @@ const path = require('path')
 // import MetaGetters from '@/mixins/MetaGetters'
 // const express = require("express")
 // const app = express()
-// TODO rename videocard to video item
 export default {
-  name: 'VideoCard',
+  name: 'VideoItem',
   props: {
     video: Object,
     media: Array,

@@ -1,13 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app dense clipped-left extension-height="28">
-      <img @click="toggleDarkMode" src="../public/icons/icon.png" width="32" class="mx-3">
-      <v-toolbar-title>mediaChips</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="success" class="ma-2" @click="importData" title=" Import database"> 
-        <v-icon left>mdi-database-import</v-icon> Import DB
-      </v-btn>
-    </v-app-bar>
+    <AppBar />
 
     <SideBar />
     <Player v-show="isPlayerActive" />
@@ -32,6 +25,7 @@ const config = require('../config.json')
 export default {
   name: 'App',
   components: { 
+    AppBar: () => import('@/components/app/AppBar.vue'),
     SideBar: () => import('@/components/app/SideBar.vue'),
     Player: () => import('@/components/app/Player.vue'),
   },
@@ -57,9 +51,6 @@ export default {
       this.$vuetify.theme.themes.dark.primary = '#7059b7'
       this.$vuetify.theme.themes.dark.secondary = '#e98700'
       this.$vuetify.theme.themes.dark.accent = '#7059b7'
-    },
-    toggleDarkMode() {
-      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
     },
     importData() {
       let obj = { meta: [], metaSettings: [], items: [], videos: [],  videoMetadata: [], playlists: [], markers: [], onlyMeta: [], metaInItems: [], settings: Settings }

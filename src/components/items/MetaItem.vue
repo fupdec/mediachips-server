@@ -36,7 +36,7 @@ import axios from 'axios'
 const path = require('path')
 
 export default {
-  name: 'ItemCard',
+  name: 'MetaItem',
   props: {
     item: Object,
     meta: Object,
