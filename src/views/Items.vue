@@ -52,7 +52,6 @@ export default {
   },
   mounted() {
     this.$nextTick(async () => {
-      console.log(this.$route.fullPath)
       await this.init();
       this.$root.$on("searchItems", async (searchString) => {
         this.searchString = searchString;
