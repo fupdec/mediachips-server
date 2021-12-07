@@ -1,12 +1,25 @@
 {
   "name": "mediachips",
+  "productName": "mediaChips",
   "version": "0.1.0",
+  "author": {
+    "name": "fupdec",
+    "email": "altbbk@gmail.com"
+  },
+  "homepage": "https://github.com/fupdec/mediaChips",
+  "description": "Organize your media files with ease and convenience.",
+  "private": false,
+  "license": "GPL-3.0",
+  "repository": "github:fupdec/mediaChips",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "server": "nodemon --watch server.js server.js",
-    "electron": "electron ."
+    "electron": "electron .",
+    "pack": "electron-builder --dir",
+    "portable": "electron-builder --win portable",
+    "dist": "electron-builder"
   },
   "main": "main.js",
   "dependencies": {
@@ -15,7 +28,6 @@
     "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
-    "electron": "^16.0.3",
     "express": "^4.17.1",
     "sequelize": "^6.11.0",
     "vue": "^2.6.11",
@@ -29,6 +41,7 @@
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
+    "electron": "^16.0.4",
     "electron-builder": "^22.14.5",
     "nodemon": "^2.0.15",
     "sass": "~1.32",
@@ -40,5 +53,38 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "build": {
+    "asar": false,
+    "win": {
+      "target": "nsis",
+      "verifyUpdateCodeSignature": false,
+      "icon": "public/icons/icon.png",
+      "asarUnpack": [
+        "node_modules/@ffmpeg-installer",
+        "node_modules/@ffprobe-installer"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "icon": "public/icons/icons.icns",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "mac": {
+      "icon": "public/icons/icons.icns",
+      "asar": true,
+      "asarUnpack": [
+        "node_modules/@ffmpeg-installer",
+        "node_modules/@ffprobe-installer"
+      ]
+    }
+  }
 }
