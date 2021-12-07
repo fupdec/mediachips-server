@@ -19,22 +19,20 @@
         <span>Item Size</span>
       </v-tooltip>
     </template>
-    <v-card width="300">
-      <v-toolbar color="primary" height="36">
-        <span class="headline">Item Size</span>
-        <v-spacer></v-spacer>
-        <v-icon>mdi-card-bulleted-settings</v-icon>
-      </v-toolbar>
-      <v-slider
-        @input="updateSize($event)"
+    <v-list dense>
+      <v-list-item-group
         :value="size"
-        min="1"
-        max="5"
-        step="1"
-        class="pa-3"
-        :tick-labels="sizes"
-      />
-    </v-card>
+        @change="updateSize($event)"
+        mandatory
+        color="primary"
+      >
+        <v-list-item v-for="(s, i) in sizes" :key="i" :value="i + 1">
+          <v-list-item-content>
+            <v-list-item-title v-text="s"></v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
   </v-menu>
 </template>
 
@@ -48,7 +46,7 @@ export default {
   }),
   methods: {
     updateSize(size) {
-      this.size = size
+      this.size = size;
       this.$root.$emit("updateItemSize", size);
     },
   },
