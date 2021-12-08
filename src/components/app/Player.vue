@@ -227,7 +227,7 @@ export default {
       // })
     },
     loadSrc(video) {
-      this.player.src = this.apiUrl+'/api/video/'+ video.id
+      this.player.src = this.apiUrl+'/api/video/' + video.id
       this.getMarkers(video)
       this.trackCurrentTime()
       clearTimeout(this.statusTextTimeout)
@@ -239,7 +239,7 @@ export default {
       // if (!this.reg && this.nowPlaying>4) this.player.src = ''
     },
     async getMarkers(video) {
-      await axios.get(this.apiUrl + '/api/markers/' + video.id)
+      await axios.get(this.apiUrl + '/api/Markers/video/' + video.id)
         .then(res => {
           this.markers = res.data
         })

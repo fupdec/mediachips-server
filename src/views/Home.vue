@@ -137,7 +137,7 @@ export default {
       obj.onlyMeta = Videos.videos.slice(0,100).map(i=>
         Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
       )
-      axios.post(this.$store.state.localhost + '/api/import', obj)
+      axios.post(this.$store.state.localhost + '/api/Functions/importDatabase', obj)
     },
   },
 }

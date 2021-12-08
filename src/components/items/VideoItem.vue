@@ -163,7 +163,7 @@ export default {
     //   this.$refs.video.src = this.video.path 
     // },
     getMeta() {
-      let url = `/api/meta-for-media?mediaId=${this.video.id}`
+      let url = `/api/ItemsInMedia?mediaId=${this.video.id}`
       axios.get(this.apiUrl + url)
         .then(res => {
           this.meta = res.data

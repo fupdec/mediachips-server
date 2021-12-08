@@ -15,7 +15,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "nodemon --watch server.js server.js",
+    "server": "nodemon --watch server.js --watch app server.js",
     "electron": "electron .",
     "pack": "electron-builder --dir",
     "portable": "electron-builder --win portable",

@@ -59,7 +59,7 @@ export default {
   methods: {
     getMetaInMediaTypes() {
       this.isQueryRun = true
-      let url = `/api/meta-in-mediatypes`
+      let url = `/api/MetaInMediaTypes`
       axios.get(this.apiUrl + url)
         .then(res => {
           this.isQueryRun = false

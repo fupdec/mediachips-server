@@ -73,7 +73,7 @@ export default {
       }
     },
     countMediaInItem() {
-      let url = `/api/count-media-in-item?typeId=1&itemId=${this.item.id}`
+      let url = `/api/media/countInItem?typeId=1&itemId=${this.item.id}`
       axios.get(this.apiUrl + url)
         .then(res => {
           this.numberOfMedia = res.data.count
