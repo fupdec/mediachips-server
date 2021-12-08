@@ -8,20 +8,25 @@ const app = express()
 const cors = require('cors')
 const db = require("./app");
 
-app.use(express.json({limit: '100mb'}))
+const userfiles = './userfiles';
+if (!fs.existsSync(userfiles)) fs.mkdirSync(userfiles)
+
+app.use(express.json({
+  limit: '100mb'
+}))
 app.use(cors())
 app.use(router)
 
 // testing database connection
 try {
   db.sequelize.authenticate()
-  console.log('\x1b[36m%s\x1b[0m','Sequelize successfully connected')
+  console.log('\x1b[36m%s\x1b[0m', 'Sequelize successfully connected')
 } catch (e) {
-  console.log('\x1b[31m%s\x1b[0m','Sequelize connection error: ', e)
+  console.log('\x1b[31m%s\x1b[0m', 'Sequelize connection error: ', e)
 }
 
 // sequelize.sync({force: true}) // drop existing tables on start
-db.sequelize.sync().then(async ()=>{
+db.sequelize.sync().then(async () => {
   // create media type: videos
   await db.MediaTypes.findOrCreate({
     where: {
@@ -36,17 +41,19 @@ db.sequelize.sync().then(async ()=>{
     where: {
       id: 1,
     },
-    defaults: {
-    }
+    defaults: {}
   })
 })
 
 
 // using vue's built as static files
-const src = path.join(__dirname, 'dist') 
+const src = path.join(__dirname, 'dist')
 const staticFileMiddleware = express.static(src)
 app.use(staticFileMiddleware)
-app.use(history({ disableDotRule: true, verbose: true }))
+app.use(history({
+  disableDotRule: true,
+  verbose: true
+}))
 app.use(staticFileMiddleware)
 
 
@@ -63,7 +70,9 @@ require("./app/routes/MetaInMediaTypes.routes")(app)
 require("./app/routes/MetaSettings.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
-  res.sendFile(req.body.url, {root:__dirname})
+  res.sendFile(req.body.url, {
+    root: __dirname
+  })
 })
 router.get('/api/video/:id', (req, res) => {
   db.Media.findOne({
@@ -120,14 +129,18 @@ let defaultConfig = {
   port: 5555
 }
 try {
-  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), { flag: 'wx' })
-} catch(e) {
+  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), {
+    flag: 'wx'
+  })
+} catch (e) {
   if (e.code == 'EEXIST') console.log('\x1b[33m%s\x1b[0m', 'Server configuration loaded')
   else console.log('\x1b[31m%s\x1b[0m', e)
 }
 
 // getting IP of localhost
-const { networkInterfaces } = require('os')
+const {
+  networkInterfaces
+} = require('os')
 const nets = networkInterfaces()
 const results = Object.create(null)
 for (const name of Object.keys(nets)) {
