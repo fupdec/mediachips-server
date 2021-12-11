@@ -6,7 +6,7 @@ const fs = require('fs')
 const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
-const db = require("./app");
+const db = require("./api");
 
 app.use(express.json({
   limit: '100mb'
@@ -55,16 +55,16 @@ app.use(staticFileMiddleware)
 
 
 // REST api
-require("./app/routes/ChildMeta.routes")(app)
-require("./app/routes/Functions.routes")(app)
-require("./app/routes/Items.routes")(app)
-require("./app/routes/ItemsInMedia.routes")(app)
-require("./app/routes/Markers.routes")(app)
-require("./app/routes/Media.routes")(app)
-require("./app/routes/MediaTypes.routes")(app)
-require("./app/routes/Meta.routes")(app)
-require("./app/routes/MetaInMediaTypes.routes")(app)
-require("./app/routes/MetaSettings.routes")(app)
+require("./api/routes/ChildMeta.routes")(app)
+require("./api/routes/Functions.routes")(app)
+require("./api/routes/Items.routes")(app)
+require("./api/routes/ItemsInMedia.routes")(app)
+require("./api/routes/Markers.routes")(app)
+require("./api/routes/Media.routes")(app)
+require("./api/routes/MediaTypes.routes")(app)
+require("./api/routes/Meta.routes")(app)
+require("./api/routes/MetaInMediaTypes.routes")(app)
+require("./api/routes/MetaSettings.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   res.sendFile(req.body.url, {
