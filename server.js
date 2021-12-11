@@ -8,9 +8,6 @@ const app = express()
 const cors = require('cors')
 const db = require("./app");
 
-const userfiles = './userfiles';
-if (!fs.existsSync(userfiles)) fs.mkdirSync(userfiles)
-
 app.use(express.json({
   limit: '100mb'
 }))
