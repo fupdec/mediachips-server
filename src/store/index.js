@@ -1,18 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Player from './modules/player.js'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: () => ({
     localhost: 'http://localhost:5555',
-    player: {
-      active: false,
-      playlistVisible: false,
-      markersVisible: false,
-      markers: [],
-      nowPlaying: 0,
-    },
     scan: {
       folders: [],
       files: [],
@@ -86,5 +80,6 @@ export default new Vuex.Store({
     clearAllNotifications({ state, commit}) { commit('clearAllNotifications') },
   },
   modules: {
+    Player,
   }
 })

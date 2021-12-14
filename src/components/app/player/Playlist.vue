@@ -4,7 +4,7 @@
       <v-icon left>mdi-format-list-bulleted</v-icon>
       <span>Playlist</span>
       <v-spacer></v-spacer>
-      <v-btn @click="close" icon>
+      <v-btn @click="isPlaylistVisible = false" icon>
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
@@ -79,40 +79,63 @@
 
 
 <script>
-import Vue from "vue"
-import vuescroll from "vuescroll"
+import _ from "lodash";
+import Vue from "vue";
+import vuescroll from "vuescroll";
 
-const path = require("path")
+const path = require("path");
 
 export default {
   name: "Playlist",
-  props: {
-    videos: Array,
-  },
   components: {
     vuescroll,
   },
   mounted() {
+    this.$root.$on("scrollToNowPlaying", () => {
+      this.scrollToNowPlaying();
+    });
   },
   data: () => ({
-    playlistShuffle: [],
-    playlistMode: ["autoplay"],
     reg: true,
   }),
   computed: {
+    videos() {
+      return this.$store.state.Player.videos;
+    },
     isPlaylistVisible: {
-      get() { return this.$store.state.player.playlistVisible },
-      set(value) { this.$store.state.player.playlistVisible = value },
+      get() {
+        return this.$store.state.Player.playlistVisible;
+      },
+      set(value) {
+        this.$store.state.Player.playlistVisible = value;
+      },
+    },
+    playlistMode: {
+      get() {
+        return this.$store.state.Player.playlistMode;
+      },
+      set(value) {
+        this.$store.state.Player.playlistMode = value;
+      },
+    },
+    playlistShuffle: {
+      get() {
+        return this.$store.state.Player.playlistShuffle;
+      },
+      set(value) {
+        this.$store.state.Player.playlistShuffle = value;
+      },
     },
     nowPlaying: {
-      get() { return this.$store.state.player.nowPlaying },
-      set(value) { this.$store.state.player.nowPlaying = value },
+      get() {
+        return this.$store.state.Player.nowPlaying;
+      },
+      set(value) {
+        this.$store.state.Player.nowPlaying = value;
+      },
     },
   },
   methods: {
-    close() {
-      this.isPlaylistVisible = false;
-    },
     async getThumbs() {
       for (let i of this.videos) {
         let imgPath = path.join(
@@ -123,109 +146,41 @@ export default {
       }
     },
     play(index) {
-      this.$emit('play', this.videos[index])
-      // // console.log(this.player.playlist.items.map(i=>i.mrl))
-      // if (this.playlistMode.includes('shuffle')) {
-      //   let indices = []
-      //   for (let i = 0; i < this.videos.length; i++) indices.push(i)
-      //   this.playlistShuffle = _.shuffle(indices)
-      //   const i = this.playlistShuffle.indexOf(index)
-      //   this.playlistShuffle.splice(i, 1)
-      //   this.playlistShuffle.unshift(index)
-      //   this.player.playlist.playItem(index)
+      if (this.playlistMode.includes("shuffle")) {
+        let indexes = [];
+        for (let i = 0; i < this.videos.length; i++) indexes.push(i);
+        this.playlistShuffle = _.shuffle(indexes);
+        const i = this.playlistShuffle.indexOf(index);
+        this.playlistShuffle.splice(i, 1);
+        this.playlistShuffle.unshift(index);
+        console.log(this.player.playlist);
+        this.player.playlist.playItem(index);
 
-      //   if (this.isPlaylistVisible) { // scroll to now playing in playlist
-      //     const height = `${this.playIndex * document.documentElement.clientWidth / 10}`
-      //     this.$refs.playlist.scrollTo({ y: height }, 50)
-      //   }
-      // } else this.playVideo(this.videos[this.playIndex])
+        if (this.isPlaylistVisible) this.scrollToNowPlaying();
+      } else this.$emit("play", this.videos[index]);
     },
     getFileName(filePath) {
-      return Vue.prototype.$getFileNameFromPath(filePath)
+      return Vue.prototype.$getFileNameFromPath(filePath);
+    },
+    scrollToNowPlaying() {
+      const height =
+        (this.nowPlaying * document.documentElement.clientWidth) / 10;
+      this.$refs.playlist.scrollTo({ y: height }, 50);
     },
   },
   watch: {
     videos() {
       this.getThumbs();
     },
+    playlistMode(mode, oldMode) {
+      if (!mode.includes("shuffle") && oldMode.includes("shuffle")) return;
+      let index = [];
+      for (let i = 0; i < this.videos.length; i++) index.push(i);
+      this.playlistShuffle = _.shuffle(index);
+      this.nowPlaying = this.playlistShuffle[0];
+      this.$emit("play", this.videos[this.nowPlaying]);
+      if (this.isPlaylistVisible) this.scrollToNowPlaying();
+    },
   },
 };
 </script>
-
-
-<style lang="scss">
-.playlist-wrapper {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  min-width: 18vw;
-  .items {
-    height: calc(100vh - 116px) !important;
-  }
-  .v-card__title {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-  }
-  .video-item {
-    position: relative;
-    overflow: hidden;
-    height: 10vw;
-  }
-  .video-name {
-    font-size: 1vw;
-    line-height: 1.2;
-    word-break: keep-all;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    overflow: hidden;
-    .path {
-      padding-left: 4px;
-      position: absolute;
-    }
-  }
-  .play-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    line-height: 1;
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    z-index: 1;
-    &::before {
-      content: "";
-      position: absolute;
-      background-color: currentColor;
-      width: 100%;
-      height: 100%;
-      border-radius: 50px;
-      filter: invert(1);
-      z-index: -1;
-    }
-    .text {
-      font-size: 1vw;
-    }
-  }
-  .thumb {
-    position: absolute;
-    min-height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), transparent);
-  }
-  .toggle {
-    width: 100%;
-    .v-btn {
-      min-width: 30px;
-      width: 33.33%;
-      padding: 0;
-    }
-  }
-}
-</style>

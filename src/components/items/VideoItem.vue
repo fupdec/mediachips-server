@@ -173,7 +173,7 @@ export default {
         })
     },
     openPlayer() {
-      this.$store.state.player.active = true
+      this.$store.state.Player.active = true
       this.$root.$emit('playVideo', this.video, this.media )
     },
   },

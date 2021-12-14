@@ -62,36 +62,9 @@ export default {
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },
     jumpTo() {
-      this.$emit("jumpTo", this.mark.time);
+      this.$store.dispatch("playerJumpTo", {time: this.mark.time})
     },
   },
   watch: {},
 };
 </script>
-
-
-<style lang="scss">
-.marker {
-  cursor: pointer;
-  position: absolute;
-  width: 1px;
-  height: 10px;
-  background-color: var(--v-primary-base);
-  transition: 0.2s all ease;
-  &:hover {
-    .tooltip {
-      display: block;
-    }
-  }
-  .tooltip {
-    position: absolute;
-    bottom: 10px;
-    width: 10vw;
-    left: -4vw;
-    display: none;
-    background-color: rgba(10, 10, 10, 0.75);
-    border-radius: 2px 2px 0 0;
-    font-size: 12px;
-  }
-}
-</style>

@@ -33,7 +33,7 @@ export default {
   data: () => ({
   }),
   computed: {
-    isPlayerActive() { return this.$store.state.player.active },
+    isPlayerActive() { return this.$store.state.Player.active },
   },
   methods: {
     applyTheme() {
