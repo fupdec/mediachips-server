@@ -22,7 +22,7 @@ const ApiCalls = {
         })
       return result
     }
-    Vue.prototype.$createThumb = function (timestamp, inputPath, outputPath, width) {
+    Vue.prototype.$createThumb = function (timestamp, inputPath, outputPath, width, overwrite) {
       return new Promise((resolve, reject) => {
         axios({
             method: 'post',
@@ -31,7 +31,8 @@ const ApiCalls = {
               timestamp,
               inputPath,
               outputPath,
-              width
+              width,
+              overwrite
             }
           })
           .then(res => {

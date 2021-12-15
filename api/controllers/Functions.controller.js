@@ -266,10 +266,18 @@ exports.createThumb = async (req, res) => {
     })
   }
 
-  if (fs.existsSync(req.body.outputPath)) {
+  if (!fs.existsSync(req.body.inputPath)) {
     res.status(400).send({
-      message: "Image already exists."
+      message: "The video does not exist."
     })
+    return
+  }
+
+  if (!req.body.overwrite && fs.existsSync(req.body.outputPath)) {
+    res.status(400).send({
+      message: "The image already exists."
+    })
+    return
   }
 
   let outputPath = path.join(

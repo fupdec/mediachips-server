@@ -126,6 +126,9 @@ export default {
       this.getMeta()
       this.getImg()
     })
+    this.$root.$on("updateVideoThumb", (id) => {
+      if (this.video.id === id) this.getImg();
+    });
   },
   destroyed() {
   },

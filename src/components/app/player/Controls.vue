@@ -151,6 +151,11 @@
           <v-icon>mdi-format-list-bulleted</v-icon>
         </v-btn>
       </v-btn-toggle>
+      <v-btn-toggle class="mx-4 remove-active compact">
+        <v-btn @click="setAsThumb" small title="Set Frame as Thumb">
+          <v-icon>mdi-image</v-icon>
+        </v-btn>
+      </v-btn-toggle>
       <v-spacer></v-spacer>
       <div class="duration mx-2">
         <div class="time-start">{{ msToTime(currentTime) }}</div>
@@ -430,9 +435,21 @@ export default {
       if (!this.isPlaylistVisible) return;
       this.$root.$emit("scrollToNowPlaying");
     },
+    async setAsThumb() {
+      let video = this.videos[this.nowPlaying];
+      let imgPath = "/userfiles/media/thumbs/" + video.oldId + ".jpg";
+      let time = new Date(this.player.currentTime * 1000)
+        .toISOString()
+        .substr(11, 8);
+      await Vue.prototype
+        .$createThumb(time, video.path, imgPath, 320, true)
+        .then(() => {
+          this.$root.$emit("updateVideoThumb", video.id);
+        })
+        .catch((e) => console.log(e));
+    },
   },
-  watch: {
-  },
+  watch: {},
 };
 </script>
 

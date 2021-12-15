@@ -244,8 +244,9 @@ export default {
         await Vue.prototype
           .$createThumb(time, video.path, imgPath, 180)
           .then(() => {
-            this.$root.$emit('updateMarkerImage', mark.id)
-          });
+            this.$root.$emit("updateMarkerImage", mark.id);
+          })
+          .catch((e) => console.log(e));
       }
     },
     moveOverPlayer(e) {
@@ -272,24 +273,6 @@ export default {
         await this.player.requestPictureInPicture();
       } else await document.exitPictureInPicture();
     },
-    // TODO make it
-    // setAsThumb() {
-    //   let video = this.videos[this.nowPlaying];
-    //   let imgPath = path.join(
-    //     this.pathToUserData,
-    //     `/media/thumbs/${video.id}.jpg`
-    //   );
-    //   let specificTime = new Date(this.currentTime * 1000)
-    //     .toISOString()
-    //     .substr(11, 8);
-    //   this.createMarkerThumb(specificTime, video.path, imgPath, 320)
-    //     .then((result) => {
-    //       console.log("thumb created");
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
     playVideoInSystemPlayer() {
       shell.openPath(this.videos[this.nowPlaying].path);
     },
