@@ -100,7 +100,11 @@ export default {
   components: {
     vuescroll,
   },
-  mounted() {},
+  mounted() {
+    this.$root.$on("updateMarkerImage", (id) => {
+      if (this.markers.some(i => i.id === id)) this.getThumbs();
+    });
+  },
   data: () => ({
     markerBookmarkText: "",
     metaForMarker: "",

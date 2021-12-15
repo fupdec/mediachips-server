@@ -31,6 +31,9 @@ export default {
   components: {},
   mounted() {
     this.getImg();
+    this.$root.$on("updateMarkerImage", (id) => {
+      if (this.mark.id === id) this.getImg();
+    });
   },
   data: () => ({
     thumb: null,
@@ -50,7 +53,9 @@ export default {
       else if (this.mark.type == "meta") color = this.mark["Item.color"];
       return color;
     },
-    duration() { return Vue.prototype.$getReadableDuration(this.mark.time) },
+    duration() {
+      return Vue.prototype.$getReadableDuration(this.mark.time);
+    },
   },
   methods: {
     async getImg() {
@@ -62,7 +67,7 @@ export default {
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },
     jumpTo() {
-      this.$store.dispatch("playerJumpTo", {time: this.mark.time})
+      this.$store.dispatch("playerJumpTo", { time: this.mark.time });
     },
   },
   watch: {},

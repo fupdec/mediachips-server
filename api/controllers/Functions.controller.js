@@ -1,4 +1,5 @@
 const db = require("../index.js");
+// Models
 const VideoMetadata = db.VideoMetadata;
 const Media = db.Media;
 const Settings = db.Settings;
@@ -14,6 +15,15 @@ const Playlists = db.Playlists;
 const VideosInPlaylist = db.VideosInPlaylist;
 const Markers = db.Markers;
 const Op = db.Sequelize.Op;
+// FFMPEG
+const ffmpeg = require('fluent-ffmpeg')
+const pathToFfmpeg = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
+const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked')
+ffmpeg.setFfmpegPath(pathToFfmpeg)
+ffmpeg.setFfprobePath(pathToFfprobe)
+
+const fs = require("fs")
+const path = require('path')
 
 // importing old database from JSON
 exports.importDatabase = async (req, res) => {
@@ -229,4 +239,50 @@ exports.importDatabase = async (req, res) => {
   }).catch(e => {
     console.log(e)
   })
+};
+
+exports.createThumb = async (req, res) => {
+  /** 
+   * Creating an image by taking a frame from a video.
+   * @param {string} timestamp - time in the video, in the format 00:00:00.
+   * @param {string} inputPath - full path to the video file.
+   * @param {string} outputPath - full path to the generated image with the extension and file name.
+   * @param {number} width - width of thumbnail in pixels.
+   */
+  function createThumb(timestamp, inputPath, outputPath, width) {
+    return new Promise((resolve, reject) => {
+      ffmpeg()
+        .addOption('-ss', timestamp)
+        .addOption('-i', inputPath)
+        .addOption('-frames:v', '1')
+        .addOption('-vf', `scale=-1:${width}`)
+        .save(outputPath)
+        .on('end', (e) => {
+          resolve(e)
+        })
+        .on('error', (e) => {
+          reject(e)
+        })
+    })
+  }
+
+  if (fs.existsSync(req.body.outputPath)) {
+    res.status(400).send({
+      message: "Image already exists."
+    })
+  }
+
+  let outputPath = path.join(
+    __dirname,
+    '../../',
+    req.body.outputPath
+  )
+  createThumb(req.body.timestamp, req.body.inputPath, outputPath, req.body.width)
+    .then(thumbResult => {
+      res.status(201).send(thumbResult)
+    })
+    .catch(e => {
+      console.log(e)
+      res.status(400).send(e)
+    })
 };

@@ -237,15 +237,16 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-      // create marker thumb // TODO make this
-      // for (let i=0; i<markers.length; i++) {
-      //   let imgPath = path.join(this.pathToUserData, `/media/markers/${markers[i].id}.jpg`)
-      //   if (fs.existsSync(imgPath)) continue
-      //   let specificTime = new Date(1000*markers[i].time).toISOString().substr(11, 8)
-      //   this.createMarkerThumb(specificTime, video.path, imgPath, 180)
-      //     .then(result => { /*console.log('thumb created')*/ })
-      //     .catch(error => { /*console.log(error)*/ })
-      // }
+      // creating mark thumb
+      for (let mark of this.markers) {
+        let time = new Date(1000 * mark.time).toISOString().substr(11, 8);
+        let imgPath = "/userfiles/media/markers/" + mark.id + ".jpg";
+        await Vue.prototype
+          .$createThumb(time, video.path, imgPath, 180)
+          .then(() => {
+            this.$root.$emit('updateMarkerImage', mark.id)
+          });
+      }
     },
     moveOverPlayer(e) {
       if (!e.movementX > 0 || !e.movementY > 0) return;
@@ -313,12 +314,12 @@ export default {
     },
     changeVolume(e) {
       let volume = (this.player.volume - e.deltaY / 1000 / 2).toFixed(2);
-      if (volume < 0) volume = 0
-      if (volume > 1) volume = 1
+      if (volume < 0) volume = 0;
+      if (volume > 1) volume = 1;
       this.player.volume = volume;
       this.volume = volume;
       this.$store.dispatch("changePlayerStatusText", {
-        text: (volume*100).toFixed() + ' %',
+        text: (volume * 100).toFixed() + " %",
         icon: "volume-high",
       });
     },
@@ -393,7 +394,6 @@ export default {
     // *************************** Emitted **************************
     // ***************************************************************
     playVideoObject(video) {
-      console.log(video)
       this.loadSrc(video);
     },
   },

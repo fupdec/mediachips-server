@@ -3,16 +3,16 @@ const path = require('path')
 
 const ApiCalls = {
   install(Vue, options) {
-    Vue.prototype.$getLocalImage = async function (imgPath) { 
-      let result 
+    Vue.prototype.$getLocalImage = async function (imgPath) {
+      let result
       await axios({
-        method: 'post',
-        url: options.store.state.localhost + '/api/get-file',
-        responseType: 'blob',
-        data: {
-          url: imgPath,
-        }
-      })
+          method: 'post',
+          url: options.store.state.localhost + '/api/get-file',
+          responseType: 'blob',
+          data: {
+            url: imgPath,
+          }
+        })
         .then(res => {
           result = URL.createObjectURL(res.data)
         })
@@ -21,6 +21,27 @@ const ApiCalls = {
           // console.log(e)
         })
       return result
+    }
+    Vue.prototype.$createThumb = function (timestamp, inputPath, outputPath, width) {
+      return new Promise((resolve, reject) => {
+        axios({
+            method: 'post',
+            url: options.store.state.localhost + '/api/Functions/createThumb',
+            data: {
+              timestamp,
+              inputPath,
+              outputPath,
+              width
+            }
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
     }
   }
 }
