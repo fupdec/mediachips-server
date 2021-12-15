@@ -48,7 +48,7 @@
         <v-list dense class="pa-0">
           <v-list-item-group v-model="nowPlaying" mandatory color="primary">
             <v-list-item
-              v-for="(video, i) in videos"
+              v-for="(video, i) in playlist"
               :key="video.id"
               :ref="`videoItem${i}`"
               @click="play(i)"
@@ -99,8 +99,8 @@ export default {
     reg: true,
   }),
   computed: {
-    videos() {
-      return this.$store.state.Player.videos;
+    playlist() {
+      return this.$store.state.Player.playlist;
     },
     isPlaylistVisible: {
       get() {
@@ -137,7 +137,7 @@ export default {
   },
   methods: {
     async getThumbs() {
-      for (let i of this.videos) {
+      for (let i of this.playlist) {
         let imgPath = path.join(
           __dirname,
           `/userfiles/media/thumbs/${i.oldId}.jpg`
@@ -148,7 +148,7 @@ export default {
     play(index) {
       if (this.playlistMode.includes("shuffle")) {
         let indexes = [];
-        for (let i = 0; i < this.videos.length; i++) indexes.push(i);
+        for (let i = 0; i < this.playlist.length; i++) indexes.push(i);
         this.playlistShuffle = _.shuffle(indexes);
         const i = this.playlistShuffle.indexOf(index);
         this.playlistShuffle.splice(i, 1);
@@ -157,7 +157,7 @@ export default {
         this.player.playlist.playItem(index);
 
         if (this.isPlaylistVisible) this.scrollToNowPlaying();
-      } else this.$emit("play", this.videos[index]);
+      } else this.$emit("play", this.playlist[index]);
     },
     getFileName(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
@@ -169,16 +169,16 @@ export default {
     },
   },
   watch: {
-    videos() {
+    playlist() {
       this.getThumbs();
     },
     playlistMode(mode, oldMode) {
       if (!mode.includes("shuffle") && oldMode.includes("shuffle")) return;
       let index = [];
-      for (let i = 0; i < this.videos.length; i++) index.push(i);
+      for (let i = 0; i < this.playlist.length; i++) index.push(i);
       this.playlistShuffle = _.shuffle(index);
       this.nowPlaying = this.playlistShuffle[0];
-      this.$emit("play", this.videos[this.nowPlaying]);
+      this.$emit("play", this.playlist[this.nowPlaying]);
       if (this.isPlaylistVisible) this.scrollToNowPlaying();
     },
   },

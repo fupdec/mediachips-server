@@ -85,7 +85,7 @@ export default {
     document.addEventListener("mousemove", this.controlsMove, false);
     document.addEventListener("mouseup", this.controlsUp, false);
     this.$root.$on("playVideo", (video, videos) => {
-      this.videos = videos.map((i) => ({
+      this.playlist = videos.map((i) => ({
         ...i,
         ...{ thumb: path.join(__dirname, "/images/ghost.png") },
       }));
@@ -131,12 +131,12 @@ export default {
         this.$store.state.Player.active = value;
       },
     },
-    videos: {
+    playlist: {
       get() {
-        return this.$store.state.Player.videos;
+        return this.$store.state.Player.playlist;
       },
       set(value) {
-        this.$store.state.Player.videos = value;
+        this.$store.state.Player.playlist = value;
       },
     },
     nowPlaying: {
@@ -205,10 +205,10 @@ export default {
       this.player.addEventListener("loadedmetadata", () => {
         this.duration = this.player.duration;
       });
-      this.player.addEventListener("ended", (event) => {
+      this.player.addEventListener("ended", () => {
         if (this.playlistMode.includes("autoplay")) this.next();
       });
-      this.player.addEventListener("error", (event) => {
+      this.player.addEventListener("error", () => {
         this.playbackError = true;
       });
     },
@@ -217,7 +217,7 @@ export default {
       this.getMarkers(video);
       this.$store.commit("trackCurrentTime");
       let fileName = this.getFileNameFromPath(video.path);
-      this.nowPlaying = _.findIndex(this.videos, (i) => i.id == video.id);
+      this.nowPlaying = _.findIndex(this.playlist, (i) => i.id == video.id);
       this.$store.dispatch("changePlayerStatusText", {
         text: `${this.nowPlaying + 1}. ${fileName}`,
         icon: "playlist-play",
@@ -274,12 +274,8 @@ export default {
       } else await document.exitPictureInPicture();
     },
     playVideoInSystemPlayer() {
-      shell.openPath(this.videos[this.nowPlaying].path);
-    },
-    playVideo(video) {
-      this.player.src = video.path;
-      this.player.play();
-      // ipcRenderer.send("videoWatched", video.id);
+      // TODO remake this
+      shell.openPath(this.playlist[this.nowPlaying].path);
     },
     // ***************************************************************
     // *************************** CONTROLS **************************

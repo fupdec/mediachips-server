@@ -23,9 +23,8 @@ const Player = {
     seeking: false,
     playbackError: null,
     // Playlist
-    nowPlaying: 0,
     isPlaylistVisible: false,
-    videos: [],
+    nowPlaying: 0,
     playlist: [],
     playlistShuffle: [],
     playlistMode: ['autoplay'],

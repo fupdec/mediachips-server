@@ -200,8 +200,8 @@ export default {
         this.$store.state.Player.player = value;
       },
     },
-    videos() {
-      return this.$store.state.Player.videos;
+    playlist() {
+      return this.$store.state.Player.playlist;
     },
     nowPlaying: {
       get() {
@@ -221,12 +221,12 @@ export default {
       if (this.playlistMode.includes("shuffle")) {
         let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
         return (
-          shuffleIndex + 1 >= this.videos.length &&
+          shuffleIndex + 1 >= this.playlist.length &&
           !this.playlistMode.includes("loop")
         );
       } else
         return (
-          this.nowPlaying + 1 >= this.videos.length &&
+          this.nowPlaying + 1 >= this.playlist.length &&
           !this.playlistMode.includes("loop")
         );
     },
@@ -347,14 +347,14 @@ export default {
         let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
         shuffleIndex = shuffleIndex - 1;
         if (isLoopMode && shuffleIndex < 0)
-          shuffleIndex = this.videos.length - 1; // if loop mode
+          shuffleIndex = this.playlist.length - 1; // if loop mode
         this.nowPlaying = this.playlistShuffle[shuffleIndex];
       } else {
         this.nowPlaying = this.nowPlaying - 1;
         if (isLoopMode && this.nowPlaying < 0)
-          this.nowPlaying = this.videos.length - 1; // if loop
+          this.nowPlaying = this.playlist.length - 1; // if loop
       }
-      this.$emit("play", this.videos[this.nowPlaying]);
+      this.$emit("play", this.playlist[this.nowPlaying]);
       if (this.isPlaylistVisible) this.$root.$emit("scrollToNowPlaying");
     },
     next() {
@@ -364,14 +364,15 @@ export default {
       if (this.playlistMode.includes("shuffle")) {
         let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
         shuffleIndex = shuffleIndex + 1;
-        if (isLoopMode && shuffleIndex == this.videos.length) shuffleIndex = 0; // if loop mode
+        if (isLoopMode && shuffleIndex == this.playlist.length)
+          shuffleIndex = 0; // if loop mode
         this.nowPlaying = this.playlistShuffle[shuffleIndex];
       } else {
         this.nowPlaying = this.nowPlaying + 1;
-        if (isLoopMode && this.nowPlaying > this.videos.length - 1)
+        if (isLoopMode && this.nowPlaying > this.playlist.length - 1)
           this.nowPlaying = 0; // if loop mode
       }
-      this.$emit("play", this.videos[this.nowPlaying]);
+      this.$emit("play", this.playlist[this.nowPlaying]);
 
       if (this.isPlaylistVisible) this.$root.$emit("scrollToNowPlaying");
     },
@@ -436,7 +437,7 @@ export default {
       this.$root.$emit("scrollToNowPlaying");
     },
     async setAsThumb() {
-      let video = this.videos[this.nowPlaying];
+      let video = this.playlist[this.nowPlaying];
       let imgPath = "/userfiles/media/thumbs/" + video.oldId + ".jpg";
       let time = new Date(this.player.currentTime * 1000)
         .toISOString()
