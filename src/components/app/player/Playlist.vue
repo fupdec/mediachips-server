@@ -1,5 +1,10 @@
 <template>
-  <v-card v-show="isPlaylistVisible" class="playlist-wrapper">
+  <v-card
+    v-show="isPlaylistVisible"
+    class="playlist-wrapper"
+    elevation="20"
+    outlined
+  >
     <v-card-actions class="pa-1">
       <v-icon left>mdi-format-list-bulleted</v-icon>
       <span>Playlist</span>

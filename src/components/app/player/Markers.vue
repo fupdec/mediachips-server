@@ -1,5 +1,10 @@
 <template>
-  <v-card v-show="isMarkersVisible" class="markers-wrapper">
+  <v-card
+    v-show="isMarkersVisible"
+    class="markers-wrapper"
+    elevation="20"
+    outlined
+  >
     <v-card-actions class="pa-1">
       <v-icon left>mdi-map-mark</v-icon>
       <span>Markers</span>
@@ -46,15 +51,10 @@
           <div v-for="mark in markers" :key="mark.id" class="mark-wrapper">
             <div v-if="markersType.includes(mark.type)">
               <div @click="jumpTo(mark.time)" class="mark">
-                <v-img
-                  :src="mark.thumb"
-                  :aspect-ratio="16 / 9"
-                  class="thumb"
-                  :gradient="gradient"
-                >
+                <v-img :src="mark.thumb" :aspect-ratio="16 / 9" class="thumb">
                   <span class="time">{{ getDuration(mark.time) }}</span>
                   <div class="name">
-                    <v-icon small left :color="getColor(mark)">
+                    <v-icon small class="mr-1" :color="getColor(mark)">
                       mdi-{{ getIcon(mark) }}
                     </v-icon>
                     <span v-if="mark.type == 'meta'">{{
@@ -102,7 +102,7 @@ export default {
   },
   mounted() {
     this.$root.$on("updateMarkerImage", (id) => {
-      if (this.markers.some(i => i.id === id)) this.getThumbs();
+      if (this.markers.some((i) => i.id === id)) this.getThumbs();
     });
   },
   data: () => ({
@@ -134,11 +134,6 @@ export default {
       set(value) {
         this.$store.state.Player.markers = value;
       },
-    },
-    gradient() {
-      if (this.$vuetify.theme.dark)
-        return "to bottom, rgba(0, 0, 0, 0.5), transparent";
-      else return "to bottom, rgba(255, 255, 255, 0.5), transparent";
     },
     metaMarkers() {
       return [];

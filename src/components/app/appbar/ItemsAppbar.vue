@@ -5,7 +5,7 @@
     </div>
 
     <v-spacer></v-spacer>
-    <img :src="logo" class="logo"/>
+    <img @click="toggleDarkMode" :src="logo" class="logo"/>
     <v-spacer></v-spacer>
 
     <div>
@@ -30,6 +30,11 @@ export default {
       return path.join(__dirname, '/icons/icon.png');
     },
   },
+  methods: {
+    toggleDarkMode() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+    }
+  }
 };
 </script>
 
