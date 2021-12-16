@@ -14,7 +14,7 @@
           @click="paused ? play() : pause()"
           @dblclick="toggleFullscreen"
           @click.middle="toggleFullscreen"
-          @mousedown="handleMouseCanvas($event)"
+          @mousedown="clickOnVideo($event)"
           @wheel="changeVolume"
           @keydown="handleKey"
           tabindex="-1"
@@ -22,7 +22,7 @@
           <video ref="videoPlayer" autoplay />
           <div v-if="playbackError && reg" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
-            <div>{{ getFileNameFromPath(videos[nowPlaying].path) }}</div>
+            <div>{{ getFileNameFromPath(playlist[nowPlaying].path) }}</div>
             <div class="mb-4">Video format not supported.</div>
             <v-btn @click="playVideoInSystemPlayer" color="primary" small>
               <v-icon left>mdi-television-play</v-icon>
@@ -38,7 +38,7 @@
           </div>
           <div v-if="playbackError" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
-            <div>{{ getFileNameFromPath(videos[nowPlaying].path) }}</div>
+            <div>{{ getFileNameFromPath(playlist[nowPlaying].path) }}</div>
             <div class="mb-4">The video file is missing.</div>
           </div>
           <div v-show="statusText" class="status-text">
@@ -47,6 +47,7 @@
           </div>
         </div>
         <Controls
+          ref="controls"
           v-show="isControlsVisible"
           @toggleFullscreen="toggleFullscreen"
           @togglePictureInPicture="togglePictureInPicture"
@@ -206,7 +207,7 @@ export default {
         this.duration = this.player.duration;
       });
       this.player.addEventListener("ended", () => {
-        if (this.playlistMode.includes("autoplay")) this.next();
+        if (this.playlistMode.includes("autoplay")) this.$refs.controls.next();
       });
       this.player.addEventListener("error", () => {
         this.playbackError = true;
@@ -305,7 +306,7 @@ export default {
     handleKey(e) {
       switch (true) {
         case e.key === " ":
-          this.player.togglePause();
+          this.$refs.controls.togglePause();
           break;
         case e.key === "ArrowRight":
           this.$store.dispatch("playerJumpTo", {
@@ -327,50 +328,50 @@ export default {
           this.toggleFullscreen();
           break;
         case e.key === "p":
-          this.togglePlaylist();
+          this.$refs.controls.togglePlaylist();
           break;
         case e.key === "m":
-          this.toggleMarkers();
+          this.$refs.controls.toggleMarkers();
           break;
         case e.key === ",":
-          this.jumpToPrevMarker();
+          this.$refs.controls.jumpToPrevMarker();
           break;
         case e.key === ".":
-          this.jumpToNextMarker();
+          this.$refs.controls.jumpToNextMarker();
           break;
         case e.key === "z":
-          this.prev();
+          this.$refs.controls.prev();
           break;
         case e.key === "c":
-          this.next();
+          this.$refs.controls.next();
           break;
         case e.key === "x":
-          this.stop();
+          this.$refs.controls.stop();
           break;
         case e.key === "1":
-          this.addMarker("favorite");
+          this.addMarker("favorite"); // TODO make it
           break;
         case e.key === "2":
-          this.openDialogMarkerBookmark();
+          this.openDialogMarkerBookmark(); // TODO make it
           break;
         case e.key === "Escape":
           this.fullscreen ? this.toggleFullscreen() : "";
           break;
       }
     },
-    handleMouseCanvas(e) {
+    clickOnVideo(e) {
       let btnCode = e.button;
       switch (btnCode) {
         case 3:
-          this.prev();
+          this.$refs.controls.prev();
           break;
         case 4:
-          this.next();
+          this.$refs.controls.next();
           break;
       }
     },
     // ***************************************************************
-    // *************************** Emitted **************************
+    // *************************** Emitted ***************************
     // ***************************************************************
     playVideoObject(video) {
       this.loadSrc(video);

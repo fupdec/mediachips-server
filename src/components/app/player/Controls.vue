@@ -339,6 +339,9 @@ export default {
     stop() {
       this.$store.dispatch("playerStop");
     },
+    togglePause() {
+      this.paused ? this.play() : this.pause();
+    },
     prev() {
       if (this.isPrevDisabled) return;
       let isLoopMode = this.playlistMode.includes("loop");
