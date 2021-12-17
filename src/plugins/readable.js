@@ -1,18 +1,18 @@
 const Readable = {
   install(Vue, options) {
     Vue.prototype.$getReadableFileSize = function (bytes) {
-      if (bytes > 1000000000000) bytes = (bytes/1024/1024/1024/1024-0.01).toFixed(2) + ' TB'
-      else if (bytes > 1000000000) bytes = (bytes/1024/1024/1024-0.01).toFixed(2) + ' GB'
-      else if (bytes > 1000000) bytes = (bytes/1024/1024-0.01).toFixed(0) + ' MB'
-      else if (bytes > 1000) bytes = (bytes/1024-0.01).toFixed(0) + ' KB'
+      if (bytes > 1000000000000) bytes = (bytes / 1024 / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' TB'
+      else if (bytes > 1000000000) bytes = (bytes / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' GB'
+      else if (bytes > 1000000) bytes = (bytes / 1024 / 1024 - 0.01).toFixed(0) + ' MB'
+      else if (bytes > 1000) bytes = (bytes / 1024 - 0.01).toFixed(0) + ' KB'
       else bytes += ' B'
       return bytes
     }
     Vue.prototype.$getReadableDuration = function (duration) {
       let sec = Math.floor(duration)
-      let h = sec / 3600 ^ 0 
-      let m = (sec - h * 3600) / 60 ^ 0 
-      let s = sec - h * 3600 - m * 60 
+      let h = sec / 3600 ^ 0
+      let m = (sec - h * 3600) / 60 ^ 0
+      let s = sec - h * 3600 - m * 60
       h = h < 10 ? "0" + h + ":" : h
       if (h === "00:") h = ""
       m = m < 10 ? "0" + m : m
@@ -21,8 +21,8 @@ const Readable = {
       return total
     }
     Vue.prototype.$getReadableBitrate = function (value) {
-      if (value > 1000000) value = (value/1024/1024-0.01).toFixed(0) + ' Mbps'
-      else if (value > 1000) value = (value/1024-0.01).toFixed(0) + ' Kbps'
+      if (value > 1000000) value = (value / 1024 / 1024 - 0.01).toFixed(0) + ' Mbps'
+      else if (value > 1000) value = (value / 1024 - 0.01).toFixed(0) + ' Kbps'
       else value += ' bps'
       return value
     }
@@ -43,6 +43,38 @@ const Readable = {
     }
     Vue.prototype.$getFileExtensionFromPath = function (fullPath) {
       return fullPath.split('.').pop().toLowerCase()
+    }
+    Vue.prototype.$checkColorForDarkText = function (color) {
+      // Variables for red, green, blue values
+      let r, g, b, hsp;
+
+      // Check the format of the color, HEX or RGB?
+      if (color.match(/^rgb/)) {
+        // If RGB --> store the red, green, blue values in separate variables
+        color = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+
+        r = color[1];
+        g = color[2];
+        b = color[3];
+      } else {
+        // If hex --> Convert it to RGB: http://gist.github.com/983661
+        color = +("0x" + color.slice(1).replace(
+          color.length < 5 && /./g, '$&$&'));
+
+        r = color >> 16;
+        g = color >> 8 & 255;
+        b = color & 255;
+      }
+
+      // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+      hsp = Math.sqrt(
+        0.299 * (r * r) +
+        0.587 * (g * g) +
+        0.114 * (b * b)
+      );
+
+      // Using the HSP value, determine whether the color is light or dark
+      return hsp < 160
     }
   }
 }

@@ -1,37 +1,56 @@
 <template>
   <v-lazy>
-    <v-card @click="openPlayer" v-ripple="{ class: 'accent--text' }" :class="{favorite: isFavorite}" outlined hover
-      class="video-card meta-card">
+    <v-card
+      @click="openPlayer"
+      v-ripple="{ class: 'accent--text' }"
+      :class="{ favorite: isFavorite }"
+      outlined
+      hover
+      class="video-card meta-card"
+    >
       <v-responsive>
-        <v-img :src="thumb" :aspect-ratio="16/9"/>
-        <v-rating  
-          :value="video.rating" @input="changeRating($event, video.id)"
+        <v-img :src="thumb" :aspect-ratio="16 / 9" />
+        <v-rating
+          :value="video.rating"
+          @input="changeRating($event, video.id)"
           class="rating rating-wrapper"
-          color="yellow darken-2" background-color="grey darken-1"
-          empty-icon="mdi-star-outline" half-icon="mdi-star-half-full"
-          dense half-increments hover clearable />
-        
-        <v-btn 
-          @click="isFavorite = !isFavorite" icon absolute 
-          :color="isFavorite===false ? 'white' : 'pink'" class="fav-btn"
-        > <v-icon :color="isFavorite===false?'grey':'pink'">mdi-heart-outline</v-icon>
+          color="yellow darken-2"
+          background-color="grey darken-1"
+          empty-icon="mdi-star-outline"
+          half-icon="mdi-star-half-full"
+          dense
+          half-increments
+          hover
+          clearable
+        />
+
+        <v-btn
+          @click="isFavorite = !isFavorite"
+          icon
+          absolute
+          :color="isFavorite === false ? 'white' : 'pink'"
+          class="fav-btn"
+        >
+          <v-icon :color="isFavorite === false ? 'grey' : 'pink'"
+            >mdi-heart-outline</v-icon
+          >
         </v-btn>
-        
-        <div class="duration">{{duration}}</div>
+
+        <div class="duration">{{ duration }}</div>
 
         <div label outlined class="resolution">
           <div class="text text-no-wrap" :class="quality.toLowerCase()">
-            {{quality}}
+            {{ quality }}
           </div>
           <div class="value">
-            <span>{{height}}</span>
+            <span>{{ height }}</span>
           </div>
         </div>
-        
+
         <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
       <!-- <div>VideoID: {{video.id}}</div> -->
-      <div class="video-card-title" :title="fileName" v-html="fileName"/>
+      <div class="video-card-title" :title="fileName" v-html="fileName" />
 
       <!-- Video meta -->
       <v-chip label class="props px-2 py-1 mt-0 mx-1">
@@ -41,20 +60,25 @@
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-file-video</v-icon>
-          {{fileExtension}}
+          {{ fileExtension }}
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-monitor-screenshot</v-icon>
-          {{video.VideoMetadata.width+'x'+video.VideoMetadata.height}}
+          {{ video.VideoMetadata.width + "x" + video.VideoMetadata.height }}
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-harddisk</v-icon>
-          {{filesize}}
+          {{ filesize }}
         </div>
       </v-chip>
 
-      <v-chip v-for="i in meta" :key="i.itemId" :color="i['Item.color']">
-        {{ i['Item.name'] }} 
+      <v-chip
+        v-for="i in meta"
+        :key="i.itemId"
+        :color="i['Item.color']"
+        :text-color="getTextColor(i['Item.color'])"
+      >
+        {{ i["Item.name"] }}
       </v-chip>
 
       <!-- Parse meta -->
@@ -87,17 +111,23 @@
           </div>
         </div>
       </div> -->
-      
-      <v-icon v-if="video.bookmark" class="bookmark" color="red" :title="video.bookmark">mdi-bookmark</v-icon>
+
+      <v-icon
+        v-if="video.bookmark"
+        class="bookmark"
+        color="red"
+        :title="video.bookmark"
+        >mdi-bookmark</v-icon
+      >
     </v-card>
   </v-lazy>
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
+import Vue from "vue";
+import axios from "axios";
 
-const path = require('path')
+const path = require("path");
 // const { dialog } = require('electron').remote
 // const { clipboard } = require('electron')
 // const shell = require('electron').shell
@@ -115,7 +145,7 @@ const path = require('path')
 // const express = require("express")
 // const app = express()
 export default {
-  name: 'VideoItem',
+  name: "VideoItem",
   props: {
     video: Object,
     media: Array,
@@ -123,64 +153,97 @@ export default {
   // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
   mounted() {
     this.$nextTick(() => {
-      this.getMeta()
-      this.getImg()
-    })
+      this.getMeta();
+      this.getImg();
+    });
     this.$root.$on("updateVideoThumb", (id) => {
       if (this.video.id === id) this.getImg();
     });
   },
-  destroyed() {
-  },
+  destroyed() {},
   data: () => ({
     meta: [],
     thumb: null,
   }),
   computed: {
-    apiUrl() { return this.$store.state.localhost },
-    quality() { return Vue.prototype.$getReadableVideoQuality(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
-    height() { return Vue.prototype.$getReadableVideoHeight(this.video.VideoMetadata.width, this.video.VideoMetadata.height) },
-    filesize() { return Vue.prototype.$getReadableFileSize(this.video.filesize) },
-    duration() { return Vue.prototype.$getReadableDuration(this.video.VideoMetadata.duration) },
-    fileName() { return Vue.prototype.$getFileNameFromPath(this.video.path) },
-    fileExtension() { return Vue.prototype.$getFileExtensionFromPath(this.video.path) },
-    isFavorite() { return this.video.favorite },
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
+    quality() {
+      return Vue.prototype.$getReadableVideoQuality(
+        this.video.VideoMetadata.width,
+        this.video.VideoMetadata.height
+      );
+    },
+    height() {
+      return Vue.prototype.$getReadableVideoHeight(
+        this.video.VideoMetadata.width,
+        this.video.VideoMetadata.height
+      );
+    },
+    filesize() {
+      return Vue.prototype.$getReadableFileSize(this.video.filesize);
+    },
+    duration() {
+      return Vue.prototype.$getReadableDuration(
+        this.video.VideoMetadata.duration
+      );
+    },
+    fileName() {
+      return Vue.prototype.$getFileNameFromPath(this.video.path);
+    },
+    fileExtension() {
+      return Vue.prototype.$getFileExtensionFromPath(this.video.path);
+    },
+    isFavorite() {
+      return this.video.favorite;
+    },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
     // visibility() { return this.$store.state.Settings.videoVisibility },
     // isSelectedSingleVideo() { return this.$store.getters.getSelectedVideos.length == 1 },
     // complexMetaAssignedToVideo() { return this.$store.getters.settings.get('metaAssignedToVideos').filter({type:'complex'}).value() },
-    // metaForParsing() {  
-    //   let ids = this.$store.getters.settings.get('metaAssignedToVideos').filter({type:'complex'}).map('id').value() 
+    // metaForParsing() {
+    //   let ids = this.$store.getters.settings.get('metaAssignedToVideos').filter({type:'complex'}).map('id').value()
     //   return this.$store.getters.meta.filter(i=>ids.includes(i.id)&&i.settings.parser).value()
     // },
     // showEmptyMetaValueInCard() { return this.$store.state.Settings.showEmptyMetaValueInCard },
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
-    async getImg() { 
-      let imgPath = path.join(__dirname, '/userfiles/media/thumbs/', this.video.oldId + '.jpg') 
-      this.thumb = await Vue.prototype.$getLocalImage(imgPath)
+    async getImg() {
+      let imgPath = path.join(
+        __dirname,
+        "/userfiles/media/thumbs/",
+        this.video.oldId + ".jpg"
+      );
+      this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },
     // mountSrc() {
-    //   this.$refs.video.src = this.video.path 
+    //   this.$refs.video.src = this.video.path
     // },
     getMeta() {
-      let url = `/api/ItemsInMedia?mediaId=${this.video.id}`
-      axios.get(this.apiUrl + url)
-        .then(res => {
-          this.meta = res.data
+      let url = `/api/ItemsInMedia?mediaId=${this.video.id}`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.meta = res.data;
         })
-        .catch(e => {
-          console.log(e)
-        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     openPlayer() {
-      this.$store.state.Player.active = true
-      this.$root.$emit('playVideo', this.video, this.media )
+      this.$store.state.Player.active = true;
+      this.$root.$emit("playVideo", this.video, this.media);
+    },
+    getTextColor(color) {
+      if (!color) return ''
+      let value = Vue.prototype.$checkColorForDarkText(color);
+      if (value) return 'white'
+      else return 'black'
     },
   },
-  watch: {
-  }
-}
+  watch: {},
+};
 </script>
