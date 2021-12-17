@@ -143,9 +143,11 @@
       width: 10vw;
       left: -4vw;
       display: none;
-      background-color: rgba(10, 10, 10, 0.75);
       border-radius: 2px 2px 0 0;
       font-size: 12px;
+    }
+    .v-chip {
+      height: 18px;
     }
   }
   .duration {
@@ -185,13 +187,6 @@
   }
 }
 .theme--dark {
-  .controls {
-    .timeline {
-      .tooltip {
-        background-color: rgba(255, 255, 255, 0.75);
-      }
-    }
-  }
   .markers-wrapper {
     .mark {
       .name,
@@ -327,6 +322,18 @@
       border-radius: 0 0 3px 0;
       position: absolute;
     }
+  }
+  .time {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 1vw;
+    line-height: 1.2;
+    word-break: keep-all;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 3px 0 0 0;
+    background-color: rgba(255, 255, 255, 0.7);
   }
   .play-state {
     display: flex;

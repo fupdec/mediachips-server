@@ -62,11 +62,14 @@
               <img :src="video.thumb" class="thumb" />
               <span class="video-name">
                 <b>{{ i + 1 }}.</b>
-                <span class="path">{{ getFileName(video.path) }}</span>
+                <span class="path" v-html="getFileName(video.path)" />
               </span>
               <div v-if="!reg && i > 4" class="reg-playlist">
                 App not registered
               </div>
+              <span class="time">
+                {{ getDuration(video['VideoMetadata'].duration) }}
+              </span>
               <span
                 v-if="nowPlaying === i"
                 class="play-state overline text--primary"
@@ -166,6 +169,9 @@ export default {
     },
     getFileName(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
+    },
+    getDuration(time) {
+      return Vue.prototype.$getReadableDuration(time);
     },
     scrollToNowPlaying() {
       const height =

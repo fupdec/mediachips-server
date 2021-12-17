@@ -4,15 +4,15 @@
     class="marker"
     :style="position + `background-color:${color}`"
   >
-    <div class="tooltip text-center">
+    <v-sheet class="tooltip text-center" outlined rounded>
       <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb" />
-      <div>
-        <v-icon small left :color="color"> mdi-{{ icon }} </v-icon>
+      <v-chip small class="mr-1 px-1 py-0">
+        <v-icon small class="mr-1" :color="color"> mdi-{{ icon }} </v-icon>
         <span v-if="mark.type == 'meta'">{{ mark["Item.name"] }}</span>
         <span v-else>{{ mark.name }}</span>
-      </div>
-      <v-chip outlined small class="pa-1">{{ duration }}</v-chip>
-    </div>
+      </v-chip>
+      <v-chip label small class="pa-1 py-0">{{ duration }}</v-chip>
+    </v-sheet>
   </div>
 </template>
 
