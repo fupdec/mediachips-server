@@ -2,143 +2,79 @@
   <div>
     <v-container class="text-center">
       <v-alert type="info" outlined>
-        Welcome to mediaChips. Please choose archive with backup of version 0.11.1
+        Welcome to mediaChips. You can open the application in a browser at
+        <b> {{ localhost }} </b>
       </v-alert>
-      <v-btn color="success">import db</v-btn>
+      <v-alert type="info" outlined>
+        To import your database, first specify the exact path to the backup
+        archive of version 0.11.1
+      </v-alert>
+
+      <v-text-field
+        v-model="backup"
+        label="Place here full path to the backup archive"
+      ></v-text-field>
+      <v-btn @click="importData" :disabled="!backup" color="success">
+        <v-icon left> mdi-database-import </v-icon> import db
+      </v-btn>
     </v-container>
+
+    <v-dialog v-model="dialogImport" persistent width="500px">
+      <v-card class="text-center py-4">
+        <div v-if="isImportRun" class="headline">Importing database...</div>
+        <div v-if="isImportRun">This may take a few minutes</div>
+        <Loading v-show="isImportRun" />
+        <div>{{ importStatus }}</div>
+        <v-btn
+          @click="dialogImport = false"
+          :disabled="isImportRun"
+          v-html="'close'"
+          class="mt-4"
+        ></v-btn>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
-  name: 'Home',
-  components: {},
-  methods: {
-    importData() {
-      let obj = { meta: [], metaSettings: [], items: [], videos: [],  videoMetadata: [], playlists: [], markers: [], onlyMeta: [], metaInItems: [], settings: Settings }
-      obj.videos = Videos.videos.map(i=>({
-        oldId: i.id,
-        path: i.path,
-        filesize: i.size,
-        rating: i.rating || 0,
-        favorite: i.favorite || false,
-        bookmark: i.bookmark || null,
-        views: i.views || 0,
-        typeId: 1,
-        createdAt: (new Date(i.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-        updatedAt: (new Date(i.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-      }))
-      obj.videoMetadata = Videos.videos.map((i,x)=>({
-        // oldId: i.id, // its needed for parsing
-        mediaId: x+1,
-        duration: i.duration,
-        width: +i.resolution.match(/\d*/)[0] || 0,
-        height: +i.resolution.match(/\x(.*)/)[1] || 0,
-      }))
-      obj.playlists = Playlists.playlists.map(i=>({
-        oldId: i.id,
-        name: i.name,
-        favorite: i.favorite || false,
-        videos: i.videos || [],
-        createdAt: (new Date(i.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-        updatedAt: (new Date(i.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-      }))
-      obj.markers = Markers.markers.map(i=>({
-        time: i.time,
-        videoId: i.videoId,
-        text: ['favorite','bookmark'].includes(i.type.toLowerCase())?i.name:null,
-        type: ['favorite','bookmark'].includes(i.type.toLowerCase())?i.type.toLowerCase():'meta',
-        oldItemId: ['favorite','bookmark'].includes(i.type.toLowerCase())?null:i.name,
-      }))
-      // get meta
-      for (let m of Meta.meta) {
-        if (m.type === 'specific') continue
-        if (m.type === 'simple') {
-          let sm = {
-            oldId: m.id,
-            dataType: m.dataType,
-            name: m.settings.name,
-            nameSingular: m.settings.name,
-            icon: m.settings.icon || 'shape',
-            hint: m.settings.hint || '',
-            createdAt: (new Date(m.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-            updatedAt: (new Date(m.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-          }
-          obj.meta.push(sm)
-          if (m.dataType === 'array') {
-            let items = m.settings.items.map(i=>({
-              oldId: i.id,
-              name: i.name,
-            }))
-            obj.items.push({[m.id]: items})
-            obj.metaSettings.push({
-              "oldId": m.id,
-              "hidden": true,
-              "parser": false,
-              "imageAspectRatio": 1,
-              "imageTypes": "main",
-              "chipLabel": false,
-              "chipOutlined": false,
-              "color": false,
-              "favorite": true,
-              "rating": false,
-              "synonyms": false,
-              "bookmark": false,
-              "country": false,
-              "career": false,
-              "scraper": false,
-              "nested": false,
-              "markers": false,
-            })
-          }
-        } else if (m.type === 'complex') {
-          let cm = {
-            oldId: m.id,
-            dataType: 'array',
-            name: m.settings.name,
-            nameSingular: m.settings.nameSingular,
-            icon: m.settings.icon || 'shape',
-            hint: m.settings.hint || '',
-            createdAt: (new Date(m.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-            updatedAt: (new Date(m.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-          }
-          obj.meta.push(cm)
-          let metaSettings = m.settings
-          delete metaSettings.metaInCard
-          metaSettings.oldId = m.id
-          let imageTypes = metaSettings.imageTypes ? metaSettings.imageTypes.join() : "main"
-          metaSettings.imageTypes = imageTypes
-          obj.metaSettings.push(metaSettings)
-          let cards = Meta.cards.filter(card=>card.metaId==m.id).map(i=>({
-            oldId: i.id,
-            name: i.meta.name,
-            synonyms: i.meta.synonyms ? i.meta.synonyms.join() : null,
-            rating: i.meta.rating || 0,
-            favorite: i.meta.favorite || false,
-            bookmark: i.meta.bookmark || null,
-            country: i.meta.country ? i.meta.country.join() : null,
-            color: i.meta.color || null,
-            views: i.views || 0,
-            createdAt: (new Date(i.date).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-            updatedAt: (new Date(i.edit).toISOString()).replace('T',' ').replace('Z',' +00:00'),
-          }))
-          obj.items.push({[m.id]: cards})
-          const metaKeys = ['name','synonyms','favorite','rating','bookmark','country','color']
-          Meta.cards.filter(card=>card.metaId==m.id).slice(0,10).map(i=> {
-            let metas = Object.fromEntries(Object.entries(i.meta).filter(([key]) => !metaKeys.includes(key)))
-            obj.metaInItems.push({[i.id]: metas})
-          })
-        }
-      }
-      // get videos meta values and meta items 
-      const videoKeys = ['path','duration','size','rating','favorite','date','resolution','edit','views','viewed','bookmark']
-      obj.onlyMeta = Videos.videos.slice(0,100).map(i=>
-        Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
-      )
-      axios.post(this.$store.state.localhost + '/api/Functions/importDatabase', obj)
+  name: "Home",
+  components: {
+    Loading: () => import("@/components/elements/Loading.vue"),
+  },
+  data: () => ({
+    backup:
+      "C:\\Users\\CHANGETOUSERNAME\\AppData\\Roaming\\mediaChips\\userfiles\\backups\\CHANGETOLASTBACKUP.zip",
+    isImportRun: false,
+    importStatus: "",
+    dialogImport: false,
+  }),
+  computed: {
+    localhost() {
+      return this.$store.state.localhost;
     },
   },
-}
+  methods: {
+    importData() {
+      this.dialogImport = true;
+      this.isImportRun = true;
+      axios
+        .post(this.localhost + "/api/Functions/importDatabase", {
+          path: this.backup,
+        })
+        .then((e) => {
+          console.log(e);
+          this.importStatus = "Successfully imported";
+          this.isImportRun = false;
+          this.$root.$emit("updateNavbar");
+        })
+        .catch((e) => {
+          this.importStatus = e;
+          this.isImportRun = false;
+        });
+    },
+  },
+};
 </script>

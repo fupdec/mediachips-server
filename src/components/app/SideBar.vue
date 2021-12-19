@@ -99,6 +99,9 @@ export default {
     this.$nextTick(() => {
       this.getMediaList();
       this.getMetaList();
+      this.$root.$on("updateNavbar", () => {
+        this.getMetaList();
+      });
     });
   },
   data: () => ({
