@@ -5,8 +5,6 @@
     </div>
 
     <v-spacer></v-spacer>
-    <img @click="toggleDarkMode" :src="logo" class="logo"/>
-    <v-spacer></v-spacer>
 
     <div>
       <ItemsPerPage />

@@ -1,24 +1,26 @@
 <template>
-	<v-app-bar app dense clipped-left extension-height="28" :style="{background: headerColor}">
+  <v-app-bar
+    app
+    dense
+    clipped-left
+    extension-height="28"
+  >
     <router-view name="appbar" :key="$route.fullPath" />
 
     <!-- <template v-slot:extension v-if="tabs.length>0"> <Tabs /> </template> -->
-	</v-app-bar>
+  </v-app-bar>
 </template>
 
 
 <script>
 export default {
-  name: 'AppBar',
+  name: "AppBar",
   components: {
     // Tabs: () => import('@/components/elements/Tabs.vue'),
   },
   mounted() {
-    this.$nextTick(function () {
-    })
   },
   data: () => ({
-    headerColor: '#826893',
   }),
   computed: {
     // headerColor() {
@@ -34,9 +36,7 @@ export default {
     // },
     // tabs() { return this.$store.getters.tabs },
   },
-  methods: {
-  },
-  watch: {
-  },
-}
+  methods: {},
+  watch: {},
+};
 </script>

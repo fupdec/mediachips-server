@@ -1,10 +1,19 @@
-const { BrowserWindow, app } = require('electron')
+const {
+  BrowserWindow,
+  Menu,
+  app
+} = require('electron')
 require('./server.js')
 const config = require('./config.json')
+const path = require('path')
 
 let mainWindow = null
+
 function main() {
-  mainWindow = new BrowserWindow()
+  mainWindow = new BrowserWindow({
+    backgroundColor: '#333',
+    icon: path.join(__dirname, 'dist/icons', 'icon.png'),
+  })
   mainWindow.loadURL(`http://localhost:${config.port}/`)
   mainWindow.on('close', () => {
     mainWindow = null
@@ -12,3 +21,14 @@ function main() {
 }
 
 app.on('ready', main)
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+  // On macOS it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') app.quit()
+})
+
+let systemMenu = Menu.buildFromTemplate([])
+
+Menu.setApplicationMenu(systemMenu)

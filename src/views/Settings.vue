@@ -1,8 +1,10 @@
 <template>
   <v-container>
+    <v-switch label="Dark mode" v-model="darkMode"></v-switch>
+    
     <vuescroll>
-      <div style="max-height:400px;">
-        <TableMetaInMediaTypes/>
+      <div style="max-height: 400px">
+        <TableMetaInMediaTypes />
       </div>
     </vuescroll>
   </v-container>
@@ -10,26 +12,29 @@
 
 
 <script>
-import vuescroll from 'vuescroll'
-import TableMetaInMediaTypes from '@/components/settings/TableMetaInMediaTypes.vue'
+import vuescroll from "vuescroll";
+import TableMetaInMediaTypes from "@/components/settings/TableMetaInMediaTypes.vue";
 
 export default {
-  name: 'Settings',
+  name: "Settings",
   components: {
     vuescroll,
     TableMetaInMediaTypes,
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
-    })
+      this.darkMode = this.$vuetify.theme.dark;
+    });
   },
-  data: ()=>({
+  data: () => ({
+    darkMode: false,
   }),
-  computed: {
-  },
-  methods: {
-  },
+  computed: {},
+  methods: {},
   watch: {
-  }
-}
+    darkMode() {
+      this.$vuetify.theme.dark = this.darkMode;
+    },
+  },
+};
 </script>
