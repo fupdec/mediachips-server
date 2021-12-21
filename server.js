@@ -23,6 +23,7 @@ try {
 }
 
 // sequelize.sync({force: true}) // drop existing tables on start
+const settings = require('./default-settings.json')
 db.sequelize.sync().then(async () => {
   // create media type: videos
   await db.MediaTypes.findOrCreate({
@@ -34,11 +35,8 @@ db.sequelize.sync().then(async () => {
       extensions: '.mp4'
     }
   })
-  await db.Settings.findOrCreate({
-    where: {
-      id: 1,
-    },
-    defaults: {}
+  await db.Settings.bulkCreate(settings.default, {
+    ignoreDuplicates: true
   })
 })
 
@@ -151,7 +149,7 @@ for (const name of Object.keys(nets)) {
     }
   }
 }
-const ip = results.Ethernet[0]
+const ip = results.Ethernet ? results.Ethernet[0] : '192.168.0.1'
 let config = require(configPath)
 config.ip = ip
 

@@ -233,10 +233,29 @@ exports.importDatabase = async (req, res) => {
     //   else await VideoMetadata.create({...{mediaId:media.id}, ...video})
     // }
   }).then(async () => {
-    await Settings.update(obj.settings, {
-      where: {
-        id: 1
-      }
+    const defaultSettings = require('../../default-settings.json')
+    const settings = obj.settings
+    let allowed = defaultSettings.default.map(i => i.option)
+
+    const filteredOptions = Object.keys(settings)
+      .filter(key => allowed.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = settings[key];
+        return obj;
+      }, {});
+
+    let options = []
+    for (let option in filteredOptions) {
+      let value = filteredOptions[option]
+      console.log(typeof value)
+      options.push({
+        option: option,
+        value: value
+      })
+    }
+
+    await Settings.bulkCreate(options, {
+      updateOnDuplicate: ["value"]
     })
   }).then(async () => {
     await Meta.bulkCreate(obj.meta)
