@@ -18,14 +18,18 @@
           <td>
             <div class="d-flex justify-space-between align-center">
               <span>
-                <v-icon left>mdi-{{i.icon}}</v-icon>
-                {{i.name}}
+                <v-icon left>mdi-{{ i.icon }}</v-icon>
+                {{ i.name }}
               </span>
-              <v-icon left :title="i.dataType">mdi-{{getIcon(i.dataType)}}</v-icon>
+              <v-icon left :title="i.dataType"
+                >mdi-{{ getIcon(i.dataType) }}</v-icon
+              >
             </div>
           </td>
           <th>
-            <v-icon v-if="isMetaAssigned(i.id)" color="success">mdi-checkbox-marked-circle</v-icon>
+            <v-icon v-if="isMetaAssigned(i.id)" color="success"
+              >mdi-checkbox-marked-circle</v-icon
+            >
             <v-icon v-else>mdi-minus</v-icon>
           </th>
           <th>
@@ -39,54 +43,54 @@
 
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
-  name: 'TableMetaInMediaTypes',
-  components: { },
+  name: "TableMetaInMediaTypes",
+  components: {},
   mounted() {
     this.$nextTick(() => {
-      this.getMetaInMediaTypes()
-    })
+      this.getMetaInMediaTypes();
+    });
   },
   data: () => ({
     metaInMediaTypes: [],
     metaAll: [],
   }),
   computed: {
-    apiUrl() { return this.$store.state.localhost },
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
   },
   methods: {
     getMetaInMediaTypes() {
-      this.isQueryRun = true
-      let url = `/api/MetaInMediaTypes`
-      axios.get(this.apiUrl + url)
-        .then(res => {
-          this.isQueryRun = false
-          this.metaInMediaTypes = res.data.assigned
-          this.metaAll = res.data.meta
+      let url = `/api/MetaInMediaTypes`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.metaInMediaTypes = res.data.assigned;
+          this.metaAll = res.data.meta;
         })
-        .catch(e => {
-          this.isQueryRun = false
-          console.log(e)
-        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     isMetaAssigned(metaId) {
-      let assigned = this.metaInMediaTypes.map(i=>i['Meta.id'])
-      return assigned.includes(metaId)
+      let assigned = this.metaInMediaTypes.map((i) => i["Meta.id"]);
+      return assigned.includes(metaId);
     },
     getIcon(type) {
-      if (type === 'string') return 'alphabetical'
-      if (type === 'date') return 'calendar'
-      if (type === 'number') return 'numeric'
-      if (type === 'array') return 'code-array'
-      if (type === 'boolean') return 'toggle-switch'
-      if (type === 'rating') return 'star'
-      if (type === 'cards') return 'card-bulleted'
-      return 'shape'
+      if (type === "string") return "alphabetical";
+      if (type === "date") return "calendar";
+      if (type === "number") return "numeric";
+      if (type === "array") return "code-array";
+      if (type === "boolean") return "toggle-switch";
+      if (type === "rating") return "star";
+      if (type === "cards") return "card-bulleted";
+      return "shape";
     },
-  }
-}
+  },
+};
 </script>
 
 
@@ -100,7 +104,7 @@ export default {
       padding: 5px;
       z-index: 1;
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -121,7 +125,7 @@ export default {
       }
     }
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       width: 100%;
       height: 100%;
@@ -138,7 +142,7 @@ export default {
   td:first-child {
     position: relative;
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -160,7 +164,7 @@ export default {
   margin: 0;
   font-weight: normal;
 }
-.diagonal>div {
+.diagonal > div {
   position: relative;
   height: 100%;
   width: 100%;
@@ -175,7 +179,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     right: 0;
@@ -195,7 +199,7 @@ export default {
   display: flex;
   align-items: flex-end;
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;

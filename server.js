@@ -64,6 +64,7 @@ require("./api/routes/MediaTypes.routes")(app)
 require("./api/routes/Meta.routes")(app)
 require("./api/routes/MetaInMediaTypes.routes")(app)
 require("./api/routes/MetaSettings.routes")(app)
+require("./api/routes/Settings.routes")(app)
 require("./api/routes/ValuesInItems.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)
 

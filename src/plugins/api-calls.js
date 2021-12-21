@@ -44,6 +44,39 @@ const ApiCalls = {
           })
       })
     }
+    Vue.prototype.$getOption = function (option) {
+      return new Promise((resolve, reject) => {
+        let url = `/api/Settings?option=${option}`;
+        axios
+          .get(options.store.state.localhost + url)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
+    Vue.prototype.$setOption = function (option, value) {
+      return new Promise((resolve, reject) => {
+        axios({
+            method: 'post',
+            url: options.store.state.localhost + '/api/Settings',
+            data: {
+              option,
+              value,
+            },
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
   }
 }
 

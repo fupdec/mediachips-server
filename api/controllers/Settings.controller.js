@@ -2,32 +2,37 @@ const db = require("../index.js");
 const Settings = db.Settings;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Tutorial
-exports.create = (req, res) => {
-
-};
-
-// Retrieve all Tutorials from the database.
-exports.findAll = (req, res) => {
-
-};
-
-// Find a single Tutorial with an id
+// Find a single option with a name in the request
 exports.findOne = (req, res) => {
-
+  Settings.findOne({
+    where: {
+      option: req.query.option
+    },
+    raw: true
+  }).then(async (data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
 };
 
-// Update a Tutorial by the id in the request
+// Update a single option with a name and value in the request
 exports.update = (req, res) => {
+  if (!req.body) return res.sendStatus(400)
 
-};
-
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
-
-};
-
-// Delete all Tutorials from the database.
-exports.deleteAll = (req, res) => {
-
+  Settings.update({
+    value: req.body.value
+  }, {
+    where: {
+      option: req.body.option
+    },
+  }).then((data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
 };
