@@ -12,19 +12,37 @@
         <div v-if="meta.MetaSetting.rating" class="rating-wrapper"> <v-rating :value="item.rating" dense half-increments hover clearable color="yellow darken-2" background-color="grey" empty-icon="mdi-star-outline" half-icon="mdi-star-half-full"/> </div>
         <v-icon v-if="meta.MetaSetting.bookmark && item.bookmark" class="bookmark" color="red" :title="item.bookmark">mdi-bookmark</v-icon>
       </div>
+      <v-icon v-if="item.bookmark" class="bookmark" color="red" :title="item.bookmark">mdi-bookmark</v-icon>
 
       <div class="px-1 name">{{item.name}}</div>
-      <div class="px-1">
-        <v-chip outlined>
-          <v-icon class="mr-1">mdi-video-outline</v-icon> <b>{{numberOfMedia}}</b>
-        </v-chip>
-        <v-chip outlined>
-          <v-icon class="mr-1">mdi-eye-outline</v-icon> <b>{{item.views}}</b>
-        </v-chip>
-      </div>
       <div v-if="meta.MetaSetting.synonyms && item.synonyms" class="px-1 synonyms"> <span class="pl-2"/> {{item.synonyms}} </div>
       
-      <v-icon v-if="item.bookmark" class="bookmark" color="red" :title="item.bookmark">mdi-bookmark</v-icon>
+      <v-chip title="Number of videos">
+        <v-icon class="mr-1">mdi-video-outline</v-icon> {{numberOfMedia}}
+      </v-chip>
+      <v-chip title="Number of views">
+        <v-icon class="mr-1">mdi-eye-outline</v-icon> {{item.views}}
+      </v-chip>
+
+      <v-chip
+        v-for="i in items"
+        :key="i.itemId + i.childItemId"
+        :color="i['Item.color']"
+        :text-color="getTextColor(i['Item.color'])"
+        :title="i.Meta.name"
+      >
+        <v-icon class="mr-1">mdi-{{i.Meta.icon}}</v-icon>
+        {{ i["Item.name"] }}
+      </v-chip>
+
+      <v-chip
+        v-for="(v,i) in values"
+        :key="i"
+        :title="v.Meta.name"
+      >
+        <v-icon class="mr-1">mdi-{{v.Meta.icon}}</v-icon>
+        {{ v.value }}
+      </v-chip>
     </v-card>
   </v-lazy>
 </template>
@@ -45,6 +63,8 @@ export default {
     this.$nextTick(() => {
       this.getImages()
       this.countMediaInItem()
+      this.getItems()
+      this.getValues()
     })
   },
   data: () => ({
@@ -55,6 +75,8 @@ export default {
       custom1: null,
       custom2: null,
     },
+    items: [],
+    values: [],
   }),
   computed: {
     apiUrl() { return this.$store.state.localhost },
@@ -81,6 +103,34 @@ export default {
         .catch(e => {
           console.log(e)
         })
+    },
+    getItems() {
+      let url = `/api/ItemsInItems?itemId=${this.item.id}`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.items = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getValues() {
+      let url = `/api/ValuesInItems?itemId=${this.item.id}`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.values = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getTextColor(color) {
+      if (!color) return "";
+      let value = Vue.prototype.$checkColorForDarkText(color);
+      if (value) return "white";
+      else return "black";
     },
   },
   watch: {

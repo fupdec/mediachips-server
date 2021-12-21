@@ -154,6 +154,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.getMeta();
+      this.getValues();
       this.getImg();
     });
     this.$root.$on("updateVideoThumb", (id) => {
@@ -163,6 +164,7 @@ export default {
   destroyed() {},
   data: () => ({
     meta: [],
+    values: [],
     thumb: null,
   }),
   computed: {
@@ -233,15 +235,26 @@ export default {
           console.log(e);
         });
     },
+    getValues() {
+      let url = `/api/ValuesInMedia?mediaId=${this.video.id}`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.values = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     openPlayer() {
       this.$store.state.Player.active = true;
       this.$root.$emit("playVideo", this.video, this.media);
     },
     getTextColor(color) {
-      if (!color) return ''
+      if (!color) return "";
       let value = Vue.prototype.$checkColorForDarkText(color);
-      if (value) return 'white'
-      else return 'black'
+      if (value) return "white";
+      else return "black";
     },
   },
   watch: {},

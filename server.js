@@ -58,6 +58,7 @@ app.use(staticFileMiddleware)
 require("./api/routes/ChildMeta.routes")(app)
 require("./api/routes/Functions.routes")(app)
 require("./api/routes/Items.routes")(app)
+require("./api/routes/ItemsInItems.routes")(app)
 require("./api/routes/ItemsInMedia.routes")(app)
 require("./api/routes/Markers.routes")(app)
 require("./api/routes/Media.routes")(app)
@@ -65,6 +66,8 @@ require("./api/routes/MediaTypes.routes")(app)
 require("./api/routes/Meta.routes")(app)
 require("./api/routes/MetaInMediaTypes.routes")(app)
 require("./api/routes/MetaSettings.routes")(app)
+require("./api/routes/ValuesInItems.routes")(app)
+require("./api/routes/ValuesInMedia.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   res.sendFile(req.body.url, {
