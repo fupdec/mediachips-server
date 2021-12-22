@@ -3,8 +3,7 @@ const {
   Menu,
   app
 } = require('electron')
-require('./server.js')
-const config = require('./config.json')
+const server = require('./server.js')
 const path = require('path')
 
 let mainWindow = null
@@ -14,7 +13,7 @@ function main() {
     backgroundColor: '#333',
     icon: path.join(__dirname, 'dist/icons', 'icon.png'),
   })
-  mainWindow.loadURL(`http://localhost:${config.port}/`)
+  mainWindow.loadURL(`http://localhost:${server.config.port}/`)
   mainWindow.on('close', () => {
     mainWindow = null
   })
@@ -29,6 +28,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-let systemMenu = Menu.buildFromTemplate([])
+// let systemMenu = Menu.buildFromTemplate([])
 
-Menu.setApplicationMenu(systemMenu)
+// Menu.setApplicationMenu(systemMenu)

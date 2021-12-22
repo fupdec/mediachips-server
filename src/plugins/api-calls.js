@@ -3,6 +3,20 @@ const path = require('path')
 
 const ApiCalls = {
   install(Vue, options) {
+    Vue.prototype.$getLocalhost = function () {
+      return new Promise((resolve, reject) => {
+        axios.get('/config.json')
+          .then(res => {
+            const config = res.data
+            options.store.state.localhost = `http://${config.ip}:${config.port}`;
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
     Vue.prototype.$getLocalImage = async function (imgPath) {
       let result
       await axios({

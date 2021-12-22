@@ -14,6 +14,44 @@ app.use(express.json({
 app.use(cors())
 app.use(router)
 
+
+// creating default config
+const configPath = path.join(__dirname, 'dist/config.json')
+let defaultConfig = {
+  port: 5555
+}
+try {
+  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), {
+    flag: 'wx'
+  })
+} catch (e) {
+  if (e.code == 'EEXIST') console.log('\x1b[33m%s\x1b[0m', 'Server configuration loaded')
+  else console.log('\x1b[31m%s\x1b[0m', e)
+}
+
+// getting IP of localhost
+const {
+  networkInterfaces
+} = require('os')
+const nets = networkInterfaces()
+const results = Object.create(null)
+for (const name of Object.keys(nets)) {
+  for (const net of nets[name]) {
+    if (net.family === 'IPv4' && !net.internal) {
+      if (!results[name]) results[name] = []
+      results[name].push(net.address)
+    }
+  }
+}
+const ip = results.Ethernet ? results.Ethernet[0] : '192.168.0.1' // local IP
+let config = require(configPath)
+config.ip = ip
+
+fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
+  if (err) return console.log(err)
+})
+
+
 // testing database connection
 try {
   db.sequelize.authenticate()
@@ -121,43 +159,6 @@ router.get('/api/video/:id', (req, res) => {
   })
 })
 
-
-// creating default config
-const configPath = './config.json'
-let defaultConfig = {
-  port: 5555
-}
-try {
-  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), {
-    flag: 'wx'
-  })
-} catch (e) {
-  if (e.code == 'EEXIST') console.log('\x1b[33m%s\x1b[0m', 'Server configuration loaded')
-  else console.log('\x1b[31m%s\x1b[0m', e)
-}
-
-// getting IP of localhost
-const {
-  networkInterfaces
-} = require('os')
-const nets = networkInterfaces()
-const results = Object.create(null)
-for (const name of Object.keys(nets)) {
-  for (const net of nets[name]) {
-    if (net.family === 'IPv4' && !net.internal) {
-      if (!results[name]) results[name] = []
-      results[name].push(net.address)
-    }
-  }
-}
-const ip = results.Ethernet ? results.Ethernet[0] : '192.168.0.1'
-let config = require(configPath)
-config.ip = ip
-
-fs.writeFileSync(configPath, JSON.stringify(config, null, 2), function writeJSON(err) {
-  if (err) return console.log(err)
-})
-
 // Creating default folders
 const userfiles = path.join(__dirname, 'userfiles')
 const mediaPath = path.join(userfiles, 'media')
@@ -174,3 +175,5 @@ if (!fs.existsSync(metaPath)) fs.mkdirSync(metaPath)
 app.listen(config.port, () => {
   console.info('\x1b[7m%s\x1b[0m', `App started. Open in browser: http://${ip}:${config.port}`);
 })
+
+exports.config = config

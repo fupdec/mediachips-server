@@ -14,7 +14,6 @@
 
 <script>
 import Vue from "vue";
-const config = require("../config.json");
 
 export default {
   name: "App",
@@ -23,8 +22,8 @@ export default {
     SideBar: () => import("@/components/app/SideBar.vue"),
     Player: () => import("@/components/app/Player.vue"),
   },
-  beforeMount() {
-    this.$store.state.localhost = `http://${config.ip}:${config.port}`;
+  async beforeMount() {
+    await Vue.prototype.$getLocalhost();
   },
   mounted() {
     this.$nextTick(() => {
