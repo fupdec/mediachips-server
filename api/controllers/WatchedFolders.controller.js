@@ -6,7 +6,16 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {};
 
 // Retrieve all Folders from the database.
-exports.findAll = (req, res) => {};
+exports.findAll = (req, res) => {
+  WatchedFolders.findAll()
+    .then(data => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Find a single Folder with an id
 exports.findOne = (req, res) => {};
