@@ -51,19 +51,11 @@ exports.importDatabase = async (req, res) => {
   const metaOld = path.join(tempPath, 'media/meta')
   const metaNew = path.join(userfiles, 'media/meta')
   if (fs.existsSync(thumbsOld)) {
-    fs.rmSync(thumbsNew, {
-      recursive: true,
-      force: true
-    })
     fs.rename(thumbsOld, thumbsNew, function (err) {
       if (err) console.log(err)
     })
   }
   if (fs.existsSync(metaOld)) {
-    fs.rmSync(metaNew, {
-      recursive: true,
-      force: true
-    })
     fs.rename(metaOld, metaNew, function (err) {
       if (err) console.log(err)
     })

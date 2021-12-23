@@ -52,6 +52,19 @@ fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
 })
 
 
+// Creating default folders
+const userfiles = path.join(__dirname, 'userfiles')
+const mediaPath = path.join(userfiles, 'media')
+const markersPath = path.join(mediaPath, 'markers')
+// const thumbsPath = path.join(mediaPath, 'thumbs')
+// const metaPath = path.join(mediaPath, 'meta')
+if (!fs.existsSync(userfiles)) fs.mkdirSync(userfiles)
+if (!fs.existsSync(mediaPath)) fs.mkdirSync(mediaPath)
+if (!fs.existsSync(markersPath)) fs.mkdirSync(markersPath)
+// if (!fs.existsSync(thumbsPath)) fs.mkdirSync(thumbsPath)
+// if (!fs.existsSync(metaPath)) fs.mkdirSync(metaPath)
+
+
 // testing database connection
 try {
   db.sequelize.authenticate()
@@ -158,17 +171,6 @@ router.get('/api/video/:id', (req, res) => {
     })
   })
 })
-
-// Creating default folders
-const userfiles = path.join(__dirname, 'userfiles')
-const mediaPath = path.join(userfiles, 'media')
-const markersPath = path.join(mediaPath, 'markers')
-const thumbsPath = path.join(mediaPath, 'thumbs')
-const metaPath = path.join(mediaPath, 'meta')
-if (!fs.existsSync(mediaPath)) fs.mkdirSync(mediaPath)
-if (!fs.existsSync(markersPath)) fs.mkdirSync(markersPath)
-if (!fs.existsSync(thumbsPath)) fs.mkdirSync(thumbsPath)
-if (!fs.existsSync(metaPath)) fs.mkdirSync(metaPath)
 
 
 // starting server
