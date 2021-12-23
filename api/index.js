@@ -33,6 +33,7 @@ db.ValuesInItems = require("./models/ValuesInItems.model")(sequelize, Sequelize)
 db.ValuesInMedia = require("./models/ValuesInMedia.model")(sequelize, Sequelize);
 db.VideoMetadata = require("./models/VideoMetadata.model")(sequelize, Sequelize);
 db.VideosInPlaylist = require("./models/VideosInPlaylist.model")(sequelize, Sequelize);
+db.WatchedFolders = require("./models/WatchedFolders.model")(sequelize, Sequelize);
 
 
 // RELATIONS
@@ -92,5 +93,7 @@ db.ChildMeta.belongsTo(db.Meta, { foreignKey: 'metaId' })
 db.Meta.hasMany(db.ChildMeta, { foreignKey: 'childMetaId', onDelete: "cascade" })
 db.ChildMeta.belongsTo(db.Meta, { foreignKey: 'childMetaId' })
 
+db.MediaTypes.hasMany(db.WatchedFolders, { foreignKey: 'typeId', onDelete: "cascade" })
+db.WatchedFolders.belongsTo(db.MediaTypes, { foreignKey: 'typeId' })
 
 module.exports = db;

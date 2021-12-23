@@ -118,6 +118,7 @@ require("./api/routes/MetaSettings.routes")(app)
 require("./api/routes/Settings.routes")(app)
 require("./api/routes/ValuesInItems.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)
+require("./api/routes/WatchedFolders.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   res.sendFile(req.body.url, {
