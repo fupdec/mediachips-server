@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="mt-10 px-4">
+  <v-card outlined class="px-4">
     <div class="headline text-center my-4">
       Folders
       <v-tooltip right>
@@ -37,7 +37,7 @@
               dense
             />
             <v-btn
-              @click="saveFolderName(i)"
+              @click="renameFolder(i)"
               :disabled="folderName == ''"
               class="ml-1"
               color="green"
@@ -133,6 +133,8 @@ export default {
   data: () => ({
     folders: [],
     watchFolders: false,
+    folderName: "",
+    folderNameEdit: -1,
   }),
   computed: {
     apiUrl() {
@@ -144,15 +146,104 @@ export default {
       await axios
         .get(this.apiUrl + "/api/WatchedFolders")
         .then((res) => {
-          console.log(res.data);
           this.folders = res.data;
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    addFolder() {
+    async addFolder() {
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/WatchedFolders",
+        data: {
+          path: "D:\\torrents",
+          name: "D:\\torrents",
+          typeId: 1,
+        },
+      })
+        .then(() => {
+          this.getFolders();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
+    async renameFolder(i) {
+      const folder = this.folders[i];
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/WatchedFolders/" + folder.id,
+        data: {
+          name: this.folderName,
+        },
+      })
+        .then(async () => {
+          await this.getFolders();
+          this.folderNameEdit = -1;
+        })
+        .catch((e) => {
+          this.folderNameEdit = -1;
+          console.log(e);
+        });
+    },
+    async removeFolder(i) {
+      const folder = this.folders[i];
+      await axios({
+        method: "delete",
+        url: this.apiUrl + "/api/WatchedFolders/" + folder.id,
+      })
+        .then(() => {
+          this.getFolders();
+          this.folders.splice(i, 1);
+          if (this.folders.length == 0) this.watchFolders = false;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    updateFolders() {},
   },
 };
 </script>
+
+
+<style lang="scss" scoped>
+.folder-list {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  background-color: rgba(150, 150, 150, 0.1);
+  padding-left: 5px;
+  padding-right: 3px;
+  margin-bottom: 3px;
+  .folder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 40px);
+    .v-input__slot {
+      min-height: 32px !important;
+    }
+    .name {
+      display: flex;
+      align-items: center;
+      max-width: calc(50% - 40px);
+    }
+    .path {
+      max-width: 40%;
+      .icon-open {
+        display: none;
+      }
+      &:hover {
+        .icon-closed {
+          display: none;
+        }
+        .icon-open {
+          display: inline-flex;
+        }
+      }
+    }
+  }
+}
+</style>

@@ -4,8 +4,8 @@ module.exports = (sequelize, Sequelize) => {
       path: Sequelize.TEXT,
       name: Sequelize.TEXT,
       watch: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
     }, {
       name: {

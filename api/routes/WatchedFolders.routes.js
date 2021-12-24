@@ -12,7 +12,7 @@ module.exports = app => {
   // Retrieve a single WatchedFolders with id
   router.get("/:id", WatchedFolders.findOne);
 
-  // Update a WatchedFolders with id
+  // Update a WatchedFolder with id
   router.put("/:id", WatchedFolders.update);
 
   // Delete a WatchedFolders with id
