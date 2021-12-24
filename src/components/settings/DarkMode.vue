@@ -1,9 +1,8 @@
 <template>
-  <v-switch
-    label="Dark mode"
-    :value="darkMode"
-    @change="change($event)"
-  ></v-switch>
+  <v-btn @click="toggleDarkMode" color="primary" block x-large rounded>
+    <v-icon large class="mr-4"> mdi-theme-light-dark </v-icon>
+    Toggle Dark Mode
+  </v-btn>
 </template>
 
 
@@ -22,10 +21,10 @@ export default {
     darkMode: false,
   }),
   methods: {
-    async change(value) {
-      this.darkMode = value;
-      this.$vuetify.theme.dark = value;
-      value = value === true ? "1" : "0";
+    async toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+      this.$vuetify.theme.dark = this.darkMode;
+      const value = this.darkMode === true ? "1" : "0";
       await Vue.prototype.$setOption("darkMode", value);
     },
   },
