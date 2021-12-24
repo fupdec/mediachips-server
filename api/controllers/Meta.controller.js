@@ -1,14 +1,25 @@
 const db = require("../index.js");
-const Meta = db.Meta;
-const MetaSettings = db.MetaSettings;
+const {
+  Meta,
+  MetaSettings
+} = require("../index.js");
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Tutorial
+// Create and Save a new Meta
 exports.create = (req, res) => {
-
+  Meta
+    .create(req.body)
+    .then(data => {
+      res.status(201).send(data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
 };
 
-// Retrieve all Tutorials from the database.
+// Retrieve all Metas from the database.
 exports.findAll = (req, res) => {
   Meta.findAll({
       include: {
@@ -24,22 +35,14 @@ exports.findAll = (req, res) => {
     })
 };
 
-// Find a single Tutorial with an id
-exports.findOne = (req, res) => {
+// Find a single Meta with an id
+exports.findOne = (req, res) => {};
 
-};
+// Update a Meta by the id in the request
+exports.update = (req, res) => {};
 
-// Update a Tutorial by the id in the request
-exports.update = (req, res) => {
+// Delete a Meta with the specified id in the request
+exports.delete = (req, res) => {};
 
-};
-
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
-
-};
-
-// Delete all Tutorials from the database.
-exports.deleteAll = (req, res) => {
-
-};
+// Delete all Metas from the database.
+exports.deleteAll = (req, res) => {};

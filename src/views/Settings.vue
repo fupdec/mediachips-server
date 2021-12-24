@@ -14,8 +14,8 @@
       <v-tab href="#meta-settings" draggable="false">
         Meta<v-icon>mdi-shape</v-icon>
       </v-tab>
-      <v-tab href="#videos-settings" draggable="false">
-        Videos<v-icon>mdi-video</v-icon>
+      <v-tab href="#media-settings" draggable="false">
+        Media<v-icon>mdi-heart</v-icon>
       </v-tab>
       <v-tab href="#privacy-settings" draggable="false">
         Privacy<v-icon>mdi-key</v-icon>
@@ -42,16 +42,16 @@
         </v-card>
       </v-tab-item>
       <v-tab-item value="meta-settings">
+        <MetaList />
+      </v-tab-item>
+      <v-tab-item value="media-settings">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
+          <div class="headline text-center pb-2">Meta assigned to media</div>
           <vuescroll>
             <div style="max-height: 400px">
               <TableMetaInMediaTypes />
             </div>
           </vuescroll>
-        </v-card>
-      </v-tab-item>
-      <v-tab-item value="videos-settings">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
         </v-card>
       </v-tab-item>
       <v-tab-item value="privacy-settings">
@@ -80,6 +80,7 @@ export default {
     vuescroll,
     DarkMode: () => import("@/components/settings/DarkMode.vue"),
     WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
+    MetaList: () => import("@/components/settings/MetaList.vue"),
     TableMetaInMediaTypes: () => import("@/components/settings/TableMetaInMediaTypes.vue"),
   },
   data: () => ({

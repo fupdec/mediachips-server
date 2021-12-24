@@ -44,6 +44,22 @@ const Readable = {
     Vue.prototype.$getFileExtensionFromPath = function (fullPath) {
       return fullPath.split('.').pop().toLowerCase()
     }
+    Vue.prototype.$getIconDataType = function (type) {
+      if (type === "string") return "mdi-alphabetical";
+      if (type === "date") return "mdi-calendar";
+      if (type === "number") return "mdi-numeric";
+      if (type === "array") return "mdi-code-array";
+      if (type === "boolean") return "mdi-toggle-switch";
+      if (type === "rating") return "mdi-star";
+      return "mdi-shape";
+    }
+    Vue.prototype.$validateName = function (string) {
+      string = string.trim().toLowerCase()
+      if (string.length > 50) return 'Name must be less than 50 characters'
+      else if (string.length===0) return 'Name is required'
+      else if (/[\\\/\%"?<>{}\[\]]/g.test(string)) return 'Name must not content \\/\%\"<>{}\[\]'
+      else return true
+    }
     Vue.prototype.$checkColorForDarkText = function (color) {
       // Variables for red, green, blue values
       let r, g, b, hsp;
