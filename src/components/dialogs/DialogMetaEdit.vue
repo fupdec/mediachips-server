@@ -56,10 +56,9 @@
                 <v-icon>mdi-{{ metaIcon }}</v-icon>
                 <v-btn
                   @click="dialogIcons = true"
-                  color="primary"
                   small
                   rounded
-                  depressed
+                  outlined
                   class="ml-4"
                 >
                   <v-icon left>mdi-shape-plus</v-icon>
@@ -70,16 +69,20 @@
               <!-- Rating -->
               <MetaSettingsRating
                 v-if="meta.type == 'rating'"
+                @update="updateRating($event)"
                 :meta="meta"
+              />
+
+              <v-switch
+                v-if="meta.type == 'string'"
+                v-model="isLink"
+                label="Link to an Internet address"
+                hide-details
               />
             </v-form>
 
             <div class="mt-6 text-right">
-              <v-btn
-                @click="dialogDeleteMeta = true"
-                color="error"
-                depressed
-              >
+              <v-btn @click="dialogDeleteMeta = true" color="error" depressed>
                 <v-icon left>mdi-delete</v-icon>
                 Delete meta
               </v-btn>
@@ -146,6 +149,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.initMeta();
+      this.getSettings();
     });
   },
   data: () => ({
@@ -156,6 +160,8 @@ export default {
     singular: "",
     metaHint: "",
     metaIcon: "shape",
+    isLink: false,
+    rating: {},
   }),
   computed: {
     apiUrl() {
@@ -165,7 +171,6 @@ export default {
   methods: {
     initMeta() {
       const meta = this.meta;
-      console.log(meta);
       this.name = meta.name;
       this.singular = meta.nameSingular;
       this.metaHint = meta.hint;
@@ -198,7 +203,7 @@ export default {
 
       await axios({
         method: "put",
-        url: this.apiUrl + "/api/Meta",
+        url: this.apiUrl + "/api/Meta/" + this.meta.id,
         data: {
           name: this.name,
           nameSingular: this.singular,
@@ -213,8 +218,36 @@ export default {
           console.log(e);
         });
 
+      this.updateSettings();
       this.$emit("update");
       this.close();
+    },
+    getSettings() {
+      axios
+        .get(this.apiUrl + "/api/MetaSetting/" + this.meta.id)
+        .then((res) => {
+          const settings = res.data;
+          this.isLink = settings.isLink;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    updateSettings() {
+      const data = {
+        ...this.rating,
+        ...{
+          isLink: this.isLink,
+        },
+      };
+      axios({
+        method: "put",
+        url: this.apiUrl + "/api/MetaSetting/" + this.meta.id,
+        data: data,
+      });
+    },
+    updateRating(rating) {
+      this.rating = rating;
     },
     close() {
       this.$emit("close");

@@ -20,9 +20,24 @@
 
         <vuescroll>
           <v-card-text class="px-4">
-            <v-alert v-show="type == 'array'" type="info" text dense>
-              For type "array" in the navigation menu there will be a link to a
-              page with all the items of this meta.
+            <v-alert
+              v-show="type == 'array'"
+              type="info"
+              text
+              dense
+              class="body-2"
+            >
+              For this type in the navigation menu there will be a link to a
+              page with all the items of this meta
+            </v-alert>
+            <v-alert
+              v-show="type == 'array' || type == 'rating'"
+              type="info"
+              text
+              dense
+              class="body-2"
+            >
+              After adding, a dialog with detailed settings will appear
             </v-alert>
             <v-form
               v-model="valid"
@@ -73,16 +88,22 @@
                 <v-icon>mdi-{{ metaIcon }}</v-icon>
                 <v-btn
                   @click="dialogIcons = true"
-                  color="primary"
                   small
                   rounded
-                  depressed
+                  outlined
                   class="ml-4"
                 >
                   <v-icon left>mdi-shape-plus</v-icon>
                   Change icon
                 </v-btn>
               </div>
+
+              <v-switch
+                v-if="type == 'string'"
+                v-model="isLink"
+                label="Link to an Internet address"
+                hide-details
+              />
             </v-form>
           </v-card-text>
         </vuescroll>
@@ -123,6 +144,7 @@ export default {
     singular: "",
     metaHint: "",
     metaIcon: "shape",
+    isLink: false,
   }),
   computed: {
     apiUrl() {
@@ -164,7 +186,9 @@ export default {
           nameSingular: this.type == "array" ? this.singular : this.name,
           hint: this.metaHint,
           icon: this.metaIcon,
-          metaSetting: {},
+          metaSetting: {
+            isLink: this.isLink,
+          },
         },
       })
         .then(() => {

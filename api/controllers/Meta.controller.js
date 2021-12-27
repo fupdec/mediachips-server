@@ -60,7 +60,22 @@ exports.findLatest = (req, res) => {
 };
 
 // Update a Meta by the id in the request
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  Meta
+    .update(req.body, {
+      where: {
+        id: parseInt(req.params.id)
+      }
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Delete a Meta with the specified id in the request
 exports.delete = (req, res) => {

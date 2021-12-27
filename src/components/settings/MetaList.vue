@@ -103,6 +103,7 @@
       :dialog="dialogEdit"
       :meta="selectedMeta"
       @close="dialogEdit = false"
+      @update="getMeta"
       @delete="deleteMeta($event)"
     />
   </v-card>
