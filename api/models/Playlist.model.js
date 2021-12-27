@@ -19,11 +19,6 @@ module.exports = (sequelize, Sequelize) => {
         unique: true,
       },
       viewedAt: Sequelize.DATE,
-    }, {
-      name: {
-        singular: 'Playlist',
-        plural: 'Playlists',
-      },
     }
   )
 

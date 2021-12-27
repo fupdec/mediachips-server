@@ -22,6 +22,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       hint: Sequelize.TEXT,
+    }, {
+      name: {
+        singular: 'meta',
+        plural: 'meta',
+      },
     }
   )
 

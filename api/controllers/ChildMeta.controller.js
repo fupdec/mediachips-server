@@ -1,6 +1,7 @@
-const db = require("../index.js");
-const ChildMeta = db.ChildMeta;
-const Op = db.Sequelize.Op;
+const {
+  ChildMeta,
+  Meta
+} = require("../index.js");
 
 // Create and Save a new ChildMeta
 exports.create = (req, res) => {};
@@ -10,7 +11,9 @@ exports.findAll = (req, res) => {
   ChildMeta.findAll({
     where: {
       metaId: req.query.metaId
-    }
+    },
+    include: [Meta],
+    raw: true
   }).then(async (data) => {
     res.status(201).send(data)
   }).catch(err => {

@@ -12,7 +12,8 @@ const {
   MetaInMediaType,
   Playlist,
   VideosInPlaylist,
-  Marker
+  Marker,
+  ChildMeta
 } = require("../index.js");
 
 // FFMPEG
@@ -78,6 +79,7 @@ exports.importDatabase = async (req, res) => {
         markers: [],
         onlyMeta: [],
         metaInItems: [],
+        childMeta: [],
         settings: Settings
       }
       obj.videos = Videos.videos.map(i => ({
@@ -169,11 +171,19 @@ exports.importDatabase = async (req, res) => {
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
           }
           let metaSettings = m.settings
-          // TODO create child associacions
+          if (metaSettings.metaInCard) {
+            obj.childMeta.push({
+              metaId: m.id,
+              childMetaId: metaSettings.metaInCard.map(i => i.id),
+              scraperField: metaSettings.metaInCard.map(i => i.scraperField),
+            })
+          }
           delete metaSettings.metaInCard
           metaSettings.oldId = m.id
-          let imageTypes = metaSettings.imageTypes ? metaSettings.imageTypes.join() : "main"
-          metaSettings.imageTypes = imageTypes
+          if (metaSettings.imageTypes) {
+            if (metaSettings.imageTypes.length == 0) metaSettings.imageTypes = "main"
+            else metaSettings.imageTypes = metaSettings.imageTypes.join()
+          }
           cm.metaSetting = metaSettings
           obj.meta.push(cm)
           let cards = Meta.cards.filter(card => card.metaId == m.id).map(i => ({
@@ -385,6 +395,41 @@ exports.importDatabase = async (req, res) => {
         }
       }
     }
+  }).then(async () => { 
+    let childMeta = []
+    let cm = obj.childMeta
+    console.log(cm)
+    for (let c of cm) {
+      const meta = await Meta.findOne({
+        where: {
+          oldId: c.metaId
+        },
+        raw: true
+      })
+      if (!meta) continue
+
+      for (let id of c.childMetaId) {
+        console.log(id)
+        const child = await Meta.findOne({
+          where: {
+            oldId: id
+          },
+          raw: true
+        }) 
+
+        if (child) {
+          console.log(child)
+          childMeta.push({
+            metaId: meta.id,
+            childMetaId: child.id,
+            scraperField: null,
+          })
+        }
+      }
+    }
+    console.log(childMeta)
+
+    await ChildMeta.bulkCreate(childMeta)
   }).then(async () => { // meta in metaItems
     for (let card of obj.metaInItems) {
       for (let cardId in card) {
