@@ -131,6 +131,7 @@ import axios from "axios";
 import vuescroll from "vuescroll";
 
 export default {
+  name: "DialogMetaEdit",
   props: {
     dialog: Boolean,
     meta: Object,
@@ -218,7 +219,9 @@ export default {
     close() {
       this.$emit("close");
     },
-    deleteMeta() {},
+    deleteMeta() {
+      this.$emit("delete", this.meta);
+    },
   },
 };
 </script>

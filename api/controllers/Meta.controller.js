@@ -63,7 +63,23 @@ exports.findLatest = (req, res) => {
 exports.update = (req, res) => {};
 
 // Delete a Meta with the specified id in the request
-exports.delete = (req, res) => {};
+exports.delete = (req, res) => {
+  Meta
+    .destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+    .then(() => {
+      // TODO delete folder with images of the meta
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Delete all Metas from the database.
 exports.deleteAll = (req, res) => {};

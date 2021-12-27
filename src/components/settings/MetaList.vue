@@ -103,6 +103,7 @@
       :dialog="dialogEdit"
       :meta="selectedMeta"
       @close="dialogEdit = false"
+      @delete="deleteMeta($event)"
     />
   </v-card>
 </template>
@@ -171,6 +172,19 @@ export default {
           });
       }
       this.getMeta();
+      if (this.type == "array") this.$root.$emit("updateNavbar");
+    },
+    deleteMeta(meta) {
+      this.dialogEdit = false;
+      axios
+        .delete(this.apiUrl + "/api/Meta/" + meta.id)
+        .then(() => {
+          if (meta.type == "array") this.$root.$emit("updateNavbar");
+          this.getMeta();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   },
 };
