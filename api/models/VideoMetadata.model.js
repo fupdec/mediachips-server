@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const VideoMetadata = sequelize.define(
-    'VideoMetadata', {
+    'videoMetadata', {
       duration: {
         type: Sequelize.INTEGER,
         defaultValue: 0
@@ -24,8 +24,8 @@ module.exports = (sequelize, Sequelize) => {
       codec: Sequelize.TEXT,
     }, {
       name: {
-        singular: 'VideoMetadata',
-        plural: 'VideoMetadata',
+        singular: 'videoMetadata',
+        plural: 'videoMetadata',
       },
       timestamps: false
     }

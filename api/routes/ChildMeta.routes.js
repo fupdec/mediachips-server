@@ -3,22 +3,22 @@ module.exports = app => {
 
   const router = require("express").Router();
 
-  // Create a new Tutorial
+  // Create a new ChildMeta
   router.post("/", ChildMeta.create);
 
-  // Retrieve all Tutorials
+  // Retrieve all ChildMeta
   router.get("/", ChildMeta.findAll);
 
-  // Retrieve a single Tutorial with id
+  // Retrieve a single ChildMeta with id
   router.get("/:id", ChildMeta.findOne);
 
-  // Update a Tutorial with id
+  // Update a ChildMeta with id
   router.put("/:id", ChildMeta.update);
 
-  // Delete a Tutorial with id
+  // Delete a ChildMeta with id
   router.delete("/:id", ChildMeta.delete);
 
-  // Delete all Tutorials
+  // Delete all ChildMeta
   router.delete("/", ChildMeta.deleteAll);
 
   app.use('/api/ChildMeta', router);

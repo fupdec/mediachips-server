@@ -77,7 +77,7 @@ try {
 const settings = require('./default-settings.json')
 db.sequelize.sync().then(async () => {
   // create media type: videos
-  await db.MediaTypes.findOrCreate({
+  await db.MediaType.findOrCreate({
     where: {
       name: 'Video',
     },
@@ -86,7 +86,7 @@ db.sequelize.sync().then(async () => {
       extensions: '.mp4'
     }
   })
-  await db.Settings.bulkCreate(settings.default, {
+  await db.Setting.bulkCreate(settings.default, {
     ignoreDuplicates: true
   })
 })
@@ -106,19 +106,19 @@ app.use(staticFileMiddleware)
 // REST api
 require("./api/routes/ChildMeta.routes")(app)
 require("./api/routes/Functions.routes")(app)
-require("./api/routes/Items.routes")(app)
-require("./api/routes/ItemsInItems.routes")(app)
+require("./api/routes/Item.routes")(app)
+require("./api/routes/ItemsInItem.routes")(app)
 require("./api/routes/ItemsInMedia.routes")(app)
-require("./api/routes/Markers.routes")(app)
+require("./api/routes/Marker.routes")(app)
 require("./api/routes/Media.routes")(app)
-require("./api/routes/MediaTypes.routes")(app)
+require("./api/routes/MediaType.routes")(app)
 require("./api/routes/Meta.routes")(app)
-require("./api/routes/MetaInMediaTypes.routes")(app)
-require("./api/routes/MetaSettings.routes")(app)
-require("./api/routes/Settings.routes")(app)
-require("./api/routes/ValuesInItems.routes")(app)
+require("./api/routes/MetaInMediaType.routes")(app)
+require("./api/routes/MetaSetting.routes")(app)
+require("./api/routes/Setting.routes")(app)
+require("./api/routes/ValuesInItem.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)
-require("./api/routes/WatchedFolders.routes")(app)
+require("./api/routes/WatchedFolder.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   res.sendFile(req.body.url, {

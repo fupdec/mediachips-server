@@ -1,11 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
   const Meta = sequelize.define(
-    'Meta', {
+    'meta', {
       oldId: {
         type: Sequelize.TEXT,
         unique: true,
       },
-      dataType: {
+      type: {
         type: Sequelize.TEXT,
         allowNull: false,
       },
@@ -22,11 +22,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       hint: Sequelize.TEXT,
-    }, {
-      name: {
-        singular: 'Meta',
-        plural: 'Meta',
-      },
     }
   )
 

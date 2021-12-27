@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Media = sequelize.define(
-    'Media', {
+    'media', {
       path: {
         type: Sequelize.TEXT,
         allowNull: false,
@@ -28,11 +28,6 @@ module.exports = (sequelize, Sequelize) => {
         unique: true,
       },
       viewedAt: Sequelize.DATE,
-    }, {
-      name: {
-        singular: 'Media',
-        plural: 'Media',
-      },
     }
   )
 

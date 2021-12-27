@@ -1,14 +1,15 @@
 const db = require("../index.js");
 const {
   Meta,
-  MetaSettings
+  MetaSetting
 } = require("../index.js");
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Meta
 exports.create = (req, res) => {
-  Meta
-    .create(req.body)
+  Meta.create(req.body, {
+      include: [MetaSetting]
+    })
     .then(data => {
       res.status(201).send(data)
     })
@@ -23,7 +24,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   Meta.findAll({
       include: {
-        model: MetaSettings
+        model: MetaSetting
       }
     })
     .then(data => {
@@ -37,6 +38,26 @@ exports.findAll = (req, res) => {
 
 // Find a single Meta with an id
 exports.findOne = (req, res) => {};
+
+// Find a single Meta with an id
+exports.findLatest = (req, res) => {
+  Meta.findAll({
+      limit: 1,
+      include: {
+        model: MetaSetting
+      },
+      order: [
+        ['createdAt', 'DESC']
+      ]
+    })
+    .then(data => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Update a Meta by the id in the request
 exports.update = (req, res) => {};

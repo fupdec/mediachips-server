@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const MetaState = sequelize.define(
-    'MetaState', {
+    'metaState', {
       query: Sequelize.TEXT,
       sortBy: {
         type: Sequelize.TEXT,

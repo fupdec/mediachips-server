@@ -90,7 +90,7 @@ export default {
       let url = "/api/";
       if (this.route.includes("meta")) {
         await this.getMeta();
-        url += `items?metaId=${this.$route.query.metaId}`;
+        url += `item?metaId=${this.$route.query.metaId}`;
       } else if (this.route.includes("media")) {
         url += `media?type=1`;
       }

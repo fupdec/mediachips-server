@@ -5,9 +5,6 @@ const sequelize = new Sequelize({
   storage: path.join(__dirname, '../userfiles/databases', 'db.sqlite'),
   dialectOptions: {
     multipleStatements: true
-  },
-  define: {
-    freezeTableName: true
   }
 })
 
@@ -16,84 +13,199 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.ChildMeta = require("./models/ChildMeta.model")(sequelize, Sequelize);
-db.Items = require("./models/Items.model")(sequelize, Sequelize);
-db.ItemsInItems = require("./models/ItemsInItems.model")(sequelize, Sequelize);
-db.ItemsInMedia = require("./models/ItemsInMedia.model")(sequelize, Sequelize);
-db.Markers = require("./models/Markers.model")(sequelize, Sequelize);
-db.Media = require("./models/Media.model")(sequelize, Sequelize);
-db.MediaTypes = require("./models/MediaTypes.model")(sequelize, Sequelize);
-db.Meta = require("./models/Meta.model")(sequelize, Sequelize);
-db.MetaInMediaTypes = require("./models/MetaInMediaTypes.model")(sequelize, Sequelize);
-db.MetaSettings = require("./models/MetaSettings.model")(sequelize, Sequelize);
-db.MetaState = require("./models/MetaState.model")(sequelize, Sequelize);
-db.Playlists = require("./models/Playlists.model")(sequelize, Sequelize);
-db.Settings = require("./models/Settings.model")(sequelize, Sequelize);
-db.ValuesInItems = require("./models/ValuesInItems.model")(sequelize, Sequelize);
-db.ValuesInMedia = require("./models/ValuesInMedia.model")(sequelize, Sequelize);
-db.VideoMetadata = require("./models/VideoMetadata.model")(sequelize, Sequelize);
-db.VideosInPlaylist = require("./models/VideosInPlaylist.model")(sequelize, Sequelize);
-db.WatchedFolders = require("./models/WatchedFolders.model")(sequelize, Sequelize);
+const ChildMeta = require("./models/ChildMeta.model")(sequelize, Sequelize);
+const Item = require("./models/Item.model")(sequelize, Sequelize);
+const ItemsInItem = require("./models/ItemsInItem.model")(sequelize, Sequelize);
+const ItemsInMedia = require("./models/ItemsInMedia.model")(sequelize, Sequelize);
+const Marker = require("./models/Marker.model")(sequelize, Sequelize);
+const Media = require("./models/Media.model")(sequelize, Sequelize);
+const MediaType = require("./models/MediaType.model")(sequelize, Sequelize);
+const Meta = require("./models/Meta.model")(sequelize, Sequelize);
+const MetaInMediaType = require("./models/MetaInMediaType.model")(sequelize, Sequelize);
+const MetaSetting = require("./models/MetaSetting.model")(sequelize, Sequelize);
+const MetaState = require("./models/MetaState.model")(sequelize, Sequelize);
+const Playlist = require("./models/Playlist.model")(sequelize, Sequelize);
+const Setting = require("./models/Setting.model")(sequelize, Sequelize);
+const ValuesInItem = require("./models/ValuesInItem.model")(sequelize, Sequelize);
+const ValuesInMedia = require("./models/ValuesInMedia.model")(sequelize, Sequelize);
+const VideoMetadata = require("./models/VideoMetadata.model")(sequelize, Sequelize);
+const VideosInPlaylist = require("./models/VideosInPlaylist.model")(sequelize, Sequelize);
+const WatchedFolder = require("./models/WatchedFolder.model")(sequelize, Sequelize);
 
 
 // RELATIONS
-db.MediaTypes.hasMany(db.Media, { foreignKey: 'typeId', onDelete: "cascade" })
-db.Media.belongsTo(db.MediaTypes, { foreignKey: 'typeId' })
+MediaType.hasMany(Media, {
+  foreignKey: 'typeId',
+  onDelete: "cascade"
+})
+Media.belongsTo(MediaType, {
+  foreignKey: 'typeId'
+})
 
-db.VideoMetadata.removeAttribute('id')
-db.Media.hasOne(db.VideoMetadata, { onDelete: "cascade", foreignKey: 'mediaId' })
-db.VideoMetadata.belongsTo(db.Media, { foreignKey: 'mediaId' })
+VideoMetadata.removeAttribute('id')
+Media.hasOne(VideoMetadata, {
+  onDelete: "cascade",
+  foreignKey: 'mediaId'
+})
+VideoMetadata.belongsTo(Media, {
+  foreignKey: 'mediaId'
+})
 
-db.VideosInPlaylist.removeAttribute('id')
-db.Playlists.hasMany(db.VideosInPlaylist, { onDelete: "cascade", foreignKey: 'playlistId' })
-db.VideosInPlaylist.belongsTo(db.Playlists, { foreignKey: 'playlistId' })
-db.Media.hasMany(db.VideosInPlaylist, { onDelete: "cascade", foreignKey: 'mediaId' })
-db.VideosInPlaylist.belongsTo(db.Media, { foreignKey: 'mediaId' })
+VideosInPlaylist.removeAttribute('id')
+Playlist.hasMany(VideosInPlaylist, {
+  onDelete: "cascade",
+  foreignKey: 'playlistId'
+})
+VideosInPlaylist.belongsTo(Playlist, {
+  foreignKey: 'playlistId'
+})
+Media.hasMany(VideosInPlaylist, {
+  onDelete: "cascade",
+  foreignKey: 'mediaId'
+})
+VideosInPlaylist.belongsTo(Media, {
+  foreignKey: 'mediaId'
+})
 
-db.MetaSettings.removeAttribute('id')
-db.Meta.hasOne(db.MetaSettings, { foreignKey: 'metaId', onDelete: "cascade" })
-db.MetaSettings.belongsTo(db.Meta, { foreignKey: 'metaId' })
+MetaSetting.removeAttribute('id')
+Meta.hasOne(MetaSetting, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+MetaSetting.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
 
-db.MetaState.removeAttribute('id')
-db.Meta.hasOne(db.MetaState, { foreignKey: 'metaId', onDelete: "cascade" })
-db.MetaState.belongsTo(db.Meta, { foreignKey: 'metaId' })
+MetaState.removeAttribute('id')
+Meta.hasOne(MetaState, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+MetaState.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
 
-db.MetaInMediaTypes.removeAttribute('id')
-db.MediaTypes.belongsToMany(db.Meta, { through: db.MetaInMediaTypes, foreignKey: 'typeId', otherKey: 'metaId', unique: false })
+MetaInMediaType.removeAttribute('id')
+MediaType.belongsToMany(Meta, {
+  through: MetaInMediaType,
+  foreignKey: 'typeId',
+  otherKey: 'metaId',
+  unique: false
+})
 
-db.Meta.hasOne(db.Items, { foreignKey: 'metaId', onDelete: "cascade" })
-db.Items.belongsTo(db.Meta, { foreignKey: 'metaId' })
+Meta.hasOne(Item, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+Item.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
 
-db.ItemsInMedia.removeAttribute('id')
-db.Items.hasMany(db.ItemsInMedia, { foreignKey: 'itemId', onDelete: "cascade" })
-db.ItemsInMedia.belongsTo(db.Items, { foreignKey: 'itemId' })
-db.Media.hasMany(db.ItemsInMedia, { foreignKey: 'mediaId', onDelete: "cascade" })
-db.ItemsInMedia.belongsTo(db.Media, { foreignKey: 'mediaId' })
+ItemsInMedia.removeAttribute('id')
+Item.hasMany(ItemsInMedia, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+ItemsInMedia.belongsTo(Item, {
+  foreignKey: 'itemId'
+})
+Media.hasMany(ItemsInMedia, {
+  foreignKey: 'mediaId',
+  onDelete: "cascade"
+})
+ItemsInMedia.belongsTo(Media, {
+  foreignKey: 'mediaId'
+})
 
-db.ValuesInMedia.removeAttribute('id')
-db.Media.belongsToMany(db.Meta, { through: db.ValuesInMedia, foreignKey: 'mediaId', otherKey: 'metaId', unique: false })
+ValuesInMedia.removeAttribute('id')
+Media.belongsToMany(Meta, {
+  through: ValuesInMedia,
+  foreignKey: 'mediaId',
+  otherKey: 'metaId',
+  unique: false
+})
 
-db.ItemsInItems.removeAttribute('id')
-db.Items.hasMany(db.ItemsInItems, { foreignKey: 'itemId', onDelete: "cascade" })
-db.ItemsInItems.belongsTo(db.Items, { foreignKey: 'itemId' })
-db.Items.hasMany(db.ItemsInItems, { foreignKey: 'childItemId', onDelete: "cascade" })
-db.ItemsInItems.belongsTo(db.Items, { foreignKey: 'childItemId' })
+ItemsInItem.removeAttribute('id')
+Item.hasMany(ItemsInItem, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+ItemsInItem.belongsTo(Item, {
+  foreignKey: 'itemId'
+})
+Item.hasMany(ItemsInItem, {
+  foreignKey: 'childItemId',
+  onDelete: "cascade"
+})
+ItemsInItem.belongsTo(Item, {
+  foreignKey: 'childItemId'
+})
 
-db.ValuesInItems.removeAttribute('id')
-db.Items.belongsToMany(db.Meta, { through: db.ValuesInItems, foreignKey: 'itemId', otherKey: 'metaId', unique: false })
+ValuesInItem.removeAttribute('id')
+Item.belongsToMany(Meta, {
+  through: ValuesInItem,
+  foreignKey: 'itemId',
+  otherKey: 'metaId',
+  unique: false
+})
 
-db.Items.hasMany(db.Markers, { foreignKey: 'itemId', onDelete: "cascade" })
-db.Markers.belongsTo(db.Items, { foreignKey: 'itemId' })
-db.Media.hasMany(db.Markers, { foreignKey: 'mediaId', onDelete: "cascade" })
-db.Markers.belongsTo(db.Media, { foreignKey: 'mediaId' })
+Item.hasMany(Marker, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+Marker.belongsTo(Item, {
+  foreignKey: 'itemId'
+})
+Media.hasMany(Marker, {
+  foreignKey: 'mediaId',
+  onDelete: "cascade"
+})
+Marker.belongsTo(Media, {
+  foreignKey: 'mediaId'
+})
 
-db.ChildMeta.removeAttribute('id')
-db.Meta.hasMany(db.ChildMeta, { foreignKey: 'metaId', onDelete: "cascade" })
-db.ChildMeta.belongsTo(db.Meta, { foreignKey: 'metaId' })
-db.Meta.hasMany(db.ChildMeta, { foreignKey: 'childMetaId', onDelete: "cascade" })
-db.ChildMeta.belongsTo(db.Meta, { foreignKey: 'childMetaId' })
+ChildMeta.removeAttribute('id')
+Meta.hasMany(ChildMeta, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+ChildMeta.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
+Meta.hasMany(ChildMeta, {
+  foreignKey: 'childMetaId',
+  onDelete: "cascade"
+})
+ChildMeta.belongsTo(Meta, {
+  foreignKey: 'childMetaId'
+})
 
-db.MediaTypes.hasMany(db.WatchedFolders, { foreignKey: 'typeId', onDelete: "cascade" })
-db.WatchedFolders.belongsTo(db.MediaTypes, { foreignKey: 'typeId' })
+MediaType.hasMany(WatchedFolder, {
+  foreignKey: 'typeId',
+  onDelete: "cascade"
+})
+WatchedFolder.belongsTo(MediaType, {
+  foreignKey: 'typeId'
+})
+
+
+db.ChildMeta = ChildMeta
+db.Item = Item
+db.ItemsInItem = ItemsInItem
+db.ItemsInMedia = ItemsInMedia
+db.Marker = Marker
+db.Media = Media
+db.MediaType = MediaType
+db.Meta = Meta
+db.MetaInMediaType = MetaInMediaType
+db.MetaSetting = MetaSetting
+db.MetaState = MetaState
+db.Playlist = Playlist
+db.Setting = Setting
+db.ValuesInItem = ValuesInItem
+db.ValuesInMedia = ValuesInMedia
+db.VideoMetadata = VideoMetadata
+db.VideosInPlaylist = VideosInPlaylist
+db.WatchedFolder = WatchedFolder
 
 module.exports = db;

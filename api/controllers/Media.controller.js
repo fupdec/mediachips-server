@@ -1,7 +1,9 @@
 const db = require("../index.js");
-const Media = db.Media;
-const VideoMetadata = db.VideoMetadata;
-const ItemsInMedia = db.ItemsInMedia;
+const {
+  Media,
+  VideoMetadata,
+  ItemsInMedia
+} = require("../index.js");
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Media

@@ -231,7 +231,7 @@ export default {
     },
     async getMarkers(video) {
       await axios
-        .get(this.apiUrl + "/api/Markers/video/" + video.id)
+        .get(this.apiUrl + "/api/Marker/video/" + video.id)
         .then((res) => {
           this.markers = res.data;
         })

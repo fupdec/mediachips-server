@@ -9,6 +9,9 @@ module.exports = app => {
   // Retrieve all Meta
   router.get("/", Meta.findAll);
 
+  // Retrieve the last added meta
+  router.get("/latest", Meta.findLatest);
+
   // Retrieve a single Meta with id
   router.get("/:id", Meta.findOne);
 

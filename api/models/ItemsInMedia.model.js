@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const ItemsInMedia = sequelize.define('ItemsInMedia', null, {
+  const ItemsInMedia = sequelize.define('itemsInMedia', null, {
     timestamps: false
   })
 

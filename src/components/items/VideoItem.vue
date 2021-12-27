@@ -64,7 +64,7 @@
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-monitor-screenshot</v-icon>
-          {{ video.VideoMetadata.width + "x" + video.VideoMetadata.height }}
+          {{ video.videoMetadata.width + "x" + video.videoMetadata.height }}
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-harddisk</v-icon>
@@ -75,10 +75,10 @@
       <v-chip
         v-for="i in meta"
         :key="i.itemId"
-        :color="i['Item.color']"
-        :text-color="getTextColor(i['Item.color'])"
+        :color="i['item.color']"
+        :text-color="getTextColor(i['item.color'])"
       >
-        {{ i["Item.name"] }}
+        {{ i["item.name"] }}
       </v-chip>
 
       <!-- Parse meta -->
@@ -99,14 +99,14 @@
           </v-chip-group>
           <div v-else-if="m.type=='simple'" class="simple-meta">
             <v-icon :title="getMeta(m.id).settings.name">mdi-{{getMeta(m.id).settings.icon}}</v-icon>
-            <span v-if="getMeta(m.id).dataType=='array'">{{getArrayValuesForCard(m.id, 'video')}}</span>
-            <span v-else-if="getMeta(m.id).dataType=='rating'">      
+            <span v-if="getMeta(m.id).type=='array'">{{getArrayValuesForCard(m.id, 'video')}}</span>
+            <span v-else-if="getMeta(m.id).type=='rating'">      
               <v-rating :value="video[m.id]" @input="changeMetaRating($event, m.id)" :length="getMeta(m.id).settings.ratingMax" hover 
                 :full-icon="`mdi-${getMeta(m.id).settings.ratingIcon}`" :empty-icon="`mdi-${getMeta(m.id).settings.ratingIconEmpty||getMeta(m.id).settings.ratingIcon}`" 
                 :color="getMeta(m.id).settings.ratingColor" background-color="grey" class="meta-rating" clearable
                 :half-increments="getMeta(m.id).settings.ratingHalf" :half-icon="`mdi-${getMeta(m.id).settings.ratingIconHalf||getMeta(m.id).settings.ratingIcon}`"/>
             </span>
-            <span v-else-if="getMeta(m.id).dataType=='boolean'">{{video[m.id]?'Yes':'No'}}</span>
+            <span v-else-if="getMeta(m.id).type=='boolean'">{{video[m.id]?'Yes':'No'}}</span>
             <span v-else>{{video[m.id]}}</span>
           </div>
         </div>
@@ -173,14 +173,14 @@ export default {
     },
     quality() {
       return Vue.prototype.$getReadableVideoQuality(
-        this.video.VideoMetadata.width,
-        this.video.VideoMetadata.height
+        this.video.videoMetadata.width,
+        this.video.videoMetadata.height
       );
     },
     height() {
       return Vue.prototype.$getReadableVideoHeight(
-        this.video.VideoMetadata.width,
-        this.video.VideoMetadata.height
+        this.video.videoMetadata.width,
+        this.video.videoMetadata.height
       );
     },
     filesize() {
@@ -188,7 +188,7 @@ export default {
     },
     duration() {
       return Vue.prototype.$getReadableDuration(
-        this.video.VideoMetadata.duration
+        this.video.videoMetadata.duration
       );
     },
     fileName() {

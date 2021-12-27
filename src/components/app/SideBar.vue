@@ -122,7 +122,7 @@ export default {
   methods: {
     getMediaList() {
       axios
-        .get(this.apiUrl + "/api/mediaTypes")
+        .get(this.apiUrl + "/api/mediaType")
         .then((res) => {
           this.mediaTypes = res.data;
         })
@@ -134,9 +134,9 @@ export default {
       axios
         .get(this.apiUrl + "/api/meta")
         .then((res) => {
-          let metaAll = res.data.filter((i) => i.dataType == "array");
-          this.metaList = metaAll.filter((i) => !i.MetaSetting.hidden);
-          this.hiddenMetaList = metaAll.filter((i) => i.MetaSetting.hidden);
+          let metaAll = res.data.filter((i) => i.type == "array");
+          this.metaList = metaAll.filter((i) => !i.metaSetting.hidden);
+          this.hiddenMetaList = metaAll.filter((i) => i.metaSetting.hidden);
         })
         .catch((e) => {
           console.log(e);

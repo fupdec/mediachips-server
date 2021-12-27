@@ -60,7 +60,7 @@ const ApiCalls = {
     }
     Vue.prototype.$getOption = function (option) {
       return new Promise((resolve, reject) => {
-        let url = `/api/Settings?option=${option}`;
+        let url = `/api/Setting?option=${option}`;
         axios
           .get(options.store.state.localhost + url)
           .then(res => {
@@ -76,7 +76,7 @@ const ApiCalls = {
       return new Promise((resolve, reject) => {
         axios({
             method: 'post',
-            url: options.store.state.localhost + '/api/Settings',
+            url: options.store.state.localhost + '/api/Setting',
             data: {
               option,
               value,

@@ -21,8 +21,8 @@
                 <v-icon left>mdi-{{ i.icon }}</v-icon>
                 {{ i.name }}
               </span>
-              <v-icon left :title="i.dataType"
-                >mdi-{{ getIcon(i.dataType) }}</v-icon
+              <v-icon left :title="i.type"
+                >mdi-{{ getIcon(i.type) }}</v-icon
               >
             </div>
           </td>
@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     getMetaInMediaTypes() {
-      let url = `/api/MetaInMediaTypes`;
+      let url = `/api/MetaInMediaType`;
       axios
         .get(this.apiUrl + url)
         .then((res) => {

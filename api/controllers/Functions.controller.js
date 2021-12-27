@@ -1,20 +1,20 @@
-const db = require("../index.js");
-// Models
-const VideoMetadata = db.VideoMetadata;
-const Media = db.Media;
-const Settings = db.Settings;
-const MetaSettings = db.MetaSettings;
-const Meta = db.Meta;
-const Items = db.Items;
-const ItemsInItems = db.ItemsInItems;
-const ItemsInMedia = db.ItemsInMedia;
-const ValuesInMedia = db.ValuesInMedia;
-const ValuesInItems = db.ValuesInItems;
-const MetaInMediaTypes = db.MetaInMediaTypes;
-const Playlists = db.Playlists;
-const VideosInPlaylist = db.VideosInPlaylist;
-const Markers = db.Markers;
-const Op = db.Sequelize.Op;
+const {
+  VideoMetadata,
+  Media,
+  Setting,
+  MetaSetting,
+  Meta,
+  Item,
+  ItemsInItem,
+  ItemsInMedia,
+  ValuesInMedia,
+  ValuesInItem,
+  MetaInMediaType,
+  Playlist,
+  VideosInPlaylist,
+  Marker
+} = require("../index.js");
+
 // FFMPEG
 const ffmpeg = require('fluent-ffmpeg')
 const pathToFfmpeg = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
@@ -71,7 +71,6 @@ exports.importDatabase = async (req, res) => {
 
       let obj = {
         meta: [],
-        metaSettings: [],
         items: [],
         videos: [],
         videoMetadata: [],
@@ -121,24 +120,14 @@ exports.importDatabase = async (req, res) => {
         if (m.type === 'simple') {
           let sm = {
             oldId: m.id,
-            dataType: m.dataType,
+            type: m.dataType,
             name: m.settings.name,
             nameSingular: m.settings.name,
             icon: m.settings.icon || 'shape',
             hint: m.settings.hint || '',
             createdAt: (new Date(m.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
-          }
-          obj.meta.push(sm)
-          if (m.dataType === 'array') {
-            let items = m.settings.items.map(i => ({
-              oldId: i.id,
-              name: i.name,
-            }))
-            obj.items.push({
-              [m.id]: items
-            })
-            obj.metaSettings.push({
+            metaSetting: {
               "oldId": m.id,
               "hidden": true,
               "parser": false,
@@ -156,12 +145,22 @@ exports.importDatabase = async (req, res) => {
               "scraper": false,
               "nested": false,
               "markers": false,
+            }
+          }
+          obj.meta.push(sm)
+          if (m.dataType === 'array') {
+            let items = m.settings.items.map(i => ({
+              oldId: i.id,
+              name: i.name,
+            }))
+            obj.items.push({
+              [m.id]: items
             })
           }
         } else if (m.type === 'complex') {
           let cm = {
             oldId: m.id,
-            dataType: 'array',
+            type: 'array',
             name: m.settings.name,
             nameSingular: m.settings.nameSingular,
             icon: m.settings.icon || 'shape',
@@ -169,13 +168,14 @@ exports.importDatabase = async (req, res) => {
             createdAt: (new Date(m.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
           }
-          obj.meta.push(cm)
           let metaSettings = m.settings
+          // TODO create child associacions
           delete metaSettings.metaInCard
           metaSettings.oldId = m.id
           let imageTypes = metaSettings.imageTypes ? metaSettings.imageTypes.join() : "main"
           metaSettings.imageTypes = imageTypes
-          obj.metaSettings.push(metaSettings)
+          cm.metaSetting = metaSettings
+          obj.meta.push(cm)
           let cards = Meta.cards.filter(card => card.metaId == m.id).map(i => ({
             oldId: i.id,
             name: i.meta.name,
@@ -246,22 +246,15 @@ exports.importDatabase = async (req, res) => {
       })
     }
 
-    await Settings.bulkCreate(options, {
+    await Setting.bulkCreate(options, {
       updateOnDuplicate: ["value"]
     })
   }).then(async () => {
-    await Meta.bulkCreate(obj.meta)
-    for (let m of obj.metaSettings) {
-      const foundMeta = await Meta.findOne({
-        where: {
-          oldId: m.oldId
-        }
-      })
-      if (foundMeta) await MetaSettings.create({
-        ...m,
-        ...{
-          metaId: foundMeta.id
-        }
+    for (let m of obj.meta) {
+      await Meta.create(m, {
+        include: [MetaSetting]
+      }).catch(e => {
+        console.log(e)
       })
     }
     for (let items of obj.items) {
@@ -278,7 +271,7 @@ exports.importDatabase = async (req, res) => {
             },
             ...it
           }))
-          await Items.bulkCreate(newItems)
+          await Item.bulkCreate(newItems)
         }
       }
     }
@@ -290,16 +283,16 @@ exports.importDatabase = async (req, res) => {
         }
       })
       if (meta === null) continue
-      else await MetaInMediaTypes.create({
+      else await MetaInMediaType.create({
         typeId: 1,
         metaId: meta.id
       })
     }
   }).then(async () => {
-    await Playlists.bulkCreate(obj.playlists)
+    await Playlist.bulkCreate(obj.playlists)
   }).then(async () => {
     for (let playlist of obj.playlists) {
-      const p = await Playlists.findOne({
+      const p = await Playlist.findOne({
         where: {
           oldId: playlist.oldId
         }
@@ -328,7 +321,7 @@ exports.importDatabase = async (req, res) => {
       if (media === null) continue
       else marker.mediaId = media.id
       if (marker.type === 'meta') {
-        const metaItem = await Items.findOne({
+        const metaItem = await Item.findOne({
           where: {
             oldId: marker.oldItemId
           }
@@ -336,7 +329,7 @@ exports.importDatabase = async (req, res) => {
         if (media === null) continue
         else marker.itemId = metaItem.id
       }
-      await Markers.create(marker)
+      await Marker.create(marker)
     }
   }).then(async () => { // meta in videos
     for (let videoMeta of obj.onlyMeta) {
@@ -357,9 +350,9 @@ exports.importDatabase = async (req, res) => {
         if (m === null) continue
         else {
           let val = onlyMetaFields[fieldName]
-          if (m.dataType === 'array') {
+          if (m.type === 'array') {
             for (let item of val) {
-              const metaItem = await Items.findOne({
+              const metaItem = await Item.findOne({
                 where: {
                   oldId: item
                 }
@@ -395,7 +388,7 @@ exports.importDatabase = async (req, res) => {
   }).then(async () => { // meta in metaItems
     for (let card of obj.metaInItems) {
       for (let cardId in card) {
-        const metaItem = await Items.findOne({
+        const metaItem = await Item.findOne({
           where: {
             oldId: cardId
           }
@@ -409,9 +402,9 @@ exports.importDatabase = async (req, res) => {
           })
           if (metaOfItem === null) continue
           let val = card[cardId][key]
-          if (metaOfItem.dataType === 'array') {
+          if (metaOfItem.type === 'array') {
             for (let itemOldId of val) {
-              const childItem = await Items.findOne({
+              const childItem = await Item.findOne({
                 where: {
                   oldId: itemOldId
                 }
@@ -419,7 +412,7 @@ exports.importDatabase = async (req, res) => {
               if (childItem === null) continue
               else {
                 try {
-                  await ItemsInItems.create({
+                  await ItemsInItem.create({
                     itemId: metaItem.id,
                     childItemId: childItem.id
                   })
@@ -431,7 +424,7 @@ exports.importDatabase = async (req, res) => {
           } else {
             try {
               if (val !== 0 && val !== '')
-                await ValuesInItems.create({
+                await ValuesInItem.create({
                   value: val,
                   metaId: metaOfItem.id,
                   itemId: metaItem.id

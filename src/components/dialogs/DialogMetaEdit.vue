@@ -1,0 +1,224 @@
+<template>
+  <div>
+    <v-dialog
+      v-if="dialog"
+      :value="dialog"
+      @input="close"
+      scrollable
+      width="600"
+    >
+      <v-card>
+        <div class="d-flex justify-space-between">
+          <div class="headline ma-4">Settings of meta "{{ meta.name }}"</div>
+          <div
+            class="
+              d-flex
+              flex-sm-row flex-column-reverse
+              justify-end
+              ma-sm-4 ma-2
+            "
+          >
+            <v-btn @click="close" outlined>
+              <v-icon left>mdi-close</v-icon> Cancel
+            </v-btn>
+            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
+            <v-btn @click="apply" color="success" depressed>
+              <v-icon left>mdi-check</v-icon> Apply
+            </v-btn>
+          </div>
+        </div>
+
+        <v-divider></v-divider>
+
+        <vuescroll>
+          <v-card-text class="px-4">
+            <v-form
+              v-model="valid"
+              ref="form"
+              class="flex-grow-1"
+              @submit.prevent
+            >
+              <v-text-field v-model="name" :rules="[nameRules]" label="Name" />
+              <v-text-field
+                v-if="meta.type == 'array'"
+                v-model="singular"
+                :rules="[nameRules]"
+                label="Singular name"
+              />
+              <v-text-field
+                v-model="metaHint"
+                label="Hint"
+                hint="This text under the field is the hint"
+              />
+
+              <div class="text--secondary caption mt-2 mb-1">Icon</div>
+              <div class="d-flex">
+                <v-icon>mdi-{{ metaIcon }}</v-icon>
+                <v-btn
+                  @click="dialogIcons = true"
+                  color="primary"
+                  small
+                  rounded
+                  depressed
+                  class="ml-4"
+                >
+                  <v-icon left>mdi-shape-plus</v-icon>
+                  Change icon
+                </v-btn>
+              </div>
+
+              <!-- Rating -->
+              <MetaSettingsRating
+                v-if="meta.type == 'rating'"
+                :meta="meta"
+              />
+            </v-form>
+
+            <div class="mt-6 text-right">
+              <v-btn
+                @click="dialogDeleteMeta = true"
+                color="error"
+                depressed
+              >
+                <v-icon left>mdi-delete</v-icon>
+                Delete meta
+              </v-btn>
+            </div>
+          </v-card-text>
+        </vuescroll>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogDeleteMeta" max-width="450">
+      <v-card>
+        <div class="d-flex justify-space-between">
+          <div></div>
+          <div class="ma-sm-4 ma-2">
+            <v-btn @click="deleteMeta" color="error" depressed>
+              <v-icon left>mdi-check</v-icon> Delete
+            </v-btn>
+          </div>
+        </div>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="text-center">
+          <v-icon size="72" color="error" class="py-4">
+            mdi-alert-outline
+          </v-icon>
+          <div class="error--text">
+            The meta will be removed from all assigned media and items.
+            <div v-if="meta.type == 'array'">
+              And it will also delete all items of this meta.
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <DialogIcons
+      v-if="dialogIcons"
+      @close="dialogIcons = false"
+      @apply="changeIcon($event)"
+    />
+  </div>
+</template>
+
+
+<script>
+import Vue from "vue";
+import axios from "axios";
+import vuescroll from "vuescroll";
+
+export default {
+  props: {
+    dialog: Boolean,
+    meta: Object,
+  },
+  name: "DialogEditMetaRating",
+  components: {
+    vuescroll,
+    DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
+    MetaSettingsRating: () =>
+      import("@/components/dialogs/meta/MetaSettingsRating.vue"),
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.initMeta();
+    });
+  },
+  data: () => ({
+    dialogIcons: false,
+    dialogDeleteMeta: false,
+    valid: false,
+    name: "",
+    singular: "",
+    metaHint: "",
+    metaIcon: "shape",
+  }),
+  computed: {
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
+  },
+  methods: {
+    initMeta() {
+      const meta = this.meta;
+      console.log(meta);
+      this.name = meta.name;
+      this.singular = meta.nameSingular;
+      this.metaHint = meta.hint;
+      this.metaIcon = meta.icon;
+    },
+    changeIcon(icon) {
+      this.dialogIcons = false;
+      this.metaIcon = icon;
+    },
+    getHint() {
+      const type = this.meta.type;
+      if (type === "string") return "for description or notes";
+      if (type === "date") return "e.g. release date, last viewed date";
+      if (type === "number") return "to count";
+      if (type === "array")
+        return "for multiple items. for example: Earth, Mars, Venus.";
+      if (type === "boolean") return "true or false";
+      if (type === "rating") return "for scoring";
+      return "Please select one of the types";
+    },
+    getIcon(type) {
+      return Vue.prototype.$getIconDataType(type);
+    },
+    nameRules(string) {
+      return Vue.prototype.$validateName(string);
+    },
+    async apply() {
+      this.$refs.form.validate();
+      if (!this.valid) return;
+
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/Meta",
+        data: {
+          name: this.name,
+          nameSingular: this.singular,
+          hint: this.metaHint,
+          icon: this.metaIcon,
+        },
+      })
+        .then(() => {
+          if (this.type == "array") this.$root.$emit("updateNavbar");
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      this.$emit("update");
+      this.close();
+    },
+    close() {
+      this.$emit("close");
+    },
+    deleteMeta() {},
+  },
+};
+</script>

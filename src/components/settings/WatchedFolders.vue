@@ -144,7 +144,7 @@ export default {
   methods: {
     async getFolders() {
       await axios
-        .get(this.apiUrl + "/api/WatchedFolders")
+        .get(this.apiUrl + "/api/WatchedFolder")
         .then((res) => {
           this.folders = res.data;
         })
@@ -155,7 +155,7 @@ export default {
     async addFolder() {
       await axios({
         method: "post",
-        url: this.apiUrl + "/api/WatchedFolders",
+        url: this.apiUrl + "/api/WatchedFolder",
         data: {
           path: "D:\\torrents",
           name: "D:\\torrents",
@@ -173,7 +173,7 @@ export default {
       const folder = this.folders[i];
       await axios({
         method: "put",
-        url: this.apiUrl + "/api/WatchedFolders/" + folder.id,
+        url: this.apiUrl + "/api/WatchedFolder/" + folder.id,
         data: {
           name: this.folderName,
         },
@@ -191,7 +191,7 @@ export default {
       const folder = this.folders[i];
       await axios({
         method: "delete",
-        url: this.apiUrl + "/api/WatchedFolders/" + folder.id,
+        url: this.apiUrl + "/api/WatchedFolder/" + folder.id,
       })
         .then(() => {
           this.getFolders();

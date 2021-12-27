@@ -1,6 +1,8 @@
 const db = require("../index.js");
-const ValuesInMedia = db.ValuesInMedia;
-const Meta = db.Meta;
+const {
+  Meta,
+  ValuesInMedia
+} = require("../index.js");
 const Op = db.Sequelize.Op;
 
 // Create and Save a new ValuesInMedia

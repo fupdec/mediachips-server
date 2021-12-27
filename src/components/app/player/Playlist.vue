@@ -68,7 +68,7 @@
                 App not registered
               </div>
               <span class="time">
-                {{ getDuration(video['VideoMetadata'].duration) }}
+                {{ getDuration(video['videoMetadata'].duration) }}
               </span>
               <span
                 v-if="nowPlaying === i"

@@ -33,11 +33,10 @@
               clearable
               rounded
               outlined
-              hide-details
               prepend-inner-icon="mdi-magnify"
               label="Search"
+              hint="by name, type, hint, icon, date"
               style="max-width: 250px"
-              class="mb-4"
             ></v-text-field>
 
             <v-spacer class="mx-2" />
@@ -47,13 +46,11 @@
               dense
               rounded
               outlined
-              hide-details
               label="Sort by"
               prepend-inner-icon="mdi-sort"
               append-icon="mdi-chevron-down"
-              :items="['name', 'dataType', 'createdAt', 'updatedAt']"
+              :items="['name', 'type', 'createdAt', 'updatedAt']"
               style="max-width: 200px"
-              class="mb-4"
               menu-props="offset-y"
             ></v-select>
 
@@ -83,22 +80,29 @@
             v-for="item in props.items"
             :key="item.id"
             outlined
-            @click="open(item.id)"
+            @click="open(item)"
             style="margin: 6px"
           >
             <v-icon size="20" left>mdi-{{ item.icon }}</v-icon>
             {{ item.name }}
-            <v-icon right small>{{ getIcon(item.dataType) }}</v-icon>
+            <v-icon right small>{{ getIcon(item.type) }}</v-icon>
           </v-chip>
         </v-chip-group>
       </template>
     </v-data-iterator>
 
-    <DialogAddMeta
-      v-if="dialogAddMeta"
-      :dialog="dialogAddMeta"
-      @close="dialogAddMeta = false"
-      @update="getMeta"
+    <DialogMetaAdd
+      v-if="dialogAdd"
+      :dialog="dialogAdd"
+      @added="finishAdding($event)"
+      @close="dialogAdd = false"
+    />
+
+    <DialogMetaEdit
+      v-if="dialogEdit"
+      :dialog="dialogEdit"
+      :meta="selectedMeta"
+      @close="dialogEdit = false"
     />
   </v-card>
 </template>
@@ -111,8 +115,8 @@ import axios from "axios";
 export default {
   name: "MetaList",
   components: {
-    DialogAddMeta: () => import("@/components/dialogs/DialogAddMeta.vue"),
-    // DialogEditMeta: () => import("@/components/dialogs/DialogEditMeta.vue"),
+    DialogMetaAdd: () => import("@/components/dialogs/DialogMetaAdd.vue"),
+    DialogMetaEdit: () => import("@/components/dialogs/DialogMetaEdit.vue"),
   },
   mounted() {
     this.$nextTick(async () => {
@@ -124,7 +128,9 @@ export default {
     search: "",
     sortBy: "name",
     sortDesc: false,
-    dialogAddMeta: false,
+    dialogAdd: false,
+    dialogEdit: false,
+    selectedMeta: null,
   }),
   computed: {
     apiUrl() {
@@ -136,7 +142,6 @@ export default {
       await axios
         .get(this.apiUrl + "/api/Meta")
         .then((res) => {
-          console.log(res.data);
           this.meta = res.data;
         })
         .catch((e) => {
@@ -147,9 +152,26 @@ export default {
       return Vue.prototype.$getIconDataType(type);
     },
     addMeta() {
-      this.dialogAddMeta = true;
+      this.dialogAdd = true;
     },
-    open(metaId) {},
+    open(meta) {
+      this.selectedMeta = meta;
+      this.dialogEdit = true;
+    },
+    finishAdding(type) {
+      this.dialogAdd = false;
+      if (["array", "rating"].includes(type)) {
+        axios
+          .get(this.apiUrl + "/api/Meta/latest")
+          .then((res) => {
+            this.open(res.data[0]);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+      this.getMeta();
+    },
   },
 };
 </script>
