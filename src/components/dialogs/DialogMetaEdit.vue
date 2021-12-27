@@ -65,21 +65,29 @@
                   Change icon
                 </v-btn>
               </div>
-
-              <!-- Rating -->
-              <MetaSettingsRating
-                v-if="meta.type == 'rating'"
-                @update="updateRating($event)"
-                :meta="meta"
-              />
-
-              <v-switch
-                v-if="meta.type == 'string'"
-                v-model="isLink"
-                label="Link to an Internet address"
-                hide-details
-              />
             </v-form>
+
+            <!-- Rating -->
+            <MetaSettingsRating
+              v-if="meta.type == 'rating'"
+              @update="updateRating($event)"
+              :meta="meta"
+            />
+
+            <!-- String -->
+            <v-switch
+              v-if="meta.type == 'string'"
+              v-model="isLink"
+              label="Link to an Internet address"
+              hide-details
+            />
+
+            <!-- Array -->
+            <MetaSettingsArray
+              v-if="meta.type == 'array'"
+              @update="updateSettingsArray($event)"
+              :meta="meta"
+            />
 
             <div class="mt-6 text-right">
               <v-btn @click="dialogDeleteMeta = true" color="error" depressed>
@@ -143,6 +151,8 @@ export default {
   components: {
     vuescroll,
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
+    MetaSettingsArray: () =>
+      import("@/components/dialogs/meta/MetaSettingsArray.vue"),
     MetaSettingsRating: () =>
       import("@/components/dialogs/meta/MetaSettingsRating.vue"),
   },
@@ -162,6 +172,7 @@ export default {
     metaIcon: "shape",
     isLink: false,
     rating: {},
+    settingsArray: {},
   }),
   computed: {
     apiUrl() {
@@ -219,7 +230,6 @@ export default {
         });
 
       this.updateSettings();
-      this.$emit("update");
       this.close();
     },
     getSettings() {
@@ -235,6 +245,7 @@ export default {
     },
     updateSettings() {
       const data = {
+        ...this.settingsArray,
         ...this.rating,
         ...{
           isLink: this.isLink,
@@ -245,9 +256,13 @@ export default {
         url: this.apiUrl + "/api/MetaSetting/" + this.meta.id,
         data: data,
       });
+      this.$emit("update", this.meta.type);
     },
     updateRating(rating) {
       this.rating = rating;
+    },
+    updateSettingsArray(settings) {
+      this.settingsArray = settings;
     },
     close() {
       this.$emit("close");

@@ -9,8 +9,8 @@ module.exports = app => {
   // Retrieve all ChildMeta
   router.get("/", ChildMeta.findAll);
 
-  // Retrieve a single ChildMeta with id
-  router.get("/:id", ChildMeta.findOne);
+  // Retrieve all ChildMeta with parent id
+  router.get("/:id", ChildMeta.findAll);
 
   // Update a ChildMeta with id
   router.put("/:id", ChildMeta.update);

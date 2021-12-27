@@ -103,7 +103,7 @@
       :dialog="dialogEdit"
       :meta="selectedMeta"
       @close="dialogEdit = false"
-      @update="getMeta"
+      @update="updateMeta($event)"
       @delete="deleteMeta($event)"
     />
   </v-card>
@@ -174,6 +174,10 @@ export default {
       }
       this.getMeta();
       if (this.type == "array") this.$root.$emit("updateNavbar");
+    },
+    updateMeta(type) {
+      this.getMeta();
+      if (type == "array") this.$root.$emit("updateNavbar");
     },
     deleteMeta(meta) {
       this.dialogEdit = false;

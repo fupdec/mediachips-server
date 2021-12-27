@@ -1,28 +1,34 @@
 <template>
   <div>
-    <v-card outlined class="px-4 pb-4 mt-4">
-      <div class="overline text-center mt-2">Settings for Rating</div>
+    <v-card outlined class="pa-4 mt-8">
+      <div class="overline text-center">Settings for Rating</div>
 
       <div class="d-flex justify-center align-center mb-2">
         <v-rating
           v-model="rating"
-          :length="ratingMax > 10 ? 10 : ratingMax < 2 ? 2 : ratingMax"
+          :length="
+            settings.ratingMax > 10
+              ? 10
+              : settings.ratingMax < 2
+              ? 2
+              : settings.ratingMax
+          "
           hover
-          :full-icon="`mdi-${ratingIcon}`"
-          :empty-icon="`mdi-${ratingIconEmpty || ratingIcon}`"
-          :color="ratingColor"
+          :full-icon="`mdi-${settings.ratingIcon}`"
+          :empty-icon="`mdi-${settings.ratingIconEmpty || settings.ratingIcon}`"
+          :color="settings.ratingColor"
           background-color="grey"
           class="meta-rating"
           clearable
-          :half-increments="ratingHalf"
-          :half-icon="`mdi-${ratingIconHalf || ratingIcon}`"
+          :half-increments="settings.ratingHalf"
+          :half-icon="`mdi-${settings.ratingIconHalf || settings.ratingIcon}`"
         />
         <span class="mx-2">{{ rating }}</span>
       </div>
 
       <div class="text--secondary caption mb-1">Full icon</div>
       <div class="d-flex">
-        <v-icon>mdi-{{ ratingIcon }}</v-icon>
+        <v-icon>mdi-{{ settings.ratingIcon }}</v-icon>
         <v-btn
           @click="selectIcon('ratingIcon')"
           small
@@ -34,9 +40,9 @@
           Change icon
         </v-btn>
       </div>
-      <div class="text--secondary caption mt-2 mb-1">Empty icon</div>
+      <div class="text--secondary caption mt-4 mb-1">Empty icon</div>
       <div class="d-flex">
-        <v-icon>mdi-{{ ratingIconEmpty }}</v-icon>
+        <v-icon>mdi-{{ settings.ratingIconEmpty }}</v-icon>
         <v-btn
           @click="selectIcon('ratingIconEmpty')"
           small
@@ -49,16 +55,16 @@
         >
       </div>
       <v-text-field
-        v-model="ratingMax"
+        v-model="settings.ratingMax"
         type="number"
         :rules="[(v) => (v > 1 && v < 11) || 'Incorrect value']"
         label="Max value"
-        class="mt-4"
+        class="mt-6"
         style="max-width: 200px"
-        :hint="`The rating will be from 0 to ${ratingMax}`"
+        :hint="`The rating will be from 0 to ${settings.ratingMax}`"
       />
       <div class="d-flex">
-        <v-icon :color="ratingColor" large left>mdi-circle</v-icon>
+        <v-icon :color="settings.ratingColor" large left>mdi-circle</v-icon>
         <v-btn
           @click="dialogPalette = true"
           rounded
@@ -69,12 +75,12 @@
           <v-icon left>mdi-palette</v-icon> change color
         </v-btn>
       </div>
-      <v-switch v-model="ratingHalf" label="Half increment" />
-      <div v-if="ratingHalf" class="text--secondary caption mb-1">
+      <v-switch v-model="settings.ratingHalf" label="Half increment" />
+      <div v-if="settings.ratingHalf" class="text--secondary caption mb-1">
         Half icon
       </div>
-      <div v-if="ratingHalf" class="d-flex">
-        <v-icon>mdi-{{ ratingIconHalf }}</v-icon>
+      <div v-if="settings.ratingHalf" class="d-flex">
+        <v-icon>mdi-{{ settings.ratingIconHalf }}</v-icon>
         <v-btn
           @click="selectIcon('ratingIconHalf')"
           small
@@ -96,7 +102,7 @@
 
     <ColorPicker
       :dialog="dialogPalette"
-      :color="ratingColor"
+      :color="settings.ratingColor"
       @close="dialogPalette = false"
       @getColor="changeColor($event)"
     />
@@ -121,12 +127,14 @@ export default {
   },
   data: () => ({
     rating: 2,
-    ratingIcon: "star",
-    ratingIconEmpty: "star-outline",
-    ratingIconHalf: "star-half-full",
-    ratingHalf: false,
-    ratingMax: 5,
-    ratingColor: "#ffab00",
+    settings: {
+      ratingIcon: "star",
+      ratingIconEmpty: "star-outline",
+      ratingIconHalf: "star-half-full",
+      ratingHalf: false,
+      ratingMax: 5,
+      ratingColor: "#ffab00",
+    },
     iconType: "",
     dialogIcons: false,
     dialogPalette: false,
@@ -136,12 +144,7 @@ export default {
     initSettings() {
       const settings = this.meta.metaSetting;
       if (!settings) return;
-      this.ratingIcon = settings.ratingIcon || "star";
-      this.ratingIconEmpty = settings.ratingIconEmpty || "star-outline";
-      this.ratingIconHalf = settings.ratingIconHalf || "star-half-full";
-      this.ratingHalf = settings.ratingHalf || false;
-      this.ratingMax = settings.ratingMax || 5;
-      this.ratingColor = settings.ratingColor || "ffab00";
+      this.settings = { ...this.settings, ...settings };
     },
     selectIcon(type) {
       this.iconType = type;
@@ -149,48 +152,25 @@ export default {
     },
     changeIcon(icon) {
       this.dialogIcons = false;
-      this[this.iconType] = icon;
+      this.settings[this.iconType] = icon;
     },
     changeColor(e) {
-      this.ratingColor = e;
+      this.settings.ratingColor = e;
       this.dialogPalette = false;
     },
     updateRating() {
-      const rating = {
-        ratingIcon: this.ratingIcon,
-        ratingIconEmpty: this.ratingIconEmpty,
-        ratingIconHalf: this.ratingIconHalf,
-        ratingHalf: this.ratingHalf,
-        ratingMax: this.ratingMax,
-        ratingColor: this.ratingColor,
-      };
-      this.$emit("update", rating);
+      this.$emit("update", this.settings);
     },
   },
   watch: {
-    ratingMax(val) {
+    'settings.ratingMax': function (val) {
       val = parseInt(val);
       if (val < 2 || val > 10) return;
       else if (this.rating > val) this.rating = val;
-      this.updateRating();
     },
-    ratingIcon() {
-      this.updateRating();
-    },
-    ratingIconEmpty() {
-      this.updateRating();
-    },
-    ratingIconHalf() {
-      this.updateRating();
-    },
-    ratingHalf() {
-      this.updateRating();
-    },
-    ratingMax() {
-      this.updateRating();
-    },
-    ratingColor() {
-      this.updateRating();
+    settings: {
+      handler: 'updateRating',
+      deep: true
     },
   },
 };
