@@ -164,8 +164,13 @@ export default {
         this.$store.state.Player.duration = value;
       },
     },
-    paused() {
+    paused: {
+      get() {
       return this.$store.state.Player.paused;
+      },
+      set(value) {
+        this.$store.state.Player.paused = value;
+      },
     },
     currentTime: {
       get() {
@@ -201,6 +206,7 @@ export default {
       this.player.src = null;
       this.currentTime = 0;
       this.isPlayerActive = false;
+      this.paused = false;
     },
     initPlayer() {
       this.player.addEventListener("loadedmetadata", () => {
