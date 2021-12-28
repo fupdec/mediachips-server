@@ -130,23 +130,26 @@ exports.importDatabase = async (req, res) => {
             createdAt: (new Date(m.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             metaSetting: {
-              "oldId": m.id,
-              "hidden": true,
-              "parser": false,
-              "imageAspectRatio": 1,
-              "imageTypes": "main",
-              "chipLabel": false,
-              "chipOutlined": false,
-              "color": false,
-              "favorite": true,
-              "rating": false,
-              "synonyms": false,
-              "bookmark": false,
-              "country": false,
-              "career": false,
-              "scraper": false,
-              "nested": false,
-              "markers": false,
+              ...{
+                "oldId": m.id,
+                "hidden": true,
+                "parser": false,
+                "imageAspectRatio": 1,
+                "imageTypes": "main",
+                "chipLabel": false,
+                "chipOutlined": false,
+                "color": false,
+                "favorite": true,
+                "rating": false,
+                "synonyms": false,
+                "bookmark": false,
+                "country": false,
+                "career": false,
+                "scraper": false,
+                "nested": false,
+                "markers": false,
+              },
+              ...m.settings
             }
           }
           obj.meta.push(sm)
@@ -395,10 +398,9 @@ exports.importDatabase = async (req, res) => {
         }
       }
     }
-  }).then(async () => { 
+  }).then(async () => {
     let childMeta = []
     let cm = obj.childMeta
-    console.log(cm)
     for (let c of cm) {
       const meta = await Meta.findOne({
         where: {
@@ -415,10 +417,9 @@ exports.importDatabase = async (req, res) => {
             oldId: id
           },
           raw: true
-        }) 
+        })
 
         if (child) {
-          console.log(child)
           childMeta.push({
             metaId: meta.id,
             childMetaId: child.id,
@@ -427,7 +428,6 @@ exports.importDatabase = async (req, res) => {
         }
       }
     }
-    console.log(childMeta)
 
     await ChildMeta.bulkCreate(childMeta)
   }).then(async () => { // meta in metaItems

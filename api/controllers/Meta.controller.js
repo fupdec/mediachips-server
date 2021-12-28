@@ -4,6 +4,8 @@ const {
   MetaSetting
 } = require("../index.js");
 const Op = db.Sequelize.Op;
+const fs = require("fs")
+const path = require('path')
 
 // Create and Save a new Meta
 exports.create = (req, res) => {
@@ -86,7 +88,12 @@ exports.delete = (req, res) => {
       }
     })
     .then(() => {
-      // TODO delete folder with images of the meta
+      const userfiles = path.join(__dirname, '../../userfiles')
+      const dir = path.join(userfiles, 'media/meta', req.params.id)
+      fs.rmSync(dir, {
+        recursive: true,
+        force: true
+      })
       res.sendStatus(201)
     })
     .catch(err => {
