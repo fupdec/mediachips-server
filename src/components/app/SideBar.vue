@@ -96,12 +96,12 @@ export default {
   name: "SideBar",
   components: { vuescroll },
   mounted() {
-    this.$nextTick(() => {
-      this.getMediaList();
+    this.$nextTick(async () => {
+      await this.getMediaList();
+      await this.getMetaList();
+    });
+    this.$root.$on("updateNavbar", () => {
       this.getMetaList();
-      this.$root.$on("updateNavbar", () => {
-        this.getMetaList();
-      });
     });
   },
   data: () => ({
@@ -120,8 +120,8 @@ export default {
     },
   },
   methods: {
-    getMediaList() {
-      axios
+    async getMediaList() {
+      await axios
         .get(this.apiUrl + "/api/mediaType")
         .then((res) => {
           this.mediaTypes = res.data;
@@ -130,8 +130,8 @@ export default {
           console.log(e);
         });
     },
-    getMetaList() {
-      axios
+    async getMetaList() {
+      await axios
         .get(this.apiUrl + "/api/meta")
         .then((res) => {
           let metaAll = res.data.filter((i) => i.type == "array");
