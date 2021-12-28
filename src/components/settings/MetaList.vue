@@ -1,6 +1,8 @@
 <template>
   <v-card flat max-width="800" style="margin: auto" class="my-6 px-4">
-    <div class="headline text-center">List of meta</div>
+    <v-btn @click="addMeta" color="success" class="mb-6" rounded depressed>
+      <v-icon left>mdi-plus</v-icon> Add meta
+    </v-btn>
 
     <v-data-iterator
       :items="meta"
@@ -13,69 +15,55 @@
       no-results-text="No meta found"
     >
       <template v-slot:header>
-        <div class="d-flex flex-column align-start my-4">
-          <v-btn
-            @click="addMeta"
-            color="success"
-            class="mb-6"
+        <div v-if="meta.length" class="d-flex flex-wrap mb-8 mb-sm-0">
+          <v-text-field
+            v-model="search"
+            dense
+            clearable
             rounded
-            depressed
-            height="40"
+            outlined
+            prepend-inner-icon="mdi-magnify"
+            label="Search"
+            hint="by name, type, hint, icon, date"
+            style="max-width: 250px"
+          ></v-text-field>
+
+          <div class="mx-2" />
+
+          <v-select
+            v-model="sortBy"
+            dense
+            rounded
+            outlined
+            label="Sort by"
+            prepend-inner-icon="mdi-sort"
+            append-icon="mdi-chevron-down"
+            :items="['name', 'type', 'createdAt', 'updatedAt']"
+            style="max-width: 200px"
+            menu-props="offset-y"
+          ></v-select>
+
+          <div class="mx-2" />
+
+          <v-btn-toggle
+            v-model="sortDesc"
+            dense
+            mandatory
+            rounded
+            color="primary"
           >
-            <v-icon left>mdi-plus</v-icon>
-            Add meta
-          </v-btn>
-
-          <div v-if="meta.length" class="d-flex just align-start flex-wrap">
-            <v-text-field
-              v-model="search"
-              dense
-              clearable
-              rounded
-              outlined
-              prepend-inner-icon="mdi-magnify"
-              label="Search"
-              hint="by name, type, hint, icon, date"
-              style="max-width: 250px"
-            ></v-text-field>
-
-            <v-spacer class="mx-2" />
-
-            <v-select
-              v-model="sortBy"
-              dense
-              rounded
-              outlined
-              label="Sort by"
-              prepend-inner-icon="mdi-sort"
-              append-icon="mdi-chevron-down"
-              :items="['name', 'type', 'createdAt', 'updatedAt']"
-              style="max-width: 200px"
-              menu-props="offset-y"
-            ></v-select>
-
-            <v-spacer class="mx-2" />
-
-            <v-btn-toggle
-              v-model="sortDesc"
-              dense
-              mandatory
-              rounded
-              color="primary"
-            >
-              <v-btn outlined height="40" :value="false">
-                <v-icon>mdi-arrow-up</v-icon>
-              </v-btn>
-              <v-btn outlined height="40" :value="true">
-                <v-icon>mdi-arrow-down</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-          </div>
+            <v-btn outlined height="40" :value="false">
+              <v-icon>mdi-arrow-up</v-icon>
+            </v-btn>
+            <v-btn outlined height="40" :value="true">
+              <v-icon>mdi-arrow-down</v-icon>
+            </v-btn>
+          </v-btn-toggle>
         </div>
       </template>
 
       <template v-slot:default="props">
-        <v-chip-group active-class="primary--text" column>
+        <v-chip-group column>
           <v-chip
             v-for="item in props.items"
             :key="item.id"
