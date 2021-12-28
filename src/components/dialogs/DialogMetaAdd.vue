@@ -11,7 +11,7 @@
         <div class="d-flex pa-4">
           <div class="headline">Adding new meta</div>
           <v-spacer class="mx-2"></v-spacer>
-          <v-btn @click="addMeta" color="success">
+          <v-btn @click="addMeta" color="success" depressed>
             <v-icon left>mdi-plus</v-icon> Add
           </v-btn>
         </div>
@@ -21,16 +21,6 @@
         <vuescroll>
           <v-card-text class="px-4">
             <v-alert
-              v-show="type == 'array'"
-              type="info"
-              text
-              dense
-              class="body-2"
-            >
-              For this type in the navigation menu there will be a link to a
-              page with all the items of this meta
-            </v-alert>
-            <v-alert
               v-show="type == 'array' || type == 'rating'"
               type="info"
               text
@@ -38,6 +28,16 @@
               class="body-2"
             >
               After adding, a dialog with detailed settings will appear
+            </v-alert>
+            <v-alert
+              v-show="type == 'array'"
+              type="info"
+              text
+              dense
+              class="body-2"
+            >
+              You can view and manage array items on the meta page. A link to
+              the meta page will appear in the navigation menu.
             </v-alert>
             <v-form
               v-model="valid"
@@ -84,15 +84,9 @@
               />
 
               <div class="text--secondary caption mt-2 mb-1">Icon</div>
-              <div class="d-flex">
-                <v-icon>mdi-{{ metaIcon }}</v-icon>
-                <v-btn
-                  @click="dialogIcons = true"
-                  small
-                  rounded
-                  outlined
-                  class="ml-4"
-                >
+              <div class="d-flex align-center">
+                <v-icon large left>mdi-{{ metaIcon }}</v-icon>
+                <v-btn @click="dialogIcons = true" small rounded outlined>
                   <v-icon left>mdi-shape-plus</v-icon>
                   Change icon
                 </v-btn>

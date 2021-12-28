@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels multiple class="mt-8">
+  <v-expansion-panels multiple class="mt-8 settings-meta">
     <v-expansion-panel>
       <v-expansion-panel-header> Global settings </v-expansion-panel-header>
       <v-expansion-panel-content>
@@ -240,7 +240,7 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
-      <v-expansion-panel-header>Child meta</v-expansion-panel-header>
+      <v-expansion-panel-header>Child meta in items</v-expansion-panel-header>
       <v-expansion-panel-content>
         <MetaSettingsChildMeta :meta="meta" />
       </v-expansion-panel-content>
@@ -317,5 +317,15 @@ export default {
   border-radius: 3px;
   margin-right: 10px;
   background-color: rgba(121, 121, 121, 0.164);
+}
+@media (max-width: 480px) {
+  .settings-meta {
+    .v-expansion-panel-header {
+      padding: 10px;
+    }
+    .v-expansion-panel-content__wrap {
+      padding: 0 10px 15px;
+    }
+  }
 }
 </style>

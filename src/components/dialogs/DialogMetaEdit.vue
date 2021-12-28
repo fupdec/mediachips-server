@@ -52,15 +52,9 @@
               />
 
               <div class="text--secondary caption mt-2 mb-1">Icon</div>
-              <div class="d-flex">
-                <v-icon>mdi-{{ metaIcon }}</v-icon>
-                <v-btn
-                  @click="dialogIcons = true"
-                  small
-                  rounded
-                  outlined
-                  class="ml-4"
-                >
+              <div class="d-flex align-center">
+                <v-icon large left>mdi-{{ metaIcon }}</v-icon>
+                <v-btn @click="dialogIcons = true" small rounded outlined>
                   <v-icon left>mdi-shape-plus</v-icon>
                   Change icon
                 </v-btn>
@@ -104,7 +98,18 @@
       <v-card>
         <div class="d-flex justify-space-between">
           <div></div>
-          <div class="ma-sm-4 ma-2">
+          <div
+            class="
+              d-flex
+              flex-sm-row flex-column-reverse
+              justify-end
+              ma-sm-4 ma-2
+            "
+          >
+            <v-btn @click="dialogDeleteMeta = false" outlined>
+              <v-icon left>mdi-close</v-icon> Cancel
+            </v-btn>
+            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
             <v-btn @click="deleteMeta" color="error" depressed>
               <v-icon left>mdi-check</v-icon> Delete
             </v-btn>

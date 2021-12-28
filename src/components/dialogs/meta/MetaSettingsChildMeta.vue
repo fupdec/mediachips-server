@@ -1,29 +1,156 @@
 <template>
   <div>
-    <v-list v-if="childMeta.length" dense class="list-zebra pa-0">
-      <v-list-item v-for="(m, i) in childMeta" :key="i" class="pr-1 pl-2">
-        <div
-          class="d-flex justify-space-between align-center"
-          style="width: 100%"
-        >
-          <v-chip outlined>
-            <v-icon left>mdi-{{ m["meta.icon"] }}</v-icon>
-            <span>{{ m["meta.name"] }}</span>
-            <v-icon right small>{{ getIcon(m["meta.type"]) }}</v-icon>
-            <!-- TODO scraper field -->
-          </v-chip>
-          <span>
-            <v-btn @click="remove(i)" color="red" icon>
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </span>
-        </div>
-      </v-list-item>
-    </v-list>
-    <div v-else class="mb-4 text-center">
-      <v-icon large class="mb-2">mdi-card-off-outline</v-icon>
+    <v-alert type="info" text dense dismissible class="body-2">
+      Changes are applied immediately and are irreversible
+    </v-alert>
+
+    <v-btn
+      @click="openDialogAdd"
+      color="success"
+      small
+      rounded
+      depressed
+      class="mr-4"
+    >
+      <v-icon left>mdi-plus</v-icon> Add
+    </v-btn>
+
+    <v-btn
+      @click="dialogRemove = true"
+      color="error"
+      small
+      rounded
+      depressed
+      :disabled="selectedForRemove.length == 0"
+    >
+      <v-icon left>mdi-close</v-icon> Remove
+    </v-btn>
+
+    <v-chip-group
+      v-if="childMeta.length"
+      v-model="selectedForRemove"
+      active-class="primary--text"
+      multiple
+      column
+      class="mt-4"
+    >
+      <v-chip v-for="m in childMeta" :key="m.id" outlined style="margin: 6px">
+        <v-icon size="20" left>mdi-{{ m["meta.icon"] }}</v-icon>
+        {{ m["meta.name"] }}
+        <v-icon right small>{{ getIcon(m["meta.type"]) }}</v-icon>
+      </v-chip>
+    </v-chip-group>
+
+    <div v-else class="text-center my-4">
+      <v-icon large class="mb-2">mdi-ghost-outline</v-icon>
       <div>No meta added</div>
     </div>
+
+    <v-dialog v-if="dialogAdd" v-model="dialogAdd" scrollable width="580">
+      <v-card>
+        <div class="d-flex justify-space-between">
+          <div class="headline ma-4">Selecting meta</div>
+          <div
+            class="
+              d-flex
+              flex-sm-row flex-column-reverse
+              justify-end
+              ma-sm-4 ma-2
+            "
+          >
+            <v-btn @click="dialogAdd = false" outlined>
+              <v-icon left>mdi-close</v-icon> Cancel
+            </v-btn>
+            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
+            <v-btn @click="addMeta" color="success" depressed>
+              <v-icon left>mdi-check</v-icon> Apply
+            </v-btn>
+          </div>
+        </div>
+
+        <v-divider class="mb-4"></v-divider>
+
+        <v-card-text>
+          <v-data-iterator
+            :items="metaForAdd"
+            :search="search"
+            :items-per-page="-1"
+            hide-default-footer
+            no-data-text="No meta available"
+            no-results-text="No meta found"
+          >
+            <template v-slot:header>
+              <v-text-field
+                v-if="metaForAdd.length"
+                v-model="search"
+                dense
+                clearable
+                rounded
+                outlined
+                class="mt-2"
+                prepend-inner-icon="mdi-magnify"
+                label="Search"
+                hint="by name, type, hint, icon, date"
+                style="max-width: 350px"
+              ></v-text-field>
+            </template>
+
+            <template v-slot:default="props">
+              <v-chip-group
+                v-model="selectedForAdd"
+                active-class="primary--text"
+                multiple
+                column
+              >
+                <v-chip
+                  v-for="item in props.items"
+                  :key="item.id"
+                  outlined
+                  style="margin: 6px"
+                >
+                  <v-icon size="20" left>mdi-{{ item.icon }}</v-icon>
+                  {{ item.name }}
+                  <v-icon right small>{{ getIcon(item.type) }}</v-icon>
+                </v-chip>
+              </v-chip-group>
+            </template>
+          </v-data-iterator>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogRemove" max-width="450">
+      <v-card>
+        <div class="d-flex justify-space-between">
+          <div></div>
+          <div
+            class="
+              d-flex
+              flex-sm-row flex-column-reverse
+              justify-end
+              ma-sm-4 ma-2
+            "
+          >
+            <v-btn @click="dialogRemove = false" outlined>
+              <v-icon left>mdi-close</v-icon> Cancel
+            </v-btn>
+            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
+            <v-btn @click="removeMeta" color="error" depressed>
+              <v-icon left>mdi-check</v-icon> Remove
+            </v-btn>
+          </div>
+        </div>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="text-center">
+          <v-icon size="72" color="error" class="py-4">
+            mdi-alert-outline
+          </v-icon>
+          <div class="error--text">The meta will be removed from all items</div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -31,7 +158,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 
 export default {
   name: "MetaSettingsChildMeta",
@@ -46,6 +172,12 @@ export default {
   },
   data: () => ({
     childMeta: [],
+    metaForAdd: [],
+    selectedForAdd: [],
+    selectedForRemove: [],
+    dialogAdd: false,
+    dialogRemove: false,
+    search: "",
   }),
   computed: {
     apiUrl() {
@@ -57,7 +189,6 @@ export default {
       await axios
         .get(this.apiUrl + "/api/ChildMeta?metaId=" + this.meta.id)
         .then((res) => {
-          console.log(res.data);
           this.childMeta = res.data;
         })
         .catch((e) => {
@@ -67,7 +198,51 @@ export default {
     getIcon(type) {
       return Vue.prototype.$getIconDataType(type);
     },
-    remove(index) {},
+    openDialogAdd() {
+      this.dialogAdd = true;
+      axios
+        .get(this.apiUrl + "/api/Meta")
+        .then((res) => {
+          const metaAll = res.data;
+          let childMetaIds = this.childMeta.map((i) => i.childMetaId);
+          let metaFree = metaAll.filter((i) => !childMetaIds.includes(i.id));
+          this.metaForAdd = metaFree.filter((i) => i.id != this.meta.id);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async addMeta() {
+      for (let index of this.selectedForAdd) {
+        const meta = this.metaForAdd[index];
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/ChildMeta",
+          data: {
+            metaId: this.meta.id,
+            childMetaId: meta.id,
+          },
+        });
+      }
+      this.dialogAdd = false;
+      this.selectedForAdd = [];
+      this.getChildMeta();
+    },
+    async removeMeta() {
+      for (let index of this.selectedForRemove) {
+        const meta = this.childMeta[index];
+        await axios.delete(
+          this.apiUrl +
+            "/api/ChildMeta/" +
+            meta.childMetaId +
+            `?metaId=${this.meta.id}`
+        );
+      }
+
+      this.getChildMeta();
+      this.selectedForRemove = [];
+      this.dialogRemove = false;
+    },
   },
   watch: {},
 };

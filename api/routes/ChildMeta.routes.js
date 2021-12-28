@@ -9,13 +9,13 @@ module.exports = app => {
   // Retrieve all ChildMeta
   router.get("/", ChildMeta.findAll);
 
-  // Retrieve all ChildMeta with parent id
+  // Retrieve all ChildMeta with parent metaId
   router.get("/:id", ChildMeta.findAll);
 
   // Update a ChildMeta with id
   router.put("/:id", ChildMeta.update);
 
-  // Delete a ChildMeta with id
+  // Delete a ChildMeta with ChildMetaId
   router.delete("/:id", ChildMeta.delete);
 
   // Delete all ChildMeta
