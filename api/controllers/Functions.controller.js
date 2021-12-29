@@ -31,6 +31,10 @@ const StreamZip = require('node-stream-zip')
 exports.importDatabase = async (req, res) => {
   if (!req.body) return res.sendStatus(400)
 
+  let itemsIds = []
+  let metaIds = []
+  let mediaIds = []
+
   const userfiles = path.join(__dirname, '../../userfiles')
   const tempPath = path.join(userfiles, '/temp')
   if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath)
@@ -95,8 +99,7 @@ exports.importDatabase = async (req, res) => {
         updatedAt: (new Date(i.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
       }))
       obj.videoMetadata = Videos.videos.map((i, x) => ({
-        // oldId: i.id, // its needed for parsing
-        mediaId: x + 1,
+        oldId: i.id, // its needed for parsing
         duration: i.duration,
         width: +i.resolution.match(/\d*/)[0] || 0,
         height: +i.resolution.match(/\x(.*)/)[1] || 0,
@@ -225,18 +228,24 @@ exports.importDatabase = async (req, res) => {
 
   const obj = await createImportObject()
 
-  fs.rmSync(tempPath, {
-    recursive: true,
-    force: true
-  })
-
   Media.bulkCreate(obj.videos).then(async () => {
-    await VideoMetadata.bulkCreate(obj.videoMetadata)
-    // for (let video of obj.videoMetadata) {
-    //   const media = await Media.findOne({ where: { oldId: video.oldId } })
-    //   if (media === null) continue
-    //   else await VideoMetadata.create({...{mediaId:media.id}, ...video})
-    // }
+    mediaIds = await Media.findAll({
+      attributes: ['id', 'oldId'],
+      raw: true
+    })
+
+    let videoMetadata = []
+    for (let video of obj.videoMetadata) {
+      let media = mediaIds.find(x => x.oldId === video.oldId)
+      if (!media) continue
+      else videoMetadata.push({
+        ...{
+          mediaId: media.id
+        },
+        ...video
+      })
+    }
+    await VideoMetadata.bulkCreate(videoMetadata)
   }).then(async () => {
     const defaultSettings = require('../../default-settings.json')
     const settings = obj.settings
@@ -263,6 +272,7 @@ exports.importDatabase = async (req, res) => {
       updateOnDuplicate: ["value"]
     })
   }).then(async () => {
+    // importing meta
     for (let m of obj.meta) {
       await Meta.create(m, {
         include: [MetaSetting]
@@ -270,33 +280,36 @@ exports.importDatabase = async (req, res) => {
         console.log(e)
       })
     }
+    // getting all old ids for meta
+    metaIds = await Meta.findAll({
+      attributes: ['id', 'oldId', 'type'],
+      raw: true
+    })
+
     for (let items of obj.items) {
       for (let i in items) {
-        const meta = await Meta.findOne({
-          where: {
-            oldId: i
-          }
-        })
-        if (meta) {
-          let newItems = items[i].map(it => ({
-            ...{
-              metaId: meta.id
-            },
-            ...it
-          }))
-          await Item.bulkCreate(newItems)
-        }
+        const meta = metaIds.find(x => x.oldId === i)
+        if (!meta) continue
+
+        let newItems = items[i].map(it => ({
+          ...{
+            metaId: meta.id
+          },
+          ...it
+        }))
+        await Item.bulkCreate(newItems)
       }
     }
+
+    itemsIds = await Item.findAll({
+      attributes: ['id', 'oldId'],
+      raw: true
+    })
   }).then(async () => {
     for (let i of obj.settings.metaAssignedToVideos) {
-      const meta = await Meta.findOne({
-        where: {
-          oldId: i.id
-        }
-      })
-      if (meta === null) continue
-      else await MetaInMediaType.create({
+      const meta = metaIds.find(x => x.oldId === i.id)
+      if (!meta) continue
+      await MetaInMediaType.create({
         typeId: 1,
         metaId: meta.id
       })
@@ -312,12 +325,8 @@ exports.importDatabase = async (req, res) => {
       })
       if (p === null) continue
       for (let i of playlist.videos) {
-        const media = await Media.findOne({
-          where: {
-            oldId: i
-          }
-        })
-        if (media === null) continue
+        let media = mediaIds.find(x => x.oldId === i)
+        if (!media) continue
         else await VideosInPlaylist.create({
           playlistId: p.id,
           mediaId: media.id
@@ -325,162 +334,181 @@ exports.importDatabase = async (req, res) => {
       }
     }
   }).then(async () => {
+    let markers = []
     for (let marker of obj.markers) {
-      const media = await Media.findOne({
-        where: {
-          oldId: marker.videoId
-        }
-      })
-      if (media === null) continue
-      else marker.mediaId = media.id
+      let found = mediaIds.find(x => x.oldId === marker.videoId)
+      if (!found) continue
+      marker.mediaId = found.id
       if (marker.type === 'meta') {
-        const metaItem = await Item.findOne({
-          where: {
-            oldId: marker.oldItemId
-          }
-        })
-        if (media === null) continue
-        else marker.itemId = metaItem.id
+        let foundItem = itemsIds.find(x => x.oldId === marker.oldItemId)
+        if (!foundItem) continue
+        else marker.itemId = foundItem.id
       }
-      await Marker.create(marker)
+      markers.push(marker)
     }
+    await Marker.bulkCreate(markers)
   }).then(async () => { // meta in videos
+    let itemsInMedia = []
+    let valuesInMedia = []
     for (let videoMeta of obj.onlyMeta) {
-      const mVideo = await Media.findOne({
-        where: {
-          oldId: videoMeta.id
-        }
-      })
-      if (mVideo === null) continue
+      let mVideo = mediaIds.find(x => x.oldId === videoMeta.id)
+      if (!mVideo) continue
 
       let onlyMetaFields = Object.fromEntries(Object.entries(videoMeta).filter(([key]) => !key.includes('id')))
       for (let fieldName in onlyMetaFields) {
-        const m = await Meta.findOne({
-          where: {
-            oldId: fieldName
-          }
-        })
-        if (m === null) continue
+        let m = metaIds.find(x => x.oldId === fieldName)
+        if (!m) continue
         else {
           let val = onlyMetaFields[fieldName]
           if (m.type === 'array') {
             for (let item of val) {
-              const metaItem = await Item.findOne({
-                where: {
-                  oldId: item
-                }
-              })
-              if (metaItem === null) continue
+              let metaItem = itemsIds.find(x => x.oldId === item)
+              if (!metaItem) continue
               else {
-                try {
-                  await ItemsInMedia.create({
-                    metaId: m.id,
-                    mediaId: mVideo.id,
-                    itemId: metaItem.id
-                  })
-                } catch (e) {
-                  console.log('Query error: ', e)
-                }
+                itemsInMedia.push({
+                  metaId: m.id,
+                  mediaId: mVideo.id,
+                  itemId: metaItem.id
+                })
               }
             }
           } else {
-            try {
-              if (val !== 0 && val !== '')
-                await ValuesInMedia.create({
-                  value: val,
-                  metaId: m.id,
-                  mediaId: mVideo.id,
-                })
-            } catch (e) {
-              console.log('Query error: ', e)
-            }
+            valuesInMedia.push({
+              value: val,
+              metaId: m.id,
+              mediaId: mVideo.id,
+            })
           }
         }
       }
     }
+    await ItemsInMedia.bulkCreate(itemsInMedia)
+    await ValuesInMedia.bulkCreate(valuesInMedia)
   }).then(async () => {
     let childMeta = []
     let cm = obj.childMeta
     for (let c of cm) {
-      const meta = await Meta.findOne({
-        where: {
-          oldId: c.metaId
-        },
-        raw: true
-      })
+      let meta = metaIds.find(x => x.oldId === c.metaId)
       if (!meta) continue
 
       for (let id of c.childMetaId) {
-        console.log(id)
-        const child = await Meta.findOne({
-          where: {
-            oldId: id
-          },
-          raw: true
-        })
+        let child = metaIds.find(x => x.oldId === id)
+        if (!child) continue
 
-        if (child) {
-          childMeta.push({
-            metaId: meta.id,
-            childMetaId: child.id,
-            scraperField: null,
-          })
-        }
+        childMeta.push({
+          metaId: meta.id,
+          childMetaId: child.id,
+          scraperField: null,
+        })
       }
     }
 
     await ChildMeta.bulkCreate(childMeta)
   }).then(async () => { // meta in metaItems
+    let itemsInItem = []
+    let valuesInItem = []
     for (let card of obj.metaInItems) {
       for (let cardId in card) {
-        const metaItem = await Item.findOne({
-          where: {
-            oldId: cardId
-          }
-        })
-        if (metaItem === null) continue
+        let metaItem = itemsIds.find(x => x.oldId === cardId)
+        if (!metaItem) continue
+
         for (let key in card[cardId]) {
-          const metaOfItem = await Meta.findOne({
-            where: {
-              oldId: key
-            }
-          })
-          if (metaOfItem === null) continue
+          let metaOfItem = metaIds.find(x => x.oldId === key)
+          if (!metaOfItem) continue
+
           let val = card[cardId][key]
           if (metaOfItem.type === 'array') {
             for (let itemOldId of val) {
-              const childItem = await Item.findOne({
-                where: {
-                  oldId: itemOldId
-                }
-              })
-              if (childItem === null) continue
+              let childItem = itemsIds.find(x => x.oldId === itemOldId)
+              if (!childItem) continue
               else {
-                try {
-                  await ItemsInItem.create({
-                    itemId: metaItem.id,
-                    childItemId: childItem.id
-                  })
-                } catch (e) {
-                  console.log('Query error: ', e)
-                }
+                itemsInItem.push({
+                  itemId: metaItem.id,
+                  childItemId: childItem.id
+                })
               }
             }
           } else {
-            try {
-              if (val !== 0 && val !== '')
-                await ValuesInItem.create({
-                  value: val,
-                  metaId: metaOfItem.id,
-                  itemId: metaItem.id
-                })
-            } catch (e) {
-              console.log('Query error: ', e)
-            }
+            if (val !== 0 && val !== '')
+              valuesInItem.push({
+                value: val,
+                metaId: metaOfItem.id,
+                itemId: metaItem.id
+              })
           }
         }
       }
     }
+    await ItemsInItem.bulkCreate(itemsInItem)
+    await ValuesInItem.bulkCreate(valuesInItem)
+  }).then(() => {
+    for (let id of metaIds) { // creating folders for meta images
+      let folderMetaOldId = path.join(metaNew, id.oldId)
+      let folderMetaNewId = path.join(metaNew, `${id.id}`)
+
+      if (fs.existsSync(folderMetaOldId)) {
+        fs.rename(folderMetaOldId, folderMetaNewId, function () {})
+      }
+    }
+  }).then(() => {
+    let tree = [];
+
+    function mapDir(dir) {
+      fs.readdirSync(dir).forEach(file => {
+        const abs = path.join(dir, file);
+        if (fs.statSync(abs).isDirectory()) return mapDir(abs);
+        else return tree.push(abs);
+      });
+    }
+
+    mapDir(metaNew)
+
+    function replaceMetaId(name) {
+      const types = ["_main", "_alt", "_custom1", "_custom2", "_avatar", "_header"]
+      for (let type of types) {
+        if (!name.includes(type)) continue
+        let oldId = name.replace(type, '')
+        let found = itemsIds.find(x => x.oldId === oldId)
+        if (!found) continue
+        name = found.id + type
+        break
+      }
+      return name
+    }
+
+    for (let imgPath of tree) { // renaming meta images
+      // getting image name with type from path e.g. _main, _alt, _custom1
+      let nameOld = path.basename(imgPath, path.extname(imgPath))
+      // finding new id of meta
+      let nameNew = replaceMetaId(nameOld)
+      let newPath = imgPath.replace(nameOld, nameNew)
+      if (fs.existsSync(imgPath)) {
+        fs.rename(imgPath, newPath, function () {})
+      }
+    }
+
+    mapDir(thumbsNew)
+
+    function replaceMediaId(name) {
+      let found = mediaIds.find(x => x.oldId === name)
+      if (found) return found.id
+      else return name
+    }
+
+    for (let imgPath of tree) { // renaming media images
+      let nameOld = path.basename(imgPath, path.extname(imgPath))
+      let nameNew = replaceMediaId(nameOld)
+      let newPath = imgPath.replace(nameOld, nameNew)
+      if (fs.existsSync(imgPath)) {
+        fs.rename(imgPath, newPath, function () {})
+      }
+    }
+
+    fs.rmSync(tempPath, {
+      recursive: true,
+      force: true
+    })
+
     res.status(201).send({
       message: "All data has been successfully imported."
     })

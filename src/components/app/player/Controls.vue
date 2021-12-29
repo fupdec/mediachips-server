@@ -441,7 +441,7 @@ export default {
     },
     async setAsThumb() {
       let video = this.playlist[this.nowPlaying];
-      let imgPath = "/userfiles/media/thumbs/" + video.oldId + ".jpg";
+      let imgPath = "/userfiles/media/thumbs/" + video.id + ".jpg";
       let time = new Date(this.player.currentTime * 1000)
         .toISOString()
         .substr(11, 8);

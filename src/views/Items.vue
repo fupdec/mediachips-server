@@ -16,7 +16,7 @@
       class="card-grid wide-image videos-selection"
       :class="[`card-size-${itemSize}`]"
     >
-      <VideoItem v-for="i in items" :key="i.id" :video="i" :media="items" />
+      <ItemVideo v-for="i in items" :key="i.id" :video="i" :media="items" />
     </v-container>
     <v-container
       v-else-if="route.includes('meta')"
@@ -24,7 +24,7 @@
       class="card-grid"
       :class="[`card-size-${itemSize}`]"
     >
-      <MetaItem v-for="i in items" :key="i.id" :item="i" :meta="meta" />
+      <ItemMeta v-for="i in items" :key="i.id" :item="i" :meta="meta" />
     </v-container>
 
     <v-pagination
@@ -46,8 +46,8 @@ export default {
   name: "Items",
   components: {
     vuescroll,
-    VideoItem: () => import("@/components/items/VideoItem.vue"),
-    MetaItem: () => import("@/components/items/MetaItem.vue"),
+    ItemVideo: () => import("@/components/items/ItemVideo.vue"),
+    ItemMeta: () => import("@/components/items/ItemMeta.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
   mounted() {

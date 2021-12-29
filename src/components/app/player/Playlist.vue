@@ -148,7 +148,7 @@ export default {
       for (let i of this.playlist) {
         let imgPath = path.join(
           __dirname,
-          `/userfiles/media/thumbs/${i.oldId}.jpg`
+          `/userfiles/media/thumbs/${i.id}.jpg`
         );
         i.thumb = await Vue.prototype.$getLocalImage(imgPath);
       }

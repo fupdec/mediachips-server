@@ -145,7 +145,7 @@ const path = require("path");
 // const express = require("express")
 // const app = express()
 export default {
-  name: "VideoItem",
+  name: "ItemVideo",
   props: {
     video: Object,
     media: Array,
@@ -217,7 +217,7 @@ export default {
       let imgPath = path.join(
         __dirname,
         "/userfiles/media/thumbs/",
-        this.video.oldId + ".jpg"
+        this.video.id + ".jpg"
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },
