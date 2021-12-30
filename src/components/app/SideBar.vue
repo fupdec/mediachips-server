@@ -95,11 +95,9 @@ import vuescroll from "vuescroll";
 export default {
   name: "SideBar",
   components: { vuescroll },
-  mounted() {
-    this.$nextTick(async () => {
-      await this.getMediaList();
-      await this.getMetaList();
-    });
+  async mounted() {
+    await this.getMediaList();
+    await this.getMetaList();
     this.$root.$on("updateNavbar", () => {
       this.getMetaList();
     });
