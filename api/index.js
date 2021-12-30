@@ -23,7 +23,7 @@ const MediaType = require("./models/MediaType.model")(sequelize, Sequelize);
 const Meta = require("./models/Meta.model")(sequelize, Sequelize);
 const MetaInMediaType = require("./models/MetaInMediaType.model")(sequelize, Sequelize);
 const MetaSetting = require("./models/MetaSetting.model")(sequelize, Sequelize);
-const MetaState = require("./models/MetaState.model")(sequelize, Sequelize);
+const PageSetting = require("./models/PageSetting.model")(sequelize, Sequelize);
 const Playlist = require("./models/Playlist.model")(sequelize, Sequelize);
 const Setting = require("./models/Setting.model")(sequelize, Sequelize);
 const ValuesInItem = require("./models/ValuesInItem.model")(sequelize, Sequelize);
@@ -76,13 +76,20 @@ MetaSetting.belongsTo(Meta, {
   foreignKey: 'metaId'
 })
 
-MetaState.removeAttribute('id')
-Meta.hasOne(MetaState, {
+PageSetting.removeAttribute('id')
+Meta.hasOne(PageSetting, {
   foreignKey: 'metaId',
   onDelete: "cascade"
 })
-MetaState.belongsTo(Meta, {
+PageSetting.belongsTo(Meta, {
   foreignKey: 'metaId'
+})
+MediaType.hasOne(PageSetting, {
+  foreignKey: 'typeId',
+  onDelete: "cascade"
+})
+PageSetting.belongsTo(MediaType, {
+  foreignKey: 'typeId'
 })
 
 MetaInMediaType.removeAttribute('id')
@@ -199,7 +206,7 @@ db.MediaType = MediaType
 db.Meta = Meta
 db.MetaInMediaType = MetaInMediaType
 db.MetaSetting = MetaSetting
-db.MetaState = MetaState
+db.PageSetting = PageSetting
 db.Playlist = Playlist
 db.Setting = Setting
 db.ValuesInItem = ValuesInItem

@@ -1,7 +1,8 @@
 const db = require("../index.js");
 const {
   Meta,
-  MetaSetting
+  MetaSetting,
+  PageSetting
 } = require("../index.js");
 const Op = db.Sequelize.Op;
 const fs = require("fs")
@@ -10,9 +11,17 @@ const path = require('path')
 // Create and Save a new Meta
 exports.create = (req, res) => {
   Meta.create(req.body, {
-      include: [MetaSetting]
+      include: [MetaSetting, PageSetting],
+      raw: true
     })
     .then(data => {
+      const m = data.dataValues
+      if (m.type == 'array') {
+        const userfiles = path.join(__dirname, '../../userfiles')
+        const metaFolder = path.join(userfiles, `media/meta/${m.id}`, );
+        if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
+      }
+
       res.status(201).send(data)
     })
     .catch(err => {

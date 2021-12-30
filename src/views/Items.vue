@@ -69,6 +69,7 @@ export default {
   data: () => ({
     meta: null,
     items: [],
+    pageSettings: {},
     totalItems: 0,
     totalPages: 0,
     page: 1,
@@ -97,7 +98,25 @@ export default {
       url += `&page=${this.page - 1}&size=${this.perPage}&query=${
         this.searchString
       }`;
+      this.getPageSettings();
       this.getItems(url);
+    },
+    async getPageSettings() {
+      let query = "";
+      if (this.route.includes("meta")) {
+        query = `?metaId=${this.meta.id}`;
+      } else if (this.route.includes("media")) {
+        query = `?typeId=${1}`;
+      }
+      let url = `/api/PageSetting`;
+      await axios
+        .get(this.apiUrl + url + query)
+        .then((res) => {
+          this.pageSettings = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     async getMeta() {
       await axios

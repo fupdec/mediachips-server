@@ -83,8 +83,12 @@ db.sequelize.sync().then(async () => {
     },
     defaults: {
       icon: 'video-outline',
-      extensions: '.mp4'
-    }
+      extensions: '.mp4',
+      pageSetting: {
+        page: 1
+      },
+    },
+    include: [db.PageSetting]
   })
   await db.Setting.bulkCreate(settings.default, {
     ignoreDuplicates: true
@@ -115,6 +119,7 @@ require("./api/routes/MediaType.routes")(app)
 require("./api/routes/Meta.routes")(app)
 require("./api/routes/MetaInMediaType.routes")(app)
 require("./api/routes/MetaSetting.routes")(app)
+require("./api/routes/PageSetting.routes")(app)
 require("./api/routes/Setting.routes")(app)
 require("./api/routes/ValuesInItem.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)

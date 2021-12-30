@@ -183,6 +183,12 @@ export default {
           metaSetting: {
             isLink: this.isLink,
           },
+          pageSetting:
+            this.type == "array"
+              ? {
+                  page: 1,
+                }
+              : null,
         },
       })
         .then(() => {
@@ -192,10 +198,6 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-
-      // TODO creating folder
-      // const metaFolder = path.join(this.pathToUserData, "media", "meta", id);
-      // if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
 
       this.close();
     },

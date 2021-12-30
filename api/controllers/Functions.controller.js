@@ -10,6 +10,7 @@ const {
   ValuesInMedia,
   ValuesInItem,
   MetaInMediaType,
+  PageSetting,
   Playlist,
   VideosInPlaylist,
   Marker,
@@ -153,7 +154,10 @@ exports.importDatabase = async (req, res) => {
                 "markers": false,
               },
               ...m.settings
-            }
+            },
+            pageSetting: m.dataType == "array" ? {
+              page: 1
+            } : null,
           }
           obj.meta.push(sm)
           if (m.dataType === 'array') {
@@ -191,6 +195,9 @@ exports.importDatabase = async (req, res) => {
             else metaSettings.imageTypes = metaSettings.imageTypes.join()
           }
           cm.metaSetting = metaSettings
+          cm.pageSetting = {
+            page: 1
+          }
           obj.meta.push(cm)
           let cards = Meta.cards.filter(card => card.metaId == m.id).map(i => ({
             oldId: i.id,
@@ -275,7 +282,7 @@ exports.importDatabase = async (req, res) => {
     // importing meta
     for (let m of obj.meta) {
       await Meta.create(m, {
-        include: [MetaSetting]
+        include: [MetaSetting, PageSetting]
       }).catch(e => {
         console.log(e)
       })
