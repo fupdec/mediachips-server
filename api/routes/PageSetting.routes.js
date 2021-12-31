@@ -7,7 +7,7 @@ module.exports = app => {
   router.get("/", PageSetting.findOne);
 
   // Update a single option with a name and value in the request
-  router.post("/", PageSetting.update);
+  router.put("/", PageSetting.update);
 
   app.use('/api/PageSetting', router);
 };

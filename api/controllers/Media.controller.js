@@ -41,7 +41,7 @@ exports.findAll = (req, res) => {
   const {
     page,
     size,
-    type,
+    typeId,
     query
   } = req.query
   const {
@@ -53,7 +53,7 @@ exports.findAll = (req, res) => {
     limit,
     offset,
     where: {
-      typeId: type || 1,
+      typeId: typeId,
       path: {
         [Op.like]: `%${query}%`
       },

@@ -22,12 +22,21 @@ exports.findOne = (req, res) => {
 
 // Update a single option with a name and value in the request
 exports.update = (req, res) => {
+  const {
+    metaId,
+    typeId
+  } = req.query
+
+  console.log(metaId, typeId)
+  let where = {}  
+  if (metaId) where.metaId = metaId
+  else if (typeId) where.typeId = typeId
+  console.log(where)
+
   PageSetting.update({
-    value: req.body.value
+    [req.body.option]: req.body.value
   }, {
-    where: {
-      option: req.body.option
-    },
+    where: where
   }).then((data) => {
     res.status(201).send(data)
   }).catch(err => {

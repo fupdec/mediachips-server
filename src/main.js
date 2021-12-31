@@ -25,8 +25,8 @@ Vue.use(vuescroll, {
 })
 Vue.config.productionTip = false
 
-Vue.use(Readable)
-Vue.use(ApiCalls, { store })
+Vue.use(Readable, { store, router })
+Vue.use(ApiCalls, { store, router })
 
 new Vue({
   router,

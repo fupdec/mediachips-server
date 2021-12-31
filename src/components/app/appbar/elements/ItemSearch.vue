@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :value="searchStringComputed"
+            :value="query"
             icon="mdi-format-letter-case"
             overlap
             offset-x="23"
@@ -21,8 +21,8 @@
     <v-card width="350">
       <div class="pa-2 d-flex">
         <v-text-field
-          :value="searchStringComputed"
-          @input="changeSearchString($event)"
+          :value="query"
+          @input="update($event)"
           autofocus
           @click:clear="clearSearch"
           @keypress.enter="search"
@@ -50,18 +50,18 @@
 <script>
 export default {
   name: "ItemSearch",
-  data: () => ({
-    searchStringComputed: "",
-  }),
+  props: {
+    query: String,
+  },
   methods: {
-    changeSearchString(e) {
-      this.searchStringComputed = e;
+    update(e) {
+      this.$emit("update", e);
     },
     clearSearch() {
       this.$root.$emit("searchItems", "");
     },
     search() {
-      this.$root.$emit("searchItems", this.searchStringComputed);
+      this.$root.$emit("searchItems", this.query);
     },
   },
 };

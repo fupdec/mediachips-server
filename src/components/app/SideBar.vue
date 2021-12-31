@@ -12,19 +12,19 @@
         <v-divider v-if="mediaTypes.length > 0" class="my-1" />
 
         <v-list-item
-          v-for="media in mediaTypes"
-          :key="media.name + media.id"
+          v-for="type in mediaTypes"
+          :key="type.name + type.id"
           link
           exact
-          :to="`/media?mediaId=${media.id}&tabId=default`"
+          :to="`/media?typeId=${type.id}&tabId=default`"
           active-class="secondary--text"
           color="secondary"
           draggable="false"
         >
           <v-list-item-icon>
-            <v-icon>mdi-{{ media.icon }}</v-icon>
+            <v-icon>mdi-{{ type.icon }}</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>{{ media.name }}</v-list-item-title>
+          <v-list-item-title>{{ type.name }}</v-list-item-title>
         </v-list-item>
 
         <v-divider v-if="metaList.length > 0" class="my-1" />

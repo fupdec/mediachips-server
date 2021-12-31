@@ -1,49 +1,80 @@
 <template>
   <div class="app-bar-container">
     <div>
-      <ItemSearch />
+      <ItemSearch :query="sets.query" @update="updateQuery($event)" />
     </div>
 
     <v-spacer></v-spacer>
 
     <div>
-      <ItemsPerPage />
-      <ItemSize />
+      <ItemsPerPage :perPage="sets.perPage" @update="updatePerPage($event)" />
+      <ItemSize :size="sets.size" @update="updateSize($event)" />
     </div>
   </div>
 </template>
 
 
 <script>
-const path = require("path");
+import Vue from "vue";
+import axios from "axios";
+
 export default {
   name: "ItemsAppbar",
   components: {
     ItemSearch: () => import("@/components/app/appbar/elements/ItemSearch.vue"),
-    ItemsPerPage: () => import("@/components/app/appbar/elements/ItemsPerPage.vue"),
+    ItemsPerPage: () =>
+      import("@/components/app/appbar/elements/ItemsPerPage.vue"),
     ItemSize: () => import("@/components/app/appbar/elements/ItemSize.vue"),
   },
+  mounted() {
+    this.getPageSettings();
+  },
+  data: () => ({
+    sets: {
+      page: 1,
+      perPage: 20,
+      query: "",
+      size: 3,
+    },
+  }),
   computed: {
-    logo() {
-      return path.join(__dirname, '/icons/icon.png');
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
+    isMetaPage() {
+      return Vue.prototype.$checkCurrentPage("meta");
+    },
+    isMediaPage() {
+      return Vue.prototype.$checkCurrentPage("media");
     },
   },
   methods: {
-    toggleDarkMode() {
-      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
-    }
-  }
+    async getPageSettings() {
+      let query = "";
+      if (this.isMetaPage) {
+        query = `?metaId=${this.$route.query.metaId}`;
+      } else if (this.isMediaPage) {
+        query = `?typeId=${this.$route.query.typeId}`;
+      }
+      let url = "/api/PageSetting";
+      await axios
+        .get(this.apiUrl + url + query)
+        .then((res) => {
+          this.sets = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    updateQuery(e) {
+      this.sets.query = e;
+    },
+    updatePerPage(e) {
+      this.sets.perPage = e;
+    },
+    updateSize(e) {
+      this.sets.size = e;
+    },
+  },
 };
 </script>
-
-
-<style lang="scss" scoped>
-.logo {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 8px;
-  margin: auto;
-  height: 32px;
-}
-</style>

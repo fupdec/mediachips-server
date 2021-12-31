@@ -65,7 +65,6 @@ export default {
           path: this.backup,
         })
         .then((e) => {
-          console.log(e);
           this.importStatus = "Successfully imported";
           this.isImportRun = false;
           this.$root.$emit("updateNavbar");

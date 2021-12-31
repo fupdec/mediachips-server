@@ -75,7 +75,7 @@ const ApiCalls = {
     Vue.prototype.$setOption = function (option, value) {
       return new Promise((resolve, reject) => {
         axios({
-            method: 'post',
+            method: 'put',
             url: options.store.state.localhost + '/api/Setting',
             data: {
               option,

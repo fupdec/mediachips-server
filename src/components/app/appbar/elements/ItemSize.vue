@@ -40,13 +40,15 @@
 <script>
 export default {
   name: "ItemSize",
+  props: {
+    size: Number,
+  },
   data: () => ({
-    size: 3,
     sizes: ["XS", "S", "M", "L", "XL"],
   }),
   methods: {
     updateSize(size) {
-      this.size = size;
+      this.$emit("update", size);
       this.$root.$emit("updateItemSize", size);
     },
   },

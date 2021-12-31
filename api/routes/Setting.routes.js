@@ -7,7 +7,7 @@ module.exports = app => {
   router.get("/", Setting.findOne);
 
   // Update a single option with a name and value in the request
-  router.post("/", Setting.update);
+  router.put("/", Setting.update);
 
   app.use('/api/Setting', router);
 };

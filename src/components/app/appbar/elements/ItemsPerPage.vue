@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :content="sizes[size]"
+            :content="perPage"
             class="text-uppercase"
             color="secondary"
             overlap
@@ -40,13 +40,20 @@
 <script>
 export default {
   name: "ItemsPerPage",
+  props: {
+    perPage: Number,
+  },
   data: () => ({
-    size: 0,
     sizes: [20, 50, 100, 200, 300],
   }),
+  computed: {
+    size() {
+      return this.sizes.findIndex((v)=> v == this.perPage)
+    }
+  },
   methods: {
     updateSize(size) {
-      this.size = size;
+      this.$emit("update", this.sizes[size]);
       this.$root.$emit("updatePerPage", this.sizes[size]);
     },
   },
