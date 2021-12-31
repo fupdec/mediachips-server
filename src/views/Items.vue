@@ -1,6 +1,7 @@
 <template>
   <vuescroll>
     <v-pagination
+      v-show="items.length"
       :value="sets.page"
       @input="changePage($event)"
       :length="totalPages"
@@ -28,12 +29,29 @@
     </v-container>
 
     <v-pagination
+      v-show="items.length"
       :value="sets.page"
       @input="changePage($event)"
       :length="totalPages"
       total-visible="5"
       class="pb-10"
     />
+
+    <div
+      v-if="0 == totalItems && totalItems == totalItemsInDb"
+      class="text-center"
+    >
+      <v-icon x-large class="my-4">mdi-ghost-outline</v-icon>
+      <div>There are no items</div>
+    </div>
+
+    <div
+      v-if="0 == totalItems && totalItems !== totalItemsInDb"
+      class="text-center"
+    >
+      <v-icon x-large class="my-4">mdi-filter-outline</v-icon>
+      <div>There is no items matching the filters</div>
+    </div>
   </vuescroll>
 </template>
 
@@ -85,7 +103,8 @@ export default {
       query: "",
       size: 3,
     },
-    totalItems: 0,
+    totalItems: 1,
+    totalItemsInDb: 0,
     totalPages: 0,
     isQueryRun: false,
   }),
@@ -173,11 +192,12 @@ export default {
       this.isQueryRun = true;
       await axios
         .get(this.apiUrl + url)
-        .then((response) => {
+        .then((res) => {
           this.isQueryRun = false;
-          this.items = response.data.items;
-          this.totalItems = response.data.totalItems;
-          this.totalPages = response.data.totalPages;
+          this.items = res.data.items;
+          this.totalItems = res.data.totalItems;
+          this.totalPages = res.data.totalPages;
+          this.totalItemsInDb = res.data.total;
         })
         .catch((e) => {
           this.isQueryRun = false;

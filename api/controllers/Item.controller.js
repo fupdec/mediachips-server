@@ -54,9 +54,21 @@ exports.findAll = (req, res) => {
         [Op.like]: `%${query}%`
       },
     },
-  }).then(data => {
+  }).then(async data => {
+    const total = await Item.findAndCountAll({
+      where: {
+        metaId: metaId,
+      },
+      raw: true
+    })
     const response = getPagingData(data, page, limit)
-    res.status(201).send(response)
+    
+    res.status(201).send({
+      ...response,
+      ...{
+        total: total.count
+      }
+    })
   }).catch(err => {
     res.status(500).send({
       message: err.message || "Some error occurred while retrieving media."

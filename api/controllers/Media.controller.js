@@ -63,9 +63,18 @@ exports.findAll = (req, res) => {
     ],
     // include: { all: true }
     include: [VideoMetadata]
-  }).then(data => {
+  }).then(async data => {
+    const total = await Media.findAndCountAll({
+      raw: true
+    })
     const response = getPagingData(data, page, limit)
-    res.status(201).send(response)
+
+    res.status(201).send({
+      ...response,
+      ...{
+        total: total.count
+      }
+    })
   }).catch(err => {
     res.status(500).send({
       message: err.message || "Some error occurred while retrieving media."
