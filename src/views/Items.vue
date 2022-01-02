@@ -75,17 +75,25 @@ export default {
   mounted() {
     this.$nextTick(async () => {});
     this.$root.$on("searchItems", async (val) => {
-      this.updatePageSetting("query", val);
+      this.updatePageSetting({
+        page: 1,
+        query: val,
+      });
+      this.sets.page = 1;
       this.sets.query = val;
       await this.getItems();
     });
     this.$root.$on("updatePerPage", async (val) => {
-      this.updatePageSetting("perPage", val);
+      this.updatePageSetting({
+        page: 1,
+        perPage: val,
+      });
+      this.sets.page = 1;
       this.sets.perPage = val;
       await this.getItems();
     });
     this.$root.$on("updateItemSize", async (val) => {
-      this.updatePageSetting("size", val);
+      this.updatePageSetting({ size: val });
       this.sets.size = val;
     });
   },
@@ -152,7 +160,7 @@ export default {
      * @param {string} option - name of a column in table pageSettings.
      * @param {any} value - value in the column.
      */
-    updatePageSetting(option, value) {
+    updatePageSetting(data) {
       let query = "";
       if (this.isMetaPage) {
         query = `?metaId=${this.meta.id}`;
@@ -162,10 +170,7 @@ export default {
       axios({
         method: "put",
         url: this.apiUrl + "/api/PageSetting" + query,
-        data: {
-          option,
-          value,
-        },
+        data: data,
       });
     },
     async getMeta() {
@@ -206,7 +211,7 @@ export default {
     },
     async changePage(e) {
       this.sets.page = e;
-      await this.updatePageSetting("page", e);
+      await this.updatePageSetting({ page: e });
       await this.getItems();
     },
   },

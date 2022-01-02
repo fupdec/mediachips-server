@@ -27,11 +27,9 @@ exports.update = (req, res) => {
     typeId
   } = req.query
 
-  console.log(metaId, typeId)
   let where = {}  
   if (metaId) where.metaId = metaId
   else if (typeId) where.typeId = typeId
-  console.log(where)
 
   PageSetting.update({
     [req.body.option]: req.body.value
