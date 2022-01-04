@@ -123,6 +123,7 @@ require("./api/routes/PageSetting.routes")(app)
 require("./api/routes/Setting.routes")(app)
 require("./api/routes/ValuesInItem.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)
+require("./api/routes/VideoMetadata.routes")(app)
 require("./api/routes/WatchedFolder.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {

@@ -6,68 +6,33 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {};
 
 // Retrieve all Item from the database.
-exports.findAll = (req, res) => {
-  if (!req.body) return res.sendStatus(400)
+exports.findAll = async (req, res) => {
+  let query = "SELECT * FROM `items` AS `item` ";
+  query += "WHERE `item`.`metaId` = '" + req.query.metaId + "' ";
+  query += "AND `item`.`name` LIKE '%" + req.query.search + "%' ";
+  query += "ORDER BY 'name'";
 
-  const getPagination = (page, size) => {
-    const limit = size ? +size : 20
-    const offset = page ? page * limit : 0
-
-    return {
-      limit,
-      offset
-    }
-  }
-  const getPagingData = (data, page, limit) => {
-    const {
-      count: totalItems,
-      rows: items
-    } = data
-    const currentPage = page ? +page : 0
-    const totalPages = Math.ceil(totalItems / limit)
-
-    return {
-      totalItems,
-      items,
-      totalPages,
-      currentPage
-    }
-  }
-
-  const {
-    page,
-    size,
-    metaId,
-    query
-  } = req.query
-  const {
-    limit,
-    offset
-  } = getPagination(page, size)
-
-  Item.findAndCountAll({
-    limit,
-    offset,
-    where: {
-      metaId: metaId,
-      name: {
-        [Op.like]: `%${query}%`
-      },
-    },
+  await db.sequelize.query(query, {
+    raw: true
   }).then(async data => {
-    const total = await Item.findAndCountAll({
+    const limit = req.query.limit ? +req.query.limit : 20
+    const start = req.query.page ? +req.query.page * limit : 0
+    const end = start + limit
+    const total = data[0].length
+    const pages = Math.ceil(total / limit)
+    const items = data[0]
+    const totalRows = await Item.findAndCountAll({
       where: {
-        metaId: metaId,
+        metaId: req.query.metaId,
       },
       raw: true
     })
-    const response = getPagingData(data, page, limit)
-    
+
     res.status(201).send({
-      ...response,
-      ...{
-        total: total.count
-      }
+      items: items.slice(start, end),
+      total: total,
+      pages: pages,
+      totalRows: totalRows.count
     })
   }).catch(err => {
     res.status(500).send({

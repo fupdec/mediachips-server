@@ -4,7 +4,7 @@
       v-show="items.length"
       :value="sets.page"
       @input="changePage($event)"
-      :length="totalPages"
+      :length="pages"
       total-visible="5"
       class="pt-4"
     />
@@ -17,7 +17,7 @@
       class="card-grid wide-image videos-selection"
       :class="[`card-size-${sets.size}`]"
     >
-      <ItemVideo v-for="i in items" :key="i.id" :video="i" :media="items" />
+      <ItemVideo v-for="i in items" :key="i.id" :video="i" :items="items" />
     </v-container>
     <v-container
       v-else-if="isMetaPage"
@@ -32,13 +32,13 @@
       v-show="items.length"
       :value="sets.page"
       @input="changePage($event)"
-      :length="totalPages"
+      :length="pages"
       total-visible="5"
       class="pb-10"
     />
 
     <div
-      v-if="0 == totalItems && totalItems == totalItemsInDb"
+      v-if="0 == total && total == totalInDb"
       class="text-center"
     >
       <v-icon x-large class="my-4">mdi-ghost-outline</v-icon>
@@ -46,7 +46,7 @@
     </div>
 
     <div
-      v-if="0 == totalItems && totalItems !== totalItemsInDb"
+      v-if="0 == total && total !== totalInDb"
       class="text-center"
     >
       <v-icon x-large class="my-4">mdi-filter-outline</v-icon>
@@ -80,16 +80,16 @@ export default {
         query: val,
       });
       this.sets.page = 1;
-      this.sets.query = val;
+      this.sets.search = val;
       await this.getItems();
     });
-    this.$root.$on("updatePerPage", async (val) => {
+    this.$root.$on("updateLimit", async (val) => {
       this.updatePageSetting({
         page: 1,
-        perPage: val,
+        limit: val,
       });
       this.sets.page = 1;
-      this.sets.perPage = val;
+      this.sets.limit = val;
       await this.getItems();
     });
     this.$root.$on("updateItemSize", async (val) => {
@@ -99,7 +99,7 @@ export default {
   },
   beforeDestroy() {
     this.$root.$off("searchItems");
-    this.$root.$off("updatePerPage");
+    this.$root.$off("updateLimit");
     this.$root.$off("updateItemSize");
   },
   data: () => ({
@@ -107,13 +107,13 @@ export default {
     items: [],
     sets: {
       page: 1,
-      perPage: 20,
-      query: "",
+      limit: 20,
+      search: "",
       size: 3,
     },
-    totalItems: 1,
-    totalItemsInDb: 0,
-    totalPages: 0,
+    total: 1,
+    totalInDb: 0,
+    pages: 0,
     isQueryRun: false,
   }),
   computed: {
@@ -190,9 +190,9 @@ export default {
       } else if (this.isMediaPage) {
         url += `media?typeId=1`;
       }
-      url += `&page=${this.sets.page - 1}`;
-      url += `&size=${this.sets.perPage}`;
-      url += `&query=${this.sets.query || ""}`;
+      url += `&page=${this.sets.page-1}`;
+      url += `&limit=${this.sets.limit}`;
+      url += `&search=${this.sets.search || ""}`;
 
       this.isQueryRun = true;
       await axios
@@ -200,9 +200,9 @@ export default {
         .then((res) => {
           this.isQueryRun = false;
           this.items = res.data.items;
-          this.totalItems = res.data.totalItems;
-          this.totalPages = res.data.totalPages;
-          this.totalItemsInDb = res.data.total;
+          this.total = res.data.total;
+          this.pages = res.data.pages;
+          this.totalInDb = res.data.totalRows;
         })
         .catch((e) => {
           this.isQueryRun = false;

@@ -9,7 +9,20 @@ exports.create = (req, res) => {};
 exports.findAll = (req, res) => {};
 
 // Find a single VideoMetadata with an id
-exports.findOne = (req, res) => {};
+exports.findOne = (req, res) => {
+  VideoMetadata.findOne({
+    where: {
+      mediaId: req.params.id,
+    },
+    raw: true
+  }).then(async (data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
 
 // Update a VideoMetadata by the id in the request
 exports.update = (req, res) => {};

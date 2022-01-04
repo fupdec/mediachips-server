@@ -7,7 +7,7 @@
     <v-spacer></v-spacer>
 
     <div>
-      <ItemsPerPage :perPage="sets.perPage" @update="updatePerPage($event)" />
+      <ItemsLimit :limit="sets.limit" @update="updateLimit($event)" />
       <ItemSize :size="sets.size" @update="updateSize($event)" />
     </div>
   </div>
@@ -22,8 +22,8 @@ export default {
   name: "ItemsAppbar",
   components: {
     ItemSearch: () => import("@/components/app/appbar/elements/ItemSearch.vue"),
-    ItemsPerPage: () =>
-      import("@/components/app/appbar/elements/ItemsPerPage.vue"),
+    ItemsLimit: () =>
+      import("@/components/app/appbar/elements/ItemsLimit.vue"),
     ItemSize: () => import("@/components/app/appbar/elements/ItemSize.vue"),
   },
   mounted() {
@@ -32,7 +32,7 @@ export default {
   data: () => ({
     sets: {
       page: 1,
-      perPage: 20,
+      limit: 20,
       query: "",
       size: 3,
     },
@@ -69,8 +69,8 @@ export default {
     updateQuery(e) {
       this.sets.query = e;
     },
-    updatePerPage(e) {
-      this.sets.perPage = e;
+    updateLimit(e) {
+      this.sets.limit = e;
     },
     updateSize(e) {
       this.sets.size = e;

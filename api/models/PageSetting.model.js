@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         defaultValue: 1,
       },
-      perPage: {
+      limit: {
         type: Sequelize.INTEGER,
         defaultValue: 20,
       },

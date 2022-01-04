@@ -1,6 +1,6 @@
 <template>
   <v-lazy>
-    <v-card :class="{ favorite: isFavorite }" outlined hover class="meta-card">
+    <v-card :class="{ favorite: item.favorite }" outlined hover class="meta-card">
       <div class="img-container">
         <v-icon
           v-if="meta.metaSetting.color"
@@ -135,9 +135,6 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
-    },
-    isFavorite() {
-      return this.item.favorite;
     },
   },
   methods: {

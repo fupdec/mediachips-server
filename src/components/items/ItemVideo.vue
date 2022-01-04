@@ -3,7 +3,7 @@
     <v-card
       @click="openPlayer"
       v-ripple="{ class: 'accent--text' }"
-      :class="{ favorite: isFavorite }"
+      :class="{ favorite: video.favorite }"
       outlined
       hover
       class="video-card meta-card"
@@ -25,13 +25,12 @@
         />
 
         <v-btn
-          @click="isFavorite = !isFavorite"
           icon
           absolute
-          :color="isFavorite === false ? 'white' : 'pink'"
+          :color="video.favorite ? 'pink' : 'white'"
           class="fav-btn"
         >
-          <v-icon :color="isFavorite === false ? 'grey' : 'pink'"
+          <v-icon :color="video.favorite ? 'pink' : 'grey'"
             >mdi-heart-outline</v-icon
           >
         </v-btn>
@@ -64,7 +63,7 @@
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-monitor-screenshot</v-icon>
-          {{ video.videoMetadata.width + "x" + video.videoMetadata.height }}
+          {{ metadata.width + "x" + metadata.height }}
         </div>
         <div label outlined class="prop">
           <v-icon>mdi-harddisk</v-icon>
@@ -148,21 +147,25 @@ export default {
   name: "ItemVideo",
   props: {
     video: Object,
-    media: Array,
+    items: Array,
   },
   // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
+  beforeMount() {
+    this.getMetadata();
+    this.getMeta();
+    this.getValues();
+    this.getImg();
+  },
   mounted() {
-    this.$nextTick(() => {
-      this.getMeta();
-      this.getValues();
-      this.getImg();
-    });
     this.$root.$on("updateVideoThumb", (id) => {
       if (this.video.id === id) this.getImg();
     });
   },
-  destroyed() {},
+  beforeDestroy() {
+    this.$root.$off("updateVideoThumb");
+  },
   data: () => ({
+    metadata: {},
     meta: [],
     values: [],
     thumb: null,
@@ -173,32 +176,27 @@ export default {
     },
     quality() {
       return Vue.prototype.$getReadableVideoQuality(
-        this.video.videoMetadata.width,
-        this.video.videoMetadata.height
+        this.metadata.width,
+        this.metadata.height
       );
     },
     height() {
       return Vue.prototype.$getReadableVideoHeight(
-        this.video.videoMetadata.width,
-        this.video.videoMetadata.height
+        this.metadata.width,
+        this.metadata.height
       );
     },
     filesize() {
       return Vue.prototype.$getReadableFileSize(this.video.filesize);
     },
     duration() {
-      return Vue.prototype.$getReadableDuration(
-        this.video.videoMetadata.duration
-      );
+      return Vue.prototype.$getReadableDuration(this.metadata.duration);
     },
     fileName() {
       return Vue.prototype.$getFileNameFromPath(this.video.path);
     },
     fileExtension() {
       return Vue.prototype.$getFileExtensionFromPath(this.video.path);
-    },
-    isFavorite() {
-      return this.video.favorite;
     },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
@@ -224,6 +222,17 @@ export default {
     // mountSrc() {
     //   this.$refs.video.src = this.video.path
     // },
+    getMetadata() {
+      let url = `/api/VideoMetadata/${this.video.id}`;
+      axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.metadata = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     getMeta() {
       let url = `/api/ItemsInMedia?mediaId=${this.video.id}`;
       axios
@@ -248,7 +257,7 @@ export default {
     },
     openPlayer() {
       this.$store.state.Player.active = true;
-      this.$root.$emit("playVideo", this.video, this.media);
+      this.$root.$emit("playVideo", this.video, this.items);
     },
     getTextColor(color) {
       if (!color) return "";

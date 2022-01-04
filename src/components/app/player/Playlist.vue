@@ -67,9 +67,9 @@
               <div v-if="!reg && i > 4" class="reg-playlist">
                 App not registered
               </div>
-              <span class="time">
+              <!-- <span class="time">
                 {{ getDuration(video['videoMetadata'].duration) }}
-              </span>
+              </span> -->
               <span
                 v-if="nowPlaying === i"
                 class="play-state overline text--primary"
@@ -102,6 +102,9 @@ export default {
     this.$root.$on("scrollToNowPlaying", () => {
       this.scrollToNowPlaying();
     });
+  },
+  beforeDestroy() {
+    this.$root.$off("scrollToNowPlaying")
   },
   data: () => ({
     reg: true,

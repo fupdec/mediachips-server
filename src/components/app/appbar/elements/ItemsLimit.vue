@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :content="perPage"
+            :content="limit"
             class="text-uppercase"
             color="secondary"
             overlap
@@ -21,12 +21,12 @@
     </template>
     <v-list dense>
       <v-list-item-group
-        :value="size"
+        :value="limit"
         @change="updateSize($event)"
         mandatory
         color="primary"
       >
-        <v-list-item v-for="i in sizes" :key="i">
+        <v-list-item v-for="i in limits" :key="i">
           <v-list-item-content>
             <v-list-item-title v-text="i"></v-list-item-title>
           </v-list-item-content>
@@ -39,22 +39,22 @@
 
 <script>
 export default {
-  name: "ItemsPerPage",
+  name: "ItemsLimit",
   props: {
-    perPage: Number,
+    limit: Number,
   },
   data: () => ({
-    sizes: [20, 50, 100, 200, 300],
+    limits: [20, 50, 100, 200, 300],
   }),
   computed: {
     size() {
-      return this.sizes.findIndex((v)=> v == this.perPage)
+      return this.limits.findIndex((v)=> v == this.limit)
     }
   },
   methods: {
-    updateSize(size) {
-      this.$emit("update", this.sizes[size]);
-      this.$root.$emit("updatePerPage", this.sizes[size]);
+    updateSize(limit) {
+      this.$emit("update", this.limits[limit]);
+      this.$root.$emit("updateLimit", this.limits[limit]);
     },
   },
 };
