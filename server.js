@@ -85,7 +85,8 @@ db.sequelize.sync().then(async () => {
       icon: 'video-outline',
       extensions: '.mp4',
       pageSetting: {
-        page: 1
+        page: 1,
+        sortBy: 'path'
       },
     },
     include: [db.PageSetting]

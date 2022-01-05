@@ -10,28 +10,24 @@
         <span>Sort Items By</span>
       </v-tooltip>
     </template>
-    <v-card class="d-flex">
-      <vuescroll>
-        <v-card-text class="pa-0">
-          <v-btn-toggle
-            :value="sets.sortBy"
-            @change="update($event)"
-            mandatory
-            class="group-buttons-sort"
-            color="primary"
-          >
-            <v-tooltip v-for="(s, i) in sort" :key="i" bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn v-on="on" :value="s.name" outlined>
-                  <v-icon>mdi-{{ s.icon }}</v-icon>
-                </v-btn>
-              </template>
-              <span>Sort by {{ s.tip }}</span>
-            </v-tooltip>
-          </v-btn-toggle>
-        </v-card-text>
-      </vuescroll>
-    </v-card>
+
+    <v-list dense>
+      <v-list-item-group
+        :value="sortBy"
+        @change="update($event)"
+        mandatory
+        color="primary"
+      >
+        <v-list-item v-for="i in list" :key="i.by" :value="i.by">
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon left>mdi-{{ i.icon }}</v-icon>
+              {{ i.name }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
   </v-menu>
 </template>
 
@@ -51,21 +47,26 @@ export default {
     });
   },
   data: () => ({
-    sort: [
+    list: [
       {
-        name: "name",
+        by: "name",
         icon: "alphabetical-variant",
-        tip: "Name",
+        name: "Name",
       },
       {
-        name: "createdAt",
+        by: "createdAt",
         icon: "calendar-plus",
-        tip: "Date Added",
+        name: "Date Added",
       },
       {
-        name: "updatedAt",
+        by: "updatedAt",
         icon: "calendar-edit",
-        tip: "Date of Editing",
+        name: "Date of Editing",
+      },
+      {
+        by: "rating",
+        icon: "star",
+        name: "Rating",
       },
     ],
   }),
@@ -78,9 +79,14 @@ export default {
         return (this.$store.state.pageSettings = value);
       },
     },
+    index() {
+      return this.list.findIndex((i) => i.by == this.sets.sortBy);
+    },
+    sortBy() {
+      return this.list[this.index] ? this.list[this.index].by : '';
+    },
     icon() {
-      const index = this.sort.findIndex((i) => i.name == this.sets.sortBy);
-      return index > -1 ? this.sort[index].icon : "shape";
+      return this.list[this.index] ? this.list[this.index].icon : 'shape';
     },
     isMediaPage() {
       return Vue.prototype.$checkCurrentPage("media");
@@ -89,11 +95,11 @@ export default {
   methods: {
     init() {
       if (this.isMediaPage) {
-        this.sort.shift();
-        this.sort.unshift({
-          name: "path",
+        this.list.shift();
+        this.list.unshift({
+          by: "path",
           icon: "alphabetical-variant",
-          tip: "Path",
+          name: "Path",
         });
       }
     },
