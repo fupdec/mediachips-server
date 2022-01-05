@@ -11,23 +11,23 @@ exports.create = (req, res) => {};
 
 // Retrieve all Media from the database.
 exports.findAll = async (req, res) => {
-  let query = "SELECT * FROM `media` AS `media` ";
-  query += "WHERE `media`.`typeId` = '" + req.query.typeId + "' ";
-  query += "AND `media`.`path` LIKE '%" + req.query.search + "%' ";
-  query += "ORDER BY 'rating'";
+  let query = "SELECT * FROM `media` ";
+  query += "WHERE `typeId` = '" + req.body.typeId + "' ";
+  query += "AND `path` LIKE '%" + req.body.query + "%' ";
+  query += "ORDER BY " + req.body.sortBy + " " + req.body.sortDir;
 
   await db.sequelize.query(query, {
     raw: true
   }).then(async data => {
-    const limit = req.query.limit ? +req.query.limit : 20
-    const start = req.query.page ? +req.query.page * limit : 0
+    const limit = req.body.limit ? +req.body.limit : 20
+    const start = req.body.page ? +req.body.page * limit : 0
     const end = start + limit
     const total = data[0].length
     const pages = Math.ceil(total / limit)
     const items = data[0]
     const totalRows = await Media.findAndCountAll({
       where: {
-        typeId: req.query.typeId,
+        typeId: req.body.typeId,
       },
       raw: true
     })

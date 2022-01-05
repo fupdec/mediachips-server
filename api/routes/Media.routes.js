@@ -7,7 +7,7 @@ module.exports = app => {
   router.post("/", Media.create);
 
   // Retrieve all Media
-  router.get("/", Media.findAll);
+  router.post("/filter", Media.findAll);
 
   // Retrieve a single Media with id
   router.get("/countInItem", Media.countInItem);

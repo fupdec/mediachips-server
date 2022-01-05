@@ -22,7 +22,7 @@
     <v-list dense>
       <v-list-item-group
         :value="size"
-        @change="updateSize($event)"
+        @change="update($event)"
         mandatory
         color="primary"
       >
@@ -40,16 +40,28 @@
 <script>
 export default {
   name: "ItemSize",
-  props: {
-    size: Number,
-  },
   data: () => ({
+    size: 3,
     sizes: ["XS", "S", "M", "L", "XL"],
   }),
+  computed: {
+    sets: {
+      get() {
+        return this.$store.state.pageSettings;
+      },
+      set(value) {
+        return (this.$store.state.pageSettings = value);
+      },
+    },
+  },
   methods: {
-    updateSize(size) {
-      this.$emit("update", size);
-      this.$root.$emit("updateItemSize", size);
+    update(val) {
+      this.sets.size = val;
+    },
+  },
+  watch: {
+    "sets.size"(val) {
+      this.size = val;
     },
   },
 };

@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :content="limit"
+            :content="sets.limit"
             class="text-uppercase"
             color="secondary"
             overlap
@@ -22,7 +22,7 @@
     <v-list dense>
       <v-list-item-group
         :value="limit"
-        @change="updateSize($event)"
+        @change="update($event)"
         mandatory
         color="primary"
       >
@@ -40,21 +40,25 @@
 <script>
 export default {
   name: "ItemsLimit",
-  props: {
-    limit: Number,
-  },
   data: () => ({
-    limits: [20, 50, 100, 200, 300],
+    limits: [25, 50, 100, 200, 300],
   }),
   computed: {
-    size() {
-      return this.limits.findIndex((v)=> v == this.limit)
-    }
+    sets: {
+      get() {
+        return this.$store.state.pageSettings;
+      },
+      set(value) {
+        return (this.$store.state.pageSettings = value);
+      },
+    },
+    limit() {
+      return this.limits.findIndex((i) => i == this.sets.limit);
+    },
   },
   methods: {
-    updateSize(limit) {
-      this.$emit("update", this.limits[limit]);
-      this.$root.$emit("updateLimit", this.limits[limit]);
+    update(val) {
+      this.sets.limit = this.limits[val];
     },
   },
 };

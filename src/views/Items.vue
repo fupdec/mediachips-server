@@ -37,18 +37,12 @@
       class="pb-10"
     />
 
-    <div
-      v-if="0 == total && total == totalInDb"
-      class="text-center"
-    >
+    <div v-if="0 == total && total == totalInDb" class="text-center">
       <v-icon x-large class="my-4">mdi-ghost-outline</v-icon>
       <div>There are no items</div>
     </div>
 
-    <div
-      v-if="0 == total && total !== totalInDb"
-      class="text-center"
-    >
+    <div v-if="0 == total && total !== totalInDb" class="text-center">
       <v-icon x-large class="my-4">mdi-filter-outline</v-icon>
       <div>There is no items matching the filters</div>
     </div>
@@ -74,43 +68,10 @@ export default {
   },
   mounted() {
     this.$nextTick(async () => {});
-    this.$root.$on("searchItems", async (val) => {
-      this.updatePageSetting({
-        page: 1,
-        query: val,
-      });
-      this.sets.page = 1;
-      this.sets.search = val;
-      await this.getItems();
-    });
-    this.$root.$on("updateLimit", async (val) => {
-      this.updatePageSetting({
-        page: 1,
-        limit: val,
-      });
-      this.sets.page = 1;
-      this.sets.limit = val;
-      await this.getItems();
-    });
-    this.$root.$on("updateItemSize", async (val) => {
-      this.updatePageSetting({ size: val });
-      this.sets.size = val;
-    });
-  },
-  beforeDestroy() {
-    this.$root.$off("searchItems");
-    this.$root.$off("updateLimit");
-    this.$root.$off("updateItemSize");
   },
   data: () => ({
     meta: null,
     items: [],
-    sets: {
-      page: 1,
-      limit: 20,
-      search: "",
-      size: 3,
-    },
     total: 1,
     totalInDb: 0,
     pages: 0,
@@ -119,6 +80,14 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    sets: {
+      get() {
+        return this.$store.state.pageSettings;
+      },
+      set(value) {
+        return (this.$store.state.pageSettings = value);
+      },
     },
     route() {
       return this.$route.path;
@@ -163,9 +132,9 @@ export default {
     updatePageSetting(data) {
       let query = "";
       if (this.isMetaPage) {
-        query = `?metaId=${this.meta.id}`;
+        query = `?metaId=${this.$route.query.metaId}`;
       } else if (this.isMediaPage) {
-        query = `?typeId=${1}`;
+        query = `?typeId=${this.$route.query.typeId}`;
       }
       axios({
         method: "put",
@@ -185,18 +154,26 @@ export default {
     },
     async getItems() {
       let url = "/api/";
+      let sets = {};
       if (this.isMetaPage) {
-        url += `item?metaId=${this.$route.query.metaId}`;
+        url += "item/filter";
+        sets.metaId = this.$route.query.metaId;
       } else if (this.isMediaPage) {
-        url += `media?typeId=1`;
+        url += "media/filter";
+        sets.typeId = this.$route.query.typeId;
       }
-      url += `&page=${this.sets.page-1}`;
-      url += `&limit=${this.sets.limit}`;
-      url += `&search=${this.sets.search || ""}`;
+      sets.page = this.sets.page - 1;
+      sets.limit = this.sets.limit;
+      sets.sortBy = this.sets.sortBy;
+      sets.sortDir = this.sets.sortDir;
+      sets.query = this.sets.query || "";
 
       this.isQueryRun = true;
-      await axios
-        .get(this.apiUrl + url)
+      await axios({
+        method: "post",
+        url: this.apiUrl + url,
+        data: sets,
+      })
         .then((res) => {
           this.isQueryRun = false;
           this.items = res.data.items;
@@ -215,6 +192,39 @@ export default {
       await this.getItems();
     },
   },
-  watch: {},
+  watch: {
+    "sets.query"(val, old) {
+      if (val === old) return;
+      this.updatePageSetting({
+        page: 1,
+        query: val,
+      });
+      this.sets.page = 1;
+      this.getItems();
+    },
+    "sets.limit"(val, old) {
+      if (val === old) return;
+      this.updatePageSetting({
+        page: 1,
+        limit: val,
+      });
+      this.sets.page = 1;
+      this.getItems();
+    },
+    "sets.size"(val, old) {
+      if (val === old) return;
+      this.updatePageSetting({ size: val });
+    },
+    "sets.sortBy"(val, old) {
+      if (val === old) return;
+      this.updatePageSetting({ sortBy: val });
+      this.getItems();
+    },
+    "sets.sortDir"(val, old) {
+      if (val === old) return;
+      this.updatePageSetting({ sortDir: val });
+      this.getItems();
+    },
+  },
 };
 </script>

@@ -7,7 +7,7 @@ module.exports = app => {
   router.post("/", Item.create);
 
   // Retrieve all Item
-  router.get("/", Item.findAll);
+  router.post("/filter", Item.findAll);
 
   // Retrieve a single Item with id
   router.get("/:id", Item.findOne);
