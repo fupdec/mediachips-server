@@ -2077,3 +2077,9 @@ $headings: '.display-4,.display-3,.display-2,.display-1,.headline,.title,.subtit
     }
   }
 }
+
+@media (max-width: 480px) {
+  .__rail-is-vertical {
+    width: 0 !important;
+  }
+}
