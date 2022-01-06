@@ -4,8 +4,8 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :value="searchString"
-            icon="mdi-format-letter-case"
+            :value="content"
+            :content="content"
             overlap
             offset-x="23"
             offset-y="44"
@@ -61,6 +61,11 @@ export default {
       set(value) {
         return (this.$store.state.pageSettings = value);
       },
+    },
+    content() {
+      if (typeof this.searchString == "string")
+        return this.searchString.substring(0, 2);
+      else return "";
     },
   },
   methods: {
