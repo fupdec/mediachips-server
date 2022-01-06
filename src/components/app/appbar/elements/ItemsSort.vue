@@ -1,17 +1,51 @@
 <template>
-  <v-menu offset-y nudge-bottom="10" :close-on-content-click="false">
+  <v-menu offset-y nudge-bottom="10">
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
-            <v-icon>mdi-{{ icon }}</v-icon>
-          </v-btn>
+          <v-badge
+            :icon="`mdi-${icon}`"
+            overlap
+            offset-x="23"
+            offset-y="44"
+            class="badge-sort"
+          >
+            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
+              <v-icon>mdi-sort-variant</v-icon>
+              <v-icon
+                v-if="sets.sortDir == 'asc'"
+                size="16"
+                class="badge-sort-icon"
+              >
+                mdi-arrow-down-thin
+              </v-icon>
+              <v-icon v-else size="16" class="badge-sort-icon">
+                mdi-arrow-up-thin
+              </v-icon>
+            </v-btn>
+          </v-badge>
         </template>
         <span>Sort Items By</span>
       </v-tooltip>
     </template>
 
     <v-list dense>
+      <v-subheader>Sort Direction</v-subheader>
+      <v-list-item @click="toggleDir">
+        <v-list-item-content>
+          <v-list-item-title>
+            <span v-if="sets.sortDir == 'asc'">
+              <v-icon left> mdi-sort-ascending </v-icon>
+              Ascending
+            </span>
+            <span v-else>
+              <v-icon left> mdi-sort-descending </v-icon>
+              Descending
+            </span>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-subheader>Sort By</v-subheader>
       <v-list-item-group
         :value="sortBy"
         @change="update($event)"
@@ -37,7 +71,7 @@ import vuescroll from "vuescroll";
 import Vue from "vue";
 
 export default {
-  name: "ItemsSortBy",
+  name: "ItemsSort",
   components: {
     vuescroll,
   },
@@ -83,10 +117,10 @@ export default {
       return this.list.findIndex((i) => i.by == this.sets.sortBy);
     },
     sortBy() {
-      return this.list[this.index] ? this.list[this.index].by : '';
+      return this.list[this.index] ? this.list[this.index].by : "";
     },
     icon() {
-      return this.list[this.index] ? this.list[this.index].icon : 'shape';
+      return this.list[this.index] ? this.list[this.index].icon : "shape";
     },
     isMediaPage() {
       return Vue.prototype.$checkCurrentPage("media");
@@ -102,6 +136,9 @@ export default {
           name: "Path",
         });
       }
+    },
+    toggleDir() {
+      this.sets.sortDir = this.sets.sortDir === "asc" ? "desc" : "asc";
     },
     update(val) {
       this.sets.sortBy = val;

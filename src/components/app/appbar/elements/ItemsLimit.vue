@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y nudge-bottom="10" :close-on-content-click="false">
+  <v-menu offset-y nudge-bottom="10">
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
@@ -19,6 +19,7 @@
         <span>Items Per Page</span>
       </v-tooltip>
     </template>
+    
     <v-list dense>
       <v-list-item-group
         :value="limit"
