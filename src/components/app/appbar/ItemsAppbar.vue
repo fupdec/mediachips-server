@@ -1,15 +1,16 @@
 <template>
   <div class="app-bar-container">
     <div>
-      <ItemSearch />
+      <ItemsSearch />
       <ItemsSort />
+      <!-- <ItemsFavorite /> -->
     </div>
 
     <v-spacer></v-spacer>
 
     <div>
       <ItemsLimit />
-      <ItemSize />
+      <ItemsSize />
     </div>
   </div>
 </template>
@@ -19,11 +20,12 @@
 export default {
   name: "ItemsAppbar",
   components: {
-    ItemSearch: () => import("@/components/app/appbar/elements/ItemSearch.vue"),
+    ItemsSearch: () => import("@/components/app/appbar/elements/ItemsSearch.vue"),
     ItemsSort: () =>
       import("@/components/app/appbar/elements/ItemsSort.vue"),
+    ItemsFavorite: () => import("@/components/app/appbar/elements/ItemsFavorite.vue"),
     ItemsLimit: () => import("@/components/app/appbar/elements/ItemsLimit.vue"),
-    ItemSize: () => import("@/components/app/appbar/elements/ItemSize.vue"),
+    ItemsSize: () => import("@/components/app/appbar/elements/ItemsSize.vue"),
   },
 };
 </script>
