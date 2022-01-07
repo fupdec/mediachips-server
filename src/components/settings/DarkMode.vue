@@ -1,8 +1,10 @@
 <template>
-  <v-btn @click="toggleDarkMode" color="primary" block x-large rounded>
-    <v-icon large class="mr-4"> mdi-theme-light-dark </v-icon>
-    Toggle Dark Mode
-  </v-btn>
+  <div class="px-4">
+    <v-btn @click="toggleDarkMode" color="primary" block x-large rounded>
+      <v-icon large class="mr-4"> mdi-theme-light-dark </v-icon>
+      Toggle Dark Mode
+    </v-btn>
+  </div>
 </template>
 
 

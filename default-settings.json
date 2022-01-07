@@ -29,31 +29,31 @@
     },
     {
       "option": "appColorLightPrimary",
-      "value": "#FFB526"
+      "value": "#7059b7"
     },
     {
       "option": "appColorLightSecondary",
-      "value": "#098DFF"
+      "value": "#e98700"
     },
     {
       "option": "appColorLightAccent",
-      "value": "#FF427F"
+      "value": "#7059b7"
     },
     {
       "option": "appColorLightHeader",
-      "value": "#FFE8F0"
+      "value": "#e1d6eb"
     },
     {
       "option": "appColorDarkPrimary",
-      "value": "#D37816"
+      "value": "#7059b7"
     },
     {
       "option": "appColorDarkSecondary",
-      "value": "#347EC5"
+      "value": "#e98700"
     },
     {
       "option": "appColorDarkAccent",
-      "value": "#B8164A"
+      "value": "#7059b7"
     },
     {
       "option": "appColorDarkHeader",

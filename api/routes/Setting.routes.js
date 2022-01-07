@@ -3,11 +3,14 @@ module.exports = app => {
 
   const router = require("express").Router();
 
-  // Retrieve a single option with a name in the request
-  router.get("/", Setting.findOne);
+  // Retrieve all options from the database
+  router.get("/", Setting.findAll);
+
+  // Retrieve a single option with a name
+  router.get("/:option", Setting.findOne);
 
   // Update a single option with a name and value in the request
-  router.put("/", Setting.update);
+  router.put("/:option", Setting.update);
 
   app.use('/api/Setting', router);
 };

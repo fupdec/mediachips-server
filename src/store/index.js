@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Player from './modules/player.js'
+const defaultSettings = require('./../../default-settings.json')
 
 Vue.use(Vuex)
 
@@ -44,6 +45,7 @@ export default new Vuex.Store({
     clipboardMeta: {},
     updateFoldersData: 0,
     backgroundProcesses: [],
+    settings: defaultSettings,
   }),
   getters: {
     getNotifications(state) {

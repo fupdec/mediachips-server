@@ -21,6 +21,7 @@
 
 <script>
 import Vue from "vue";
+import axios from "axios";
 
 export default {
   name: "App",
@@ -33,33 +34,52 @@ export default {
   async mounted() {
     await Vue.prototype.$getLocalhost();
     this.isApiReady = true;
-    await this.applyTheme()
+    await this.initSettings()
       .then(() => {
         this.isServerError = false;
       })
       .catch(() => {
         this.isServerError = true;
       });
+    await this.applyTheme();
   },
   data: () => ({
     isServerError: false,
     isApiReady: false,
   }),
   computed: {
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
     isPlayerActive() {
       return this.$store.state.Player.active;
     },
   },
   methods: {
+    async initSettings() {
+      await axios
+        .get(this.apiUrl + "/api/Setting")
+        .then((res) => {
+          const settings = res.data;
+          let sets = {};
+          for (let i of settings) {
+            sets[i.option] = i.value;
+          }
+          this.$store.state.settings = sets;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     async applyTheme() {
-      let option = await Vue.prototype.$getOption("darkMode");
-      this.$vuetify.theme.dark = option.data.value === "1" ? true : false;
-      this.$vuetify.theme.themes.light.primary = "#7059b7";
-      this.$vuetify.theme.themes.light.secondary = "#e98700";
-      this.$vuetify.theme.themes.light.accent = "#7059b7";
-      this.$vuetify.theme.themes.dark.primary = "#7059b7";
-      this.$vuetify.theme.themes.dark.secondary = "#e98700";
-      this.$vuetify.theme.themes.dark.accent = "#7059b7";
+      const sets = this.$store.state.settings;
+      this.$vuetify.theme.dark = sets.darkMode === "1" ? true : false;
+      this.$vuetify.theme.themes.light.primary = sets.appColorLightPrimary;
+      this.$vuetify.theme.themes.light.secondary = sets.appColorLightSecondary;
+      this.$vuetify.theme.themes.light.accent = sets.appColorLightAccent;
+      this.$vuetify.theme.themes.dark.primary = sets.appColorDarkPrimary;
+      this.$vuetify.theme.themes.dark.secondary = sets.appColorDarkSecondary;
+      this.$vuetify.theme.themes.dark.accent = sets.appColorDarkAccent;
     },
   },
 };

@@ -4,47 +4,55 @@
       <v-icon left>mdi-cog-outline</v-icon> Settings
     </div>
 
-    <v-tabs v-model="tab" centered icons-and-text class="settings-tabs">
-      <v-tab href="#app-settings" draggable="false">
-        App<v-icon>mdi-application</v-icon>
+    <v-tabs
+      v-model="tab"
+      centered
+      show-arrows
+      center-active
+      icons-and-text
+      class="settings-tabs"
+    >
+      <v-tab href="#app" draggable="false">
+        App <v-icon>mdi-application</v-icon>
       </v-tab>
-      <v-tab href="#appearance-settings" draggable="false">
-        Appearance<v-icon>mdi-palette</v-icon>
+      <v-tab href="#appearance" draggable="false">
+        Appearance <v-icon>mdi-palette</v-icon>
       </v-tab>
-      <v-tab href="#meta-settings" draggable="false">
-        Meta<v-icon>mdi-shape</v-icon>
+      <v-tab href="#meta" draggable="false">
+        Meta <v-icon>mdi-shape</v-icon>
       </v-tab>
-      <v-tab href="#media-settings" draggable="false">
-        Media<v-icon>mdi-heart</v-icon>
+      <v-tab href="#media" draggable="false">
+        Media <v-icon>mdi-heart</v-icon>
       </v-tab>
-      <v-tab href="#privacy-settings" draggable="false">
-        Privacy<v-icon>mdi-key</v-icon>
+      <v-tab href="#privacy" draggable="false">
+        Privacy <v-icon>mdi-key</v-icon>
       </v-tab>
-      <v-tab href="#database-settings" draggable="false">
-        Database<v-icon>mdi-database</v-icon>
+      <v-tab href="#database" draggable="false">
+        Database <v-icon>mdi-database</v-icon>
       </v-tab>
-      <v-tab href="#about-settings" draggable="false">
-        About<v-icon>mdi-information-variant</v-icon>
+      <v-tab href="#about" draggable="false">
+        About <v-icon>mdi-information-variant</v-icon>
       </v-tab>
     </v-tabs>
 
     <v-divider></v-divider>
 
     <v-tabs-items v-model="tab" class="settings-tabs">
-      <v-tab-item value="app-settings">
+      <v-tab-item value="app">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
           <WatchedFolders />
         </v-card>
       </v-tab-item>
-      <v-tab-item value="appearance-settings">
+      <v-tab-item value="appearance">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
           <DarkMode />
+          <Appearance />
         </v-card>
       </v-tab-item>
-      <v-tab-item value="meta-settings">
+      <v-tab-item value="meta">
         <MetaList />
       </v-tab-item>
-      <v-tab-item value="media-settings">
+      <v-tab-item value="media">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
           <div class="headline text-center pb-2">Meta assigned to media</div>
           <vuescroll>
@@ -54,15 +62,15 @@
           </vuescroll>
         </v-card>
       </v-tab-item>
-      <v-tab-item value="privacy-settings">
+      <v-tab-item value="privacy">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
         </v-card>
       </v-tab-item>
-      <v-tab-item value="database-settings">
+      <v-tab-item value="database">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
         </v-card>
       </v-tab-item>
-      <v-tab-item value="about-settings">
+      <v-tab-item value="about">
         <v-card flat max-width="800" style="margin: auto" class="py-10">
         </v-card>
       </v-tab-item>
@@ -79,12 +87,14 @@ export default {
   components: {
     vuescroll,
     DarkMode: () => import("@/components/settings/DarkMode.vue"),
+    Appearance: () => import("@/components/settings/Appearance.vue"),
     WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
     MetaList: () => import("@/components/settings/MetaList.vue"),
-    TableMetaInMediaTypes: () => import("@/components/settings/TableMetaInMediaTypes.vue"),
+    TableMetaInMediaTypes: () =>
+      import("@/components/settings/TableMetaInMediaTypes.vue"),
   },
   data: () => ({
-    tab: "app-settings",
+    tab: "app",
   }),
 };
 </script>
