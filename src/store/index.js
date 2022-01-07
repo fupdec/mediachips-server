@@ -13,6 +13,11 @@ export default new Vuex.Store({
       files: [],
       stage: 0,
     },
+    page: {
+      name: "Items",
+      nameSingular: "Item",
+      icon: "shape",
+    },
     pageSettings: {
       page: 1,
       limit: 20,

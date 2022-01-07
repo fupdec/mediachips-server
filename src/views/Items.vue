@@ -79,10 +79,6 @@ export default {
   },
   data: () => ({
     meta: null,
-    page: {
-      name: "Items",
-      icon: "shape",
-    },
     items: [],
     total: 1,
     totalInDb: 0,
@@ -92,6 +88,14 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    page: {
+      get() {
+        return this.$store.state.page;
+      },
+      set(value) {
+        return (this.$store.state.page = value);
+      },
     },
     sets: {
       get() {
@@ -159,6 +163,7 @@ export default {
         .then((res) => {
           this.meta = res.data;
           this.page.name = this.meta.name;
+          this.page.nameSingular = this.meta.nameSingular;
           this.page.icon = this.meta.icon;
         })
         .catch((e) => {
@@ -171,6 +176,7 @@ export default {
         .then((res) => {
           const mediaType = res.data;
           this.page.name = mediaType.name;
+          this.page.nameSingular = mediaType.nameSingular;
           this.page.icon = mediaType.icon;
         })
         .catch((e) => {
