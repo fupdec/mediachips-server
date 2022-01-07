@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app dense clipped-left extension-height="28">
-    <v-tooltip bottom>
+    <v-tooltip v-if="sets.navigationSide == '1'" bottom >
       <template v-slot:activator="{ on }">
         <v-btn @click="toggleNav" v-on="on" icon tile class="ml-0">
           <v-icon>mdi-menu</v-icon>
@@ -43,6 +43,14 @@ export default {
       },
       set(value) {
         this.$store.state.navDrawer = value;
+      },
+    },
+    sets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        return (this.$store.state.settings = value);
       },
     },
   },

@@ -2,7 +2,9 @@
   <v-app v-if="isApiReady">
     <AppBar />
 
-    <SideBar />
+    <SideBar v-if="sets.navigationSide == '1'" />
+    <BottomBar v-if="sets.navigationSide == '2'" />
+
     <Player v-show="isPlayerActive" />
 
     <v-main app>
@@ -28,6 +30,7 @@ export default {
   components: {
     AppBar: () => import("@/components/app/AppBar.vue"),
     SideBar: () => import("@/components/app/SideBar.vue"),
+    BottomBar: () => import("@/components/app/BottomBar.vue"),
     Player: () => import("@/components/app/Player.vue"),
   },
   async beforeMount() {},
@@ -54,6 +57,14 @@ export default {
     isPlayerActive() {
       return this.$store.state.Player.active;
     },
+    sets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        return (this.$store.state.settings = value);
+      },
+    },
   },
   methods: {
     async initSettings() {
@@ -65,14 +76,14 @@ export default {
           for (let i of settings) {
             sets[i.option] = i.value;
           }
-          this.$store.state.settings = sets;
+          this.sets = sets;
         })
         .catch((e) => {
           console.log(e);
         });
     },
     async applyTheme() {
-      const sets = this.$store.state.settings;
+      const sets = this.sets;
       this.$vuetify.theme.dark = sets.darkMode === "1" ? true : false;
       this.$vuetify.theme.themes.light.primary = sets.appColorLightPrimary;
       this.$vuetify.theme.themes.light.secondary = sets.appColorLightSecondary;

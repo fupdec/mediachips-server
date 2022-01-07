@@ -54,6 +54,8 @@
       <v-icon x-large class="my-4">mdi-filter-outline</v-icon>
       <div>There is no items matching the filters</div>
     </div>
+
+    <div v-show="appSets.navigationSide=='2'" class="py-6"></div>
   </vuescroll>
 </template>
 
@@ -103,6 +105,14 @@ export default {
       },
       set(value) {
         return (this.$store.state.pageSettings = value);
+      },
+    },
+    appSets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        return (this.$store.state.settings = value);
       },
     },
     route() {
