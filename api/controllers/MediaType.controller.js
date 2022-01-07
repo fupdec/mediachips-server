@@ -20,7 +20,21 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single MediaType with an id
-exports.findOne = (req, res) => {};
+exports.findOne = (req, res) => {
+  MediaType.findOne({
+    where: {
+      id: req.params.id
+    },
+    raw: true
+  })
+  .then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
 // Update a MediaType by the id in the request
 exports.update = (req, res) => {};

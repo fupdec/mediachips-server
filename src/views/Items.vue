@@ -1,5 +1,13 @@
 <template>
   <vuescroll>
+    <div class="headline text-h4 d-flex align-center justify-center pt-4">
+      <v-icon left>mdi-{{ page.icon }}</v-icon> {{ page.name }}
+      <span v-if="total != totalInDb" class="text-h6 ml-2">
+        ({{ total }} of {{ totalInDb }})
+      </span>
+      <span v-else class="text-h6 ml-2">({{ total }})</span>
+    </div>
+
     <v-pagination
       v-show="items.length"
       :value="sets.page"
@@ -71,6 +79,10 @@ export default {
   },
   data: () => ({
     meta: null,
+    page: {
+      name: "Items",
+      icon: "shape",
+    },
     items: [],
     total: 1,
     totalInDb: 0,
@@ -101,9 +113,8 @@ export default {
   },
   methods: {
     async init() {
-      if (this.isMetaPage) {
-        await this.getMeta();
-      }
+      if (this.isMetaPage) await this.getMeta();
+      else if (this.isMediaPage) await this.getMedia();
       await this.getPageSettings();
       await this.getItems();
     },
@@ -144,9 +155,23 @@ export default {
     },
     async getMeta() {
       await axios
-        .get(this.apiUrl + "/api/meta")
+        .get(this.apiUrl + "/api/meta/" + this.$route.query.metaId)
         .then((res) => {
-          this.meta = res.data.find((i) => i.id == this.$route.query.metaId);
+          this.meta = res.data;
+          this.page.name = this.meta.name;
+          this.page.icon = this.meta.icon;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async getMedia() {
+      await axios
+        .get(this.apiUrl + "/api/MediaType/" + this.$route.query.typeId)
+        .then((res) => {
+          const mediaType = res.data;
+          this.page.name = mediaType.name;
+          this.page.icon = mediaType.icon;
         })
         .catch((e) => {
           console.log(e);

@@ -79,13 +79,13 @@ db.sequelize.sync().then(async () => {
   // create media type: videos
   await db.MediaType.findOrCreate({
     where: {
-      name: 'Video',
+      name: 'Videos',
     },
     defaults: {
+      nameSingular: 'Video',
       icon: 'video-outline',
-      extensions: '.mp4',
+      extensions: '.mp4, .wmv, .mkv',
       pageSetting: {
-        page: 1,
         sortBy: 'path'
       },
     },

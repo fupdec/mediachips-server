@@ -48,7 +48,23 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single Meta with an id
-exports.findOne = (req, res) => {};
+exports.findOne = (req, res) => {
+  Meta.findOne({
+    where: {
+      id: req.params.id
+    },
+    include: {
+      model: MetaSetting
+    },
+  })
+  .then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
 // Find a single Meta with an id
 exports.findLatest = (req, res) => {
