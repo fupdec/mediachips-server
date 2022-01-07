@@ -15,7 +15,7 @@
             </v-btn>
           </v-badge>
         </template>
-        <span>Search by Name</span>
+        <span>Quick Search</span>
       </v-tooltip>
     </template>
     <v-card width="350">
@@ -49,7 +49,7 @@
 
 <script>
 export default {
-  name: "ItemSearch",
+  name: "ItemsSearch",
   data: () => ({
     searchString: "",
   }),

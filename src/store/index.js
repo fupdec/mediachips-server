@@ -46,7 +46,7 @@ export default new Vuex.Store({
     videoPlayerPlaylist: null,
     foldersData: [],
     dialogFolder: false,
-    navDrawer: false,
+    navDrawer: true,
     clipboardMeta: {},
     updateFoldersData: 0,
     backgroundProcesses: [],

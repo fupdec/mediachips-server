@@ -1,5 +1,11 @@
 <template>
-  <v-navigation-drawer app permanent mini-variant expand-on-hover clipped>
+  <v-navigation-drawer
+    v-model="nav"
+    app
+    mini-variant
+    expand-on-hover
+    clipped
+  >
     <vuescroll :ops="ops">
       <v-list nav dense>
         <v-list-item link to="/" color="secondary" draggable="false">
@@ -115,6 +121,14 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    nav: {
+      get() {
+        return this.$store.state.navDrawer;
+      },
+      set(value) {
+        this.$store.state.navDrawer = value;
+      },
     },
   },
   methods: {

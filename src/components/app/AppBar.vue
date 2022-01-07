@@ -1,10 +1,14 @@
 <template>
-  <v-app-bar
-    app
-    dense
-    clipped-left
-    extension-height="28"
-  >
+  <v-app-bar app dense clipped-left extension-height="28">
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn @click="toggleNav" v-on="on" icon tile class="ml-0">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
+      </template>
+      <span>Toggle Navigation</span>
+    </v-tooltip>
+
     <router-view name="appbar" :key="$route.fullPath" />
 
     <!-- <template v-slot:extension v-if="tabs.length>0"> <Tabs /> </template> -->
@@ -18,10 +22,8 @@ export default {
   components: {
     // Tabs: () => import('@/components/elements/Tabs.vue'),
   },
-  mounted() {
-  },
-  data: () => ({
-  }),
+  mounted() {},
+  data: () => ({}),
   computed: {
     // headerColor() {
     //   if (this.$store.state.Settings.headerGradient) {
@@ -35,8 +37,19 @@ export default {
     //   }
     // },
     // tabs() { return this.$store.getters.tabs },
+    nav: {
+      get() {
+        return this.$store.state.navDrawer;
+      },
+      set(value) {
+        this.$store.state.navDrawer = value;
+      },
+    },
   },
-  methods: {},
-  watch: {},
+  methods: {
+    toggleNav() {
+      this.nav = !this.nav;
+    },
+  },
 };
 </script>

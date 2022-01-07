@@ -120,12 +120,6 @@ export default {
         this.added.push(n);
       }
     },
-    clear() {
-      this.sets.query = "";
-    },
-    search() {
-      this.sets.query = this.searchString;
-    },
     nameRules(string) {
       return Vue.prototype.$validateName(string);
     },

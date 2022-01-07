@@ -25,7 +25,7 @@
             </v-btn>
           </v-badge>
         </template>
-        <span>Sort Items By</span>
+        <span>Sort {{ page.name }}</span>
       </v-tooltip>
     </template>
 
@@ -105,6 +105,9 @@ export default {
     ],
   }),
   computed: {
+    page() {
+      return this.$store.state.page;
+    },
     sets: {
       get() {
         return this.$store.state.pageSettings;
