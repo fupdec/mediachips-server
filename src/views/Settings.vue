@@ -75,6 +75,7 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
+    <div v-show="appSets.navigationSide=='2'" class="py-6"></div>
   </vuescroll>
 </template>
 
@@ -96,5 +97,15 @@ export default {
   data: () => ({
     tab: "app",
   }),
+  computed: {
+    appSets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        return (this.$store.state.settings = value);
+      },
+    },
+  },
 };
 </script>
