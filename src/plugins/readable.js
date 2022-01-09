@@ -58,10 +58,17 @@ const Readable = {
     }
     Vue.prototype.$validateName = function (string) {
       string = string.trim().toLowerCase()
-      if (string.length > 50) return 'Name must be less than 50 characters'
+      if (string.length > 50) return 'Name must be less than 99 characters'
       else if (string.length===0) return 'Name is required'
       else if (/[\\\/\%"?<>{}\[\]]/g.test(string)) return 'Name must not content \\/\%\"<>{}\[\]'
       else return true
+    }
+    Vue.prototype.$transformTextToArray = function (string) {
+      let arr = string.trim();
+      arr = arr.split(/\r?\n/);
+      arr = arr.filter((el) => el != "");
+      arr = arr.map((s) => s.trim());
+      return arr
     }
     Vue.prototype.$checkColorForDarkText = function (color) {
       // Variables for red, green, blue values
