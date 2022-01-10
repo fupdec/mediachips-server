@@ -12,7 +12,11 @@
           <v-icon>mdi-filter-outline</v-icon>
         </v-badge>
       </v-btn>
-      <DialogItemsFilter :dialog="dialogFilter" @close="dialogFilter = false" />
+      <DialogItemsFilter
+        v-if="dialogFilter"
+        :dialog="dialogFilter"
+        @close="dialogFilter = false"
+      />
     </template>
     <span>Filter {{ page.name }}</span>
   </v-tooltip>

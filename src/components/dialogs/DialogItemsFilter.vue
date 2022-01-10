@@ -36,13 +36,17 @@
               v-for="(f, i) in filters"
               :key="i"
               :filter="f"
+              :listBy="listBy"
+              @setBy="setBy($event, i)"
+              @setCond="setCond($event, i)"
+              @setVal="setVal($event, i)"
               @remove="remove(i)"
               @duplicate="duplicate(i)"
             />
           </v-card-text>
         </vuescroll>
 
-        <div v-if="filters.length == 0" class="text-center py-6 overline">
+        <div v-if="filters.length == 0" class="text-center pb-6 overline">
           <v-icon large class="mb-2">mdi-ghost-outline</v-icon>
           <div>No filters</div>
         </div>
@@ -87,16 +91,142 @@ export default {
   props: {
     dialog: Boolean,
   },
-  name: "DialogItemsFilter",
   components: {
     vuescroll,
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mounted() {
-    this.$nextTick(function () {});
+    this.$nextTick(function () {
+      this.init();
+    });
   },
   data: () => ({
     filters: [],
+    listBy: [],
+    cols: {
+      standart: [
+        {
+          by: "rating",
+          type: "number",
+          icon: "star",
+          text: "Rating",
+        },
+        {
+          by: "favorite",
+          type: "boolean",
+          icon: "heart",
+          text: "Favorite",
+        },
+        {
+          by: "bookmark",
+          type: "string",
+          icon: "bookmark",
+          text: "Bookmark",
+        },
+        {
+          by: "views",
+          type: "number",
+          icon: "eye",
+          text: "Number of views",
+        },
+        {
+          by: "viewedAt",
+          type: "date",
+          icon: "calendar-clock",
+          text: "Viewed date",
+        },
+        {
+          by: "createdAt",
+          type: "date",
+          icon: "calendar-plus",
+          text: "Date added",
+        },
+        {
+          by: "updatedAt",
+          type: "date",
+          icon: "calendar-edit",
+          text: "Editing date",
+        },
+      ],
+      metaItem: [
+        {
+          by: "name",
+          type: "string",
+          icon: "alphabetical-variant",
+          text: "Name",
+        },
+        {
+          by: "synonyms",
+          type: "string",
+          icon: "alphabetical",
+          text: "Synonyms",
+        },
+        {
+          by: "country",
+          type: "array",
+          icon: "flag",
+          text: "Country",
+        },
+        {
+          by: "color",
+          type: "string",
+          icon: "palette",
+          text: "Color",
+        },
+      ],
+      media: [
+        {
+          by: "path",
+          type: "string",
+          icon: "file-search",
+          text: "File path",
+        },
+        {
+          by: "filesize",
+          type: "number",
+          icon: "harddisk",
+          text: "File size",
+        },
+      ],
+      video: [
+        {
+          by: "duration",
+          type: "number",
+          icon: "timer-outline",
+          text: "Duration",
+        },
+        {
+          by: "width",
+          type: "number",
+          icon: "monitor-screenshot",
+          text: "Width",
+        },
+        {
+          by: "height",
+          type: "number",
+          icon: "monitor-screenshot",
+          text: "Height",
+        },
+        {
+          by: "bitrate",
+          type: "number",
+          icon: "filmstrip",
+          text: "Bitrate",
+        },
+        {
+          by: "fps",
+          type: "number",
+          icon: "filmstrip",
+          text: "Frames per second",
+        },
+        {
+          by: "codec",
+          type: "string",
+          icon: "filmstrip",
+          text: "Codec",
+        },
+      ],
+    },
   }),
   computed: {
     apiUrl() {
@@ -105,8 +235,65 @@ export default {
     page() {
       return this.$store.state.page;
     },
+    isMetaPage() {
+      return Vue.prototype.$checkCurrentPage("meta");
+    },
+    isMediaPage() {
+      return Vue.prototype.$checkCurrentPage("media");
+    },
+    typeId() {
+      return +this.$router.history.current.query.typeId;
+    },
+    metaId() {
+      return +this.$router.history.current.query.metaId;
+    },
   },
   methods: {
+    async init() {
+      let assigned = [];
+      this.listBy = [...this.listBy, ...this.cols.standart];
+
+      if (this.isMediaPage) {
+        this.listBy = [...this.listBy, ...this.cols.media];
+        if (this.typeId == 1) {
+          this.listBy = [...this.listBy, ...this.cols.video];
+
+          await axios
+            .get(this.apiUrl + "/api/MetaInMediaType")
+            .then((res) => {
+              assigned = res.data.assigned;
+              assigned = assigned.filter((i) => i.id == this.typeId);
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        }
+      } else if (this.isMetaPage) {
+        this.listBy = [...this.listBy, ...this.cols.metaItem];
+
+        await axios
+          .get(this.apiUrl + "/api/ChildMeta?metaId=" + this.metaId)
+          .then((res) => {
+            assigned = res.data;
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+      
+      for (let i of assigned) {
+        this.listBy.push({
+          by: i["meta.id"],
+          type: i["meta.type"],
+          icon: i["meta.icon"],
+          text: i["meta.name"],
+        });
+      }
+
+      this.listBy.sort((a, b) =>
+        a.text > b.text ? 1 : b.text > a.text ? -1 : 0
+      );
+    },
     add() {
       this.filters.push({
         by: null,
@@ -117,14 +304,31 @@ export default {
         lock: false,
       });
     },
+    setBy(value, index) {
+      this.filters[index].by = value;
+      let found = this.listBy.findIndex((i) => i.by == value);
+      if (found > -1) this.filters[index].type = this.listBy[found].type;
+      this.filters[index].cond = null;
+      this.filters[index].val = null;
+    },
+    setCond(value, index) {
+      this.filters[index].cond = value;
+    },
+    setVal(value, index) {
+      this.filters[index].val = value;
+    },
     duplicate(index) {
       this.filters.push(this.filters[index]);
     },
     remove(index) {
       this.filters.splice(index, 1);
     },
-    removeAll() {},
-    apply() {},
+    removeAll() {
+      this.filters = [];
+    },
+    apply() {
+      this.$emit("close");
+    },
     close() {
       this.$emit("close");
     },
