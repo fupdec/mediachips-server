@@ -59,7 +59,7 @@ const Readable = {
     Vue.prototype.$validateName = function (string) {
       string = string.trim().toLowerCase()
       if (string.length > 50) return 'Name must be less than 99 characters'
-      else if (string.length===0) return 'Name is required'
+      else if (string.length === 0) return 'Name is required'
       else if (/[\\\/\%"?<>{}\[\]]/g.test(string)) return 'Name must not content \\/\%\"<>{}\[\]'
       else return true
     }
@@ -101,6 +101,29 @@ const Readable = {
 
       // Using the HSP value, determine whether the color is light or dark
       return hsp < 160
+    }
+    Vue.prototype.$showHoverImage = function (event, metaId, itemId) {
+      if (event.buttons !== 0) return
+      let x = event.clientX
+      let y = event.clientY
+      let appHeight = window.innerHeight
+      let appWidth = window.innerWidth
+      let imgSize = 160
+      let doubleOffset = 60
+      if (appWidth < x + imgSize + doubleOffset) x -= (imgSize + doubleOffset)
+      if (appHeight < y + imgSize + doubleOffset) y -= (imgSize + doubleOffset)
+      options.store.state.hover.x = x
+      options.store.state.hover.y = y
+      options.store.state.hover.show = true
+      options.store.state.hover.itemId = itemId
+      options.store.state.hover.metaId = metaId
+
+      options.store.state.hover.time = new Date().getTime()
+      setTimeout(() => {
+        let currentTime = new Date().getTime()
+        if (currentTime - options.store.state.hover.time > 4500)
+          options.store.state.hover.show = false
+      }, 5000)
     }
   }
 }

@@ -169,11 +169,18 @@ html {
     margin: -10px;
   }
 }
-.list-img-preview {
+.hover-image {
+  pointer-events: none;
   position: fixed !important;
   z-index: 999 !important;
-  border: 1px solid #777;
-  background-color: rgba(60, 60, 60, 0.9);
+  border-radius: 10px;
+  border: 1px solid #5a5a5a;
+  background-color: rgba(150, 150, 150, 0.9);
+  width: 160px;
+  height: 160px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .group-buttons {
   .v-btn {
@@ -1061,34 +1068,17 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  .overline {
-    input {
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-  }
   .by {
     width: 25%;
-    display: flex;
   }
   .cond {
     width: 25%;
-    margin-left: 15px !important;
-    margin-right: 15px !important;
-    .v-select__selections {
-      display: flex;
-      justify-content: center;
-    }
-    .v-select__selection {
-      margin: 0;
-    }
-    input {
-      display: none;
-    }
   }
   .val {
     width: 50%;
-    margin-right: 10px;
+  }
+  .v-autocomplete.v-select.v-input--is-focused input {
+    min-width: 10px;
   }
   .v-input__icon--append {
     display: none;

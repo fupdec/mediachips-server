@@ -18,7 +18,7 @@ exports.findAll = (req, res) => {
     },
     include: [{
       model: Item,
-      attributes: ['name', 'color'],
+      attributes: ['name', 'color', 'metaId'],
     }],
     raw: true
   }).then(data => {

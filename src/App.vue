@@ -11,6 +11,8 @@
       <router-view :key="$route.fullPath" />
     </v-main>
 
+    <HoverImage />
+
     <v-dialog v-model="isServerError" persistent overlay-opacity="1">
       <v-alert type="error" text outlined class="mb-0">
         Failed to start the server. The settings may be incorrect. After
@@ -32,6 +34,7 @@ export default {
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
     Player: () => import("@/components/app/Player.vue"),
+    HoverImage: () => import("@/components/app/HoverImage.vue"),
   },
   async beforeMount() {},
   async mounted() {

@@ -85,6 +85,8 @@
       <v-chip
         v-for="i in items"
         :key="i.itemId + i.childItemId"
+        @mouseover.stop="showHoverImage($event, i.itemId, i.childItemId)"
+        @mouseleave.stop="$store.state.hover.show = false"
         :color="i['item.color']"
         :text-color="getTextColor(i['item.color'])"
         :title="i.meta.name"
@@ -192,6 +194,9 @@ export default {
       let value = Vue.prototype.$checkColorForDarkText(color);
       if (value) return "white";
       else return "black";
+    },
+    showHoverImage(event, metaId, itemId) {
+      Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
   },
   watch: {},

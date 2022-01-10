@@ -31,9 +31,9 @@ export default new Vuex.Store({
     isLogVisible: false,
     notifications: [],
     hover: {
-      state: false,
-      id: '',
-      type: '',
+      show: false,
+      itemId: null,
+      metaId: null,
       time: 0,
       x: 0,
       y: 0,
