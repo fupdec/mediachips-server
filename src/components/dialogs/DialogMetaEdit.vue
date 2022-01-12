@@ -94,41 +94,27 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogDeleteMeta" max-width="450">
+    <v-dialog v-model="dialogDeleteMeta">
       <v-card>
-        <div class="d-flex justify-space-between">
-          <div></div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="dialogDeleteMeta = false" outlined>
-              <v-icon left>mdi-close</v-icon> Cancel
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="deleteMeta" color="error" depressed>
-              <v-icon left>mdi-check</v-icon> Delete
-            </v-btn>
-          </div>
-        </div>
-
-        <v-divider></v-divider>
-
         <v-card-text class="text-center">
-          <v-icon size="72" color="error" class="py-4">
-            mdi-alert-outline
-          </v-icon>
+          <v-icon large color="error" class="py-6"> mdi-alert-outline </v-icon>
           <div class="error--text">
             The meta will be removed from all assigned media and items.
             <div v-if="meta.type == 'array'">
               And it will also delete all items of this meta.
             </div>
+            Are you sure?
           </div>
         </v-card-text>
+        <v-card-actions class="pb-4">
+          <v-btn @click="dialogDeleteMeta = false" plain>
+            <v-icon left>mdi-close</v-icon> Cancel
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn @click="deleteMeta" color="error" plain>
+            <v-icon left>mdi-check</v-icon> Delete
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
 
