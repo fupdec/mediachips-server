@@ -31,17 +31,20 @@
         <v-divider></v-divider>
 
         <vuescroll>
-          <v-card-text class="text-center">
+          <v-card-text class="text-center px-2 px-sm-4">
             <FilterRow
               v-for="(f, i) in filters"
               :key="i"
               :filter="f"
               :listBy="listBy"
+              ref="filterRow"
               @setBy="setBy($event, i)"
               @setCond="setCond($event, i)"
               @setVal="setVal($event, i)"
               @remove="remove(i)"
               @duplicate="duplicate(i)"
+              @pickDate="pickDate(i)"
+              @valid="validate($event)"
             />
           </v-card-text>
         </vuescroll>
@@ -51,7 +54,7 @@
           <div>No filters</div>
         </div>
 
-        <v-card-actions class="pt-0">
+        <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             @click="add"
@@ -78,6 +81,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="datePicker.dialog">
+      <v-date-picker
+        @change="setDate($event)"
+        :value="datePicker.value"
+        color="primary"
+        no-title
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -86,6 +98,7 @@
 import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
+import Cols from "../../../filter-cols";
 
 export default {
   props: {
@@ -103,130 +116,13 @@ export default {
   data: () => ({
     filters: [],
     listBy: [],
-    cols: {
-      standart: [
-        {
-          by: "rating",
-          type: "number",
-          icon: "star",
-          text: "Rating",
-        },
-        {
-          by: "favorite",
-          type: "boolean",
-          icon: "heart",
-          text: "Favorite",
-        },
-        {
-          by: "bookmark",
-          type: "string",
-          icon: "bookmark",
-          text: "Bookmark",
-        },
-        {
-          by: "views",
-          type: "number",
-          icon: "eye",
-          text: "Number of views",
-        },
-        {
-          by: "viewedAt",
-          type: "date",
-          icon: "calendar-clock",
-          text: "Viewed date",
-        },
-        {
-          by: "createdAt",
-          type: "date",
-          icon: "calendar-plus",
-          text: "Date added",
-        },
-        {
-          by: "updatedAt",
-          type: "date",
-          icon: "calendar-edit",
-          text: "Editing date",
-        },
-      ],
-      metaItem: [
-        {
-          by: "name",
-          type: "string",
-          icon: "alphabetical-variant",
-          text: "Name",
-        },
-        {
-          by: "synonyms",
-          type: "string",
-          icon: "alphabetical",
-          text: "Synonyms",
-        },
-        {
-          by: "country",
-          type: "array",
-          icon: "flag",
-          text: "Country",
-        },
-        {
-          by: "color",
-          type: "string",
-          icon: "palette",
-          text: "Color",
-        },
-      ],
-      media: [
-        {
-          by: "path",
-          type: "string",
-          icon: "file-search",
-          text: "File path",
-        },
-        {
-          by: "filesize",
-          type: "number",
-          icon: "harddisk",
-          text: "File size",
-        },
-      ],
-      video: [
-        {
-          by: "duration",
-          type: "number",
-          icon: "timer-outline",
-          text: "Duration",
-        },
-        {
-          by: "width",
-          type: "number",
-          icon: "monitor-screenshot",
-          text: "Width",
-        },
-        {
-          by: "height",
-          type: "number",
-          icon: "monitor-screenshot",
-          text: "Height",
-        },
-        {
-          by: "bitrate",
-          type: "number",
-          icon: "filmstrip",
-          text: "Bitrate",
-        },
-        {
-          by: "fps",
-          type: "number",
-          icon: "filmstrip",
-          text: "Frames per second",
-        },
-        {
-          by: "codec",
-          type: "string",
-          icon: "filmstrip",
-          text: "Codec",
-        },
-      ],
+    valid: true,
+    datePicker: {
+      dialog: false,
+      index: -1,
+      value: null,
     },
+    cols: Cols,
   }),
   computed: {
     apiUrl() {
@@ -280,7 +176,7 @@ export default {
             console.log(e);
           });
       }
-      
+
       for (let i of assigned) {
         this.listBy.push({
           by: i["meta.id"],
@@ -318,7 +214,8 @@ export default {
       this.filters[index].val = value;
     },
     duplicate(index) {
-      this.filters.push(this.filters[index]);
+      const filter = _.cloneDeep(this.filters[index]);
+      this.filters.push(filter);
     },
     remove(index) {
       this.filters.splice(index, 1);
@@ -327,10 +224,29 @@ export default {
       this.filters = [];
     },
     apply() {
+      if (this.filters.length) {
+        for (let i of this.$refs.filterRow) {
+          i.validate();
+        }
+      }
+      if (!this.valid) return;
+      this.$store.state.filters = this.filters;
       this.$emit("close");
     },
     close() {
       this.$emit("close");
+    },
+    pickDate(index) {
+      this.datePicker.dialog = true;
+      this.datePicker.value = this.filters[index].val;
+      this.datePicker.index = index;
+    },
+    setDate(date) {
+      this.datePicker.dialog = false;
+      this.filters[this.datePicker.index].val = date;
+    },
+    validate(val) {
+      this.valid = val;
     },
   },
 };

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Player from './modules/player.js'
-const defaultSettings = require('./../../default-settings.json')
+const Settings = require('./../../default-settings.js')
 
 Vue.use(Vuex)
 
@@ -30,6 +30,7 @@ export default new Vuex.Store({
     log: [],
     isLogVisible: false,
     notifications: [],
+    filters: [],
     hover: {
       show: false,
       itemId: null,
@@ -49,7 +50,7 @@ export default new Vuex.Store({
     clipboardMeta: {},
     updateFoldersData: 0,
     backgroundProcesses: [],
-    settings: defaultSettings,
+    settings: Settings,
   }),
   getters: {
     getNotifications(state) {

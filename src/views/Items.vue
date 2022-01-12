@@ -55,7 +55,7 @@
       <div>There is no items matching the filters</div>
     </div>
 
-    <div v-show="appSets.navigationSide=='2'" class="py-6"></div>
+    <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
   </vuescroll>
 </template>
 
@@ -123,6 +123,14 @@ export default {
     },
     isMediaPage() {
       return Vue.prototype.$checkCurrentPage("media");
+    },
+    filters: {
+      get() {
+        return this.$store.state.filters;
+      },
+      set(value) {
+        return (this.$store.state.filters = value);
+      },
     },
   },
   methods: {
@@ -208,6 +216,7 @@ export default {
       sets.sortBy = this.sets.sortBy;
       sets.sortDir = this.sets.sortDir;
       sets.query = this.sets.query || "";
+      sets.filters = this.filters;
 
       this.isQueryRun = true;
       await axios({
@@ -221,6 +230,7 @@ export default {
           this.total = res.data.total;
           this.pages = res.data.pages;
           this.totalInDb = res.data.totalRows;
+          // TODO jump to the fisrt page if current page greater than total pages
         })
         .catch((e) => {
           this.isQueryRun = false;
@@ -264,6 +274,9 @@ export default {
     "sets.sortDir"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ sortDir: val });
+      this.getItems();
+    },
+    filters() {
       this.getItems();
     },
   },

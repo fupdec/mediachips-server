@@ -74,7 +74,7 @@ try {
 }
 
 // sequelize.sync({force: true}) // drop existing tables on start
-const settings = require('./default-settings.json')
+const Settings = require('./default-settings.js')
 db.sequelize.sync().then(async () => {
   // create media type: videos
   await db.MediaType.findOrCreate({
@@ -91,7 +91,7 @@ db.sequelize.sync().then(async () => {
     },
     include: [db.PageSetting]
   })
-  await db.Setting.bulkCreate(settings.default, {
+  await db.Setting.bulkCreate(Settings, {
     ignoreDuplicates: true
   })
 })

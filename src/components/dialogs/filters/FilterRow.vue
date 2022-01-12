@@ -1,207 +1,204 @@
 <template>
-  <v-card outlined x-large class="filter-row pa-2">
-    <v-autocomplete
-      @input="setBy($event)"
-      :value="filter.by"
-      :items="listBy"
-      :disabled="filter.lock"
-      :filter="filterBy"
-      item-value="by"
-      label="By"
-      class="by"
-      outlined
-      dense
-      hide-selected
-      hide-details
-    >
-      <template v-slot:selection="data">
-        <v-icon>mdi-{{ data.item.icon }}</v-icon>
-        <span class="mx-2">{{ data.item.text }}</span>
-        <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
-      </template>
-      <template v-slot:item="data">
-        <div class="d-flex justify-space-between" style="width: 100%">
-          <v-icon>mdi-{{ data.item.icon }}</v-icon>
-          <span class="mx-2" style="width: 100%">{{ data.item.text }}</span>
-          <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
-        </div>
-      </template>
-    </v-autocomplete>
-
-    <v-autocomplete
-      @input="setCond($event)"
-      :value="filter.cond"
-      :items="getListCond(filter.type)"
-      :disabled="filter.lock"
-      :filter="filterBy"
-      item-value="cond"
-      label="Condition"
-      class="cond mx-sm-2"
-      outlined
-      dense
-      hide-selected
-      hide-details
-    >
-      <template v-slot:selection="data">
-        <v-icon>mdi-{{ data.item.icon }}</v-icon>
-        <span class="mx-2">{{ data.item.text }}</span>
-      </template>
-      <template v-slot:item="data">
-        <div class="list-item">
-          <v-icon left>mdi-{{ data.item.icon }}</v-icon>
-          <span>{{ data.item.text }}</span>
-        </div>
-      </template>
-    </v-autocomplete>
-
-    <v-text-field
-      v-if="filter.type === 'string' || filter.type === null"
-      @input="setVal($event)"
-      :value="filter.val"
-      :disabled="
-        filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
-      "
-      label="String"
-      class="val"
-      outlined
-      dense
-      hide-details
-    />
-
-    <v-text-field
-      v-if="filter.type === 'number'"
-      @input="setVal($event)"
-      :value="filter.val"
-      :disabled="
-        filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
-      "
-      type="number"
-      label="Number"
-      class="val"
-      outlined
-      dense
-      hide-details
-    />
-
-    <v-text-field
-      v-if="filter.type === 'date'"
-      @click="(datePicker = true), (datePickerIndex = i)"
-      :value="filter.val"
-      :disabled="
-        filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
-      "
-      label="Date"
-      class="val"
-      outlined
-      dense
-      readonly
-    />
-    <v-dialog v-model="datePicker" width="300px">
-      <v-date-picker
-        v-if="filter.type === 'date'"
-        @change="setVal($event, datePickerIndex), (datePicker = false)"
-        :max="new Date().toISOString().substr(0, 10)"
-        min="1950-01-01"
-        :value="filters[datePickerIndex].val"
-        no-title
-        color="primary"
-        full-width
-      />
-    </v-dialog>
-
-    <v-autocomplete
-      v-if="filter.type === 'array'"
-      @input="setVal($event)"
-      :value="filter.val"
-      :items="listItems"
-      item-value="id"
-      :disabled="
-        filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
-      "
-      :menu-props="{ contentClass: 'list-with-preview' }"
-      :ref="filter.by"
-      :filter="filterItems"
-      label="Values"
-      class="val hidden-close"
-      outlined
-      multiple
-      dense
-      hide-selected
-      hide-details
-    >
-      <template v-slot:selection="data">
-        <v-chip
-          v-bind="data.attrs"
-          @click="data.select"
-          @click:close="removeItem(data.item.id)"
-          @mouseover.stop="showHoverImage($event, data.item.id)"
-          @mouseleave.stop="$store.state.hover.show = false"
-          :input-value="data.selected"
-          :color="data.item.color"
-          :label="meta.metaSetting.chipLabel"
-          :outlined="meta.metaSetting.chipOutlined"
-          small
-          close
-          class="my-1 px-2"
-        >
-          <span>{{ data.item.name }}</span>
-        </v-chip>
-      </template>
-      <template v-slot:item="data">
-        <div
-          @mouseover.stop="showHoverImage($event, data.item.id)"
-          @mouseleave.stop="$store.state.hover.show = false"
-          class="list-item"
-        >
-          <span v-if="meta.metaSetting.favorite">
-            <v-icon v-if="data.item.favorite" color="pink" left size="14">
-              mdi-heart
-            </v-icon>
-            <v-icon v-else left size="14"> mdi-heart-outline </v-icon>
-          </span>
-          <span v-if="meta.metaSetting.color">
-            <v-icon :color="data.item.color || ''" left x-small>
-              mdi-circle
-            </v-icon>
-          </span>
-          <span>{{ data.item.name }}</span>
-          <span v-if="meta.metaSetting.synonyms" class="aliases">
-            {{ data.item.synonyms }}
-          </span>
-        </div>
-      </template>
-    </v-autocomplete>
-
-    <v-card-actions class="pa-0">
-      <v-btn
-        @click="duplicate"
-        title="Duplicate filter"
-        class="ma-1 ml-sm-3"
-        color="green"
-        outlined
-        icon
-        fab
-        x-small
-        :disabled="filter.type == 'boolean'"
-      >
-        <v-icon>mdi-content-duplicate</v-icon>
-      </v-btn>
-
-      <v-btn
-        @click="remove"
+  <v-form ref="form" v-model="valid">
+    <v-card outlined class="filter-row pa-2 mb-2">
+      <v-autocomplete
+        @input="setBy($event)"
+        :value="filter.by"
+        :items="listBy"
         :disabled="filter.lock"
-        class="ma-1"
-        color="red"
+        :filter="filterBy"
+        :rules="[(v) => !!v || 'By is required']"
+        item-value="by"
+        label="By"
+        class="by"
         outlined
-        icon
-        fab
-        x-small
-        title="Remove filter"
+        dense
+        hide-selected
+        hide-details
       >
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+        <template v-slot:selection="data">
+          <v-icon>mdi-{{ data.item.icon }}</v-icon>
+          <span class="mx-2">{{ data.item.text }}</span>
+          <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
+        </template>
+        <template v-slot:item="data">
+          <div class="d-flex justify-space-between" style="width: 100%">
+            <v-icon>mdi-{{ data.item.icon }}</v-icon>
+            <span class="mx-2" style="width: 100%">{{ data.item.text }}</span>
+            <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
+          </div>
+        </template>
+      </v-autocomplete>
+
+      <v-autocomplete
+        @input="setCond($event)"
+        :value="filter.cond"
+        :items="getListCond(filter.type)"
+        :disabled="filter.lock"
+        :filter="filterBy"
+        :rules="[(v) => !!v || 'Condition is required']"
+        item-value="cond"
+        label="Condition"
+        class="cond mx-sm-2"
+        outlined
+        dense
+        hide-selected
+        hide-details
+      >
+        <template v-slot:selection="data">
+          <v-icon>mdi-{{ data.item.icon }}</v-icon>
+          <span class="mx-2">{{ data.item.text }}</span>
+        </template>
+        <template v-slot:item="data">
+          <div class="list-item">
+            <v-icon left>mdi-{{ data.item.icon }}</v-icon>
+            <span>{{ data.item.text }}</span>
+          </div>
+        </template>
+      </v-autocomplete>
+
+      <v-text-field
+        v-if="filter.type === 'string' || filter.type === null"
+        @input="setVal($event)"
+        :value="filter.val"
+        :disabled="
+          filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
+        "
+        :rules="[validVal]"
+        label="String"
+        class="val"
+        outlined
+        dense
+        hide-details
+      />
+
+      <v-text-field
+        v-if="filter.type === 'number'"
+        @input="setVal($event)"
+        :value="filter.val"
+        :disabled="
+          filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
+        "
+        :rules="[validVal]"
+        type="number"
+        label="Number"
+        class="val"
+        outlined
+        dense
+        hide-details
+      />
+
+      <v-text-field
+        v-if="filter.type === 'date'"
+        @click="pickDate"
+        :value="filter.val"
+        :disabled="
+          filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
+        "
+        :rules="[validVal]"
+        label="Date"
+        class="val"
+        outlined
+        dense
+        readonly
+        hide-details
+      />
+
+      <v-autocomplete
+        v-if="filter.type === 'array'"
+        @input="setVal($event)"
+        :value="filter.val"
+        :items="listItems"
+        item-value="id"
+        :disabled="
+          filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
+        "
+        :menu-props="{ contentClass: 'list-with-preview' }"
+        :ref="filter.by"
+        :filter="filterItems"
+        :rules="[validVal]"
+        label="Values"
+        class="val hidden-close"
+        outlined
+        multiple
+        dense
+        hide-selected
+        hide-details
+      >
+        <template v-slot:selection="data">
+          <v-chip
+            v-bind="data.attrs"
+            @click="data.select"
+            @click:close="removeItem(data.item.id)"
+            @mouseover.stop="showHoverImage($event, data.item.id)"
+            @mouseleave.stop="$store.state.hover.show = false"
+            :input-value="data.selected"
+            :color="data.item.color"
+            :label="meta.metaSetting.chipLabel"
+            :outlined="meta.metaSetting.chipOutlined"
+            small
+            close
+            class="my-1 px-2"
+          >
+            <span>{{ data.item.name }}</span>
+          </v-chip>
+        </template>
+        <template v-slot:item="data">
+          <div
+            @mouseover.stop="showHoverImage($event, data.item.id)"
+            @mouseleave.stop="$store.state.hover.show = false"
+            class="list-item"
+          >
+            <span v-if="meta.metaSetting.favorite">
+              <v-icon v-if="data.item.favorite" color="pink" left size="14">
+                mdi-heart
+              </v-icon>
+              <v-icon v-else left size="14"> mdi-heart-outline </v-icon>
+            </span>
+            <span v-if="meta.metaSetting.color">
+              <v-icon :color="data.item.color || ''" left x-small>
+                mdi-circle
+              </v-icon>
+            </span>
+            <span>{{ data.item.name }}</span>
+            <span v-if="meta.metaSetting.synonyms" class="aliases">
+              {{ data.item.synonyms }}
+            </span>
+          </div>
+        </template>
+      </v-autocomplete>
+
+      <v-card-actions class="pa-0">
+        <v-btn
+          @click="duplicate"
+          title="Duplicate filter"
+          class="ma-1 ml-sm-3"
+          color="green"
+          outlined
+          icon
+          fab
+          x-small
+          :disabled="filter.type == 'boolean'"
+        >
+          <v-icon>mdi-content-duplicate</v-icon>
+        </v-btn>
+
+        <v-btn
+          @click="remove"
+          :disabled="filter.lock"
+          class="ma-1"
+          color="red"
+          outlined
+          icon
+          fab
+          x-small
+          title="Remove filter"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-form>
 </template>
 
 
@@ -218,7 +215,7 @@ export default {
     this.$nextTick(function () {});
   },
   data: () => ({
-    datePicker: false,
+    valid: false,
     listItems: [],
   }),
   computed: {
@@ -248,6 +245,7 @@ export default {
       sets.sortBy = "name";
       sets.sortDir = "asc";
       sets.query = "";
+      sets.filters = [];
 
       await axios
         .get(this.apiUrl + "/api/meta/" + metaId)
@@ -279,10 +277,10 @@ export default {
     showHoverImage(event, itemId) {
       Vue.prototype.$showHoverImage(event, this.filter.by, itemId);
     },
-    removeItem(item) { 
-      const index = this.filter.val.indexOf(item)
-      if (index > -1) this.filter.val.splice(index, 1)
-      this.$store.state.hover.show = false
+    removeItem(item) {
+      const index = this.filter.val.indexOf(item);
+      if (index > -1) this.filter.val.splice(index, 1);
+      this.$store.state.hover.show = false;
     },
     remove() {
       this.$emit("remove");
@@ -292,32 +290,32 @@ export default {
       else if (type == "number" || type == "date")
         return [
           {
-            cond: "equal",
+            cond: "=",
             icon: "equal",
             text: "equal",
           },
           {
-            cond: "not equal",
+            cond: "!=",
             icon: "not-equal-variant",
             text: "not equal",
           },
           {
-            cond: "greater than",
+            cond: ">",
             icon: "greater-than",
             text: "greater than",
           },
           {
-            cond: "less than",
+            cond: "<",
             icon: "less-than",
             text: "less than",
           },
           {
-            cond: "greater than or equal",
+            cond: ">=",
             icon: "greater-than-or-equal",
             text: "greater than or equal",
           },
           {
-            cond: "less than or equal",
+            cond: "<=",
             icon: "less-than-or-equal",
             text: "less than or equal",
           },
@@ -325,22 +323,22 @@ export default {
       else if (type == "string")
         return [
           {
-            cond: "includes",
+            cond: "like",
             icon: "equal",
             text: "includes",
           },
           {
-            cond: "excludes",
+            cond: "not like",
             icon: "not-equal-variant",
             text: "excludes",
           },
           {
-            cond: "empty",
+            cond: "is null",
             icon: "code-brackets",
             text: "empty",
           },
           {
-            cond: "not empty",
+            cond: "not null",
             icon: "dots-horizontal",
             text: "not empty",
           },
@@ -348,27 +346,28 @@ export default {
       else if (type == "array")
         return [
           {
-            cond: "includes one of",
+            cond: "in",
             icon: "math-norm",
             text: "includes one of",
           },
+          // TODO includes all and other conditions
+          // {
+          //   cond: "includes all",
+          //   icon: "equal",
+          //   text: "includes all",
+          // },
+          // {
+          //   cond: "not in",
+          //   icon: "not-equal-variant",
+          //   text: "excludes",
+          // },
           {
-            cond: "includes all",
-            icon: "equal",
-            text: "includes all",
-          },
-          {
-            cond: "excludes",
-            icon: "not-equal-variant",
-            text: "excludes",
-          },
-          {
-            cond: "empty",
+            cond: "is null",
             icon: "code-brackets",
             text: "empty",
           },
           {
-            cond: "not empty",
+            cond: "not null",
             icon: "code-brackets",
             text: "not empty",
           },
@@ -432,10 +431,25 @@ export default {
       let query = queryText.toLowerCase();
       return text.includes(query);
     },
+    pickDate() {
+      this.$emit("pickDate");
+    },
+    validate() {
+      this.$refs.form.validate();
+    },
+    validVal(val) {
+      const cond = this.filter.cond;
+      if (val !== null) return true;
+      if (cond !== "is null" && cond !== "is null") return true;
+      else return "Value is required";
+    },
   },
   watch: {
     async "filter.by"(val) {
       if (typeof val == "number") await this.getItems(val);
+    },
+    valid(val) {
+      this.$emit("valid", val);
     },
   },
 };
