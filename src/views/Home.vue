@@ -15,22 +15,31 @@
         label="Place here full path to the backup archive"
       ></v-text-field>
       <v-btn @click="importData" :disabled="!backup" color="success">
-        <v-icon left> mdi-database-import </v-icon> import db
+        <v-icon left> mdi-database-import </v-icon> Import Database
       </v-btn>
     </v-container>
 
     <v-dialog v-model="dialogImport" persistent width="500px">
       <v-card class="text-center py-4">
-        <div v-if="isImportRun" class="headline">Importing database...</div>
-        <div v-if="isImportRun">This may take a few minutes</div>
-        <Loading v-show="isImportRun" />
-        <div>{{ importStatus }}</div>
+        <v-card-text>
+          <div v-if="isImportRun">
+            <div class="headline mb-4">Importing database...</div>
+            <v-alert type="info" dense text class="body-2">
+              This may take a few minutes
+            </v-alert>
+            <Loading />
+          </div>
+          <div class="headline">{{ importStatus }}</div>
+        </v-card-text>
         <v-btn
           @click="dialogImport = false"
           :disabled="isImportRun"
-          v-html="'close'"
+          color="success"
           class="mt-4"
-        ></v-btn>
+          depressed
+        >
+          <v-icon left>mdi-check</v-icon> OK
+        </v-btn>
       </v-card>
     </v-dialog>
   </div>

@@ -21,7 +21,10 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  position: relative;
   svg:last-of-type {
+    bottom: 0;
+    margin: auto;
     position: absolute;
   }
 }
