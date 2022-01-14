@@ -80,6 +80,10 @@ html {
     box-shadow: none !important;
   }
 }
+.theme--dark.v-pagination .v-pagination__navigation,
+.theme--dark.v-pagination .v-pagination__item {
+  background: none;
+}
 // DIALOG
 .v-dialog {
   &__content {

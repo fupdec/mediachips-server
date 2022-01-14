@@ -26,7 +26,13 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-
+/* TODO 
+* fix checking if server running
+* countries array
+* playlists: remake as meta
+* toggle visibility of each meta in items on page
+* settings for meta list for each meta
+*/
 export default {
   name: "App",
   components: {
