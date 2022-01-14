@@ -11,10 +11,9 @@ const {
   ValuesInItem,
   MetaInMediaType,
   PageSetting,
-  Playlist,
-  VideosInPlaylist,
   Marker,
-  ChildMeta
+  ChildMeta,
+  SavedFilter
 } = require("../index.js");
 
 // FFMPEG
@@ -27,65 +26,13 @@ ffmpeg.setFfprobePath(pathToFfprobe)
 const fs = require("fs")
 const path = require('path')
 const StreamZip = require('node-stream-zip')
-const Cols = require('../../filter-cols')
 
-
-exports.filterItems = (sets, itemsType) => {
-  /** 
-   * Creating query for getting items from database.
-   * @param {array} filters - with filter objects.
-   */
-  let filters = sets.filters
-  let videoCols = Cols.video.map(i => i.by)
-  const isFilterByVideo = filters.some(i => videoCols.includes(i.by))
-  const isFilterTypeArray = filters.some(i => i.type === 'array')
-
-  const parseFilters = (arr) => {
-    let q = ""
-    for (let i of arr) {
-      if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
-      if (i.type === 'string') {
-        q += `AND ${i.by} ${i.cond} `;
-        if (!i.cond.includes('null')) {
-          q += `'%${i.val}%' `;
-        }
-      } else if (i.type === 'number') {
-        q += `AND ${i.by} ${i.cond} ${i.val} `;
-      } else if (i.type === 'date') {
-        q += `AND ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
-      } else if (i.type === 'array') {
-        q += `AND itemsIn${itemsType}.childItemId ${i.cond} (${i.val.join()}) `;
-      }
-    }
-    return q
-  }
-
-  let q = `SELECT * FROM ${itemsType} `;
-  if (isFilterByVideo) {
-    q += "INNER JOIN videoMetadata ON media.id = videoMetadata.mediaId ";
-  }
-  if (isFilterTypeArray) {
-    if (itemsType == 'media') {
-      q += "INNER JOIN itemsInMedia ON media.id = itemsInMedia.mediaId ";
-    } else if (itemsType == 'items') {
-      q += "INNER JOIN itemsInItems ON items.id = itemsInItems.itemId ";
-    }
-  }
-  if (itemsType == 'media') {
-    q += `WHERE typeId = ${sets.typeId} `;
-  } else if (itemsType == 'items') {
-    q += `WHERE metaId = ${sets.metaId} `;
-  }
-  q += parseFilters(filters);
-  q += "GROUP BY id ";
-  q += `ORDER BY ${sets.sortBy} ${sets.sortDir} `;
-  return q
-};
 
 // importing old database from JSON
 exports.importDatabase = async (req, res) => {
   if (!req.body) return res.sendStatus(400)
 
+  // TODO import filters with new filtering system
   let itemsIds = []
   let metaIds = []
   let mediaIds = []
@@ -337,6 +284,25 @@ exports.importDatabase = async (req, res) => {
     for (let m of obj.meta) {
       await Meta.create(m, {
         include: [MetaSetting, PageSetting]
+      }).then(async cm => {
+        if (cm.type === 'array') {
+          const [cf, isC] = await SavedFilter.findOrCreate({
+            where: {
+              name: null,
+              metaId: cm.id
+            }
+          })
+
+          if (isC) {
+            await PageSetting.update({
+              filterId: cf.id
+            }, {
+              where: {
+                metaId: cm.id
+              }
+            })
+          }
+        }
       }).catch(e => {
         console.log(e)
       })
@@ -375,25 +341,26 @@ exports.importDatabase = async (req, res) => {
         metaId: meta.id
       })
     }
-  }).then(async () => {
-    await Playlist.bulkCreate(obj.playlists)
-  }).then(async () => {
-    for (let playlist of obj.playlists) {
-      const p = await Playlist.findOne({
-        where: {
-          oldId: playlist.oldId
-        }
-      })
-      if (p === null) continue
-      for (let i of playlist.videos) {
-        let media = mediaIds.find(x => x.oldId === i)
-        if (!media) continue
-        else await VideosInPlaylist.create({
-          playlistId: p.id,
-          mediaId: media.id
-        })
-      }
-    }
+    // }).then(async () => {
+    //   await Playlist.bulkCreate(obj.playlists)
+    // }).then(async () => {
+    // TODO Remake playlist with meta
+    // for (let playlist of obj.playlists) {
+    //   const p = await Playlist.findOne({
+    //     where: {
+    //       oldId: playlist.oldId
+    //     }
+    //   })
+    //   if (p === null) continue
+    //   for (let i of playlist.videos) {
+    //     let media = mediaIds.find(x => x.oldId === i)
+    //     if (!media) continue
+    //     else await VideosInPlaylist.create({
+    //       playlistId: p.id,
+    //       mediaId: media.id
+    //     })
+    //   }
+    // }
   }).then(async () => {
     let markers = []
     for (let marker of obj.markers) {

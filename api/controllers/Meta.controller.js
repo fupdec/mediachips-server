@@ -2,7 +2,8 @@ const db = require("../index.js");
 const {
   Meta,
   MetaSetting,
-  PageSetting
+  PageSetting,
+  SavedFilter
 } = require("../index.js");
 const Op = db.Sequelize.Op;
 const fs = require("fs")
@@ -14,12 +15,29 @@ exports.create = (req, res) => {
       include: [MetaSetting, PageSetting],
       raw: true
     })
-    .then(data => {
+    .then(async data => {
       const m = data.dataValues
       if (m.type == 'array') {
         const userfiles = path.join(__dirname, '../../userfiles')
         const metaFolder = path.join(userfiles, `media/meta/${m.id}`, );
         if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
+
+        const [cf, isC] = await SavedFilter.findOrCreate({
+          where: {
+            name: null,
+            metaId: m.id
+          }
+        })
+
+        if (isC) {
+          await PageSetting.update({
+            filterId: cf.id
+          }, {
+            where: {
+              metaId: m.id
+            }
+          })
+        }
       }
 
       res.status(201).send(data)
@@ -50,20 +68,20 @@ exports.findAll = (req, res) => {
 // Find a single Meta with an id
 exports.findOne = (req, res) => {
   Meta.findOne({
-    where: {
-      id: req.params.id
-    },
-    include: {
-      model: MetaSetting
-    },
-  })
-  .then(data => {
-    res.status(201).send(data)
-  }).catch(err => {
-    res.status(500).send({
-      message: err.message || "Some error occurred while performing query."
+      where: {
+        id: req.params.id
+      },
+      include: {
+        model: MetaSetting
+      },
     })
-  })
+    .then(data => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
 };
 
 // Find a single Meta with an id

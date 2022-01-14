@@ -18,10 +18,12 @@ export default new Vuex.Store({
       nameSingular: "Item",
       icon: "shape",
     },
+    items: [],
+    filters: [],
     pageSettings: {
       page: 1,
       limit: 20,
-      query: "",
+      filterId: null,
       size: 3,
       sortBy: "name",
       sortDir: "asc",

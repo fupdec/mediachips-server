@@ -1,3 +1,5 @@
+const Cols = require('../../filter-cols')
+
 const Readable = {
   install(Vue, options) {
     Vue.prototype.$checkCurrentPage = function (page) {
@@ -125,6 +127,57 @@ const Readable = {
           options.store.state.hover.show = false
       }, 5000)
     }
+    Vue.prototype.$filterItems = function (sets, itemsType) {
+      /** 
+       * Creating query for getting items from database.
+       * @param {array} filters - with filter objects.
+       */
+      let filters = sets.filters
+      let videoCols = Cols.video.map(i => i.by)
+      const isFilterByVideo = filters.some(i => videoCols.includes(i.by))
+      const isFilterTypeArray = filters.some(i => i.type === 'array')
+
+      const parseFilters = (arr) => {
+        let q = ""
+        for (let i of arr) {
+          if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
+          if (i.type === 'string') {
+            q += `AND ${i.by} ${i.cond} `;
+            if (!i.cond.includes('null')) {
+              q += `'%${i.val}%' `;
+            }
+          } else if (i.type === 'number') {
+            q += `AND ${i.by} ${i.cond} ${i.val} `;
+          } else if (i.type === 'date') {
+            q += `AND ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
+          } else if (i.type === 'array') {
+            q += `AND itemsIn${itemsType}.childItemId ${i.cond} (${i.val.join()}) `;
+          }
+        }
+        return q
+      }
+
+      let q = `SELECT * FROM ${itemsType} `;
+      if (isFilterByVideo) {
+        q += "INNER JOIN videoMetadata ON media.id = videoMetadata.mediaId ";
+      }
+      if (isFilterTypeArray) {
+        if (itemsType == 'media') {
+          q += "INNER JOIN itemsInMedia ON media.id = itemsInMedia.mediaId ";
+        } else if (itemsType == 'items') {
+          q += "INNER JOIN itemsInItems ON items.id = itemsInItems.itemId ";
+        }
+      }
+      if (itemsType == 'media') {
+        q += `WHERE typeId = ${sets.typeId} `;
+      } else if (itemsType == 'items') {
+        q += `WHERE metaId = ${sets.metaId} `;
+      }
+      q += parseFilters(filters);
+      q += "GROUP BY id ";
+      q += `ORDER BY ${sets.sortBy} ${sets.sortDir} `;
+      return q
+    };
   }
 }
 

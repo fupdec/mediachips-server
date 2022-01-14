@@ -12,28 +12,18 @@ exports.create = (req, res) => {};
 
 // Retrieve all Media from the database.
 exports.findAll = (req, res) => {
-  let sets = req.body 
-  db.sequelize.query(Functions.filterItems(sets, 'media'), {
+  db.sequelize.query(req.body.query, {
     raw: true
   }).then(async data => {
-    const limit = sets.limit ? +sets.limit : 20
-    const start = sets.page ? +sets.page * limit : 0
-    const end = start + limit
-    const total = data[0].length
-    const pages = Math.ceil(total / limit)
-    const items = data[0]
-    const totalRows = await Media.findAndCountAll({
+    const total = await Media.findAndCountAll({
       where: {
-        typeId: sets.typeId,
+        typeId: req.body.typeId,
       },
       raw: true
     })
-
     res.status(201).send({
-      items: items.slice(start, end),
-      total: total,
-      pages: pages,
-      totalRows: totalRows.count
+      items: data[0],
+      total: total.count,
     })
   }).catch(err => {
     res.status(500).send({

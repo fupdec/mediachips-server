@@ -115,6 +115,14 @@ export default {
         return (this.$store.state.settings = value);
       },
     },
+    filters: {
+      get() {
+        return this.$store.state.filters;
+      },
+      set(value) {
+        return (this.$store.state.filters = value);
+      },
+    },
     route() {
       return this.$route.path;
     },
@@ -124,13 +132,11 @@ export default {
     isMediaPage() {
       return Vue.prototype.$checkCurrentPage("media");
     },
-    filters: {
-      get() {
-        return this.$store.state.filters;
-      },
-      set(value) {
-        return (this.$store.state.filters = value);
-      },
+    typeId() {
+      return +this.$router.history.current.query.typeId;
+    },
+    metaId() {
+      return +this.$router.history.current.query.metaId;
     },
   },
   methods: {
@@ -138,7 +144,20 @@ export default {
       if (this.isMetaPage) await this.getMeta();
       else if (this.isMediaPage) await this.getMedia();
       await this.getPageSettings();
-      await this.getItems();
+      await this.getFilters();
+    },
+    async getFilters() {
+      let query = "?";
+      if (this.metaId) query += `metaId=${this.metaId}`;
+      if (this.typeId) query += `&typeId=${this.typeId}`;
+      await axios
+        .get(this.apiUrl + "/api/SavedFilter/page" + query)
+        .then((res) => {
+          this.$store.state.filters = res.data || [];
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     async getPageSettings() {
       let query = "";
@@ -201,22 +220,21 @@ export default {
           console.log(e);
         });
     },
-    async getItems() {
+    async getItemsFromDb() {
       let url = "/api/";
       let sets = {};
+      sets.sortBy = this.sets.sortBy;
+      sets.sortDir = this.sets.sortDir;
+      sets.filters = this.filters;
       if (this.isMetaPage) {
         url += "item/filter";
         sets.metaId = this.$route.query.metaId;
+        sets.query = Vue.prototype.$filterItems(sets, "items");
       } else if (this.isMediaPage) {
         url += "media/filter";
         sets.typeId = this.$route.query.typeId;
+        sets.query = Vue.prototype.$filterItems(sets, "media");
       }
-      sets.page = this.sets.page - 1;
-      sets.limit = this.sets.limit;
-      sets.sortBy = this.sets.sortBy;
-      sets.sortDir = this.sets.sortDir;
-      sets.query = this.sets.query || "";
-      sets.filters = this.filters;
 
       this.isQueryRun = true;
       await axios({
@@ -226,32 +244,41 @@ export default {
       })
         .then((res) => {
           this.isQueryRun = false;
-          this.items = res.data.items;
-          this.total = res.data.total;
-          this.pages = res.data.pages;
-          this.totalInDb = res.data.totalRows;
-          // TODO jump to the fisrt page if current page greater than total pages
+          const items = res.data.items;
+          this.$store.state.items = _.cloneDeep(items);
+          this.totalInDb = res.data.total;
+          this.getItems();
         })
         .catch((e) => {
           this.isQueryRun = false;
           console.log(e);
         });
     },
+    getItems() {
+      const items = _.cloneDeep(this.$store.state.items);
+      const start = (this.sets.page - 1) * this.sets.limit;
+      const end = start + this.sets.limit;
+      this.total = items.length;
+      this.pages = Math.ceil(this.total / this.sets.limit);
+      this.items = items.slice(start, end);
+      // TODO infinite scroll of pages
+      // TODO jump to the fisrt page if current page greater than total pages
+    },
     async changePage(e) {
       this.sets.page = e;
+      this.getItems();
       await this.updatePageSetting({ page: e });
-      await this.getItems();
     },
   },
   watch: {
-    "sets.query"(val, old) {
+    filters(val, old) {
       if (val === old) return;
       this.updatePageSetting({
         page: 1,
         query: val,
       });
       this.sets.page = 1;
-      this.getItems();
+      this.getItemsFromDb();
     },
     "sets.limit"(val, old) {
       if (val === old) return;
@@ -269,15 +296,12 @@ export default {
     "sets.sortBy"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ sortBy: val });
-      this.getItems();
+      this.getItemsFromDb();
     },
     "sets.sortDir"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ sortDir: val });
-      this.getItems();
-    },
-    filters() {
-      this.getItems();
+      this.getItemsFromDb();
     },
   },
 };

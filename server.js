@@ -77,7 +77,7 @@ try {
 const Settings = require('./default-settings.js')
 db.sequelize.sync().then(async () => {
   // create media type: videos
-  await db.MediaType.findOrCreate({
+  const [videoType, createdVideo] = await db.MediaType.findOrCreate({
     where: {
       name: 'Videos',
     },
@@ -91,6 +91,26 @@ db.sequelize.sync().then(async () => {
     },
     include: [db.PageSetting]
   })
+  
+  if (createdVideo) {
+    const [filter, createdFilter] = await db.SavedFilter.findOrCreate({
+      where: {
+        name: null,
+        typeId: videoType.id
+      }
+    })
+
+    if (createdFilter) {
+      await db.PageSetting.update({
+        filterId: filter.id
+      },{
+        where: {
+          typeId: videoType.id
+        }
+      })
+    }
+  }
+
   await db.Setting.bulkCreate(Settings, {
     ignoreDuplicates: true
   })
@@ -111,7 +131,10 @@ app.use(staticFileMiddleware)
 // REST api
 require("./api/routes/ChildMeta.routes")(app)
 require("./api/routes/Functions.routes")(app)
+require("./api/routes/FilterRow.routes")(app)
+require("./api/routes/FilterRowsInSavedFilter.routes")(app)
 require("./api/routes/Item.routes")(app)
+require("./api/routes/ItemsInFilterRow.routes")(app)
 require("./api/routes/ItemsInItem.routes")(app)
 require("./api/routes/ItemsInMedia.routes")(app)
 require("./api/routes/Marker.routes")(app)
@@ -121,6 +144,7 @@ require("./api/routes/Meta.routes")(app)
 require("./api/routes/MetaInMediaType.routes")(app)
 require("./api/routes/MetaSetting.routes")(app)
 require("./api/routes/PageSetting.routes")(app)
+require("./api/routes/SavedFilter.routes")(app)
 require("./api/routes/Setting.routes")(app)
 require("./api/routes/ValuesInItem.routes")(app)
 require("./api/routes/ValuesInMedia.routes")(app)

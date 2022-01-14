@@ -25,7 +25,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         defaultValue: 'asc',
       },
-      query: Sequelize.TEXT,
       firstChar: Sequelize.TEXT,
       colors: Sequelize.TEXT,
     }, {

@@ -1,5 +1,16 @@
 <template>
   <v-form ref="form" v-model="valid">
+    <v-btn
+      v-show="index != 0"
+      @click="toggleUnion"
+      outlined
+      rounded
+      x-small
+      class="mb-2"
+    >
+      {{ filter.union === "AND" ? "AND" : "OR" }}
+    </v-btn>
+
     <v-card outlined class="filter-row pa-2 mb-2">
       <v-autocomplete
         @input="setBy($event)"
@@ -209,6 +220,7 @@ import axios from "axios";
 export default {
   props: {
     filter: Object,
+    index: Number,
     listBy: Array,
   },
   mounted() {
@@ -234,6 +246,10 @@ export default {
     setVal(val) {
       this.$emit("setVal", val);
     },
+    toggleUnion() {
+      const val = this.filter.union === "AND" ? "OR" : "AND";
+      this.$emit("setUnion", val);
+    },
     duplicate() {
       this.$emit("duplicate");
     },
@@ -241,11 +257,11 @@ export default {
       let sets = {};
       sets.metaId = metaId;
       sets.page = 0;
-      sets.limit = 1000;
+      sets.limit = 10000;
       sets.sortBy = "name";
       sets.sortDir = "asc";
-      sets.query = "";
       sets.filters = [];
+      sets.query = Vue.prototype.$filterItems(sets, "items");
 
       await axios
         .get(this.apiUrl + "/api/meta/" + metaId)

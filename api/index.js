@@ -14,7 +14,10 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 const ChildMeta = require("./models/ChildMeta.model")(sequelize, Sequelize);
+const FilterRow = require("./models/FilterRow.model")(sequelize, Sequelize);
+const FilterRowsInSavedFilter = require("./models/FilterRowsInSavedFilter.model")(sequelize, Sequelize);
 const Item = require("./models/Item.model")(sequelize, Sequelize);
+const ItemsInFilterRow = require("./models/ItemsInFilterRow.model")(sequelize, Sequelize);
 const ItemsInItem = require("./models/ItemsInItem.model")(sequelize, Sequelize);
 const ItemsInMedia = require("./models/ItemsInMedia.model")(sequelize, Sequelize);
 const Marker = require("./models/Marker.model")(sequelize, Sequelize);
@@ -24,12 +27,11 @@ const Meta = require("./models/Meta.model")(sequelize, Sequelize);
 const MetaInMediaType = require("./models/MetaInMediaType.model")(sequelize, Sequelize);
 const MetaSetting = require("./models/MetaSetting.model")(sequelize, Sequelize);
 const PageSetting = require("./models/PageSetting.model")(sequelize, Sequelize);
-const Playlist = require("./models/Playlist.model")(sequelize, Sequelize);
+const SavedFilter = require("./models/SavedFilter.model")(sequelize, Sequelize);
 const Setting = require("./models/Setting.model")(sequelize, Sequelize);
 const ValuesInItem = require("./models/ValuesInItem.model")(sequelize, Sequelize);
 const ValuesInMedia = require("./models/ValuesInMedia.model")(sequelize, Sequelize);
 const VideoMetadata = require("./models/VideoMetadata.model")(sequelize, Sequelize);
-const VideosInPlaylist = require("./models/VideosInPlaylist.model")(sequelize, Sequelize);
 const WatchedFolder = require("./models/WatchedFolder.model")(sequelize, Sequelize);
 
 
@@ -48,22 +50,6 @@ Media.hasOne(VideoMetadata, {
   foreignKey: 'mediaId'
 })
 VideoMetadata.belongsTo(Media, {
-  foreignKey: 'mediaId'
-})
-
-VideosInPlaylist.removeAttribute('id')
-Playlist.hasMany(VideosInPlaylist, {
-  onDelete: "cascade",
-  foreignKey: 'playlistId'
-})
-VideosInPlaylist.belongsTo(Playlist, {
-  foreignKey: 'playlistId'
-})
-Media.hasMany(VideosInPlaylist, {
-  onDelete: "cascade",
-  foreignKey: 'mediaId'
-})
-VideosInPlaylist.belongsTo(Media, {
   foreignKey: 'mediaId'
 })
 
@@ -195,9 +181,66 @@ WatchedFolder.belongsTo(MediaType, {
   foreignKey: 'typeId'
 })
 
+Meta.hasMany(SavedFilter, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+SavedFilter.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
+MediaType.hasMany(SavedFilter, {
+  foreignKey: 'typeId',
+  onDelete: "cascade"
+})
+SavedFilter.belongsTo(MediaType, {
+  foreignKey: 'typeId'
+})
+SavedFilter.hasMany(PageSetting, {
+  foreignKey: 'filterId',
+  onDelete: "cascade"
+})
+PageSetting.belongsTo(SavedFilter, {
+  foreignKey: 'filterId'
+})
+
+FilterRowsInSavedFilter.removeAttribute('id')
+SavedFilter.hasMany(FilterRowsInSavedFilter, {
+  foreignKey: 'filterId',
+  onDelete: "cascade"
+})
+FilterRowsInSavedFilter.belongsTo(SavedFilter, {
+  foreignKey: 'filterId'
+})
+FilterRow.hasMany(FilterRowsInSavedFilter, {
+  foreignKey: 'rowId',
+  onDelete: "cascade"
+})
+FilterRowsInSavedFilter.belongsTo(FilterRow, {
+  foreignKey: 'rowId'
+})
+
+ItemsInFilterRow.removeAttribute('id')
+Item.hasMany(ItemsInFilterRow, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+ItemsInFilterRow.belongsTo(Item, {
+  foreignKey: 'itemId'
+})
+FilterRow.hasMany(ItemsInFilterRow, {
+  foreignKey: 'rowId',
+  onDelete: "cascade"
+})
+ItemsInFilterRow.belongsTo(FilterRow, {
+  foreignKey: 'rowId'
+})
+
 
 db.ChildMeta = ChildMeta
+db.FilterRow = FilterRow
+db.FilterRowsInSavedFilter = FilterRowsInSavedFilter
 db.Item = Item
+db.ItemsInFilterRow = ItemsInFilterRow
 db.ItemsInItem = ItemsInItem
 db.ItemsInMedia = ItemsInMedia
 db.Marker = Marker
@@ -207,12 +250,11 @@ db.Meta = Meta
 db.MetaInMediaType = MetaInMediaType
 db.MetaSetting = MetaSetting
 db.PageSetting = PageSetting
-db.Playlist = Playlist
+db.SavedFilter = SavedFilter
 db.Setting = Setting
 db.ValuesInItem = ValuesInItem
 db.ValuesInMedia = ValuesInMedia
 db.VideoMetadata = VideoMetadata
-db.VideosInPlaylist = VideosInPlaylist
 db.WatchedFolder = WatchedFolder
 
 module.exports = db;

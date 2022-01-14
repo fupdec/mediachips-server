@@ -8,8 +8,8 @@
       width="1200"
     >
       <v-card>
-        <div class="d-flex justify-space-between">
-          <div class="headline ma-4">Filter {{ page.name }}</div>
+        <div class="d-flex justify-space-between align-center">
+          <div class="headline mx-4">Filter {{ page.name }}</div>
           <div
             class="
               d-flex
@@ -36,11 +36,13 @@
               v-for="(f, i) in filters"
               :key="i"
               :filter="f"
+              :index="i"
               :listBy="listBy"
               ref="filterRow"
               @setBy="setBy($event, i)"
               @setCond="setCond($event, i)"
               @setVal="setVal($event, i)"
+              @setUnion="setUnion($event, i)"
               @remove="remove(i)"
               @duplicate="duplicate(i)"
               @pickDate="pickDate(i)"
@@ -54,7 +56,7 @@
           <div>No filters</div>
         </div>
 
-        <v-card-actions>
+        <v-card-actions class="pb-4">
           <v-spacer></v-spacer>
           <v-btn
             @click="add"
@@ -109,8 +111,8 @@ export default {
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mounted() {
-    this.$nextTick(function () {
-      this.init();
+    this.$nextTick(async () => {
+      await this.init();
     });
   },
   data: () => ({
@@ -189,6 +191,8 @@ export default {
       this.listBy.sort((a, b) =>
         a.text > b.text ? 1 : b.text > a.text ? -1 : 0
       );
+
+      this.filters = this.$store.state.filters;
     },
     add() {
       this.filters.push({
@@ -198,6 +202,7 @@ export default {
         val: null,
         flag: null,
         lock: false,
+        union: "AND",
       });
     },
     setBy(value, index) {
@@ -213,6 +218,9 @@ export default {
     setVal(value, index) {
       this.filters[index].val = value;
     },
+    setUnion(value, index) {
+      this.filters[index].union = value;
+    },
     duplicate(index) {
       const filter = _.cloneDeep(this.filters[index]);
       this.filters.push(filter);
@@ -223,15 +231,52 @@ export default {
     removeAll() {
       this.filters = [];
     },
-    apply() {
+    async apply() {
       if (this.filters.length) {
         for (let i of this.$refs.filterRow) {
           i.validate();
         }
       }
       if (!this.valid) return;
-      this.$store.state.filters = this.filters;
+      this.addFilterRows();
+      this.$store.state.filters = _.cloneDeep(this.filters);
       this.$emit("close");
+    },
+    async addSavedFilter() {
+      for (let f of this.filters) {
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/FilterRow",
+          data: {
+            id: f.id,
+            filter: f,
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    },
+    async addFilterRows() {
+      for (let f of this.filters) {
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/FilterRow",
+          data: {
+            id: f.id,
+            filter: f,
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
     },
     close() {
       this.$emit("close");
