@@ -1,13 +1,18 @@
 <template>
   <v-lazy>
-    <v-card :class="{ favorite: item.favorite }" outlined hover class="meta-card">
+    <v-card
+      :class="{ favorite: item.favorite }"
+      outlined
+      hover
+      class="meta-card"
+    >
       <div class="img-container">
         <v-icon
           v-if="meta.metaSetting.color"
           class="meta-color"
           :color="item.color"
-          >mdi-circle</v-icon
-        >
+          v-html="'mdi-circle'"
+        />
         <!-- <div v-if="meta.metaSetting.country" class="country"> <div v-for="c in item.country.split(',')" :key="c" class="flag-icon"> {{c}} </div> </div> -->
         <v-img
           :src="images.main"
@@ -34,9 +39,9 @@
           :color="item.favorite ? 'pink' : 'white'"
           class="fav-btn"
         >
-          <v-icon :color="item.favorite ? 'pink' : 'grey'"
-            >mdi-heart-outline</v-icon
-          >
+          <v-icon :color="item.favorite ? 'pink' : 'grey'">
+            mdi-heart-outline
+          </v-icon>
         </v-btn>
         <div v-if="meta.metaSetting.rating" class="rating-wrapper">
           <v-rating
@@ -56,49 +61,50 @@
           class="bookmark"
           color="red"
           :title="item.bookmark"
-          >mdi-bookmark</v-icon
-        >
+          v-html="'mdi-bookmark'"
+        />
       </div>
       <v-icon
         v-if="item.bookmark"
         class="bookmark"
         color="red"
         :title="item.bookmark"
-        >mdi-bookmark</v-icon
-      >
+        v-html="'mdi-bookmark'"
+      />
 
-      <div class="px-1 name">{{ item.name }}</div>
-      <div
-        v-if="meta.metaSetting.synonyms && item.synonyms"
-        class="px-1 synonyms"
-      >
-        <span class="pl-2" /> {{ item.synonyms }}
+      <div class="description">
+        <div class="px-1 name" v-html="item.name" />
+        <div
+          v-if="meta.metaSetting.synonyms && item.synonyms"
+          class="px-1 synonyms text--secondary"
+          v-html="item.synonyms"
+        />
+
+        <v-chip title="Number of videos">
+          <v-icon class="mr-1">mdi-video-outline</v-icon> {{ numberOfMedia }}
+        </v-chip>
+        <v-chip title="Number of views">
+          <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
+        </v-chip>
+
+        <v-chip
+          v-for="i in items"
+          :key="i.itemId + i.childItemId"
+          @mouseover.stop="hoverImage($event, i['item.metaId'], i.childItemId)"
+          @mouseleave.stop="$store.state.hover.show = false"
+          :color="i['item.color']"
+          :text-color="getTextColor(i['item.color'])"
+          :title="i.meta.name"
+        >
+          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+          {{ i["item.name"] }}
+        </v-chip>
+
+        <v-chip v-for="(v, i) in values" :key="i" :title="v.meta.name">
+          <v-icon class="mr-1">mdi-{{ v.meta.icon }}</v-icon>
+          {{ v.value }}
+        </v-chip>
       </div>
-
-      <v-chip title="Number of videos">
-        <v-icon class="mr-1">mdi-video-outline</v-icon> {{ numberOfMedia }}
-      </v-chip>
-      <v-chip title="Number of views">
-        <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
-      </v-chip>
-
-      <v-chip
-        v-for="i in items"
-        :key="i.itemId + i.childItemId"
-        @mouseover.stop="showHoverImage($event, i.itemId, i.childItemId)"
-        @mouseleave.stop="$store.state.hover.show = false"
-        :color="i['item.color']"
-        :text-color="getTextColor(i['item.color'])"
-        :title="i.meta.name"
-      >
-        <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-        {{ i["item.name"] }}
-      </v-chip>
-
-      <v-chip v-for="(v, i) in values" :key="i" :title="v.meta.name">
-        <v-icon class="mr-1">mdi-{{ v.meta.icon }}</v-icon>
-        {{ v.value }}
-      </v-chip>
     </v-card>
   </v-lazy>
 </template>
@@ -195,7 +201,7 @@ export default {
       if (value) return "white";
       else return "black";
     },
-    showHoverImage(event, metaId, itemId) {
+    hoverImage(event, metaId, itemId) {
       Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
   },

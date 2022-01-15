@@ -1336,13 +1336,20 @@ html {
       font-size: 1.8em;
     }
   }
+  .description {
+    padding: 0.4em;
+  }
   .name {
     line-height: 1.4 !important;
     font-size: 1.2em;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
   }
   .synonyms {
     line-height: 1.4 !important;
     font-size: 0.9em;
+    margin-top: 0.2em;
+    margin-bottom: 0.4em;
   }
   .meta-in-card {
     padding-left: 0.2em;

@@ -1,6 +1,6 @@
 <template>
   <vuescroll>
-    <div class="headline text-h4 d-flex align-center justify-center pt-4">
+    <div class="headline text-h4 d-flex align-center justify-center pt-4 pb-2">
       <v-icon left>mdi-{{ page.icon }}</v-icon> {{ page.name }}
       <span v-if="total != totalInDb" class="body-1 text--secondary ml-2">
         ({{ total }} of {{ totalInDb }})
@@ -14,7 +14,7 @@
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
-      class="pt-4"
+      class="pt-2 pb-1"
     />
 
     <Loading v-show="isQueryRun" />
@@ -42,7 +42,7 @@
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
-      class="pb-10"
+      class="pb-10 pt-2"
     />
 
     <div v-if="0 == total && total == totalInDb" class="text-center">
@@ -55,7 +55,7 @@
       <div>There is no items matching the filters</div>
     </div>
 
-    <div v-if="items.length && isInfiniteScroll" class="text-center">
+    <div v-if="items.length && isInfiniteScroll" class="text-center py-6">
       <Loading
         v-if="loader.show && sets.page != pages"
         v-intersect="infiniteScrolling"
@@ -105,6 +105,7 @@ export default {
     });
     this.$root.$on("setItemsLimit", (val) => {
       this.sets.page = 1;
+      if (val == 101) this.items = [];
       this.updatePageSetting({
         page: 1,
         limit: val,
