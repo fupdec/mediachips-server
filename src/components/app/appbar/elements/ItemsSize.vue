@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-badge
-            :content="sizes[size - 1]"
+            :content="badge"
             class="text-uppercase"
             color="secondary"
             overlap
@@ -26,9 +26,9 @@
         mandatory
         color="primary"
       >
-        <v-list-item v-for="(s, i) in sizes" :key="i" :value="i + 1">
+        <v-list-item v-for="i in sizes" :key="i.value" :value="i.value">
           <v-list-item-content>
-            <v-list-item-title v-text="s"></v-list-item-title>
+            <v-list-item-title v-text="i.text"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
@@ -41,8 +41,28 @@
 export default {
   name: "ItemSize",
   data: () => ({
-    size: 3,
-    sizes: ["XS", "S", "M", "L", "XL"],
+    sizes: [
+      {
+        value: 1,
+        text: "XS",
+      },
+      {
+        value: 2,
+        text: "S",
+      },
+      {
+        value: 3,
+        text: "M",
+      },
+      {
+        value: 4,
+        text: "L",
+      },
+      {
+        value: 5,
+        text: "XL",
+      },
+    ],
   }),
   computed: {
     sets: {
@@ -53,15 +73,20 @@ export default {
         return (this.$store.state.pageSettings = value);
       },
     },
+    badge() {
+      const index = this.sizes.findIndex((i) => i.value == this.sets.size)
+      if (index > -1) return this.sizes[index].text
+      else return 'M'
+    },
+    size() {
+      const index = this.sizes.findIndex((i) => i.value == this.sets.size)
+      if (index > -1) return this.sizes[index].value
+      else return 3
+    },
   },
   methods: {
     update(val) {
       this.sets.size = val;
-    },
-  },
-  watch: {
-    "sets.size"(val) {
-      this.size = val;
     },
   },
 };
