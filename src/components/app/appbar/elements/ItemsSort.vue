@@ -142,9 +142,11 @@ export default {
     },
     toggleDir() {
       this.sets.sortDir = this.sets.sortDir === "asc" ? "desc" : "asc";
+      this.$root.$emit("setItemsSortDir", this.sets.sortDir)
     },
     update(val) {
       this.sets.sortBy = val;
+      this.$root.$emit("setItemsSortBy", val)
     },
   },
 };

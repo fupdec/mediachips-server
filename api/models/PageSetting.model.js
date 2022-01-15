@@ -15,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       limit: {
         type: Sequelize.INTEGER,
-        defaultValue: 25,
+        defaultValue: 101,
       },
       sortBy: {
         type: Sequelize.TEXT,

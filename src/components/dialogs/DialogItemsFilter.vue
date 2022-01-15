@@ -241,6 +241,7 @@ export default {
       this.addFilterRows();
       this.$store.state.filters = _.cloneDeep(this.filters);
       this.$emit("close");
+      this.$root.$emit("setItemsFilters")
     },
     async addSavedFilter() {
       for (let f of this.filters) {
