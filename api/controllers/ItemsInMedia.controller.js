@@ -1,7 +1,8 @@
 const db = require("../index.js");
 const {
   Item,
-  ItemsInMedia
+  ItemsInMedia,
+  Meta
 } = require("../index.js");
 const Op = db.Sequelize.Op;
 
@@ -21,6 +22,22 @@ exports.findAll = (req, res) => {
       attributes: ['name', 'color', 'metaId'],
     }],
     raw: true
+  }).then(async (data) => {
+    let result = []
+    for (let val of data) {
+      await Meta.findByPk(val['item.metaId'], {
+        attributes: ['name', 'icon'],
+        raw: true,
+      }).then(meta => {
+        result.push({
+          ...val,
+          ...{
+            meta: meta
+          }
+        })
+      })
+    }
+    return result
   }).then(data => {
     res.status(201).send(data)
   }).catch(err => {

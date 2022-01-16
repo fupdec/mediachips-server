@@ -28,21 +28,23 @@
           position="top"
           class="secondary-img"
         />
+
         <div v-if="images.custom1" class="custom1-img-button">1</div>
         <v-img :src="images.custom1" class="custom1-img" />
         <div v-if="images.custom2" class="custom2-img-button">2</div>
         <v-img :src="images.custom2" class="custom2-img" />
+
         <v-btn
           v-if="meta.metaSetting.favorite"
-          icon
-          absolute
-          :color="item.favorite ? 'pink' : 'white'"
           class="fav-btn"
+          color="pink"
+          absolute
+          icon
         >
-          <v-icon :color="item.favorite ? 'pink' : 'grey'">
-            mdi-heart-outline
-          </v-icon>
+          <v-icon v-if="item.favorite" color="pink"> mdi-heart </v-icon>
+          <v-icon v-else color="grey"> mdi-heart-outline </v-icon>
         </v-btn>
+
         <div v-if="meta.metaSetting.rating" class="rating-wrapper">
           <v-rating
             :value="item.rating"
@@ -56,6 +58,7 @@
             half-icon="mdi-star-half-full"
           />
         </div>
+
         <v-icon
           v-if="meta.metaSetting.bookmark && item.bookmark"
           class="bookmark"
@@ -64,6 +67,7 @@
           v-html="'mdi-bookmark'"
         />
       </div>
+      
       <v-icon
         v-if="item.bookmark"
         class="bookmark"
@@ -80,10 +84,10 @@
           v-html="item.synonyms"
         />
 
-        <v-chip title="Number of videos">
+        <v-chip label outlined title="Number of videos">
           <v-icon class="mr-1">mdi-video-outline</v-icon> {{ numberOfMedia }}
         </v-chip>
-        <v-chip title="Number of views">
+        <v-chip label outlined title="Number of views">
           <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
         </v-chip>
 
@@ -100,7 +104,13 @@
           {{ i["item.name"] }}
         </v-chip>
 
-        <v-chip v-for="(v, i) in values" :key="i" :title="v.meta.name">
+        <v-chip
+          v-for="(v, i) in values"
+          :key="i"
+          label
+          outlined
+          :title="v.meta.name"
+        >
           <v-icon class="mr-1">mdi-{{ v.meta.icon }}</v-icon>
           {{ v.value }}
         </v-chip>

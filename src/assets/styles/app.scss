@@ -461,19 +461,6 @@ html {
 .video-preview-container {
   transition: 0.2s all ease;
   border-radius: 5px 5px 0 0;
-  &:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    z-index: 1;
-    opacity: 0;
-    background-image: linear-gradient(225deg, #ff004b 0%, rgba(0, 0, 0, 0) 13%, rgba(0, 0, 0, 0));
-    transition: 1s all ease;
-    pointer-events: none;
-  }
   .thumb {
     width: 100%;
     position: absolute;
@@ -535,8 +522,7 @@ html {
 }
 .video-card-title {
   font-size: 1.1em;
-  padding: 0.3em 8px;
-  letter-spacing: -0.2px !important;
+  margin-bottom: 0.4em;
   overflow: hidden;
   white-space: nowrap;
   position: relative;
@@ -720,11 +706,11 @@ html {
   }
 }
 .fav-btn {
-  top: 0;
-  right: 0;
+  top: 0.2em;
+  right: 0.2em;
   opacity: 0.7;
   z-index: 1;
-  text-shadow: 0px 0px 2px #000;
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.7);
   &:hover {
     opacity: 1;
   }
@@ -1157,7 +1143,7 @@ html {
     }
   }
   &.favorite {
-    &:before {
+    &::after {
       content: "";
       position: absolute;
       width: 100%;
@@ -1166,7 +1152,7 @@ html {
       top: 0;
       border-radius: 4px;
       pointer-events: none;
-      box-shadow: 0px 2px 8px 3px rgba(255, 0, 75, 0.25), 0 0 0 1px rgba(255, 0, 75, 1);
+      box-shadow: 0px 2px 8px 3px rgba(255, 0, 75, 0.25), 0 0 0 1px #ff004b;
     }
     .main-img:before {
       opacity: 1;
@@ -1195,19 +1181,6 @@ html {
       .secondary-img {
         opacity: 1;
       }
-    }
-    &:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 1;
-      opacity: 0;
-      background-image: linear-gradient(225deg, rgba(255, 0, 75, 1) 0%, rgba(0, 0, 0, 0) 12%, rgba(0, 0, 0, 0));
-      transition: 1s all ease;
-      pointer-events: none;
     }
   }
   .secondary-img {
@@ -1300,12 +1273,12 @@ html {
   }
   .meta-color.v-icon {
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 0.2em;
+    top: 0.2em;
     z-index: 1;
     text-shadow: 0 0 3px #00000070;
     &:before {
-      font-size: 1.3em;
+      font-size: 1em;
     }
     & + .country {
       top: 2em;
@@ -1397,23 +1370,23 @@ html {
 }
 .card-grid {
   display: grid;
-  grid-gap: 10px;
+  grid-gap: 15px 10px;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   &.gap-size {
     &-xs {
-      grid-gap: 10px;
+      grid-gap: 15px 10px;
     }
     &-s {
-      grid-gap: 15px;
+      grid-gap: 20px 15px;
     }
     &-m {
-      grid-gap: 20px;
+      grid-gap: 25px 20px;
     }
     &-l {
-      grid-gap: 25px;
+      grid-gap: 30px 25px;
     }
     &-xl {
-      grid-gap: 30px;
+      grid-gap: 35px 30px;
     }
   }
   &.card-size {

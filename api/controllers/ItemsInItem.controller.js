@@ -26,7 +26,7 @@ exports.findAll = (req, res) => {
       await Meta.findByPk(val['item.metaId'], {
         attributes: ['name', 'icon'],
         raw: true,
-      }).then((meta)=>{
+      }).then(meta => {
         result.push({
           ...val,
           ...{
@@ -36,8 +36,8 @@ exports.findAll = (req, res) => {
       })
     }
     return result
-  }).then(async (result) => {
-    res.status(201).send(result)
+  }).then(data => {
+    res.status(201).send(data)
   }).catch(err => {
     res.status(500).send({
       message: err.message || "Some error occurred while performing query."

@@ -10,16 +10,16 @@ import vuescroll from 'vuescroll'
 Vue.use(vuescroll, {
   ops: {
     rail: {
-      size: '14px',
-      specifyBorderRadius: '0',
+      size: '15px',
+      specifyBorderRadius: '15px',
       gutterOfEnds: '0',
       gutterOfSide: '0',
     },
     bar: {
       background: '#555',
-      opacity: 0.6,
+      opacity: 0.7,
       minSize: 0.2,
-      size: '14px',
+      size: '15px',
     }
   }
 })

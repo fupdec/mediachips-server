@@ -24,15 +24,9 @@
           clearable
         />
 
-        <v-btn
-          icon
-          absolute
-          :color="video.favorite ? 'pink' : 'white'"
-          class="fav-btn"
-        >
-          <v-icon :color="video.favorite ? 'pink' : 'grey'"
-            >mdi-heart-outline</v-icon
-          >
+        <v-btn class="fav-btn" color="pink" absolute icon>
+          <v-icon v-if="video.favorite" color="pink"> mdi-heart </v-icon>
+          <v-icon v-else color="grey"> mdi-heart-outline </v-icon>
         </v-btn>
 
         <div class="duration">{{ duration }}</div>
@@ -48,42 +42,41 @@
 
         <!-- <video @click="mountSrc" ref="video" controls /> -->
       </v-responsive>
-      <!-- <div>VideoID: {{video.id}}</div> -->
-      <div class="video-card-title" :title="fileName" v-html="fileName" />
 
-      <!-- Video meta -->
-      <v-chip label class="props px-2 py-1 mt-0 mx-1">
-        <div label outlined class="prop" :title="video.path">
-          <v-icon>mdi-folder-outline</v-icon>
-          <span class="value">Path</span>
-        </div>
-        <div label outlined class="prop">
-          <v-icon>mdi-file-video</v-icon>
+      <div class="description">
+        <div class="video-card-title" :title="fileName" v-html="fileName" />
+
+        <!-- Video meta -->
+        <v-chip label outlined :title="video.path">
+          <v-icon left>mdi-folder-outline</v-icon> Path
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-file-video-outline</v-icon>
           {{ fileExtension }}
-        </div>
-        <div label outlined class="prop">
-          <v-icon>mdi-monitor-screenshot</v-icon>
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-monitor-screenshot</v-icon>
           {{ metadata.width + "x" + metadata.height }}
-        </div>
-        <div label outlined class="prop">
-          <v-icon>mdi-harddisk</v-icon>
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-harddisk</v-icon>
           {{ filesize }}
-        </div>
-      </v-chip>
+        </v-chip>
 
-      <v-chip
-        v-for="i in meta"
-        :key="i.itemId"
-        @mouseover.stop="showHoverImage($event, i['item.metaId'], i['itemId'])"
-        @mouseleave.stop="$store.state.hover.show = false"
-        :color="i['item.color']"
-        :text-color="getTextColor(i['item.color'])"
-      >
-        {{ i["item.name"] }}
-      </v-chip>
+        <v-chip
+          v-for="i in meta"
+          :key="i.itemId"
+          @mouseover.stop="hoverImage($event, i['item.metaId'], i['itemId'])"
+          @mouseleave.stop="$store.state.hover.show = false"
+          :color="i['item.color']"
+          :text-color="getTextColor(i['item.color'])"
+        >
+          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+          {{ i["item.name"] }}
+        </v-chip>
 
-      <!-- Parse meta -->
-      <!-- <div v-for="(m,i) in metaAssignedToVideos" :key="i">
+        <!-- Parse meta -->
+        <!-- <div v-for="(m,i) in metaAssignedToVideos" :key="i">
         <div v-if="visibility[m.id]&&checkShowEmptyValue(m)" class="meta-in-card">
           <v-chip-group v-if="m.type=='complex'" column>
             <v-icon :title="getMeta(m.id).settings.name">mdi-{{getMeta(m.id).settings.icon}}</v-icon>
@@ -112,14 +105,15 @@
           </div>
         </div>
       </div> -->
+      </div>
 
       <v-icon
         v-if="video.bookmark"
         class="bookmark"
         color="red"
         :title="video.bookmark"
-        >mdi-bookmark</v-icon
-      >
+        v-html="'mdi-bookmark'"
+      />
     </v-card>
   </v-lazy>
 </template>
@@ -267,7 +261,7 @@ export default {
       if (value) return "white";
       else return "black";
     },
-    showHoverImage(event, metaId, itemId) {
+    hoverImage(event, metaId, itemId) {
       Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
   },
