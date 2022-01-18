@@ -117,6 +117,7 @@ export default {
   },
   data: () => ({
     filters: [],
+    filtersForRemove: [],
     listBy: [],
     valid: true,
     datePicker: {
@@ -192,16 +193,18 @@ export default {
         a.text > b.text ? 1 : b.text > a.text ? -1 : 0
       );
 
-      this.filters = this.$store.state.filters;
+      this.filters = _.cloneDeep(this.$store.state.filters);
     },
     add() {
       this.filters.push({
+        id: null,
         by: null,
         type: null,
         cond: null,
         val: null,
         flag: null,
         lock: false,
+        appbar: false,
         union: "AND",
       });
     },
@@ -225,10 +228,13 @@ export default {
       const filter = _.cloneDeep(this.filters[index]);
       this.filters.push(filter);
     },
-    remove(index) {
+    async remove(index) {
+      const filter = _.cloneDeep(this.filters[index]);
+      this.filtersForRemove.push(filter);
       this.filters.splice(index, 1);
     },
     removeAll() {
+      this.filtersForRemove = _.cloneDeep(this.filters);
       this.filters = [];
     },
     async apply() {
@@ -238,37 +244,26 @@ export default {
         }
       }
       if (!this.valid) return;
-      this.addFilterRows();
+      await this.addFilterRows();
+
+      for (let f of this.filtersForRemove) {
+        await axios.delete(this.apiUrl + "/api/FilterRow/" + f.id);
+      }
+      this.filtersForRemove = [];
       this.$store.state.filters = _.cloneDeep(this.filters);
       this.$emit("close");
-      this.$root.$emit("setItemsFilters")
-    },
-    async addSavedFilter() {
-      for (let f of this.filters) {
-        await axios({
-          method: "post",
-          url: this.apiUrl + "/api/FilterRow",
-          data: {
-            id: f.id,
-            filter: f,
-          },
-        })
-          .then((res) => {
-            console.log(res.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      }
+      this.$root.$emit("setItemsFilters");
     },
     async addFilterRows() {
+      let savedFilter = this.$store.state.savedFilter;
       for (let f of this.filters) {
         await axios({
           method: "post",
           url: this.apiUrl + "/api/FilterRow",
           data: {
-            id: f.id,
             filter: f,
+            filterId: savedFilter.id,
+            rowId: f.id,
           },
         })
           .then((res) => {

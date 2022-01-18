@@ -58,7 +58,10 @@ exports.findOneForPage = (req, res) => {
           },
           include: [FilterRow],
         })
-      res.status(201).send(filters)
+      res.status(201).send({
+        filters,
+        savedFilter: data
+      })
     })
     .catch(err => {
       res.status(500).send({

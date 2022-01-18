@@ -3,8 +3,8 @@
     <template v-slot:activator="{ on }">
       <v-btn @click="dialogFilter = true" v-on="on" icon tile>
         <v-badge
-          :value="filterBadge"
-          :content="filteredTotal"
+          :value="filters"
+          :content="filters"
           overlap
           bottom
           style="z-index: 5"
@@ -32,14 +32,14 @@ export default {
   },
   data: () => ({
     dialogFilter: false,
-    filterBadge: "",
-    filteredTotal: "",
   }),
   computed: {
     page() {
       return this.$store.state.page;
     },
+    filters() {
+      return this.$store.state.filters.length;
+    },
   },
-  methods: {},
 };
 </script>

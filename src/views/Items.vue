@@ -96,11 +96,12 @@ export default {
     await this.init();
   },
   mounted() {
-    this.$root.$on("setItemsFilters", (val) => {
+    this.$root.$on("setItemsFilters", async (val) => {
       this.updatePageSetting({
         page: 1,
         query: val,
       });
+      await this.getFilters();
       this.getItemsFromDb();
     });
     this.$root.$on("setItemsLimit", (val) => {
@@ -213,7 +214,15 @@ export default {
       await axios
         .get(this.apiUrl + "/api/SavedFilter/page" + query)
         .then((res) => {
-          this.$store.state.filters = res.data || [];
+          console.log(res.data);
+          this.$store.state.filters =
+            res.data.filters.map((i) => {
+              delete i.filterRow.createdAt
+              delete i.filterRow.updatedAt
+              return i.filterRow
+            }) || [];
+          this.$store.state.savedFilter =
+            _.cloneDeep(res.data.savedFilter) || {};
         })
         .catch((e) => {
           console.log(e);
@@ -295,7 +304,7 @@ export default {
         sets.typeId = this.$route.query.typeId;
         sets.query = Vue.prototype.$filterItems(sets, "media");
       }
-
+console.log(sets.query)
       this.isQueryRun = true;
       this.loader.show = false;
       await axios({

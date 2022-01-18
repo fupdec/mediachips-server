@@ -1,24 +1,47 @@
 const {
   FilterRow,
-  Meta
+  FilterRowsInSavedFilter,
+  ItemsInFilterRow
 } = require("../index.js");
 
 // Create and Save a new FilterRow
-exports.create = (req, res) => {
-  FilterRow.findOrCreate({
+exports.create = async (req, res) => {
+  let filterObj = req.body.filter
+  let val = filterObj.val
+  if (filterObj.type == 'array') filterObj.val = null
+  console.log(req.body)
+  const [filterRow, isCreated] = await FilterRow.findOrCreate({
+    where: {
+      id: req.body.rowId,
+    },
+    defaults: filterObj,
+  })
+  console.log(filterRow, isCreated)
+
+  if (isCreated) {
+    await FilterRowsInSavedFilter.create({
+      filterId: req.body.filterId,
+      rowId: filterRow.id
+    })
+    // TODO delete items from filter value
+    if (filterObj.type == 'array') {
+      for (let i of val) {
+        await ItemsInFilterRow.findOrCreate({
+          where: {
+            itemId: i,
+            rowId: filterRow.id
+          }
+        })
+      }
+    }
+  } else {
+    await FilterRow.update(filterObj, {
       where: {
-        id: req.body.id,
+        id: req.body.rowId,
       },
-      defaults: req.body.filter,
     })
-    .then(data => {
-      res.status(201).send(data)
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
-      })
-    })
+  }
+  res.sendStatus(201)
 };
 
 // Retrieve all FilterRows from the database.

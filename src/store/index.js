@@ -19,6 +19,7 @@ export default new Vuex.Store({
       icon: "shape",
     },
     items: [],
+    savedFilter: {},
     filters: [],
     pageSettings: {
       page: 1,
@@ -32,7 +33,6 @@ export default new Vuex.Store({
     log: [],
     isLogVisible: false,
     notifications: [],
-    filters: [],
     hover: {
       show: false,
       itemId: null,
