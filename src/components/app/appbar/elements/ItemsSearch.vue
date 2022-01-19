@@ -82,7 +82,7 @@ export default {
       else this.searchString = "";
     },
     clear() {
-      if (this.index > -1) this.$root.$emit("clearSearch", this.index);
+      if (this.index > -1) this.$root.$emit("removeFilter", this.index);
     },
     search() {
       const values = {

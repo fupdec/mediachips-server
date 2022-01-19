@@ -111,10 +111,6 @@ export default {
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mounted() {
-    this.$root.$on("clearSearch", (index) => {
-      this.remove(index);
-      this.apply();
-    });
     this.$root.$on("runSearch", (values) => {
       const { index, by, string } = values;
       if (index > -1) this.filters[index].val = string;
@@ -149,14 +145,23 @@ export default {
         });
       this.apply();
     });
+    this.$root.$on("removeFilter", (index) => {
+      this.remove(index);
+      this.apply();
+    });
+    this.$root.$on("removeAllFilters", () => {
+      this.removeAll();
+      this.apply();
+    });
     this.$nextTick(async () => {
       await this.init();
     });
   },
   beforeDestroy() {
-    this.$root.$off("clearSearch");
     this.$root.$off("runSearch");
     this.$root.$off("toggleFavorite");
+    this.$root.$off("removeFilter");
+    this.$root.$off("removeAllFilters");
   },
   data: () => ({
     filters: [],
@@ -271,7 +276,8 @@ export default {
       this.filters[index].union = value;
     },
     duplicate(index) {
-      const filter = _.cloneDeep(this.filters[index]);
+      let filter = _.cloneDeep(this.filters[index]);
+      filter.id = null;
       this.filters.push(filter);
     },
     remove(index) {
@@ -280,8 +286,8 @@ export default {
       this.filters.splice(index, 1);
     },
     removeAll() {
-      this.filtersForRemove = _.cloneDeep(this.filters);
-      this.filters = [];
+      this.filtersForRemove = this.filters.filter((i) => i.lock !== true);
+      this.filters = this.filters.filter((i) => i.lock == true);
     },
     async apply() {
       if (this.dialog) {
@@ -342,6 +348,9 @@ export default {
     },
   },
   watch: {
+    dialog() {
+      this.filters = _.cloneDeep(this.filtersStore);
+    },
     filtersStore(val) {
       this.filters = _.cloneDeep(val);
     },

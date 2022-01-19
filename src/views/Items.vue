@@ -17,6 +17,14 @@
       class="pt-2 pb-1"
     />
 
+    <v-container
+      v-if="filters.length > 0"
+      fluid
+      class="d-flex justify-center align-start"
+    >
+      <FiltersChips :filters="filters" />
+    </v-container>
+
     <Loading v-show="isQueryRun" />
 
     <v-container
@@ -89,10 +97,11 @@ export default {
     vuescroll,
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
+    FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
   async beforeMount() {
-    this.$store.state.items = [];
+    this.page.items = [];
     await this.init();
   },
   mounted() {
@@ -157,7 +166,10 @@ export default {
         return this.$store.state.page;
       },
       set(value) {
-        return (this.$store.state.page = value);
+        this.$store.commit("updateState", {
+          key: "page",
+          value: value,
+        });
       },
     },
     sets: {
@@ -165,7 +177,10 @@ export default {
         return this.$store.state.pageSettings;
       },
       set(value) {
-        return (this.$store.state.pageSettings = value);
+        this.$store.commit("updateState", {
+          key: "pageSettings",
+          value: _.cloneDeep(value),
+        });
       },
     },
     appSets: {
@@ -173,7 +188,21 @@ export default {
         return this.$store.state.settings;
       },
       set(value) {
-        return (this.$store.state.settings = value);
+        this.$store.commit("updateState", {
+          key: "settings",
+          value: _.cloneDeep(value),
+        });
+      },
+    },
+    filters: {
+      get() {
+        return this.$store.state.filters;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "filters",
+          value: _.cloneDeep(value),
+        });
       },
     },
     route() {
@@ -210,16 +239,12 @@ export default {
       await axios
         .get(this.apiUrl + "/api/SavedFilter/page" + query)
         .then((res) => {
-          const filters =
+          this.filters =
             res.data.filters.map((i) => {
               delete i.filterRow.createdAt;
               delete i.filterRow.updatedAt;
               return i.filterRow;
             }) || [];
-          this.$store.commit("updateState", {
-            key: "filters",
-            value: _.cloneDeep(filters),
-          });
           this.$store.commit("updateState", {
             key: "savedFilter",
             value: _.cloneDeep(res.data.savedFilter) || {},
@@ -295,7 +320,7 @@ export default {
       let sets = {};
       sets.sortBy = this.sets.sortBy;
       sets.sortDir = this.sets.sortDir;
-      sets.filters = _.cloneDeep(this.$store.state.filters);
+      sets.filters = _.cloneDeep(this.filters);
       if (this.isMetaPage) {
         url += "item/filter";
         sets.metaId = this.$route.query.metaId;
@@ -319,7 +344,7 @@ export default {
             this.loader.show = true;
           }, 500);
           const items = res.data.items;
-          this.$store.state.items = _.cloneDeep(items);
+          this.page.items = _.cloneDeep(items);
           this.total = items.length;
           this.totalInDb = res.data.total;
           this.items = [];
@@ -344,7 +369,7 @@ export default {
         };
       };
 
-      const items = _.cloneDeep(this.$store.state.items);
+      const items = _.cloneDeep(this.page.items);
       const { start, end, pages } = countPages();
       this.pages = pages;
       if (this.isInfiniteScroll) {

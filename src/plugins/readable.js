@@ -58,6 +58,108 @@ const Readable = {
       if (type === "rating") return "mdi-star";
       return "mdi-shape";
     }
+    Vue.prototype.$getListCond = function (type) {
+      if (!type) return [];
+      else if (type == "number" || type == "date")
+        return [
+          {
+            cond: "=",
+            icon: "equal",
+            text: "equal",
+          },
+          {
+            cond: "!=",
+            icon: "not-equal-variant",
+            text: "not equal",
+          },
+          {
+            cond: ">",
+            icon: "greater-than",
+            text: "greater than",
+          },
+          {
+            cond: "<",
+            icon: "less-than",
+            text: "less than",
+          },
+          {
+            cond: ">=",
+            icon: "greater-than-or-equal",
+            text: "greater than or equal",
+          },
+          {
+            cond: "<=",
+            icon: "less-than-or-equal",
+            text: "less than or equal",
+          },
+        ];
+      else if (type == "string")
+        return [
+          {
+            cond: "like",
+            icon: "equal",
+            text: "includes",
+          },
+          {
+            cond: "not like",
+            icon: "not-equal-variant",
+            text: "excludes",
+          },
+          {
+            cond: "is null",
+            icon: "code-brackets",
+            text: "empty",
+          },
+          {
+            cond: "not null",
+            icon: "dots-horizontal",
+            text: "not empty",
+          },
+        ];
+      else if (type == "array")
+        return [
+          {
+            cond: "in",
+            icon: "math-norm",
+            text: "includes one of",
+          },
+          // TODO includes all and other conditions
+          // {
+          //   cond: "includes all",
+          //   icon: "equal",
+          //   text: "includes all",
+          // },
+          // {
+          //   cond: "not in",
+          //   icon: "not-equal-variant",
+          //   text: "excludes",
+          // },
+          {
+            cond: "is null",
+            icon: "code-brackets",
+            text: "empty",
+          },
+          {
+            cond: "not null",
+            icon: "code-brackets",
+            text: "not empty",
+          },
+        ];
+      else if (type == "boolean")
+        return [
+          {
+            cond: "=",
+            icon: "check",
+            text: "yes",
+          },
+          {
+            cond: "!=",
+            icon: "close",
+            text: "no",
+          },
+        ];
+      else return [];
+    };
     Vue.prototype.$validateName = function (string) {
       string = string.trim().toLowerCase()
       if (string.length > 50) return 'Name must be less than 99 characters'

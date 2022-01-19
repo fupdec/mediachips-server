@@ -17,6 +17,7 @@ export default new Vuex.Store({
       name: "Items",
       nameSingular: "Item",
       icon: "shape",
+      items: [],
     },
     items: [],
     savedFilter: {},
