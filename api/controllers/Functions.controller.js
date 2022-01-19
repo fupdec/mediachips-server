@@ -42,6 +42,14 @@ exports.importDatabase = async (req, res) => {
   if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath)
 
   const backupPath = path.join(req.body.path)
+  const ext = path.extname(backupPath)
+  if (!fs.existsSync(backupPath) || ext !== '.zip') {
+    res.status(400).send({
+      message: "Invalid path or file does not exist"
+    })
+    return
+  }
+
   const zip = new StreamZip.async({
     file: backupPath
   })
