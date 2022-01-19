@@ -23,7 +23,7 @@
       v-if="isMediaPage"
       fluid
       class="card-grid wide-image videos-selection"
-      :class="[`card-size-${sets.size}`]"
+      :class="[`card-size-${sets.size}`, `gap-size-${appSets.gapSize}`]"
     >
       <ItemVideo v-for="i in items" :key="i.id" :video="i" :items="items" />
     </v-container>
@@ -31,7 +31,7 @@
       v-else-if="isMetaPage"
       fluid
       class="card-grid"
-      :class="[`card-size-${sets.size}`]"
+      :class="[`card-size-${sets.size}`, `gap-size-${appSets.gapSize}`]"
     >
       <ItemMeta v-for="i in items" :key="i.id" :item="i" :meta="meta" />
     </v-container>
