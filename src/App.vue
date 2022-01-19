@@ -26,13 +26,12 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-/* TODO 
-* fix checking if server running
-* countries array
-* playlists: remake as meta
-* toggle visibility of each meta in items on page
-* settings for meta list for each meta
-*/
+/* TODO
+ * countries array
+ * playlists: remake as meta
+ * toggle visibility of each meta in items on page
+ * settings for meta list for each meta
+ */
 export default {
   name: "App",
   components: {
@@ -46,13 +45,7 @@ export default {
   async mounted() {
     await Vue.prototype.$getLocalhost();
     this.isApiReady = true;
-    await this.initSettings()
-      .then(() => {
-        this.isServerError = false;
-      })
-      .catch(() => {
-        this.isServerError = true;
-      });
+    await this.initSettings();
     await this.applyTheme();
   },
   data: () => ({
@@ -80,6 +73,7 @@ export default {
       await axios
         .get(this.apiUrl + "/api/Setting")
         .then((res) => {
+          this.isServerError = false;
           const settings = res.data;
           let sets = {};
           for (let i of settings) {
@@ -88,6 +82,7 @@ export default {
           this.sets = sets;
         })
         .catch((e) => {
+          this.isServerError = true;
           console.log(e);
         });
     },
