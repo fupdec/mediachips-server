@@ -3,16 +3,9 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge
-            :content="badge"
-            class="text-uppercase"
-            color="secondary"
-            overlap
-            offset-x="25"
-            offset-y="25"
-          >
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
-              <v-icon>mdi-view-list</v-icon>
+          <v-badge :content="badge" offset-x="25" offset-y="44">
+            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+              <v-icon>mdi-book-open-page-variant-outline</v-icon>
             </v-btn>
           </v-badge>
         </template>
@@ -57,7 +50,7 @@ export default {
       },
       {
         value: 101,
-        text: '∞',
+        text: "∞",
       },
     ],
   }),
@@ -71,20 +64,20 @@ export default {
       },
     },
     badge() {
-      const index = this.limits.findIndex((i) => i.value == this.sets.limit)
-      if (index > -1) return this.limits[index].text
-      else return 25
+      const index = this.limits.findIndex((i) => i.value == this.sets.limit);
+      if (index > -1) return this.limits[index].text;
+      else return 25;
     },
     limit() {
-      const index = this.limits.findIndex((i) => i.value == this.sets.limit)
-      if (index > -1) return this.limits[index].value
-      else return 1000
+      const index = this.limits.findIndex((i) => i.value == this.sets.limit);
+      if (index > -1) return this.limits[index].value;
+      else return 1000;
     },
   },
   methods: {
     update(val) {
       this.sets.limit = val;
-      this.$root.$emit("setItemsLimit", val)
+      this.$root.$emit("setItemsLimit", val);
     },
   },
 };

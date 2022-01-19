@@ -6,16 +6,15 @@
           <v-badge
             :value="content"
             :content="content"
-            overlap
             offset-x="23"
             offset-y="44"
           >
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
-              <v-icon>mdi-magnify</v-icon>
+            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+              <v-icon>mdi-note-search-outline</v-icon>
             </v-btn>
           </v-badge>
         </template>
-        <span>Quick Search</span>
+        <span>Quick Search by {{ by }}</span>
       </v-tooltip>
     </template>
     <v-card width="350">

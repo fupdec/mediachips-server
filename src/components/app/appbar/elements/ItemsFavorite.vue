@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
-      <v-btn @click="toggle" v-on="on" icon tile>
+      <v-btn @click="toggle" v-on="on" icon>
         <v-icon v-if="favorite">mdi-heart</v-icon>
         <v-icon v-else>mdi-heart-outline</v-icon>
       </v-btn>

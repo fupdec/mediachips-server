@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
-      <v-btn @click="dialogFilter = true" v-on="on" icon tile>
+      <v-btn @click="dialogFilter = true" v-on="on" icon>
         <v-badge
           :value="filters"
           :content="filters"

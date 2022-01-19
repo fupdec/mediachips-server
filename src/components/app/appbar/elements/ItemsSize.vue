@@ -3,16 +3,9 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge
-            :content="badge"
-            class="text-uppercase"
-            color="secondary"
-            overlap
-            offset-x="25"
-            offset-y="25"
-          >
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
-              <v-icon>mdi-card-bulleted</v-icon>
+          <v-badge :content="badge" offset-x="25" offset-y="44">
+            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+              <v-icon>mdi-format-size</v-icon>
             </v-btn>
           </v-badge>
         </template>
@@ -74,14 +67,14 @@ export default {
       },
     },
     badge() {
-      const index = this.sizes.findIndex((i) => i.value == this.sets.size)
-      if (index > -1) return this.sizes[index].text
-      else return 'M'
+      const index = this.sizes.findIndex((i) => i.value == this.sets.size);
+      if (index > -1) return this.sizes[index].text;
+      else return "M";
     },
     size() {
-      const index = this.sizes.findIndex((i) => i.value == this.sets.size)
-      if (index > -1) return this.sizes[index].value
-      else return 3
+      const index = this.sizes.findIndex((i) => i.value == this.sets.size);
+      if (index > -1) return this.sizes[index].value;
+      else return 3;
     },
   },
   methods: {

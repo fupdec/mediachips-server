@@ -3,25 +3,10 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge
-            :icon="`mdi-${icon}`"
-            overlap
-            offset-x="23"
-            offset-y="44"
-            class="badge-sort"
-          >
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon tile>
-              <v-icon>mdi-sort-variant</v-icon>
-              <v-icon
-                v-if="sets.sortDir == 'asc'"
-                size="16"
-                class="badge-sort-icon"
-              >
-                mdi-arrow-down-thin
-              </v-icon>
-              <v-icon v-else size="16" class="badge-sort-icon">
-                mdi-arrow-up-thin
-              </v-icon>
+          <v-badge :icon="`mdi-${icon}`" offset-x="23" offset-y="44">
+            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+              <v-icon v-if="sets.sortDir == 'desc'" >mdi-sort-variant</v-icon>
+              <v-icon v-else>mdi-sort-reverse-variant</v-icon>
             </v-btn>
           </v-badge>
         </template>
@@ -142,11 +127,11 @@ export default {
     },
     toggleDir() {
       this.sets.sortDir = this.sets.sortDir === "asc" ? "desc" : "asc";
-      this.$root.$emit("setItemsSortDir", this.sets.sortDir)
+      this.$root.$emit("setItemsSortDir", this.sets.sortDir);
     },
     update(val) {
       this.sets.sortBy = val;
-      this.$root.$emit("setItemsSortBy", val)
+      this.$root.$emit("setItemsSortBy", val);
     },
   },
 };

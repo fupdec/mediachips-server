@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
-      <v-btn @click="dialogNames = true" v-on="on" icon tile>
+      <v-btn @click="dialogNames = true" v-on="on" icon>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
 
