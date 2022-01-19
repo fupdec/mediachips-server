@@ -63,6 +63,12 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    updateState(state, {
+      key,
+      value
+    }) {
+      state[key] = value
+    },
     addLog(state, {
       text,
       type,

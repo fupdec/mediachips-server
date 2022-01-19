@@ -48,40 +48,57 @@
 
 
 <script>
+import Vue from "vue";
+
 export default {
   name: "ItemsSearch",
   data: () => ({
     searchString: "",
   }),
+  mounted() {
+    this.$nextTick(() => {
+      this.init();
+    });
+  },
   computed: {
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
-    },
     content() {
-      if (typeof this.searchString == "string")
+      if (this.index > -1 && this.searchString !== null)
         return this.searchString.substring(0, 2);
       else return "";
     },
+    by() {
+      return Vue.prototype.$checkCurrentPage("media") ? "path" : "name";
+    },
+    filters() {
+      return this.$store.state.filters;
+    },
+    index() {
+      return this.filters.findIndex((i) => i.by == this.by && i.appbar == true);
+    },
   },
   methods: {
+    init() {
+      if (this.index > -1) this.searchString = this.filters[this.index].val;
+      else this.searchString = "";
+    },
+    clear() {
+      if (this.index > -1) this.$root.$emit("clearSearch", this.index);
+    },
+    search() {
+      const values = {
+        index: this.index,
+        by: this.by,
+        string: this.searchString,
+      };
+      this.$root.$emit("runSearch", values);
+    },
     update(val) {
       this.searchString = val;
     },
-    clear() {
-      this.sets.query = "";
-    },
-    search() {
-      this.sets.query = this.searchString;
-    },
   },
   watch: {
-    "sets.query"(val) {
-      this.searchString = val;
+    filters() {
+      this.init();
     },
   },
 };

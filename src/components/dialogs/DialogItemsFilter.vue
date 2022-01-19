@@ -111,9 +111,34 @@ export default {
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mounted() {
+    this.$root.$on("clearSearch", (index) => {
+      this.remove(index);
+      this.apply();
+    });
+    this.$root.$on("runSearch", (values) => {
+      const { index, by, string } = values;
+      if (index > -1) this.filters[index].val = string;
+      else
+        this.filters.push({
+          id: null,
+          by: by,
+          type: "string",
+          cond: "like",
+          val: string,
+          flag: null,
+          lock: false,
+          appbar: true,
+          union: "AND",
+        });
+      this.apply();
+    });
     this.$nextTick(async () => {
       await this.init();
     });
+  },
+  beforeDestroy() {
+    this.$root.$off("clearSearch");
+    this.$root.$off("runSearch");
   },
   data: () => ({
     filters: [],
@@ -145,6 +170,9 @@ export default {
     },
     metaId() {
       return +this.$router.history.current.query.metaId;
+    },
+    filtersStore() {
+      return this.$store.state.filters;
     },
   },
   methods: {
@@ -228,7 +256,7 @@ export default {
       const filter = _.cloneDeep(this.filters[index]);
       this.filters.push(filter);
     },
-    async remove(index) {
+    remove(index) {
       const filter = _.cloneDeep(this.filters[index]);
       this.filtersForRemove.push(filter);
       this.filters.splice(index, 1);
@@ -238,19 +266,24 @@ export default {
       this.filters = [];
     },
     async apply() {
-      if (this.filters.length) {
-        for (let i of this.$refs.filterRow) {
-          i.validate();
+      if (this.dialog) {
+        if (this.filters.length) {
+          for (let i of this.$refs.filterRow) {
+            i.validate();
+          }
         }
+        if (!this.valid) return;
       }
-      if (!this.valid) return;
       await this.addFilterRows();
 
       for (let f of this.filtersForRemove) {
         await axios.delete(this.apiUrl + "/api/FilterRow/" + f.id);
       }
       this.filtersForRemove = [];
-      this.$store.state.filters = _.cloneDeep(this.filters);
+      this.$store.commit("updateState", {
+        key: "filters",
+        value: _.cloneDeep(this.filters),
+      });
       this.$emit("close");
       this.$root.$emit("setItemsFilters");
     },
@@ -288,6 +321,11 @@ export default {
     },
     validate(val) {
       this.valid = val;
+    },
+  },
+  watch: {
+    filtersStore(val) {
+      this.filters = _.cloneDeep(val);
     },
   },
 };

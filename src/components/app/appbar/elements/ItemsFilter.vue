@@ -13,7 +13,6 @@
         </v-badge>
       </v-btn>
       <DialogItemsFilter
-        v-if="dialogFilter"
         :dialog="dialogFilter"
         @close="dialogFilter = false"
       />

@@ -130,6 +130,10 @@ export default {
     this.$nextTick(async () => {});
   },
   beforeDestroy() {
+    this.$root.$off("setItemsFilters");
+    this.$root.$off("setItemsLimit");
+    this.$root.$off("setItemsSortDir");
+    this.$root.$off("setItemsSortBy");
     if (this.isInfiniteScroll) this.updatePageSetting({ page: 1 });
   },
   data: () => ({
@@ -172,14 +176,6 @@ export default {
         return (this.$store.state.settings = value);
       },
     },
-    filters: {
-      get() {
-        return this.$store.state.filters;
-      },
-      set(value) {
-        return (this.$store.state.filters = value);
-      },
-    },
     route() {
       return this.$route.path;
     },
@@ -214,15 +210,20 @@ export default {
       await axios
         .get(this.apiUrl + "/api/SavedFilter/page" + query)
         .then((res) => {
-          console.log(res.data);
-          this.$store.state.filters =
+          const filters =
             res.data.filters.map((i) => {
-              delete i.filterRow.createdAt
-              delete i.filterRow.updatedAt
-              return i.filterRow
+              delete i.filterRow.createdAt;
+              delete i.filterRow.updatedAt;
+              return i.filterRow;
             }) || [];
-          this.$store.state.savedFilter =
-            _.cloneDeep(res.data.savedFilter) || {};
+          this.$store.commit("updateState", {
+            key: "filters",
+            value: _.cloneDeep(filters),
+          });
+          this.$store.commit("updateState", {
+            key: "savedFilter",
+            value: _.cloneDeep(res.data.savedFilter) || {},
+          });
         })
         .catch((e) => {
           console.log(e);
@@ -294,7 +295,7 @@ export default {
       let sets = {};
       sets.sortBy = this.sets.sortBy;
       sets.sortDir = this.sets.sortDir;
-      sets.filters = this.filters;
+      sets.filters = _.cloneDeep(this.$store.state.filters);
       if (this.isMetaPage) {
         url += "item/filter";
         sets.metaId = this.$route.query.metaId;
@@ -304,7 +305,6 @@ export default {
         sets.typeId = this.$route.query.typeId;
         sets.query = Vue.prototype.$filterItems(sets, "media");
       }
-console.log(sets.query)
       this.isQueryRun = true;
       this.loader.show = false;
       await axios({
@@ -344,7 +344,6 @@ console.log(sets.query)
         };
       };
 
-      console.log("get items");
       const items = _.cloneDeep(this.$store.state.items);
       const { start, end, pages } = countPages();
       this.pages = pages;
