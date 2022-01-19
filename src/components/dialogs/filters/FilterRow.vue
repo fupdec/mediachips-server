@@ -391,12 +391,12 @@ export default {
       else if (type == "boolean")
         return [
           {
-            cond: "yes",
+            cond: "=",
             icon: "check",
             text: "yes",
           },
           {
-            cond: "no",
+            cond: "!=",
             icon: "close",
             text: "no",
           },

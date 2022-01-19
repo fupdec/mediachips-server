@@ -17,19 +17,38 @@ export default {
   data: () => ({
     favorite: false,
   }),
+  mounted() {
+    this.$nextTick(() => {
+      this.init();
+    });
+  },
   computed: {
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
+    filters() {
+      return this.$store.state.filters;
+    },
+    index() {
+      return this.filters.findIndex(
+        (i) => i.by == "favorite" && i.appbar == true
+      );
     },
   },
   methods: {
+    init() {
+      if (this.index > -1) this.favorite = this.filters[this.index].cond == "=";
+      else this.favorite = false;
+    },
     toggle() {
       this.favorite = !this.favorite;
+      const values = {
+        index: this.index,
+        favorite: this.favorite,
+      };
+      this.$root.$emit("toggleFavorite", values);
+    },
+  },
+  watch: {
+    filters() {
+      this.init();
     },
   },
 };

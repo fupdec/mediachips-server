@@ -132,6 +132,23 @@ export default {
         });
       this.apply();
     });
+    this.$root.$on("toggleFavorite", (values) => {
+      const { index, favorite } = values;
+      if (!favorite && index > -1) this.remove(index);
+      else
+        this.filters.push({
+          id: null,
+          by: "favorite",
+          type: "boolean",
+          cond: "=",
+          val: null,
+          flag: null,
+          lock: false,
+          appbar: true,
+          union: "AND",
+        });
+      this.apply();
+    });
     this.$nextTick(async () => {
       await this.init();
     });
@@ -139,6 +156,7 @@ export default {
   beforeDestroy() {
     this.$root.$off("clearSearch");
     this.$root.$off("runSearch");
+    this.$root.$off("toggleFavorite");
   },
   data: () => ({
     filters: [],

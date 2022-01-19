@@ -4,8 +4,8 @@
       <ItemsAdd v-if="!isMediaPage" />
       <ItemsFilter />
       <ItemsSearch />
+      <ItemsFavorite />
       <ItemsSort />
-      <!-- <ItemsFavorite /> -->
     </div>
 
     <v-spacer></v-spacer>

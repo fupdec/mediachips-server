@@ -142,16 +142,19 @@ const Readable = {
         for (let i of arr) {
           if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
           if (i.type === 'string') {
-            q += `AND ${i.by} ${i.cond} `;
+            q += `${i.union} ${i.by} ${i.cond} `;
             if (!i.cond.includes('null')) {
               q += `'%${i.val}%' `;
             }
           } else if (i.type === 'number') {
-            q += `AND ${i.by} ${i.cond} ${i.val} `;
+            q += `${i.union} ${i.by} ${i.cond} ${i.val} `;
           } else if (i.type === 'date') {
-            q += `AND ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
-          } else if (i.type === 'array') {
-            q += `AND itemsIn${itemsType}.childItemId ${i.cond} (${i.val.join()}) `;
+            q += `${i.union} ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
+          } else if (i.type === 'boolean') { // TODO rating type
+            q += `${i.union} ${i.by} ${i.cond} 1 `;
+          } else if (i.type === 'array') { // TODO fix values
+            console.log(i.val)
+            // q += `${i.union} itemsIn${itemsType}.childItemId ${i.cond} (${i.val.join()}) `;
           }
         }
         return q
