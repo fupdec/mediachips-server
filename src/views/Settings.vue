@@ -22,7 +22,7 @@
         Meta <v-icon>mdi-shape</v-icon>
       </v-tab>
       <v-tab href="#media" draggable="false">
-        Media <v-icon>mdi-heart</v-icon>
+        Media <v-icon>mdi-file</v-icon>
       </v-tab>
       <v-tab href="#privacy" draggable="false">
         Privacy <v-icon>mdi-key</v-icon>
@@ -44,8 +44,9 @@
         </v-card>
       </v-tab-item>
       <v-tab-item value="appearance">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
           <DarkMode />
+          <ThemeColors />
           <Appearance />
         </v-card>
       </v-tab-item>
@@ -75,6 +76,7 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
+    
     <div v-show="appSets.navigationSide=='2'" class="py-6"></div>
   </vuescroll>
 </template>
@@ -88,6 +90,7 @@ export default {
   components: {
     vuescroll,
     DarkMode: () => import("@/components/settings/DarkMode.vue"),
+    ThemeColors: () => import("@/components/settings/ThemeColors.vue"),
     Appearance: () => import("@/components/settings/Appearance.vue"),
     WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
     MetaList: () => import("@/components/settings/MetaList.vue"),
@@ -103,7 +106,7 @@ export default {
         return this.$store.state.settings;
       },
       set(value) {
-        return (this.$store.state.settings = value);
+        this.$store.state.settings = value;
       },
     },
   },

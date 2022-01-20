@@ -64,7 +64,7 @@ export default {
         return this.$store.state.settings;
       },
       set(value) {
-        return (this.$store.state.settings = value);
+        this.$store.state.settings = value;
       },
     },
   },
