@@ -66,12 +66,13 @@
         </v-card>
       </v-tab-item>
       <v-tab-item value="about">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
+          <About />
         </v-card>
       </v-tab-item>
     </v-tabs-items>
-    
-    <div v-show="appSets.navigationSide=='2'" class="py-6"></div>
+
+    <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
   </vuescroll>
 </template>
 
@@ -91,6 +92,7 @@ export default {
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
     Login: () => import("@/components/settings/Login.vue"),
+    About: () => import("@/components/app/About.vue"),
   },
   data: () => ({
     tab: "app",
