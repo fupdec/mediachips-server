@@ -19,6 +19,8 @@
         updating the settings, please refresh the page.
       </v-alert>
     </v-dialog>
+
+    <DialogLogin :login="login" @close="closeApp" @success="login = false" />
   </v-app>
 </template>
 
@@ -39,6 +41,7 @@ export default {
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
     Player: () => import("@/components/app/Player.vue"),
+    DialogLogin: () => import("@/components/dialogs/DialogLogin.vue"),
     HoverImage: () => import("@/components/app/HoverImage.vue"),
   },
   async beforeMount() {},
@@ -47,10 +50,12 @@ export default {
     this.isApiReady = true;
     await this.initSettings();
     await this.applyTheme();
+    this.checkLogin();
   },
   data: () => ({
     isServerError: false,
     isApiReady: false,
+    login: false,
   }),
   computed: {
     apiUrl() {
@@ -95,6 +100,12 @@ export default {
       this.$vuetify.theme.themes.dark.primary = sets.appColorDarkPrimary;
       this.$vuetify.theme.themes.dark.secondary = sets.appColorDarkSecondary;
       this.$vuetify.theme.themes.dark.accent = sets.appColorDarkAccent;
+    },
+    checkLogin() {
+      this.login = this.sets.passwordProtection == "1";
+    },
+    closeApp() {
+      // TODO close app
     },
   },
 };

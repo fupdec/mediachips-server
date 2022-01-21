@@ -15,7 +15,7 @@
       no-results-text="No meta found"
     >
       <template v-slot:header>
-        <div v-if="meta.length" class="d-flex flex-wrap mb-8 mb-sm-0">
+        <div v-if="meta.length" class="d-flex flex-wrap align-start">
           <v-text-field
             v-model="search"
             dense

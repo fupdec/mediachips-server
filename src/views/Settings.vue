@@ -13,22 +13,19 @@
       class="settings-tabs"
     >
       <v-tab href="#app" draggable="false">
-        App <v-icon>mdi-application</v-icon>
+        App <v-icon>mdi-application-cog-outline</v-icon>
       </v-tab>
       <v-tab href="#appearance" draggable="false">
-        Appearance <v-icon>mdi-palette</v-icon>
+        Appearance <v-icon>mdi-brush-variant</v-icon>
       </v-tab>
       <v-tab href="#meta" draggable="false">
-        Meta <v-icon>mdi-shape</v-icon>
+        Meta <v-icon>mdi-shape-outline</v-icon>
       </v-tab>
       <v-tab href="#media" draggable="false">
-        Media <v-icon>mdi-file</v-icon>
-      </v-tab>
-      <v-tab href="#privacy" draggable="false">
-        Privacy <v-icon>mdi-key</v-icon>
+        Media <v-icon>mdi-file-outline</v-icon>
       </v-tab>
       <v-tab href="#database" draggable="false">
-        Database <v-icon>mdi-database</v-icon>
+        Database <v-icon>mdi-database-outline</v-icon>
       </v-tab>
       <v-tab href="#about" draggable="false">
         About <v-icon>mdi-information-variant</v-icon>
@@ -39,8 +36,9 @@
 
     <v-tabs-items v-model="tab" class="settings-tabs">
       <v-tab-item value="app">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
           <WatchedFolders />
+          <Login />
         </v-card>
       </v-tab-item>
       <v-tab-item value="appearance">
@@ -61,10 +59,6 @@
               <TableMetaInMediaTypes />
             </div>
           </vuescroll>
-        </v-card>
-      </v-tab-item>
-      <v-tab-item value="privacy">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
         </v-card>
       </v-tab-item>
       <v-tab-item value="database">
@@ -96,6 +90,7 @@ export default {
     MetaList: () => import("@/components/settings/MetaList.vue"),
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
+    Login: () => import("@/components/settings/Login.vue"),
   },
   data: () => ({
     tab: "app",

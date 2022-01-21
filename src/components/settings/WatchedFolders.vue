@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="px-4">
+  <v-card outlined class="px-4 mx-2">
     <div class="headline text-center my-4">
       Folders
       <v-tooltip right>
