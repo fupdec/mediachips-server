@@ -1,6 +1,7 @@
 <template>
   <v-lazy>
     <v-card
+      v-if="pageSets.view == '1'"
       :class="{ favorite: item.favorite }"
       outlined
       hover
@@ -67,7 +68,7 @@
           v-html="'mdi-bookmark'"
         />
       </div>
-      
+
       <v-icon
         v-if="item.bookmark"
         class="bookmark"
@@ -116,6 +117,22 @@
         </v-chip>
       </div>
     </v-card>
+
+    <v-chip
+      v-else-if="pageSets.view == '2'"
+      @mousedown="stopSmoothScroll($event)"
+      class="meta-chip"
+      :color="item.color || '#777777'"
+      :label="meta.metaSetting.chipLabel"
+      :outlined="meta.metaSetting.chipOutlined"
+      @mouseover.stop="hoverImage($event, item.metaId, item.id)"
+      @mouseleave.stop="$store.state.hover.show = false"
+    >
+      <v-avatar>
+        <v-img :src="images.main" position="top" />
+      </v-avatar>
+      <div class="ml-2">{{ item.name }}</div>
+    </v-chip>
   </v-lazy>
 </template>
 
@@ -154,8 +171,16 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
+    pageSets() {
+      return this.$store.state.pageSettings;
+    },
   },
   methods: {
+    stopSmoothScroll(event) {
+      if (event.button != 1) return;
+      event.preventDefault();
+      event.stopPropagation();
+    },
     async getImages() {
       const imageTypes = ["main", "alt", "custom1", "custom2"];
       const settings = this.meta.metaSetting.imageTypes;

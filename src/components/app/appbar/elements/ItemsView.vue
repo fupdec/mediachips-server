@@ -11,24 +11,26 @@
       </v-tooltip>
     </template>
 
-    <v-list dense>
-      <v-subheader>View</v-subheader>
-      <v-list-item-group
-        :value="view"
-        @change="update($event)"
-        mandatory
-        color="primary"
-      >
-        <v-list-item v-for="i in list" :key="i.val" :value="i.val">
-          <v-list-item-content>
-            <v-list-item-title>
-              <v-icon left>mdi-{{ i.icon }}</v-icon>
-              {{ i.text }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
+    <v-card width="150">
+      <v-list dense>
+        <v-subheader>View</v-subheader>
+        <v-list-item-group
+          :value="view"
+          @change="update($event)"
+          mandatory
+          color="primary"
+        >
+          <v-list-item v-for="i in list" :key="i.val" :value="i.val">
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-icon left>mdi-{{ i.icon }}</v-icon>
+                {{ i.text }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-card>
   </v-menu>
 </template>
 
@@ -91,17 +93,20 @@ export default {
     text() {
       return this.list[this.index] ? this.list[this.index].text : "";
     },
-    isMediaPage() {
-      return Vue.prototype.$checkCurrentPage("media");
-    },
   },
   methods: {
     init() {
-      if (this.isMediaPage) {
+      if (Vue.prototype.$checkCurrentPage("media")) {
         this.list.push({
           val: "2",
           icon: "view-sequential",
           text: "Timeline",
+        });
+      } else if (Vue.prototype.$checkCurrentPage("meta")) {
+        this.list.push({
+          val: "2",
+          icon: "format-line-style",
+          text: "Chip",
         });
       }
     },
