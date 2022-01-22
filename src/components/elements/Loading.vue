@@ -1,12 +1,18 @@
 <template>
   <div class="loader">
-    <svg viewBox="0 0 640 640" style="width: 20%">
+    <svg
+      viewBox="0 0 640 640"
+      style="width: 20%; max-width: 180px; min-width: 120px"
+    >
       <path
         class="logo m"
         d="M600.5,300.5C600.5,125,511,.5,450.5.5s-89.5,150-150,150S211,.5,150.5.5.5,125,.5,300.5s124.5,300,300,300S600.5,476,600.5,300.5Z"
       />
     </svg>
-    <svg viewBox="0 0 640 640" style="width: 20%">
+    <svg
+      viewBox="0 0 640 640"
+      style="width: 20%; max-width: 180px; min-width: 120px"
+    >
       <path
         class="logo c"
         d="M440.5,240.5c-107.52,0-54.45,150-140,150-82.75,0-26.86-150-140-150-140.25,0-140.49,360,140,360S581.68,240.5,440.5,240.5Z"
@@ -46,7 +52,7 @@
     stroke-dashoffset: 1560;
     stroke: var(--v-secondary-base);
     animation-name: dash;
-    animation-delay: .3s;
+    animation-delay: 0.3s;
     animation-duration: 2s;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
