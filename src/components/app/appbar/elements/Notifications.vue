@@ -13,7 +13,7 @@
       </v-tooltip>
     </template>
 
-    <v-card min-width="300">
+    <v-card width="300">
       <v-card-actions>
         <div class="caption">Notifications</div>
         <v-spacer></v-spacer>

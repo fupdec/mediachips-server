@@ -52,7 +52,7 @@ export default new Vuex.Store({
     navDrawer: true,
     clipboardMeta: {},
     updateFoldersData: 0,
-    backgroundProcesses: [],
+    tasks: [],
     settings: Settings,
   }),
   getters: {

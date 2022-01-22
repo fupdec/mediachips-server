@@ -23,6 +23,7 @@ const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.as
 ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
+const os = require('os')
 const fs = require("fs")
 const path = require('path')
 const StreamZip = require('node-stream-zip')
@@ -606,4 +607,224 @@ exports.createThumb = async (req, res) => {
       console.log(e)
       res.status(400).send(e)
     })
+};
+
+exports.createGrid = async (req, res) => {
+  const userfiles = path.join(__dirname, '../../userfiles')
+  const gridsPath = path.join(userfiles, "/media/grids/");
+  if (!fs.existsSync(gridsPath)) fs.mkdirSync(gridsPath);
+
+  if (!fs.existsSync(req.body.input)) {
+    res.status(400).send({
+      message: "The video does not exist."
+    })
+    return
+  }
+
+  class Grid {
+    constructor(opts) {
+      this.tmpDir = os.tmpdir()
+      this.input = opts.input
+      this.output = opts.output
+      this.cols = opts.cols
+      this.rows = opts.rows
+      this.width = opts.width
+      this.tileCount = this.rows * this.cols
+    }
+
+    getVideoDuration(pathToFile) {
+      return new Promise((resolve, reject) => {
+        return ffmpeg.ffprobe(pathToFile, (error, info) => {
+          if (error) return reject(error)
+          return resolve(info.streams[0].duration)
+        })
+      })
+    }
+
+    makeLayout(i) {
+      // see https://ffmpeg.org/ffmpeg-filters.html#xstack for the madness
+      const currentColumn = i % this.cols
+      const currentRow = Math.floor(i / this.cols)
+      let colSide = []
+      let rowSide = []
+      if (currentColumn === 0) colSide.push('0')
+      else
+        for (var j = 0; j < currentColumn; j++) colSide.push('w0')
+      if (currentRow === 0) rowSide.push('0')
+      else
+        for (var k = 0; k < currentRow; k++) rowSide.push('h0')
+      return `${colSide.join('+')}_${rowSide.join('+')}`
+    }
+
+    async ffmpegSeekP(timestamp, intermediateOutput) {
+      return new Promise((resolve, reject) => {
+        ffmpeg()
+          .addOption('-ss', timestamp)
+          .addOption('-i', this.input)
+          .addOption('-frames:v', '1')
+          .save(intermediateOutput)
+          .on('end', function () {
+            setTimeout(() => {
+              resolve(intermediateOutput)
+            }, 1000)
+          })
+          .on('error', function (e) {
+            reject(e)
+          })
+      })
+    }
+
+    async ffmpegCombineP(inputFiles, streams, layouts) {
+      return new Promise((resolve, reject) => {
+        const command = ffmpeg()
+        inputFiles.forEach((inputFile) => {
+          command.input(inputFile)
+        })
+        command
+          .addOption('-y')
+          .addOption('-filter_complex', `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layouts.join('|')}[v];[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`)
+          .addOption('-map', '[scaled]')
+          .save(path.join(gridsPath, this.output))
+          .on('end', function () {
+            resolve()
+          })
+          .on('error', function (e) {
+            reject(e)
+          })
+      })
+    }
+
+    async generate() {
+      const duration = await this.getVideoDuration(this.input)
+      if (typeof duration !== 'number') return false
+      const durSlice = parseInt(duration / this.tileCount)
+
+      let framePromises = []
+      for (var i = 0; i < this.tileCount; i++) {
+        const timestamp = new Date(1000 * (i + 0.5) * durSlice).toISOString().substr(11, 8)
+        const intermediateOutput = path.join(this.tmpDir, `thumb${i}.png`)
+        framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput))
+      }
+
+      await Promise.all(framePromises)
+        .catch(err => {
+          // console.log(err)
+        })
+
+      // combine images together to make tile
+      let inputFiles = []
+      let streams = []
+      let layouts = []
+      for (var l = 0; l < this.tileCount; l++) {
+        inputFiles.push(`${this.tmpDir}/thumb${l}.png`)
+        streams.push(`[${l}:v]`)
+        layouts.push(this.makeLayout(l))
+      }
+      await this.ffmpegCombineP(inputFiles, streams, layouts)
+        .catch(err => {
+          console.log(err)
+        })
+
+      return {
+        output: this.output
+      }
+    }
+  }
+
+  const gridPath = path.join(gridsPath, req.body.output);
+  if (!fs.existsSync(gridPath)) {
+    const grid = new Grid(req.body)
+    const result = await grid.generate()
+    if (result) {
+      res.status(201).send(result)
+    } else {
+      res.status(400).send({
+        message: 'Grid already exists'
+      });
+    }
+  } else {
+    res.status(400).send({
+      message: 'Grid already exists'
+    });
+  }
+};
+
+exports.createTimeline = async (req, res) => {
+  const userfiles = path.join(__dirname, '../../userfiles')
+  const timelinesPath = path.join(userfiles, "/media/timelines/");
+  if (!fs.existsSync(timelinesPath)) fs.mkdirSync(timelinesPath);
+
+  if (!fs.existsSync(req.body.path)) {
+    res.status(400).send({
+      message: "The video does not exist."
+    })
+    return
+  }
+
+  class Timeline {
+    constructor(video) {
+      this.video = video
+    }
+
+    getVideoDuration(pathToFile) {
+      return new Promise((resolve, reject) => {
+        return ffmpeg.ffprobe(pathToFile, (error, info) => {
+          if (error) return reject(error)
+          return resolve(info.streams[0].duration)
+        })
+      })
+    }
+
+    createFrame(timestamp, output) {
+      return new Promise((resolve, reject) => {
+        ffmpeg()
+          .addOption('-ss', timestamp)
+          .addOption('-i', this.video.path)
+          .addOption('-frames:v', '1')
+          .addOption('-vf', `scale=-1:180`)
+          .save(output)
+          .on('end', () => {
+            resolve(output)
+          })
+          .on('error', (e) => {
+            reject(e)
+          })
+      })
+    }
+
+    async generate() {
+      const parts = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
+      const duration = await this.getVideoDuration(this.video.path)
+      if (typeof duration !== 'number') return false
+      const timestamps = parts.map(i => (new Date(Math.floor(duration * (i / 100) * 1000)).toISOString().substr(11, 8)))
+      let framePromises = []
+
+      for (let i = 0; i < timestamps.length; i++) {
+        let output = path.join(timelinesPath, `${this.video.id}_${parts[i]}.jpg`)
+        framePromises.push(this.createFrame(timestamps[i], output))
+      }
+
+      await Promise.all(framePromises)
+        .catch(err => {
+          // console.log(err)
+        })
+    }
+  }
+
+  const firstFrame = path.join(timelinesPath, req.body.id + "_5.jpg");
+  if (!fs.existsSync(firstFrame)) {
+    const timeline = new Timeline(req.body)
+    const result = await timeline.generate()
+    if (result) {
+      res.status(201).send(result)
+    } else {
+      res.status(400).send({
+        message: 'Timeline already exists'
+      });
+    }
+  } else {
+    res.status(400).send({
+      message: 'Timeline already exists'
+    });
+  }
 };

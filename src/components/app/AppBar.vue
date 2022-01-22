@@ -1,6 +1,18 @@
 <template>
   <v-app-bar app dense clipped-left extension-height="28">
-    <router-view name="appbar" :key="$route.fullPath" />
+    <div class="app-bar-container">
+      <vuescroll>
+        <router-view name="appbar" :key="$route.fullPath" />
+      </vuescroll>
+
+      <v-spacer></v-spacer>
+
+      <div class="d-flex">
+        <GlobalSearch />
+        <Tasks />
+        <Notifications />
+      </div>
+    </div>
 
     <!-- <template v-slot:extension v-if="tabs.length>0"> <Tabs /> </template> -->
   </v-app-bar>
@@ -8,10 +20,17 @@
 
 
 <script>
+import vuescroll from "vuescroll";
 export default {
   name: "AppBar",
   components: {
+    vuescroll,
     // Tabs: () => import('@/components/elements/Tabs.vue'),
+    GlobalSearch: () =>
+      import("@/components/app/appbar/elements/GlobalSearch.vue"),
+    Tasks: () => import("@/components/app/appbar/elements/Tasks.vue"),
+    Notifications: () =>
+      import("@/components/app/appbar/elements/Notifications.vue"),
   },
   mounted() {},
   data: () => ({}),

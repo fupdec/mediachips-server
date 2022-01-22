@@ -5,6 +5,9 @@ const Readable = {
     Vue.prototype.$checkCurrentPage = function (page) {
       return options.router.history.current.path.includes(page)
     }
+    Vue.prototype.$getRandomId = function () {
+      return Math.random().toString(16).slice(2);
+    }
     Vue.prototype.$getReadableFileSize = function (bytes) {
       if (bytes > 1000000000000) bytes = (bytes / 1024 / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' TB'
       else if (bytes > 1000000000) bytes = (bytes / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' GB'

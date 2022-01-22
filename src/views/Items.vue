@@ -90,6 +90,7 @@ import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
+import GeneratingThumbsForVideos from '@/mixins/GeneratingThumbsForVideos'
 
 export default {
   name: "Items",
@@ -100,6 +101,7 @@ export default {
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
+  mixins: [GeneratingThumbsForVideos],
   async beforeMount() {
     this.page.items = [];
     await this.init();

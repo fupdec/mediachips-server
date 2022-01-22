@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-2">
     <table class="table-meta-in-media-types">
       <thead>
         <tr>

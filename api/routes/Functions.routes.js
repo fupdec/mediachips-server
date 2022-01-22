@@ -9,5 +9,11 @@ module.exports = app => {
   // creating thumbnail for video
   router.post("/createThumb", Functions.createThumb);
 
+  // creating frames grid for video
+  router.post("/createGrid", Functions.createGrid);
+
+  // creating frames grid for video
+  router.post("/createTimeline", Functions.createTimeline);
+
   app.use('/api/Functions/', router);
 };

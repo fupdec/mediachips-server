@@ -52,17 +52,18 @@
         <MetaList />
       </v-tab-item>
       <v-tab-item value="media">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
           <div class="headline text-center pb-2">Meta assigned to media</div>
           <vuescroll>
             <div style="max-height: 400px">
               <TableMetaInMediaTypes />
             </div>
           </vuescroll>
+          <VideoPreview />
         </v-card>
       </v-tab-item>
       <v-tab-item value="database">
-        <v-card flat max-width="800" style="margin: auto" class="py-10">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
         </v-card>
       </v-tab-item>
       <v-tab-item value="about">
@@ -89,6 +90,7 @@ export default {
     Appearance: () => import("@/components/settings/Appearance.vue"),
     WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
     MetaList: () => import("@/components/settings/MetaList.vue"),
+    VideoPreview: () => import("@/components/settings/VideoPreview.vue"),
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
     Login: () => import("@/components/settings/Login.vue"),
