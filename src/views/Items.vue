@@ -10,7 +10,7 @@
 
     <v-pagination
       v-show="items.length && !isInfiniteScroll"
-      :value="sets.page"
+      :value="pageSets.page"
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
@@ -31,7 +31,7 @@
       v-if="isMediaPage"
       fluid
       class="card-grid wide-image videos-selection"
-      :class="[`card-size-${sets.size}`, `gap-size-${appSets.gapSize}`]"
+      :class="[`card-size-${pageSets.size}`, `gap-size-${appSets.gapSize}`]"
     >
       <ItemVideo v-for="i in items" :key="i.id" :video="i" :items="items" />
     </v-container>
@@ -39,14 +39,14 @@
       v-else-if="isMetaPage"
       fluid
       class="card-grid"
-      :class="[`card-size-${sets.size}`, `gap-size-${appSets.gapSize}`]"
+      :class="[`card-size-${pageSets.size}`, `gap-size-${appSets.gapSize}`]"
     >
       <ItemMeta v-for="i in items" :key="i.id" :item="i" :meta="meta" />
     </v-container>
 
     <v-pagination
       v-show="items.length && !isInfiniteScroll"
-      :value="sets.page"
+      :value="pageSets.page"
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
@@ -65,11 +65,11 @@
 
     <div v-if="items.length && isInfiniteScroll" class="text-center py-6">
       <Loading
-        v-if="loader.show && sets.page != pages"
+        v-if="loader.show && pageSets.page != pages"
         v-intersect="infiniteScrolling"
       />
       <v-btn
-        v-if="sets.page == pages"
+        v-if="pageSets.page == pages"
         class="mb-4"
         color="primary"
         rounded
@@ -90,7 +90,7 @@ import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
-import GeneratingThumbsForVideos from '@/mixins/GeneratingThumbsForVideos'
+import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";
 
 export default {
   name: "Items",
@@ -116,7 +116,7 @@ export default {
       this.getItemsFromDb();
     });
     this.$root.$on("setItemsLimit", (val) => {
-      this.sets.page = 1;
+      this.pageSets.page = 1;
       if (val == 101) this.items = [];
       this.updatePageSetting({
         page: 1,
@@ -174,7 +174,7 @@ export default {
         });
       },
     },
-    sets: {
+    pageSets: {
       get() {
         return this.$store.state.pageSettings;
       },
@@ -223,7 +223,7 @@ export default {
       return +this.$router.history.current.query.metaId;
     },
     isInfiniteScroll() {
-      return this.sets.limit === 101;
+      return this.pageSets.limit === 101;
     },
   },
   methods: {
@@ -267,7 +267,7 @@ export default {
       await axios
         .get(this.apiUrl + url + query)
         .then((res) => {
-          this.sets = res.data;
+          this.pageSets = res.data;
         })
         .catch((e) => {
           console.log(e);
@@ -320,8 +320,8 @@ export default {
     async getItemsFromDb() {
       let url = "/api/";
       let sets = {};
-      sets.sortBy = this.sets.sortBy;
-      sets.sortDir = this.sets.sortDir;
+      sets.sortBy = this.pageSets.sortBy;
+      sets.sortDir = this.pageSets.sortDir;
       sets.filters = _.cloneDeep(this.filters);
       if (this.isMetaPage) {
         url += "item/filter";
@@ -350,7 +350,7 @@ export default {
           this.total = items.length;
           this.totalInDb = res.data.total;
           this.items = [];
-          this.sets.page = 1;
+          this.pageSets.page = 1;
           this.getItems();
         })
         .catch((e) => {
@@ -360,8 +360,8 @@ export default {
     },
     getItems() {
       const countPages = () => {
-        const limit = this.isInfiniteScroll ? 25 : this.sets.limit;
-        const start = (this.sets.page - 1) * limit;
+        const limit = this.isInfiniteScroll ? 25 : this.pageSets.limit;
+        const start = (this.pageSets.page - 1) * limit;
         const end = start + limit;
         const pages = Math.ceil(this.total / limit);
         return {
@@ -382,18 +382,18 @@ export default {
       // TODO jump to the fisrt page if current page greater than total pages
     },
     changePage(e) {
-      this.sets.page = e;
+      this.pageSets.page = e;
       this.getItems();
       this.updatePageSetting({ page: e });
     },
     infiniteScrolling() {
-      if (this.sets.page >= this.pages) return;
-      this.sets.page++;
+      if (this.pageSets.page >= this.pages) return;
+      this.pageSets.page++;
       this.getItems();
     },
   },
   watch: {
-    "sets.size"(val, old) {
+    "pageSets.size"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ size: val });
     },

@@ -1,6 +1,8 @@
 <template>
   <v-lazy>
     <v-card
+      v-if="pageSets.view == '1'"
+      @mousedown="stopSmoothScroll($event)"
       @click="openPlayer"
       v-ripple="{ class: 'accent--text' }"
       :class="{ favorite: video.favorite }"
@@ -8,7 +10,12 @@
       hover
       class="video-card meta-card"
     >
-      <v-responsive>
+      <v-responsive
+        @mouseover.capture="playPreview()"
+        @mouseleave="stopPlayingPreview()"
+        :aspect-ratio="16 / 9"
+        class="video-preview-container"
+      >
         <v-img :src="thumb" :aspect-ratio="16 / 9" />
         <v-rating
           :value="video.rating"
@@ -41,6 +48,21 @@
         </div>
 
         <!-- <video @click="mountSrc" ref="video" controls /> -->
+
+        <div
+          v-if="isHovered && appSets.videoPreviewHover == 'timeline'"
+          class="timeline"
+        >
+          <img :src="frame" />
+          <div class="sections">
+            <div
+              v-for="(i, x) in timelines"
+              :key="x"
+              @mouseover="getTimelineImg(timelines[x])"
+              class="section"
+            />
+          </div>
+        </div>
       </v-responsive>
 
       <div class="description">
@@ -165,6 +187,11 @@ export default {
     meta: [],
     values: [],
     thumb: null,
+    frame: null,
+    isHovered: false,
+    section: 0,
+    timelines: [5, 15, 25, 35, 45, 55, 65, 75, 85, 95],
+    timeouts: {},
   }),
   computed: {
     apiUrl() {
@@ -194,6 +221,28 @@ export default {
     fileExtension() {
       return Vue.prototype.$getFileExtensionFromPath(this.video.path);
     },
+    pageSets: {
+      get() {
+        return this.$store.state.pageSettings;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "pageSettings",
+          value: _.cloneDeep(value),
+        });
+      },
+    },
+    appSets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "settings",
+          value: _.cloneDeep(value),
+        });
+      },
+    },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
     // visibility() { return this.$store.state.Settings.videoVisibility },
@@ -207,6 +256,11 @@ export default {
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
+    stopSmoothScroll(event) {
+      if (event.button != 1) return;
+      event.preventDefault();
+      event.stopPropagation();
+    },
     async getImg() {
       let imgPath = path.join(
         __dirname,
@@ -263,6 +317,35 @@ export default {
     },
     hoverImage(event, metaId, itemId) {
       Vue.prototype.$showHoverImage(event, metaId, itemId);
+    },
+    playPreview() {
+      if (this.isHovered) return;
+      this.isHovered = true;
+      if (this.appSets.videoPreviewHover !== "video") return;
+      // this.timeouts.z = setTimeout(() => {
+      //   // play original video
+      //   if (!this.isVideoExist) return;
+      //   this.$refs.video.src = this.video.path;
+      //   this.setVideoProgress(0.2);
+      //   this.timeouts.a = setTimeout(this.setVideoProgress, 3000, 0.4);
+      //   this.timeouts.b = setTimeout(this.setVideoProgress, 6000, 0.6);
+      //   this.timeouts.c = setTimeout(this.setVideoProgress, 9000, 0.8);
+      //   this.timeouts.d = setTimeout(this.setVideoProgress, 12000, 0.2);
+      // }, this.appSets.delayVideoPreview * 1000 + 500);
+    },
+    stopPlayingPreview() {
+      if (this.appSets.videoPreviewHover != "none") this.isHovered = false;
+      if (this.appSets.videoPreviewHover != "video") return;
+      for (const timeout in this.timeouts) clearTimeout(this.timeouts[timeout]);
+      // this.$refs.video.src = "";
+    },
+    async getTimelineImg(progress) {
+      let imgPath = path.join(
+        __dirname,
+        "/userfiles/media/timelines/",
+        `${this.video.id}_${progress}.jpg`
+      );
+      this.frame = await Vue.prototype.$getLocalImage(imgPath);
     },
   },
   watch: {},
