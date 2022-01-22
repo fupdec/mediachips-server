@@ -1,11 +1,8 @@
 const db = require("../index.js");
 const {
   Media,
-  VideoMetadata,
   ItemsInMedia
 } = require("../index.js");
-const Op = db.Sequelize.Op;
-const Functions = require('./Functions.controller')
 
 // Create and Save a new Media
 exports.create = (req, res) => {};

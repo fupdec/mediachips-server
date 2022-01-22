@@ -40,7 +40,7 @@ const ApiCalls = {
       return new Promise((resolve, reject) => {
         axios({
             method: 'post',
-            url: options.store.state.localhost + '/api/Functions/createThumb',
+            url: options.store.state.localhost + '/api/Task/createThumb',
             data: {
               timestamp,
               inputPath,

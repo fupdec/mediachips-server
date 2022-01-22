@@ -75,7 +75,7 @@ export default {
       return new Promise((resolve, reject) => {
         axios({
           method: "post",
-          url: this.apiUrl + "/api/Functions/createGrid",
+          url: this.apiUrl + "/api/Task/createGrid",
           data: {
             input: input,
             output: output,
@@ -126,7 +126,7 @@ export default {
       return new Promise((resolve, reject) => {
         axios({
           method: "post",
-          url: this.apiUrl + "/api/Functions/createTimeline",
+          url: this.apiUrl + "/api/Task/createTimeline",
           data: video,
         })
           .then((res) => {

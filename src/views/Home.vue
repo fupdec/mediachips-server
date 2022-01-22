@@ -70,7 +70,7 @@ export default {
       this.dialogImport = true;
       this.isImportRun = true;
       axios
-        .post(this.localhost + "/api/Functions/importDatabase", {
+        .post(this.localhost + "/api/Task/importDatabase", {
           path: this.backup,
         })
         .then((e) => {

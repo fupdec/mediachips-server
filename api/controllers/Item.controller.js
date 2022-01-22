@@ -1,7 +1,5 @@
 const db = require("../index.js");
 const Item = db.Item;
-const Op = db.Sequelize.Op;
-const Functions = require('./Functions.controller')
 
 // Create and Save a new Item
 exports.create = (req, res) => {};
