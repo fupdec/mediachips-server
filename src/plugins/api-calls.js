@@ -89,6 +89,24 @@ const ApiCalls = {
           })
       })
     }
+    Vue.prototype.$setPageOption = function (option, value) {
+      return new Promise((resolve, reject) => {
+        axios({
+            method: 'put',
+            url: options.store.state.localhost + "/api/Setting/" + option,
+            data: {
+              value
+            }
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
   }
 }
 

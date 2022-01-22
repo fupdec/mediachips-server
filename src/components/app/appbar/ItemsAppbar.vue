@@ -7,6 +7,7 @@
     <ItemsSort />
     <ItemsLimit />
     <ItemsSize />
+    <ItemsView />
   </div>
 </template>
 
@@ -27,6 +28,7 @@ export default {
       import("@/components/app/appbar/elements/ItemsFavorite.vue"),
     ItemsLimit: () => import("@/components/app/appbar/elements/ItemsLimit.vue"),
     ItemsSize: () => import("@/components/app/appbar/elements/ItemsSize.vue"),
+    ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
   },
   computed: {
     isMediaPage() {

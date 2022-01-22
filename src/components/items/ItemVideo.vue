@@ -36,7 +36,7 @@
           <v-icon v-else color="grey"> mdi-heart-outline </v-icon>
         </v-btn>
 
-        <div class="duration">{{ duration }}</div>
+        <div class="duration" v-html="duration" />
 
         <div label outlined class="resolution">
           <div class="text text-no-wrap" :class="quality.toLowerCase()">
@@ -58,7 +58,7 @@
             <div
               v-for="(i, x) in timelines"
               :key="x"
-              @mouseover="getTimelineImg(timelines[x])"
+              @mouseover="getFrameImg(timelines[x])"
               class="section"
             />
           </div>
@@ -137,6 +137,82 @@
         v-html="'mdi-bookmark'"
       />
     </v-card>
+    <v-card
+      v-else-if="pageSets.view == '2'"
+      @mousedown="stopSmoothScroll($event)"
+      v-ripple="{ class: 'accent--text' }"
+      :class="{ favorite: video.favorite }"
+      outlined
+      hover
+      class="video-card meta-card"
+    >
+      <div
+        @click="openPlayer"
+        @mousemove.capture="scrollStory($event)"
+        @mouseleave="stopScrollStory"
+        ref="story"
+        class="story"
+      >
+        <v-sheet class="video-card-title" v-html="fileName" />
+
+        <div label outlined class="resolution">
+          <div
+            class="text text-no-wrap"
+            :class="quality.toLowerCase()"
+            v-html="quality"
+          />
+          <div class="value" v-html="height" />
+        </div>
+        <div class="wrapper" ref="storyWrapper" :class="{ hovered: isHovered }">
+          <div v-for="(i, x) in timelines" :key="x" class="frame">
+            <img :src="frames[x]" />
+            <div
+              class="duration"
+              v-html="getDur((i / 100) * metadata.duration)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="description">
+        <!-- Video meta -->
+        <v-chip label outlined :title="video.path">
+          <v-icon left>mdi-folder-outline</v-icon> Path
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-file-video-outline</v-icon>
+          {{ fileExtension }}
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-monitor-screenshot</v-icon>
+          {{ metadata.width + "x" + metadata.height }}
+        </v-chip>
+        <v-chip label outlined>
+          <v-icon left>mdi-harddisk</v-icon>
+          {{ filesize }}
+        </v-chip>
+
+        <v-chip
+          v-for="i in meta"
+          :key="i.itemId"
+          @mouseover.stop="hoverImage($event, i['item.metaId'], i['itemId'])"
+          @mouseleave.stop="$store.state.hover.show = false"
+          :color="i['item.color']"
+          :text-color="getTextColor(i['item.color'])"
+        >
+          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+          {{ i["item.name"] }}
+        </v-chip>
+      </div>
+
+      <v-icon
+        v-if="video.bookmark"
+        class="bookmark"
+        color="red"
+        :title="video.bookmark"
+        v-html="'mdi-bookmark'"
+      />
+    </v-card>
   </v-lazy>
 </template>
 
@@ -178,6 +254,7 @@ export default {
     this.$root.$on("updateVideoThumb", (id) => {
       if (this.video.id === id) this.getImg();
     });
+    if (this.pageSets.view == "2") this.initFrames();
   },
   beforeDestroy() {
     this.$root.$off("updateVideoThumb");
@@ -188,6 +265,7 @@ export default {
     values: [],
     thumb: null,
     frame: null,
+    frames: [],
     isHovered: false,
     section: 0,
     timelines: [5, 15, 25, 35, 45, 55, 65, 75, 85, 95],
@@ -339,15 +417,44 @@ export default {
       for (const timeout in this.timeouts) clearTimeout(this.timeouts[timeout]);
       // this.$refs.video.src = "";
     },
-    async getTimelineImg(progress) {
-      let imgPath = path.join(
+    async getFrameImg(progress) {
+      const imgPath = this.getFrameImgUrl(progress);
+      this.frame = await Vue.prototype.$getLocalImage(imgPath);
+    },
+    getFrameImgUrl(progress) {
+      return path.join(
         __dirname,
         "/userfiles/media/timelines/",
         `${this.video.id}_${progress}.jpg`
       );
-      this.frame = await Vue.prototype.$getLocalImage(imgPath);
+    },
+    scrollStory(e) {
+      let storyWidth = this.$refs.story.clientWidth;
+      let wrapperWidth = this.$refs.storyWrapper.clientWidth;
+      if (wrapperWidth <= storyWidth) return;
+      let x = e.layerX;
+      let ratio = storyWidth / (wrapperWidth - storyWidth);
+      let offset = Math.ceil(x / ratio);
+      this.$refs.storyWrapper.style.left = "-" + offset + "px";
+    },
+    stopScrollStory() {
+      this.$refs.storyWrapper.style.left = 0;
+    },
+    async initFrames() {
+      for (let i = 0; i < this.timelines.length; i++) {
+        const progress = this.timelines[i];
+        const imgPath = this.getFrameImgUrl(progress);
+        this.frames.push(await Vue.prototype.$getLocalImage(imgPath));
+      }
+    },
+    getDur(secs) {
+      return Vue.prototype.$getReadableDuration(secs);
     },
   },
-  watch: {},
+  watch: {
+    "pageSets.view"(view) {
+      if (view == "2") this.initFrames();
+    },
+  },
 };
 </script>

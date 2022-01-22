@@ -636,7 +636,7 @@ exports.createGrid = async (req, res) => {
       return new Promise((resolve, reject) => {
         return ffmpeg.ffprobe(pathToFile, (error, info) => {
           if (error) return reject(error)
-          return resolve(info.streams[0].duration)
+          return resolve(info.format.duration)
         })
       })
     }
@@ -666,7 +666,7 @@ exports.createGrid = async (req, res) => {
           .on('end', function () {
             setTimeout(() => {
               resolve(intermediateOutput)
-            }, 1000)
+            }, 500)
           })
           .on('error', function (e) {
             reject(e)
@@ -770,7 +770,7 @@ exports.createTimeline = async (req, res) => {
       return new Promise((resolve, reject) => {
         return ffmpeg.ffprobe(pathToFile, (error, info) => {
           if (error) return reject(error)
-          return resolve(info.streams[0].duration)
+          return resolve(info.format.duration)
         })
       })
     }
@@ -784,7 +784,9 @@ exports.createTimeline = async (req, res) => {
           .addOption('-vf', `scale=-1:180`)
           .save(output)
           .on('end', () => {
-            resolve(output)
+            setTimeout(() => {
+              resolve(output)
+            }, 500)
           })
           .on('error', (e) => {
             reject(e)

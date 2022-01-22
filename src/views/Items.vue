@@ -30,16 +30,25 @@
     <v-container
       v-if="isMediaPage"
       fluid
-      class="card-grid wide-image videos-selection"
-      :class="[`card-size-${pageSets.size}`, `gap-size-${appSets.gapSize}`]"
+      class="wide-image videos-selection"
+      :class="[
+        `card-size-${pageSets.size}`,
+        `gap-size-${appSets.gapSize}`,
+        { 'card-grid': pageSets.view == '1' },
+        { 'line-grid': pageSets.view == '2' },
+      ]"
     >
       <ItemVideo v-for="i in items" :key="i.id" :video="i" :items="items" />
     </v-container>
     <v-container
       v-else-if="isMetaPage"
       fluid
-      class="card-grid"
-      :class="[`card-size-${pageSets.size}`, `gap-size-${appSets.gapSize}`]"
+      :class="[
+        `card-size-${pageSets.size}`,
+        `gap-size-${appSets.gapSize}`,
+        { 'card-grid': pageSets.view == '1' },
+        { 'chips-grid': pageSets.view == '2' },
+      ]"
     >
       <ItemMeta v-for="i in items" :key="i.id" :item="i" :meta="meta" />
     </v-container>
@@ -137,6 +146,11 @@ export default {
         sortBy: val,
       });
       this.getItemsFromDb();
+    });
+    this.$root.$on("setItemsView", (val) => {
+      this.updatePageSetting({
+        view: val,
+      });
     });
     this.$nextTick(async () => {});
   },
