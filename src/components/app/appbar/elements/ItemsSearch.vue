@@ -6,11 +6,11 @@
           <v-badge
             :value="content"
             :content="content"
-            offset-x="23"
-            offset-y="44"
+            offset-x="44"
+            offset-y="23"
           >
             <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-              <v-icon>mdi-note-search-outline</v-icon>
+              <v-icon>mdi-text-box-search-outline</v-icon>
             </v-btn>
           </v-badge>
         </template>

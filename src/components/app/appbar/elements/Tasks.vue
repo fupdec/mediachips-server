@@ -3,7 +3,7 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge :content="badge" :value="badge" offset-x="25" offset-y="44">
+          <v-badge :content="badge" :value="badge" offset-x="44" offset-y="25">
             <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
               <v-icon>mdi-cogs</v-icon>
             </v-btn>

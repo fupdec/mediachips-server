@@ -3,14 +3,12 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge :icon="`mdi-${icon}`" offset-x="23" offset-y="44">
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-              <v-icon v-if="sets.sortDir == 'desc'" >mdi-sort-variant</v-icon>
-              <v-icon v-else>mdi-sort-reverse-variant</v-icon>
-            </v-btn>
-          </v-badge>
+          <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+            <v-icon v-if="sets.sortDir == 'asc'">mdi-sort-ascending</v-icon>
+            <v-icon v-else>mdi-sort-descending</v-icon>
+          </v-btn>
         </template>
-        <span>Sort {{ page.name }}</span>
+        <span> Sort {{ page.name }} by {{ text }} </span>
       </v-tooltip>
     </template>
 
@@ -41,7 +39,7 @@
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-{{ i.icon }}</v-icon>
-              {{ i.name }}
+              {{ i.text }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -70,22 +68,22 @@ export default {
       {
         by: "name",
         icon: "alphabetical-variant",
-        name: "Name",
+        text: "Name",
       },
       {
         by: "createdAt",
         icon: "calendar-plus",
-        name: "Date Added",
+        text: "Date Added",
       },
       {
         by: "updatedAt",
         icon: "calendar-edit",
-        name: "Date of Editing",
+        text: "Date of Editing",
       },
       {
         by: "rating",
         icon: "star",
-        name: "Rating",
+        text: "Rating",
       },
     ],
   }),
@@ -107,6 +105,9 @@ export default {
     sortBy() {
       return this.list[this.index] ? this.list[this.index].by : "";
     },
+    text() {
+      return this.list[this.index] ? this.list[this.index].text : "";
+    },
     icon() {
       return this.list[this.index] ? this.list[this.index].icon : "shape";
     },
@@ -121,7 +122,7 @@ export default {
         this.list.unshift({
           by: "path",
           icon: "alphabetical-variant",
-          name: "Path",
+          text: "Path",
         });
       }
     },

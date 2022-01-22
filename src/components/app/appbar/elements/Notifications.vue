@@ -3,13 +3,13 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge :content="badge" :value="badge" offset-x="25" offset-y="44">
+          <v-badge :content="badge" :value="badge" offset-x="44" offset-y="25">
             <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
               <v-icon>mdi-bell-outline</v-icon>
             </v-btn>
           </v-badge>
         </template>
-        <span>Item Size</span>
+        <span>Notifications</span>
       </v-tooltip>
     </template>
 
@@ -79,7 +79,9 @@ export default {
   },
   data: () => ({
     dialog: false,
-    alerts: [{ id: 1, type: "info", text: "any" }],
+    alerts: [
+      { id: 1, type: "info", text: "Welcome to mediaChips v0.1.0-alpha" },
+    ],
   }),
   mounted() {
     this.$nextTick(() => {});

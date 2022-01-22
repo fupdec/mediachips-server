@@ -3,13 +3,11 @@
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
-          <v-badge :content="badge" offset-x="25" offset-y="44">
-            <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-              <v-icon>mdi-format-size</v-icon>
-            </v-btn>
-          </v-badge>
+          <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
+            <v-icon>mdi-format-size</v-icon>
+          </v-btn>
         </template>
-        <span>Item Size</span>
+        <span>Item Size: {{ badge }}</span>
       </v-tooltip>
     </template>
     <v-list dense>
