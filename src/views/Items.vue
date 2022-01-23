@@ -1,5 +1,5 @@
 <template>
-  <vuescroll>
+  <div>
     <div class="headline text-h4 d-flex align-center justify-center pt-4 pb-2">
       <v-icon left>mdi-{{ page.icon }}</v-icon> {{ page.name }}
       <span v-if="total != totalInDb" class="body-1 text--secondary ml-2">
@@ -90,7 +90,7 @@
     </div>
 
     <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
-  </vuescroll>
+  </div>
 </template>
 
 
@@ -105,6 +105,7 @@ export default {
   name: "Items",
   components: {
     vuescroll,
+    ItemsAppbar: () => import("@/components/app/appbar/ItemsAppbar.vue"),
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),

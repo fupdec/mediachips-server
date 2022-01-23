@@ -1,7 +1,14 @@
 <template>
-  <v-app-bar app dense clipped-left extension-height="28">
+  <v-app-bar :color="color" clipped-left dense app>
+    <template v-slot:img="{ props }">
+      <v-img v-bind="props" :gradient="gradient"></v-img>
+    </template>
     <div class="app-bar-container">
       <vuescroll>
+        <!-- <v-btn @click="toggleNavbar" icon class="ml-0">
+      <img :src="logoPath" alt="mediaChips" width="28" height="28" />
+    </v-btn> -->
+
         <router-view name="appbar" :key="$route.fullPath" />
       </vuescroll>
 
@@ -20,7 +27,9 @@
 
 
 <script>
+const path = require("path");
 import vuescroll from "vuescroll";
+
 export default {
   name: "AppBar",
   components: {
@@ -33,8 +42,51 @@ export default {
       import("@/components/app/appbar/elements/Notifications.vue"),
   },
   mounted() {},
-  data: () => ({}),
+  data: () => ({
+    collapse: false,
+  }),
   computed: {
+    logoPath() {
+      return path.join(__dirname, "/icons/icon.png");
+    },
+    isScrolled() {
+      return this.$store.state.isScrolled;
+    },
+    color() {
+      if (this.$vuetify.theme.dark) return this.appSets.appColorDarkHeader;
+      return this.appSets.appColorLightHeader;
+    },
+    gradient() {
+      if (this.appSets.headerGradient == "0") return "";
+      let gradient = "";
+      if (this.$vuetify.theme.dark) gradient = this.appSets.headerGradientDark;
+      else gradient = this.appSets.headerGradientLight;
+      gradient = gradient.replace("linear-gradient(", "");
+      gradient = gradient.replace(")", "");
+      return gradient;
+    },
+    page: {
+      get() {
+        return this.$store.state.page;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "page",
+          value: value,
+        });
+      },
+    },
+    appSets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "settings",
+          value: _.cloneDeep(value),
+        });
+      },
+    },
     // headerColor() {
     //   if (this.$store.state.Settings.headerGradient) {
     //     if (this.$vuetify.theme.isDark) {
@@ -57,7 +109,7 @@ export default {
     },
   },
   methods: {
-    toggleNav() {
+    toggleNavbar() {
       this.nav = !this.nav;
     },
   },

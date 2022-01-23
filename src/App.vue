@@ -1,14 +1,15 @@
 <template>
   <v-app v-if="isApiReady">
-    <AppBar />
-
     <SideBar v-if="sets.navigationSide == '1'" />
     <BottomBar v-if="sets.navigationSide == '2'" />
 
     <Player v-show="isPlayerActive" />
 
     <v-main app>
-      <router-view :key="$route.fullPath" />
+      <vuescroll ref="scroll" @handle-scroll="handleScroll">
+        <AppBar />
+        <router-view :key="$route.fullPath" />
+      </vuescroll>
     </v-main>
 
     <HoverImage />
@@ -28,6 +29,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import vuescroll from "vuescroll";
 /* TODO
  * countries array
  * playlists: remake as meta
@@ -37,6 +39,7 @@ import axios from "axios";
 export default {
   name: "App",
   components: {
+    vuescroll,
     AppBar: () => import("@/components/app/AppBar.vue"),
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
@@ -106,6 +109,10 @@ export default {
     },
     closeApp() {
       // TODO close app
+    },
+    handleScroll(vertical) {
+      if (vertical.scrollTop > 10) this.$store.state.isScrolled = true;
+      else this.$store.state.isScrolled = false;
     },
   },
 };

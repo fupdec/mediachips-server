@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-2">
+  <div class="table-scroll mx-2">
     <table class="table-meta-in-media-types">
       <thead>
         <tr>
@@ -21,9 +21,7 @@
                 <v-icon left>mdi-{{ i.icon }}</v-icon>
                 {{ i.name }}
               </span>
-              <v-icon left :title="i.type"
-                >mdi-{{ getIcon(i.type) }}</v-icon
-              >
+              <v-icon left :title="i.type">mdi-{{ getIcon(i.type) }}</v-icon>
             </div>
           </td>
           <th>
@@ -95,6 +93,10 @@ export default {
 
 
 <style lang="scss" scoped>
+.table-scroll {
+  max-height: 50vh;
+  overflow-x: hidden;
+}
 .table-meta-in-media-types {
   border-collapse: collapse;
   thead {

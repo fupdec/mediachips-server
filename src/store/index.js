@@ -42,6 +42,7 @@ export default new Vuex.Store({
       x: 0,
       y: 0,
     },
+    isScrolled: false,
     contextMenu: false,
     contextMenuContent: [],
     pathToUserData: '',

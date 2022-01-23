@@ -1,5 +1,5 @@
 <template>
-  <vuescroll>
+  <div>
     <div class="headline text-h4 d-flex align-center justify-center pt-4 pb-2">
       <v-icon left>mdi-cog-outline</v-icon> Settings
     </div>
@@ -54,11 +54,7 @@
       <v-tab-item value="media">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <div class="headline text-center pb-2">Meta assigned to media</div>
-          <vuescroll>
-            <div style="max-height: 400px">
-              <TableMetaInMediaTypes />
-            </div>
-          </vuescroll>
+          <TableMetaInMediaTypes />
           <VideoPreview />
         </v-card>
       </v-tab-item>
@@ -74,17 +70,14 @@
     </v-tabs-items>
 
     <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
-  </vuescroll>
+  </div>
 </template>
 
 
 <script>
-import vuescroll from "vuescroll";
-
 export default {
   name: "Settings",
   components: {
-    vuescroll,
     DarkMode: () => import("@/components/settings/DarkMode.vue"),
     ThemeColors: () => import("@/components/settings/ThemeColors.vue"),
     Appearance: () => import("@/components/settings/Appearance.vue"),
