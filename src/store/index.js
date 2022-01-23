@@ -42,6 +42,8 @@ export default new Vuex.Store({
       x: 0,
       y: 0,
     },
+    isSelect: false,
+    selected: [],
     isScrolled: false,
     contextMenu: false,
     contextMenuContent: [],
@@ -57,9 +59,6 @@ export default new Vuex.Store({
     settings: Settings,
   }),
   getters: {
-    getNotifications(state) {
-      return state.notifications
-    },
     getPathToUserData(state) {
       return path.join(state.pathToUserData, 'userfiles')
     },
@@ -83,60 +82,8 @@ export default new Vuex.Store({
         time: Date.now(),
       })
     },
-    addBackgroundProcess(state, backgroundProcess) {
-      state.backgroundProcesses.push(backgroundProcess)
-    },
-    updateTextBackgroundProcess(state, {
-      id,
-      text
-    }) {
-      const index = state.backgroundProcesses.findIndex(x => x.id === id)
-      if (index > -1) state.backgroundProcesses[index].text = text
-    },
-    removeBackgroundProcess(state, id) {
-      state.backgroundProcesses = state.backgroundProcesses.filter(i => i.id !== id)
-    },
-    setNotification(state, notification) {
-      state.notifications.push({
-        id: Math.ceil(Math.random() * new Date().getTime()),
-        showing: true,
-        type: notification.type,
-        text: notification.text,
-      })
-    },
-    removeNotification(state, id) {
-      state.notifications = state.notifications.filter(n => n.id !== id)
-    },
-    clearAllNotifications(state) {
-      state.notifications = []
-    },
-    stopLoading(state) {
-      state.itemsLoading = false
-    },
-    resetLoading(state) {
-      state.itemsLoading = true
-    },
   },
-  actions: {
-    setNotification({
-      state,
-      commit
-    }, notification) {
-      commit('setNotification', notification)
-    },
-    removeNotification({
-      state,
-      commit
-    }, id) {
-      commit('removeNotification', id)
-    },
-    clearAllNotifications({
-      state,
-      commit
-    }) {
-      commit('clearAllNotifications')
-    },
-  },
+  actions: {},
   modules: {
     Player,
   }

@@ -3,13 +3,26 @@
     <template v-slot:img="{ props }">
       <v-img v-bind="props" :gradient="gradient"></v-img>
     </template>
+
     <div class="app-bar-container">
       <vuescroll>
         <!-- <v-btn @click="toggleNavbar" icon class="ml-0">
       <img :src="logoPath" alt="mediaChips" width="28" height="28" />
     </v-btn> -->
 
-        <router-view name="appbar" :key="$route.fullPath" />
+        <div v-if="isSelect" class="d-flex align-center">
+          <v-btn @click="toggleSelect" icon class="mx-2">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+
+          {{
+            selected.length
+              ? `${selected.length} selected`
+              : `Please select ${page.name.toLowerCase()}`
+          }}
+        </div>
+
+        <router-view v-else name="appbar" :key="$route.fullPath" />
       </vuescroll>
 
       <v-spacer></v-spacer>
@@ -87,17 +100,28 @@ export default {
         });
       },
     },
-    // headerColor() {
-    //   if (this.$store.state.Settings.headerGradient) {
-    //     if (this.$vuetify.theme.isDark) {
-    //       return this.$store.state.Settings.headerGradientDark
-    //     } else return this.$store.state.Settings.headerGradientLight
-    //   } else {
-    //     if (this.$vuetify.theme.isDark) {
-    //       return this.$store.state.Settings.appColorDarkHeader
-    //     } else return this.$store.state.Settings.appColorLightHeader
-    //   }
-    // },
+    isSelect: {
+      get() {
+        return this.$store.state.isSelect;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "isSelect",
+          value: value,
+        });
+      },
+    },
+    selected: {
+      get() {
+        return this.$store.state.selected;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "selected",
+          value: value,
+        });
+      },
+    },
     // tabs() { return this.$store.getters.tabs },
     nav: {
       get() {
@@ -111,6 +135,13 @@ export default {
   methods: {
     toggleNavbar() {
       this.nav = !this.nav;
+    },
+    toggleSelect() {
+      this.$store.commit("updateState", {
+        key: "selected",
+        value: [],
+      });
+      this.isSelect = !this.isSelect;
     },
   },
 };

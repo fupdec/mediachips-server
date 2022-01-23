@@ -3,12 +3,10 @@
     <v-card
       v-if="pageSets.view == '1'"
       @mousedown="stopSmoothScroll($event)"
-      @click="openPlayer"
-      v-ripple="{ class: 'accent--text' }"
       :class="{ favorite: video.favorite }"
+      class="video-card meta-card"
       outlined
       hover
-      class="video-card meta-card"
     >
       <v-responsive
         @mouseover.capture="playPreview()"
@@ -17,6 +15,17 @@
         class="video-preview-container"
       >
         <v-img :src="thumb" :aspect-ratio="16 / 9" />
+
+        <v-btn
+          @click="openPlayer"
+          color="white"
+          class="btn-play"
+          icon
+          outlined
+        >
+          <v-icon>mdi-play</v-icon>
+        </v-btn>
+
         <v-rating
           :value="video.rating"
           @input="changeRating($event, video.id)"
@@ -136,7 +145,19 @@
         :title="video.bookmark"
         v-html="'mdi-bookmark'"
       />
+
+      <v-overlay
+        :value="isSelect"
+        @click.stop="toggleSelect"
+        :color="isSelected ? 'primary' : '#7777'"
+        absolute
+      >
+        <v-icon v-if="isSelected" size="50">
+          mdi-checkbox-marked-outline
+        </v-icon>
+      </v-overlay>
     </v-card>
+
     <v-card
       v-else-if="pageSets.view == '2'"
       @mousedown="stopSmoothScroll($event)"
@@ -212,6 +233,17 @@
         :title="video.bookmark"
         v-html="'mdi-bookmark'"
       />
+
+      <v-overlay
+        :value="isSelect"
+        @click.stop="toggleSelect"
+        :color="isSelected ? 'primary' : '#7777'"
+        absolute
+      >
+        <v-icon v-if="isSelected" size="50">
+          mdi-checkbox-marked-outline
+        </v-icon>
+      </v-overlay>
     </v-card>
   </v-lazy>
 </template>
@@ -219,6 +251,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import Item from "@/mixins/Item";
 
 const path = require("path");
 // const { dialog } = require('electron').remote
@@ -243,7 +276,7 @@ export default {
     video: Object,
     items: Array,
   },
-  // mixins: [ShowImageFunction, Functions, LabelFunctions, MetaGetters],
+  mixins: [Item],
   beforeMount() {
     this.getMetadata();
     this.getMeta();
@@ -334,11 +367,6 @@ export default {
     // playlists() { return this.$store.getters.playlists.value() },
   },
   methods: {
-    stopSmoothScroll(event) {
-      if (event.button != 1) return;
-      event.preventDefault();
-      event.stopPropagation();
-    },
     async getImg() {
       let imgPath = path.join(
         __dirname,
@@ -392,9 +420,6 @@ export default {
       let value = Vue.prototype.$checkColorForDarkText(color);
       if (value) return "white";
       else return "black";
-    },
-    hoverImage(event, metaId, itemId) {
-      Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
     playPreview() {
       if (this.isHovered) return;

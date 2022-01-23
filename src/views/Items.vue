@@ -115,6 +115,8 @@ export default {
   async beforeMount() {
     this.page.items = [];
     await this.init();
+    this.$store.state.selected = [];
+    this.$store.state.isSelect = false;
   },
   mounted() {
     this.$root.$on("setItemsFilters", async (val) => {

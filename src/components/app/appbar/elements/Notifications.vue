@@ -93,7 +93,7 @@ export default {
   },
   methods: {
     close(index) {
-      this.alerts = this.alerts.slice(index, 0);
+      this.alerts.splice(index, 1);
     },
     clearAll() {
       this.menu = false;

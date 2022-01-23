@@ -64,7 +64,7 @@ export default {
       //   if (this.numberOfCreatedGrid) this.$store.commit("updateVideos");
       this.numberOfCreatedGrid = 0;
       this.isGenGridsRun = false;
-      this.tasks = this.tasks.slice(x, 0);
+      this.tasks.splice(x, 1);
     },
     /**
      * Creating an image by taking a frame from a video.

@@ -8,6 +8,7 @@
     <ItemsLimit />
     <ItemsSize />
     <ItemsView />
+    <ItemsSelect />
   </div>
 </template>
 
@@ -29,6 +30,8 @@ export default {
     ItemsLimit: () => import("@/components/app/appbar/elements/ItemsLimit.vue"),
     ItemsSize: () => import("@/components/app/appbar/elements/ItemsSize.vue"),
     ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
+    ItemsSelect: () =>
+      import("@/components/app/appbar/elements/ItemsSelect.vue"),
   },
   computed: {
     isMediaPage() {

@@ -3,9 +3,9 @@
     <v-card
       v-if="pageSets.view == '1'"
       :class="{ favorite: item.favorite }"
+      class="meta-card"
       outlined
       hover
-      class="meta-card"
     >
       <div class="img-container">
         <v-icon
@@ -116,6 +116,17 @@
           {{ v.value }}
         </v-chip>
       </div>
+
+      <v-overlay
+        :value="isSelect"
+        @click.stop="toggleSelect"
+        :color="isSelected ? 'primary' : '#7777'"
+        absolute
+      >
+        <v-icon v-if="isSelected" size="50">
+          mdi-checkbox-marked-outline
+        </v-icon>
+      </v-overlay>
     </v-card>
 
     <v-chip
@@ -132,6 +143,17 @@
         <v-img :src="images.main" position="top" />
       </v-avatar>
       <div class="ml-2">{{ item.name }}</div>
+      
+      <v-overlay
+        :value="isSelect"
+        @click.stop="toggleSelect"
+        :color="isSelected ? 'primary' : '#7777'"
+        absolute
+      >
+        <v-icon v-if="isSelected">
+          mdi-checkbox-marked-outline
+        </v-icon>
+      </v-overlay>
     </v-chip>
   </v-lazy>
 </template>
@@ -139,6 +161,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import Item from "@/mixins/Item";
 
 const path = require("path");
 
@@ -148,6 +171,7 @@ export default {
     item: Object,
     meta: Object,
   },
+  mixins: [Item],
   mounted() {
     this.$nextTick(() => {
       this.getImages();
@@ -176,11 +200,6 @@ export default {
     },
   },
   methods: {
-    stopSmoothScroll(event) {
-      if (event.button != 1) return;
-      event.preventDefault();
-      event.stopPropagation();
-    },
     async getImages() {
       const imageTypes = ["main", "alt", "custom1", "custom2"];
       const settings = this.meta.metaSetting.imageTypes;
@@ -235,9 +254,6 @@ export default {
       let value = Vue.prototype.$checkColorForDarkText(color);
       if (value) return "white";
       else return "black";
-    },
-    hoverImage(event, metaId, itemId) {
-      Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
   },
   watch: {},
