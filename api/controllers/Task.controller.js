@@ -16,18 +16,10 @@ const {
   SavedFilter
 } = require("../index.js");
 
-// FFMPEG
-const ffmpeg = require('fluent-ffmpeg')
-const pathToFfmpeg = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
-const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked')
-ffmpeg.setFfmpegPath(pathToFfmpeg)
-ffmpeg.setFfprobePath(pathToFfprobe)
-
 const os = require('os')
 const fs = require("fs")
 const path = require('path')
 const StreamZip = require('node-stream-zip')
-
 
 // importing old database from JSON
 exports.importDatabase = async (req, res) => {
@@ -555,6 +547,14 @@ exports.importDatabase = async (req, res) => {
   })
 };
 
+
+// FFMPEG
+const ffmpeg = require('fluent-ffmpeg')
+const pathToFfmpeg = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
+const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked')
+ffmpeg.setFfmpegPath(pathToFfmpeg)
+ffmpeg.setFfprobePath(pathToFfprobe)
+
 exports.createThumb = async (req, res) => {
   /** 
    * Creating an image by taking a frame from a video.
@@ -829,4 +829,15 @@ exports.createTimeline = async (req, res) => {
       message: 'Timeline already exists'
     });
   }
+};
+
+
+const {
+  machineId
+} = require('node-machine-id')
+
+exports.getMachineId = async (req, res) => {
+  machineId().then((id) => {
+    res.status(201).send(id)
+  })
 };

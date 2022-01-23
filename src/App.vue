@@ -54,6 +54,7 @@ export default {
     await this.initSettings();
     await this.applyTheme();
     this.checkLogin();
+    await this.getMachineId();
   },
   data: () => ({
     isServerError: false,
@@ -113,6 +114,16 @@ export default {
     handleScroll(vertical) {
       if (vertical.scrollTop > 10) this.$store.state.isScrolled = true;
       else this.$store.state.isScrolled = false;
+    },
+    async getMachineId() {
+      await axios
+        .get(this.apiUrl + "/api/Task/getMachineId")
+        .then((res) => {
+          this.$store.state.machineId = res.data;
+        })
+        .catch((e) => {
+          // console.log(e);
+        });
     },
   },
 };

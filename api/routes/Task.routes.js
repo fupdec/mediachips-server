@@ -12,8 +12,11 @@ module.exports = app => {
   // creating frames grid for video
   router.post("/createGrid", Task.createGrid);
 
-  // creating frames grid for video
+  // creating frames timeline for video
   router.post("/createTimeline", Task.createTimeline);
+
+  // check serial key
+  router.get("/getMachineId", Task.getMachineId);
 
   app.use('/api/Task/', router);
 };

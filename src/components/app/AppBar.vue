@@ -28,6 +28,18 @@
       <v-spacer></v-spacer>
 
       <div class="d-flex">
+        <v-tooltip v-if="!reg" bottom>
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" @click="register" icon>
+              <v-icon>mdi-lock-question</v-icon>
+            </v-btn>
+          </template>
+          <span>
+            In the unregistered version, <br />
+            the number of media per page is limited to 5
+          </span>
+        </v-tooltip>
+
         <GlobalSearch />
         <Tasks />
         <Notifications />
@@ -42,9 +54,11 @@
 <script>
 const path = require("path");
 import vuescroll from "vuescroll";
+import Keys from "@/mixins/Keys";
 
 export default {
   name: "AppBar",
+  mixins: [Keys],
   components: {
     vuescroll,
     // Tabs: () => import('@/components/elements/Tabs.vue'),
@@ -142,6 +156,10 @@ export default {
         value: [],
       });
       this.isSelect = !this.isSelect;
+    },
+    register() {
+      if (this.$router.history.current.name !== "Settings")
+        this.$router.push("/settings/?tab=about");
     },
   },
 };

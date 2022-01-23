@@ -2,6 +2,7 @@
   <v-lazy>
     <v-card
       v-if="pageSets.view == '1'"
+      :disabled="!reg && x > 9"
       @mousedown="stopSmoothScroll($event)"
       :class="{ favorite: video.favorite }"
       class="video-card meta-card"
@@ -14,15 +15,13 @@
         :aspect-ratio="16 / 9"
         class="video-preview-container"
       >
+        <div v-if="!reg && x > 9" class="reg-block">
+          <div>App not registered</div>
+        </div>
+
         <v-img :src="thumb" :aspect-ratio="16 / 9" />
 
-        <v-btn
-          @click="openPlayer"
-          color="white"
-          class="btn-play"
-          icon
-          outlined
-        >
+        <v-btn @click="openPlayer" color="white" class="btn-play" icon outlined>
           <v-icon>mdi-play</v-icon>
         </v-btn>
 
@@ -160,6 +159,7 @@
 
     <v-card
       v-else-if="pageSets.view == '2'"
+      :disabled="!reg && x > 9"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
       :class="{ favorite: video.favorite }"
@@ -175,6 +175,7 @@
         class="story"
       >
         <v-sheet class="video-card-title" v-html="fileName" />
+        <div v-if="!reg && x > 9" class="reg-block">App not registered</div>
 
         <div label outlined class="resolution">
           <div
@@ -275,6 +276,8 @@ export default {
   props: {
     video: Object,
     items: Array,
+    reg: Boolean,
+    x: Number,
   },
   mixins: [Item],
   beforeMount() {

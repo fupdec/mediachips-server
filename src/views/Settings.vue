@@ -64,6 +64,7 @@
       </v-tab-item>
       <v-tab-item value="about">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
+          <Registration />
           <About />
         </v-card>
       </v-tab-item>
@@ -87,7 +88,13 @@ export default {
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
     Login: () => import("@/components/settings/Login.vue"),
+    Registration: () => import("@/components/settings/Registration.vue"),
     About: () => import("@/components/app/About.vue"),
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (this.$route.query.tab == "about") this.tab = "about";
+    });
   },
   data: () => ({
     tab: "app",

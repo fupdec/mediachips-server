@@ -38,7 +38,14 @@
         { 'line-grid': pageSets.view == '2' },
       ]"
     >
-      <ItemVideo v-for="i in items" :key="i.id" :video="i" :items="items" />
+      <ItemVideo
+        v-for="(i, x) in items"
+        :key="i.id"
+        :video="i"
+        :items="items"
+        :reg="reg"
+        :x="x"
+      />
     </v-container>
     <v-container
       v-else-if="isMetaPage"
@@ -100,6 +107,7 @@ import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
 import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";
+import Keys from "@/mixins/Keys";
 
 export default {
   name: "Items",
@@ -111,7 +119,7 @@ export default {
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
-  mixins: [GeneratingThumbsForVideos],
+  mixins: [GeneratingThumbsForVideos, Keys],
   async beforeMount() {
     this.page.items = [];
     await this.init();

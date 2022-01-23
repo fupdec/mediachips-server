@@ -30,9 +30,9 @@
       <vuescroll>
         <v-card-text class="pa-2 notifications-list">
           <v-alert
-            v-for="(a, i) in alerts"
-            :key="a.id"
-            :type="a.type"
+            v-for="(i, x) in notifications"
+            :key="i.id"
+            :type="i.type"
             class="mb-1"
             dense
             text
@@ -40,12 +40,12 @@
           >
             <v-row align="center">
               <v-col class="grow pa-0">
-                <div class="caption">{{ a.text }}</div>
+                <div class="caption">{{ i.text }}</div>
               </v-col>
               <v-col class="shrink pa-0">
                 <v-btn
-                  @click="close(i)"
-                  :color="a.type"
+                  @click="close(x)"
+                  :color="i.type"
                   depressed
                   block
                   icon
@@ -58,7 +58,7 @@
             </v-row>
           </v-alert>
 
-          <div v-if="alerts.length == 0" class="text-center py-2">
+          <div v-if="notifications.length == 0" class="text-center py-2">
             <v-icon class="mb-2">mdi-ghost-outline</v-icon>
             <div class="caption">No new notifications</div>
           </div>
@@ -79,24 +79,32 @@ export default {
   },
   data: () => ({
     dialog: false,
-    alerts: [
-      { id: 1, type: "info", text: "Welcome to mediaChips v0.1.0-alpha" },
-    ],
   }),
   mounted() {
     this.$nextTick(() => {});
   },
   computed: {
+    notifications: {
+      get() {
+        return this.$store.state.notifications;
+      },
+      set(value) {
+        this.$store.commit("updateState", {
+          key: "notifications",
+          value: _.cloneDeep(value),
+        });
+      },
+    },
     badge() {
-      return this.alerts.length;
+      return this.notifications.length;
     },
   },
   methods: {
     close(index) {
-      this.alerts.splice(index, 1);
+      this.notifications.splice(index, 1);
     },
     clearAll() {
-      this.menu = false;
+      this.notifications = [];
     },
   },
 };

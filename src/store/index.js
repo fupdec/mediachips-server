@@ -82,6 +82,19 @@ export default new Vuex.Store({
         time: Date.now(),
       })
     },
+    setNotification(state, {
+      text,
+      type,
+      color
+    }) {
+      state.notifications.push({
+        id: Vue.prototype.$getRandomId(),
+        type: type,
+        text: text,
+        color: color,
+        time: Date.now(),
+      })
+    },
   },
   actions: {},
   modules: {
