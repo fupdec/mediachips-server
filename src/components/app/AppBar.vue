@@ -4,14 +4,14 @@
       <v-img v-bind="props" :gradient="gradient"></v-img>
     </template>
 
-    <div class="app-bar-container">
+    <div class="app-bar-container px-1">
       <vuescroll>
         <!-- <v-btn @click="toggleNavbar" icon class="ml-0">
       <img :src="logoPath" alt="mediaChips" width="28" height="28" />
     </v-btn> -->
 
         <div v-if="isSelect" class="d-flex align-center">
-          <v-btn @click="toggleSelect" icon class="mx-2">
+          <v-btn @click="toggleSelect" icon class="mr-2">
             <v-icon>mdi-close</v-icon>
           </v-btn>
 
