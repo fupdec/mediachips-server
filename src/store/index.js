@@ -85,15 +85,21 @@ export default new Vuex.Store({
     setNotification(state, {
       text,
       type,
-      color
+      icon
     }) {
+      const id = Vue.prototype.$getRandomId()
       state.notifications.push({
-        id: Vue.prototype.$getRandomId(),
-        type: type,
-        text: text,
-        color: color,
-        time: Date.now(),
+        id,
+        text,
+        type,
+        icon,
+        show: true
       })
+      setTimeout(() => {
+        let x = state.notifications.findIndex(i => i.id == id)
+        if (x > -1) state.notifications[x].show = false
+        return false
+      }, 5000);
     },
   },
   actions: {},

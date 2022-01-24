@@ -14,6 +14,8 @@
 
     <HoverImage />
 
+    <Snackbars />
+
     <v-dialog v-model="isServerError" persistent overlay-opacity="1">
       <v-alert type="error" text outlined class="mb-0">
         Failed to start the server. The settings may be incorrect. After
@@ -46,6 +48,7 @@ export default {
     Player: () => import("@/components/app/Player.vue"),
     DialogLogin: () => import("@/components/dialogs/DialogLogin.vue"),
     HoverImage: () => import("@/components/app/HoverImage.vue"),
+    Snackbars: () => import("@/components/app/Snackbars.vue"),
   },
   async beforeMount() {},
   async mounted() {

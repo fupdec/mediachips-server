@@ -20,42 +20,26 @@
         <v-btn icon x-small @click="clearAll">
           <v-icon>mdi-notification-clear-all</v-icon>
         </v-btn>
-        <v-btn icon x-small @click="menu = false">
-          <v-icon>mdi-chevron-down</v-icon>
-        </v-btn>
       </v-card-actions>
 
       <v-divider></v-divider>
 
       <vuescroll>
-        <v-card-text class="pa-2 notifications-list">
+        <v-card-text class="pa-1" style="max-height: 500px">
           <v-alert
             v-for="(i, x) in notifications"
             :key="i.id"
             :type="i.type"
-            class="mb-1"
+            class="mb-2 pa-2"
+            style="word-break: break-all"
             dense
             text
             outlined
           >
-            <v-row align="center">
-              <v-col class="grow pa-0">
-                <div class="caption">{{ i.text }}</div>
-              </v-col>
-              <v-col class="shrink pa-0">
-                <v-btn
-                  @click="close(x)"
-                  :color="i.type"
-                  depressed
-                  block
-                  icon
-                  width="24"
-                  height="24"
-                >
-                  <v-icon size="16">mdi-close</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
+            <div class="d-flex justify-space-between align-start">
+              <span class="caption">{{ i.text }}</span>
+              <v-icon @click="close(x)" :color="i.type" right>mdi-close</v-icon>
+            </div>
           </v-alert>
 
           <div v-if="notifications.length == 0" class="text-center py-2">
