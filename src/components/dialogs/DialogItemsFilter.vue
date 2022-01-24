@@ -257,6 +257,7 @@ export default {
         lock: false,
         appbar: false,
         union: "AND",
+        metaId: null,
       });
     },
     setBy(value, index) {
@@ -265,6 +266,7 @@ export default {
       if (found > -1) this.filters[index].type = this.listBy[found].type;
       this.filters[index].cond = null;
       this.filters[index].val = null;
+      if (typeof value == "number") this.filters[index].metaId = value;
     },
     setCond(value, index) {
       this.filters[index].cond = value;

@@ -181,6 +181,14 @@ WatchedFolder.belongsTo(MediaType, {
   foreignKey: 'typeId'
 })
 
+Meta.hasMany(FilterRow, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+FilterRow.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
+
 Meta.hasMany(SavedFilter, {
   foreignKey: 'metaId',
   onDelete: "cascade"
