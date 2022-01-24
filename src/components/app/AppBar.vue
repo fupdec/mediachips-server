@@ -36,7 +36,7 @@
           </template>
           <span>
             In the unregistered version, <br />
-            the number of media per page is limited to 5
+            the number of media per page is limited to 10
           </span>
         </v-tooltip>
 

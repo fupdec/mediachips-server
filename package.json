@@ -1,6 +1,6 @@
 {
-  "name": "mediachips",
-  "productName": "mediaChips",
+  "name": "mediachips-server",
+  "productName": "mediaChips-server",
   "version": "0.1.0",
   "author": {
     "name": "fupdec",
