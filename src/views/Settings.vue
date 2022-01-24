@@ -37,7 +37,7 @@
     <v-tabs-items v-model="tab" class="settings-tabs">
       <v-tab-item value="app">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <WatchedFolders />
+          <!-- <WatchedFolders /> -->
           <Login />
         </v-card>
       </v-tab-item>

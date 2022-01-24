@@ -50,9 +50,9 @@ export default {
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  align-items: end;
-  align-content: end;
-  justify-content: start;
+  align-items: flex-end;
+  align-content: flex-end;
+  justify-content: flex-start;
   position: fixed;
   top: 65px;
   right: 15px;
