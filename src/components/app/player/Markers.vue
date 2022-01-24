@@ -57,10 +57,11 @@
                     <v-icon small class="mr-1" :color="getColor(mark)">
                       mdi-{{ getIcon(mark) }}
                     </v-icon>
-                    <span v-if="mark.type == 'meta'">{{
-                      mark["Item.name"]
-                    }}</span>
-                    <span v-else>{{ mark.name }}</span>
+                    <span
+                      v-if="mark.type == 'meta'"
+                      v-html="mark['item.name']"
+                    />
+                    <span v-else v-html="mark.name" />
                   </div>
                 </v-img>
               </div>
@@ -157,7 +158,7 @@ export default {
       let color = "primary";
       if (mark.type == "favorite") color = "#e91e63";
       else if (mark.type == "bookmark") color = "#f44336";
-      else if (mark.type == "meta") color = mark["Item.color"];
+      else if (mark.type == "meta") color = mark["item.color"];
       return color;
     },
     getDuration(duration) {

@@ -8,8 +8,8 @@
       <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb" />
       <v-chip small class="mr-1 px-1 py-0">
         <v-icon small class="mr-1" :color="color"> mdi-{{ icon }} </v-icon>
-        <span v-if="mark.type == 'meta'">{{ mark["Item.name"] }}</span>
-        <span v-else>{{ mark.name }}</span>
+        <span v-if="mark.type == 'meta'" v-html="mark['item.name']" />
+        <span v-else v-html="mark.name" />
       </v-chip>
       <v-chip label small class="pa-1 py-0">{{ duration }}</v-chip>
     </v-sheet>
@@ -50,7 +50,7 @@ export default {
       let color = "primary";
       if (this.mark.type == "favorite") color = "#e91e63";
       else if (this.mark.type == "bookmark") color = "#f44336";
-      else if (this.mark.type == "meta") color = this.mark["Item.color"];
+      else if (this.mark.type == "meta") color = this.mark["item.color"];
       return color;
     },
     duration() {
