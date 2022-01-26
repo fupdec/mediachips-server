@@ -94,8 +94,8 @@
 
         <v-chip
           v-for="i in items"
-          :key="i.itemId + i.childItemId"
-          @mouseover.stop="hoverImage($event, i['item.metaId'], i.childItemId)"
+          :key="i.parentItemId + i.itemId"
+          @mouseover.stop="hoverImage($event, i['item.metaId'], i.itemId)"
           @mouseleave.stop="$store.state.hover.show = false"
           :color="i['item.color']"
           :text-color="getTextColor(i['item.color'])"

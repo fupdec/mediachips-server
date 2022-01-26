@@ -9,37 +9,44 @@ exports.create = async (req, res) => {
   let filterObj = req.body.filter
   let val = filterObj.val
   if (filterObj.type == 'array') filterObj.val = null
-  console.log(req.body)
+
   const [filterRow, isCreated] = await FilterRow.findOrCreate({
     where: {
       id: req.body.rowId,
     },
     defaults: filterObj,
   })
-  console.log(filterRow, isCreated)
 
   if (isCreated) {
     await FilterRowsInSavedFilter.create({
       filterId: req.body.filterId,
       rowId: filterRow.id
     })
-    // TODO delete items from filter value
-    if (filterObj.type == 'array') {
-      for (let i of val) {
-        await ItemsInFilterRow.findOrCreate({
-          where: {
-            itemId: i,
-            rowId: filterRow.id
-          }
-        })
-      }
-    }
   } else {
     await FilterRow.update(filterObj, {
       where: {
         id: req.body.rowId,
       },
     })
+  }
+
+  if (filterObj.type == 'array') {
+    // deleting previously stored values
+    await ItemsInFilterRow.destroy({
+      where: {
+        rowId: filterRow.id
+      }
+    })
+    if (!filterObj.cond.includes('null'))
+      for (let i of val) {
+        await ItemsInFilterRow.findOrCreate({
+          where: {
+            itemId: i,
+            rowId: filterRow.id,
+            metaId: filterRow.metaId
+          }
+        })
+      }
   }
   res.sendStatus(201)
 };

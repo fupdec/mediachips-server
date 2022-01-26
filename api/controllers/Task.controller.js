@@ -433,7 +433,7 @@ exports.importDatabase = async (req, res) => {
     }
 
     await ChildMeta.bulkCreate(childMeta)
-  }).then(async () => { // meta in metaItems
+  }).then(async () => { // items in meta items
     let itemsInItem = []
     let valuesInItem = []
     for (let card of obj.metaInItems) {
@@ -448,12 +448,12 @@ exports.importDatabase = async (req, res) => {
           let val = card[cardId][key]
           if (metaOfItem.type === 'array') {
             for (let itemOldId of val) {
-              let childItem = itemsIds.find(x => x.oldId === itemOldId)
-              if (!childItem) continue
-              else {
+              let item = itemsIds.find(x => x.oldId === itemOldId)
+              if (item) {
                 itemsInItem.push({
-                  itemId: metaItem.id,
-                  childItemId: childItem.id
+                  parentItemId: metaItem.id,
+                  itemId: item.id,
+                  metaId: metaOfItem.id,
                 })
               }
             }

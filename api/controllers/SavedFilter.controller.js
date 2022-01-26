@@ -1,9 +1,8 @@
 const {
   SavedFilter,
-  Media,
-  Meta,
   FilterRow,
-  FilterRowsInSavedFilter
+  FilterRowsInSavedFilter,
+  ItemsInFilterRow
 } = require("../index.js");
 
 // Create and Save a new SavedFilter
@@ -51,13 +50,26 @@ exports.findOneForPage = (req, res) => {
       }
     })
     .then(async data => {
-      const filters = await FilterRowsInSavedFilter
+      let filters = await FilterRowsInSavedFilter
         .findAll({
           where: {
             filterId: data.id,
           },
           include: [FilterRow],
         })
+
+      for (let i of filters) {
+        if (i.filterRow.type == 'array') {
+          let vals = await ItemsInFilterRow
+            .findAll({
+              where: {
+                rowId: i.filterRow.id,
+              },
+            })
+          if (vals) i.filterRow.val = vals.map(i => i.itemId)
+        }
+      }
+
       res.status(201).send({
         filters,
         savedFilter: data

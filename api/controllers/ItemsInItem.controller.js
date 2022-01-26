@@ -13,7 +13,7 @@ exports.create = (req, res) => {};
 exports.findAll = (req, res) => {
   ItemsInItem.findAll({
     where: {
-      itemId: req.query.itemId
+      parentItemId: req.query.itemId
     },
     include: [{
       model: Item,

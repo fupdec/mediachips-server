@@ -64,8 +64,7 @@ const Readable = {
     Vue.prototype.$getListCond = function (type) {
       if (!type) return [];
       else if (type == "number" || type == "date")
-        return [
-          {
+        return [{
             cond: "=",
             icon: "equal",
             text: "equal",
@@ -97,8 +96,7 @@ const Readable = {
           },
         ];
       else if (type == "string")
-        return [
-          {
+        return [{
             cond: "like",
             icon: "equal",
             text: "includes",
@@ -120,23 +118,21 @@ const Readable = {
           },
         ];
       else if (type == "array")
-        return [
-          {
+        return [{
             cond: "in",
             icon: "math-norm",
             text: "includes one of",
           },
-          // TODO includes all and other conditions
           // {
-          //   cond: "includes all",
+          //   cond: "in all",
           //   icon: "equal",
           //   text: "includes all",
           // },
-          // {
-          //   cond: "not in",
-          //   icon: "not-equal-variant",
-          //   text: "excludes",
-          // },
+          {
+            cond: "not in",
+            icon: "not-equal-variant",
+            text: "excludes",
+          },
           {
             cond: "is null",
             icon: "code-brackets",
@@ -144,13 +140,12 @@ const Readable = {
           },
           {
             cond: "not null",
-            icon: "code-brackets",
+            icon: "dots-horizontal",
             text: "not empty",
           },
         ];
       else if (type == "boolean")
-        return [
-          {
+        return [{
             cond: "=",
             icon: "check",
             text: "yes",
@@ -232,56 +227,73 @@ const Readable = {
           options.store.state.hover.show = false
       }, 5000)
     }
-    Vue.prototype.$filterItems = function (sets, itemsType) {
+    Vue.prototype.$filterItems = function (sets, type) {
       /** 
        * Creating query for getting items from database.
-       * @param {array} filters - with filter objects.
+       * @param {string} type - type of items: media or items.
        */
       let filters = sets.filters
       let videoCols = Cols.video.map(i => i.by)
       const isFilterByVideo = filters.some(i => videoCols.includes(i.by))
       const isFilterTypeArray = filters.some(i => i.type === 'array')
 
-      const parseFilters = (arr) => {
+      const getQueryFromFilter = (i) => {
         let q = ""
-        for (let i of arr) {
-          if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
-          if (i.type === 'string') {
-            q += `${i.union} ${i.by} ${i.cond} `;
-            if (!i.cond.includes('null')) {
-              q += `'%${i.val}%' `;
-            }
-          } else if (i.type === 'number') {
-            q += `${i.union} ${i.by} ${i.cond} ${i.val} `;
-          } else if (i.type === 'date') {
-            q += `${i.union} ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
-          } else if (i.type === 'boolean') { // TODO rating type
-            q += `${i.union} ${i.by} ${i.cond} 1 `;
-          } else if (i.type === 'array') { // TODO fix values
-            console.log(i.val)
-            // q += `${i.union} itemsIn${itemsType}.childItemId ${i.cond} (${i.val.join()}) `;
+        if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
+        if (i.type === 'string') {
+          q += `${i.union} ${i.by} ${i.cond} `;
+          if (!i.cond.includes('null')) {
+            q += `'%${i.val}%' `;
           }
+        } else if (i.type === 'number') { // TODO add rating type
+          q += `${i.union} ${i.by} ${i.cond} ${i.val} `;
+        } else if (i.type === 'date') {
+          q += `${i.union} ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
+        } else if (i.type === 'boolean') {
+          q += `${i.union} ${i.by} ${i.cond} 1 `;
+        } else if (i.type === 'array') {
+          let parent = 'media'
+          if (type == 'items') parent = 'parentItem'
+          q += `${i.union} `
+          if (i.cond == 'not in') {
+            q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
+              ${type}.id = itemsIn${type}.${parent}Id
+                AND itemsIn${type}.itemId IN (${i.val.join()}) ) `
+          } else if (i.cond == 'in all') {
+            q += `( `
+            for (let j = 0; j < i.val.length; j++) {
+              if (j != 0) q += `AND `
+              q += `itemsIn${type}.itemId = ${i.val[j]} `
+            }
+            q += `) `
+          } else if (i.cond == 'is null') {
+            q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
+              ${type}.id = itemsIn${type}.${parent}Id
+                AND itemsIn${type}.metaId = ${i.by} ) `
+          } else if (i.cond == 'not null') {
+            q += `itemsIn${type}.metaId = ${i.by} `
+          } else q += `itemsIn${type}.itemId ${i.cond} (${i.val.join()}) `;
         }
         return q
       }
 
-      let q = `SELECT * FROM ${itemsType} `;
+      let q = `SELECT * FROM ${type} `;
       if (isFilterByVideo) {
         q += "INNER JOIN videoMetadata ON media.id = videoMetadata.mediaId ";
       }
       if (isFilterTypeArray) {
-        if (itemsType == 'media') {
-          q += "INNER JOIN itemsInMedia ON media.id = itemsInMedia.mediaId ";
-        } else if (itemsType == 'items') {
-          q += "INNER JOIN itemsInItems ON items.id = itemsInItems.itemId ";
+        if (type == 'media') {
+          q += "LEFT OUTER JOIN itemsInMedia ON media.id = itemsInMedia.mediaId ";
+        } else if (type == 'items') {
+          q += "LEFT OUTER JOIN itemsInItems ON items.id = itemsInItems.parentItemId ";
         }
       }
-      if (itemsType == 'media') {
+      if (type == 'media') {
         q += `WHERE typeId = ${sets.typeId} `;
-      } else if (itemsType == 'items') {
-        q += `WHERE metaId = ${sets.metaId} `;
+      } else if (type == 'items') {
+        q += `WHERE items.metaId = ${sets.metaId} `;
       }
-      q += parseFilters(filters);
+      for (let i of filters) q += getQueryFromFilter(i);
       q += "GROUP BY id ";
       q += `ORDER BY ${sets.sortBy} ${sets.sortDir} `;
       return q

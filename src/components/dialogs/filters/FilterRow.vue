@@ -122,14 +122,14 @@
         :items="listItems"
         item-value="id"
         :disabled="
-          filter.lock || filter.cond == 'empty' || filter.cond == 'not empty'
+          filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
         :menu-props="{ contentClass: 'list-with-preview' }"
         :ref="filter.by"
         :filter="filterItems"
         :rules="[validVal]"
         label="Values"
-        class="val hidden-close"
+        class="val"
         outlined
         multiple
         dense
@@ -139,17 +139,15 @@
         <template v-slot:selection="data">
           <v-chip
             v-bind="data.attrs"
-            @click="data.select"
-            @click:close="removeItem(data.item.id)"
+            @click="removeItem(data.item.id)"
             @mouseover.stop="showHoverImage($event, data.item.id)"
             @mouseleave.stop="$store.state.hover.show = false"
             :input-value="data.selected"
             :color="data.item.color"
             :label="meta.metaSetting.chipLabel"
             :outlined="meta.metaSetting.chipOutlined"
-            small
-            close
             class="my-1 px-2"
+            small
           >
             <span>{{ data.item.name }}</span>
           </v-chip>
@@ -224,7 +222,9 @@ export default {
     listBy: Array,
   },
   mounted() {
-    this.$nextTick(function () {});
+    this.$nextTick(() => {
+      if (typeof this.filter.by == "number") this.getItems(this.filter.by);
+    });
   },
   data: () => ({
     valid: false,
@@ -356,8 +356,8 @@ export default {
     },
     validVal(val) {
       const cond = this.filter.cond;
-      if (val !== null) return true;
-      if (cond !== "is null" && cond !== "is null") return true;
+      if (val !== null && val.length > 0) return true;
+      else if (cond !== "is null" && cond !== "null") return true;
       else return "Value is required";
     },
   },

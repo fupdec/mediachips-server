@@ -109,6 +109,13 @@ Media.hasMany(ItemsInMedia, {
 ItemsInMedia.belongsTo(Media, {
   foreignKey: 'mediaId'
 })
+Meta.hasMany(ItemsInMedia, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+ItemsInMedia.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
 
 ValuesInMedia.removeAttribute('id')
 Media.belongsToMany(Meta, {
@@ -120,18 +127,25 @@ Media.belongsToMany(Meta, {
 
 ItemsInItem.removeAttribute('id')
 Item.hasMany(ItemsInItem, {
+  foreignKey: 'parentItemId',
+  onDelete: "cascade"
+})
+ItemsInItem.belongsTo(Item, {
+  foreignKey: 'parentItemId'
+})
+Item.hasMany(ItemsInItem, {
   foreignKey: 'itemId',
   onDelete: "cascade"
 })
 ItemsInItem.belongsTo(Item, {
   foreignKey: 'itemId'
 })
-Item.hasMany(ItemsInItem, {
-  foreignKey: 'childItemId',
+Meta.hasMany(ItemsInItem, {
+  foreignKey: 'metaId',
   onDelete: "cascade"
 })
-ItemsInItem.belongsTo(Item, {
-  foreignKey: 'childItemId'
+ItemsInItem.belongsTo(Meta, {
+  foreignKey: 'metaId'
 })
 
 ValuesInItem.removeAttribute('id')
@@ -234,6 +248,13 @@ Item.hasMany(ItemsInFilterRow, {
 })
 ItemsInFilterRow.belongsTo(Item, {
   foreignKey: 'itemId'
+})
+Meta.hasMany(ItemsInFilterRow, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+ItemsInFilterRow.belongsTo(Meta, {
+  foreignKey: 'metaId'
 })
 FilterRow.hasMany(ItemsInFilterRow, {
   foreignKey: 'rowId',

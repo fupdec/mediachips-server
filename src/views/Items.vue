@@ -268,6 +268,8 @@ export default {
         .then((res) => {
           this.filters =
             res.data.filters.map((i) => {
+              let by = i.filterRow.by
+              if (/\d/.test(by)) i.filterRow.by = +by
               delete i.filterRow.createdAt;
               delete i.filterRow.updatedAt;
               return i.filterRow;
