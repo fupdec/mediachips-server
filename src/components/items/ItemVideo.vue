@@ -76,65 +76,12 @@
       <div class="description">
         <div class="video-card-title" :title="fileName" v-html="fileName" />
 
-        <!-- Video meta -->
-        <v-chip label outlined :title="video.path">
-          <v-icon left>mdi-folder-outline</v-icon> Path
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-file-video-outline</v-icon>
-          {{ fileExtension }}
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-monitor-screenshot</v-icon>
-          {{ metadata.width + "x" + metadata.height }}
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-harddisk</v-icon>
-          {{ filesize }}
-        </v-chip>
-
-        <v-chip
-          v-for="i in meta"
-          :key="i.itemId"
-          @mouseover.stop="hoverImage($event, i['item.metaId'], i['itemId'])"
-          @mouseleave.stop="$store.state.hover.show = false"
-          :color="i['item.color']"
-          :text-color="getTextColor(i['item.color'])"
-        >
-          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-          {{ i["item.name"] }}
-        </v-chip>
-
-        <!-- Parse meta -->
-        <!-- <div v-for="(m,i) in metaAssignedToVideos" :key="i">
-        <div v-if="visibility[m.id]&&checkShowEmptyValue(m)" class="meta-in-card">
-          <v-chip-group v-if="m.type=='complex'" column>
-            <v-icon :title="getMeta(m.id).settings.name">mdi-{{getMeta(m.id).settings.icon}}</v-icon>
-            <v-chip v-for="mc in video[m.id]" :key="mc" 
-              :color="getColor(m.id,mc)" 
-              :label="getMeta(m.id).settings.chipLabel"
-              :outlined="getMeta(m.id).settings.chipOutlined"
-              :title="`Open page with ${getMeta(m.id).settings.nameSingular.toLowerCase()}`"
-              @click="openMetaCardPage(m.id,mc)"
-              @click.middle="openMetaInNewTab(mc)"
-              @mouseover.stop="showImage($event,mc,'meta',m.id)" 
-              @mouseleave.stop="$store.state.hoveredImage=false"> 
-                {{ getCard(mc).meta.name }} </v-chip>
-          </v-chip-group>
-          <div v-else-if="m.type=='simple'" class="simple-meta">
-            <v-icon :title="getMeta(m.id).settings.name">mdi-{{getMeta(m.id).settings.icon}}</v-icon>
-            <span v-if="getMeta(m.id).type=='array'">{{getArrayValuesForCard(m.id, 'video')}}</span>
-            <span v-else-if="getMeta(m.id).type=='rating'">      
-              <v-rating :value="video[m.id]" @input="changeMetaRating($event, m.id)" :length="getMeta(m.id).settings.ratingMax" hover 
-                :full-icon="`mdi-${getMeta(m.id).settings.ratingIcon}`" :empty-icon="`mdi-${getMeta(m.id).settings.ratingIconEmpty||getMeta(m.id).settings.ratingIcon}`" 
-                :color="getMeta(m.id).settings.ratingColor" background-color="grey" class="meta-rating" clearable
-                :half-increments="getMeta(m.id).settings.ratingHalf" :half-icon="`mdi-${getMeta(m.id).settings.ratingIconHalf||getMeta(m.id).settings.ratingIcon}`"/>
-            </span>
-            <span v-else-if="getMeta(m.id).type=='boolean'">{{video[m.id]?'Yes':'No'}}</span>
-            <span v-else>{{video[m.id]}}</span>
-          </div>
-        </div>
-      </div> -->
+        <NestedItems
+          :items="items"
+          :values="values"
+          :metadata="nestedMetadata"
+          type="video"
+        />
       </div>
 
       <v-icon
@@ -197,34 +144,12 @@
       </div>
 
       <div class="description">
-        <!-- Video meta -->
-        <v-chip label outlined :title="video.path">
-          <v-icon left>mdi-folder-outline</v-icon> Path
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-file-video-outline</v-icon>
-          {{ fileExtension }}
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-monitor-screenshot</v-icon>
-          {{ metadata.width + "x" + metadata.height }}
-        </v-chip>
-        <v-chip label outlined>
-          <v-icon left>mdi-harddisk</v-icon>
-          {{ filesize }}
-        </v-chip>
-
-        <v-chip
-          v-for="i in meta"
-          :key="i.itemId"
-          @mouseover.stop="hoverImage($event, i['item.metaId'], i['itemId'])"
-          @mouseleave.stop="$store.state.hover.show = false"
-          :color="i['item.color']"
-          :text-color="getTextColor(i['item.color'])"
-        >
-          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-          {{ i["item.name"] }}
-        </v-chip>
+        <NestedItems
+          :items="items"
+          :values="values"
+          :metadata="nestedMetadata"
+          type="video"
+        />
       </div>
 
       <v-icon
@@ -253,6 +178,7 @@
 import Vue from "vue";
 import axios from "axios";
 import Item from "@/mixins/Item";
+import NestedItems from "./NestedItems.vue";
 
 const path = require("path");
 // const { dialog } = require('electron').remote
@@ -278,6 +204,7 @@ export default {
     reg: Boolean,
     x: Number,
   },
+  components: { NestedItems },
   mixins: [Item],
   beforeMount() {
     this.getMetadata();
@@ -296,7 +223,7 @@ export default {
   },
   data: () => ({
     metadata: {},
-    meta: [],
+    items: [],
     values: [],
     thumb: null,
     frame: null,
@@ -322,17 +249,18 @@ export default {
         this.metadata.height
       );
     },
-    filesize() {
-      return Vue.prototype.$getReadableFileSize(this.video.filesize);
+    nestedMetadata() {
+      return {
+        filesize: Vue.prototype.$getReadableFileSize(this.video.filesize),
+        fileExtension: Vue.prototype.$getFileExtensionFromPath(this.video.path),
+        resolution: this.metadata.width + "x" + this.metadata.height,
+      };
     },
     duration() {
       return Vue.prototype.$getReadableDuration(this.metadata.duration);
     },
     fileName() {
       return Vue.prototype.$getFileNameFromPath(this.video.path);
-    },
-    fileExtension() {
-      return Vue.prototype.$getFileExtensionFromPath(this.video.path);
     },
     page() {
       return this.$store.state.Page;
@@ -380,8 +308,7 @@ export default {
       axios
         .get(this.apiUrl + url)
         .then((res) => {
-          this.meta = res.data;
-          console.log(this.meta)
+          this.items = res.data;
         })
         .catch((e) => {
           console.log(e);
@@ -402,12 +329,6 @@ export default {
       this.$store.state.Player.active = true;
       let items = _.cloneDeep(this.$store.state.Page.items);
       this.$root.$emit("playVideo", this.video, items);
-    },
-    getTextColor(color) {
-      if (!color) return "";
-      let value = Vue.prototype.$checkColorForDarkText(color);
-      if (value) return "white";
-      else return "black";
     },
     playPreview() {
       if (this.isHovered) return;

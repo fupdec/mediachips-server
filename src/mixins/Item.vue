@@ -1,6 +1,4 @@
 <script>
-import Vue from "vue";
-
 export default {
   computed: {
     selection: {
@@ -26,9 +24,6 @@ export default {
       if (event.button != 1) return;
       event.preventDefault();
       event.stopPropagation();
-    },
-    hoverImage(event, metaId, itemId) {
-      Vue.prototype.$showHoverImage(event, metaId, itemId);
     },
     toggleSelect() {
       const id = this.id;

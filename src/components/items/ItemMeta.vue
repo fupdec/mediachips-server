@@ -92,29 +92,7 @@
           <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
         </v-chip>
 
-        <v-chip
-          v-for="i in items"
-          :key="i.parentItemId + i.itemId"
-          @mouseover.stop="hoverImage($event, i['item.metaId'], i.itemId)"
-          @mouseleave.stop="$store.state.hover.show = false"
-          :color="i['item.color']"
-          :text-color="getTextColor(i['item.color'])"
-          :title="i.meta.name"
-        >
-          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-          {{ i["item.name"] }}
-        </v-chip>
-
-        <v-chip
-          v-for="(v, i) in values"
-          :key="i"
-          label
-          outlined
-          :title="v.meta.name"
-        >
-          <v-icon class="mr-1">mdi-{{ v.meta.icon }}</v-icon>
-          {{ v.value }}
-        </v-chip>
+        <NestedItems :items="items" :values="values" />
       </div>
 
       <v-overlay
@@ -162,6 +140,7 @@
 import Vue from "vue";
 import axios from "axios";
 import Item from "@/mixins/Item";
+import NestedItems from "./NestedItems.vue";
 
 const path = require("path");
 
@@ -171,6 +150,7 @@ export default {
     item: Object,
     meta: Object,
   },
+  components: { NestedItems },
   mixins: [Item],
   mounted() {
     this.$nextTick(() => {
@@ -248,12 +228,6 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-    },
-    getTextColor(color) {
-      if (!color) return "";
-      let value = Vue.prototype.$checkColorForDarkText(color);
-      if (value) return "white";
-      else return "black";
     },
   },
   watch: {},

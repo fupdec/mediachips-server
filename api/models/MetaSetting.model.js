@@ -82,7 +82,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 'star-half-full',
       },
       ratingMax: {
-        type: Sequelize.NUMBER,
+        type: Sequelize.INTEGER,
         defaultValue: 5,
       },
       ratingColor: {
