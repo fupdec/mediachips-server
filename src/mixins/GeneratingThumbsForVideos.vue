@@ -158,7 +158,7 @@ export default {
     },
   },
   watch: {
-    items(videos) {
+    itemsOnPage(videos) {
       if (this.isMediaPage) this.generateImages(videos);
     },
   },
