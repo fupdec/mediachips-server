@@ -30,6 +30,19 @@ exports.findAll = (req, res) => {
 // Find a single Item with an id
 exports.findOne = (req, res) => {};
 
+// Retrieve all Item from the database.
+exports.getAll = (req, res) => {
+  Item.findAll({
+    raw: true
+  }).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
+
 // Update a Item by the id in the request
 exports.update = (req, res) => {};
 

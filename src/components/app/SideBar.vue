@@ -34,26 +34,26 @@
           <v-list-item-title>{{ type.name }}</v-list-item-title>
         </v-list-item>
 
-        <v-divider v-if="metaList.length > 0" class="my-1" />
+        <v-divider v-if="meta.length > 0" class="my-1" />
 
         <v-list-item
-          v-for="meta in metaList"
-          :key="meta.id"
+          v-for="i in meta"
+          :key="i.id"
           link
           exact
-          :to="`/meta?metaId=${meta.id}&tabId=default`"
+          :to="`/meta?metaId=${i.id}&tabId=default`"
           active-class="secondary--text"
           color="secondary"
           draggable="false"
         >
           <v-list-item-icon>
-            <v-icon>mdi-{{ meta.icon }}</v-icon>
+            <v-icon>mdi-{{ i.icon }}</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>{{ meta.name }}</v-list-item-title>
+          <v-list-item-title>{{ i.name }}</v-list-item-title>
         </v-list-item>
 
         <v-list-item
-          v-if="hiddenMetaList.length"
+          v-if="hiddenMeta.length"
           @click="showHidden = !showHidden"
           draggable="false"
         >
@@ -65,19 +65,19 @@
 
         <div v-if="showHidden">
           <v-list-item
-            v-for="meta in hiddenMetaList"
-            :key="meta.id + 1"
+            v-for="i in hiddenMeta"
+            :key="i.id + 1"
             link
             exact
-            :to="`/meta?metaId=${meta.id}&tabId=default`"
+            :to="`/meta?metaId=${i.id}&tabId=default`"
             active-class="secondary--text"
             color="secondary"
             draggable="false"
           >
             <v-list-item-icon>
-              <v-icon>mdi-{{ meta.icon }}</v-icon>
+              <v-icon>mdi-{{ i.icon }}</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>{{ meta.name }}</v-list-item-title>
+            <v-list-item-title>{{ i.name }}</v-list-item-title>
           </v-list-item>
         </div>
 
@@ -96,32 +96,35 @@
 
 
 <script>
-import axios from "axios";
 import vuescroll from "vuescroll";
 
 export default {
   name: "SideBar",
   components: { vuescroll },
-  async mounted() {
-    await this.getMediaList();
-    await this.getMetaList();
-    this.$root.$on("updateNavbar", () => {
-      this.getMetaList();
-    });
-  },
+  async mounted() {},
   data: () => ({
     ops: {
       scrollPanel: { scrollingX: false },
       rail: { size: "4px" },
     },
-    mediaTypes: [],
-    metaList: [],
-    hiddenMetaList: [],
     showHidden: false,
   }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    mediaTypes() {
+      return this.$store.state.mediaTypes;
+    },
+    meta() {
+      return this.$store.state.meta.filter(
+        (i) => i.type == "array" && !i.metaSetting.hidden
+      );
+    },
+    hiddenMeta() {
+      return this.$store.state.meta.filter(
+        (i) => i.type == "array" && i.metaSetting.hidden
+      );
     },
     nav: {
       get() {
@@ -130,30 +133,6 @@ export default {
       set(value) {
         this.$store.state.navDrawer = value;
       },
-    },
-  },
-  methods: {
-    async getMediaList() {
-      await axios
-        .get(this.apiUrl + "/api/mediaType")
-        .then((res) => {
-          this.mediaTypes = res.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getMetaList() {
-      await axios
-        .get(this.apiUrl + "/api/meta")
-        .then((res) => {
-          let metaAll = res.data.filter((i) => i.type == "array");
-          this.metaList = metaAll.filter((i) => !i.metaSetting.hidden);
-          this.hiddenMetaList = metaAll.filter((i) => i.metaSetting.hidden);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     },
   },
 };

@@ -161,18 +161,18 @@ export default {
           });
       }
       this.getMeta();
-      if (this.type == "array") this.$root.$emit("updateNavbar");
+      if (this.type == "array") this.$root.$emit("getMeta");
     },
     updateMeta(type) {
       this.getMeta();
-      if (type == "array") this.$root.$emit("updateNavbar");
+      if (type == "array") this.$root.$emit("getMeta");
     },
     deleteMeta(meta) {
       this.dialogEdit = false;
       axios
         .delete(this.apiUrl + "/api/Meta/" + meta.id)
         .then(() => {
-          if (meta.type == "array") this.$root.$emit("updateNavbar");
+          if (meta.type == "array") this.$root.$emit("getMeta");
           this.getMeta();
         })
         .catch((e) => {

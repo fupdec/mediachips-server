@@ -6,11 +6,14 @@ module.exports = app => {
   // Create a new Item
   router.post("/", Item.create);
 
-  // Retrieve all Item
+  // Retrieve all Items that match the filter
   router.post("/filter", Item.findAll);
 
   // Retrieve a single Item with id
   router.get("/:id", Item.findOne);
+
+  // Retrieve all Items
+  router.get("/", Item.getAll);
 
   // Update a Item with id
   router.put("/:id", Item.update);

@@ -1,11 +1,9 @@
-const db = require("../index.js");
 const {
   Meta,
   MetaSetting,
   PageSetting,
   SavedFilter
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 const fs = require("fs")
 const path = require('path')
 

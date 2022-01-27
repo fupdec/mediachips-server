@@ -78,7 +78,7 @@ export default {
         .then((e) => {
           this.importStatus = "Successfully imported";
           this.isImportRun = false;
-          this.$root.$emit("updateNavbar");
+          this.$root.$emit("getMeta");
         })
         .catch((e) => {
           this.importStatus = e;

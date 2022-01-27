@@ -193,7 +193,7 @@ export default {
       })
         .then(() => {
           this.$emit("added", this.type);
-          if (this.type == "array") this.$root.$emit("updateNavbar");
+          if (this.type == "array") this.$root.$emit("getMeta");
         })
         .catch((e) => {
           console.log(e);

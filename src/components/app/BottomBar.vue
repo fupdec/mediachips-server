@@ -30,24 +30,24 @@
           <span>Videos</span>
         </v-tooltip>
 
-        <v-tooltip v-for="meta in metaList" :key="meta.id" top>
+        <v-tooltip v-for="i in meta" :key="i.id" top>
           <template v-slot:activator="{ on }">
             <v-btn
               v-on="on"
-              :to="`/meta?metaId=${meta.id}&tabId=default`"
-              :title="meta.name"
+              :to="`/meta?metaId=${i.id}&tabId=default`"
+              :title="i.name"
               color="secondary"
               exact
               text
             >
-              <span>{{ meta.name }}</span>
-              <v-icon>mdi-{{ meta.icon }}</v-icon>
+              <span>{{ i.name }}</span>
+              <v-icon>mdi-{{ i.icon }}</v-icon>
             </v-btn>
           </template>
-          <span>{{ meta.name }}</span>
+          <span>{{ i.name }}</span>
         </v-tooltip>
 
-        <v-menu v-if="hiddenMetaList.length" offset-y top open-on-hover>
+        <v-menu v-if="hiddenMeta.length" offset-y top open-on-hover>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               v-bind="attrs"
@@ -64,9 +64,9 @@
           <v-list dense>
             <v-list-item-group>
               <v-list-item
-                v-for="meta in hiddenMetaList"
-                :key="meta.id + 1"
-                :to="`/meta?metaId=${meta.id}&tabId=default`"
+                v-for="i in hiddenMeta"
+                :key="i.id + 1"
+                :to="`/meta?metaId=${i.id}&tabId=default`"
                 color="secondary"
                 link
                 exact
@@ -74,8 +74,8 @@
               >
                 <v-list-item-content>
                   <v-list-item-title>
-                    <v-icon left>mdi-{{ meta.icon }}</v-icon>
-                    {{ meta.name }}
+                    <v-icon left>mdi-{{ i.icon }}</v-icon>
+                    {{ i.name }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -105,59 +105,36 @@
 
 
 <script>
-import axios from "axios";
 import vuescroll from "vuescroll";
 
 export default {
   name: "BottomBar",
   components: { vuescroll },
-  async mounted() {
-    await this.getMediaList();
-    await this.getMetaList();
-    this.$root.$on("updateNavbar", () => {
-      this.getMetaList();
-    });
-  },
   data: () => ({
     folderHovered: false,
     ops: {
       scrollPanel: { scrollingY: false },
       rail: { size: "4px" },
     },
-    mediaTypes: [],
-    metaList: [],
-    hiddenMetaList: [],
   }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
     },
-  },
-  methods: {
-    async getMediaList() {
-      await axios
-        .get(this.apiUrl + "/api/mediaType")
-        .then((res) => {
-          this.mediaTypes = res.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    mediaTypes() {
+      return this.$store.state.mediaTypes;
     },
-    async getMetaList() {
-      await axios
-        .get(this.apiUrl + "/api/meta")
-        .then((res) => {
-          let metaAll = res.data.filter((i) => i.type == "array");
-          this.metaList = metaAll.filter((i) => !i.metaSetting.hidden);
-          this.hiddenMetaList = metaAll.filter((i) => i.metaSetting.hidden);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    meta() {
+      return this.$store.state.meta.filter(
+        (i) => i.type == "array" && !i.metaSetting.hidden
+      );
+    },
+    hiddenMeta() {
+      return this.$store.state.meta.filter(
+        (i) => i.type == "array" && i.metaSetting.hidden
+      );
     },
   },
-  watch: {},
 };
 </script>
 

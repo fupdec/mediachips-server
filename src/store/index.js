@@ -14,6 +14,7 @@ export default new Vuex.Store({
       files: [],
       stage: 0,
     },
+    mediaTypes: [],
     items: [],
     meta: [],
     notifications: [],

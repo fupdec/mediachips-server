@@ -56,8 +56,14 @@ export default {
     this.isApiReady = true;
     await this.initSettings();
     await this.applyTheme();
+    await this.getMediaTypes();
+    await this.getItems();
+    await this.getMeta();
     this.checkLogin();
     await this.getMachineId();
+    this.$root.$on("getMeta", () => {
+      this.getMeta();
+    });
   },
   data: () => ({
     isServerError: false,
@@ -95,6 +101,36 @@ export default {
         })
         .catch((e) => {
           this.isServerError = true;
+          console.log(e);
+        });
+    },
+    async getMediaTypes() {
+      await axios
+        .get(this.apiUrl + "/api/mediaType")
+        .then((res) => {
+          this.$store.state.mediaTypes = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async getItems() {
+      await axios
+        .get(this.apiUrl + "/api/item")
+        .then((res) => {
+          this.$store.state.items = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async getMeta() {
+      await axios
+        .get(this.apiUrl + "/api/meta")
+        .then((res) => {
+          this.$store.state.meta = res.data;
+        })
+        .catch((e) => {
           console.log(e);
         });
     },

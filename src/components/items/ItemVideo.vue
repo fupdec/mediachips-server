@@ -381,6 +381,7 @@ export default {
         .get(this.apiUrl + url)
         .then((res) => {
           this.meta = res.data;
+          console.log(this.meta)
         })
         .catch((e) => {
           console.log(e);
