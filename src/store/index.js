@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Page from './modules/page.js'
 import Player from './modules/player.js'
 const Settings = require('./../../default-settings.js')
 
@@ -13,26 +14,8 @@ export default new Vuex.Store({
       files: [],
       stage: 0,
     },
-    page: {
-      name: "Items",
-      nameSingular: "Item",
-      icon: "shape",
-      items: [],
-    },
     items: [],
-    savedFilter: {},
-    filters: [],
-    pageSettings: {
-      page: 1,
-      limit: 20,
-      filterId: null,
-      size: 3,
-      sortBy: "name",
-      sortDir: "asc",
-    },
-    itemsLoading: true,
-    log: [],
-    isLogVisible: false,
+    meta: [],
     notifications: [],
     hover: {
       show: false,
@@ -42,9 +25,6 @@ export default new Vuex.Store({
       x: 0,
       y: 0,
     },
-    isSelect: false,
-    selected: [],
-    isScrolled: false,
     contextMenu: false,
     contextMenuContent: [],
     pathToUserData: '',
@@ -58,11 +38,6 @@ export default new Vuex.Store({
     tasks: [],
     settings: Settings,
   }),
-  getters: {
-    getPathToUserData(state) {
-      return path.join(state.pathToUserData, 'userfiles')
-    },
-  },
   mutations: {
     updateState(state, {
       key,
@@ -103,7 +78,9 @@ export default new Vuex.Store({
     },
   },
   actions: {},
+  getters: {},
   modules: {
+    Page,
     Player,
   }
 })

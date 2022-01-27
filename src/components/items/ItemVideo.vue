@@ -1,7 +1,7 @@
 <template>
   <v-lazy>
     <v-card
-      v-if="pageSets.view == '1'"
+      v-if="page.view == '1'"
       :disabled="!reg && x > 9"
       @mousedown="stopSmoothScroll($event)"
       :class="{ favorite: video.favorite }"
@@ -58,7 +58,7 @@
         <!-- <video @click="mountSrc" ref="video" controls /> -->
 
         <div
-          v-if="isHovered && appSets.videoPreviewHover == 'timeline'"
+          v-if="isHovered && sets.videoPreviewHover == 'timeline'"
           class="timeline"
         >
           <img :src="frame" />
@@ -146,7 +146,7 @@
       />
 
       <v-overlay
-        :value="isSelect"
+        :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         absolute
@@ -158,7 +158,7 @@
     </v-card>
 
     <v-card
-      v-else-if="pageSets.view == '2'"
+      v-else-if="page.view == '2'"
       :disabled="!reg && x > 9"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
@@ -236,7 +236,7 @@
       />
 
       <v-overlay
-        :value="isSelect"
+        :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         absolute
@@ -275,7 +275,6 @@ export default {
   name: "ItemVideo",
   props: {
     video: Object,
-    items: Array,
     reg: Boolean,
     x: Number,
   },
@@ -290,7 +289,7 @@ export default {
     this.$root.$on("updateVideoThumb", (id) => {
       if (this.video.id === id) this.getImg();
     });
-    if (this.pageSets.view == "2") this.initFrames();
+    if (this.page.view == "2") this.initFrames();
   },
   beforeDestroy() {
     this.$root.$off("updateVideoThumb");
@@ -335,27 +334,11 @@ export default {
     fileExtension() {
       return Vue.prototype.$getFileExtensionFromPath(this.video.path);
     },
-    pageSets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "pageSettings",
-          value: _.cloneDeep(value),
-        });
-      },
+    page() {
+      return this.$store.state.Page;
     },
-    appSets: {
-      get() {
-        return this.$store.state.settings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "settings",
-          value: _.cloneDeep(value),
-        });
-      },
+    sets() {
+      return this.$store.state.settings;
     },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
@@ -416,7 +399,8 @@ export default {
     },
     openPlayer() {
       this.$store.state.Player.active = true;
-      this.$root.$emit("playVideo", this.video, this.items);
+      let items = _.cloneDeep(this.$store.state.Page.items);
+      this.$root.$emit("playVideo", this.video, items);
     },
     getTextColor(color) {
       if (!color) return "";
@@ -427,7 +411,7 @@ export default {
     playPreview() {
       if (this.isHovered) return;
       this.isHovered = true;
-      if (this.appSets.videoPreviewHover !== "video") return;
+      if (this.sets.videoPreviewHover !== "video") return;
       // this.timeouts.z = setTimeout(() => {
       //   // play original video
       //   if (!this.isVideoExist) return;
@@ -437,11 +421,11 @@ export default {
       //   this.timeouts.b = setTimeout(this.setVideoProgress, 6000, 0.6);
       //   this.timeouts.c = setTimeout(this.setVideoProgress, 9000, 0.8);
       //   this.timeouts.d = setTimeout(this.setVideoProgress, 12000, 0.2);
-      // }, this.appSets.delayVideoPreview * 1000 + 500);
+      // }, this.sets.delayVideoPreview * 1000 + 500);
     },
     stopPlayingPreview() {
-      if (this.appSets.videoPreviewHover != "none") this.isHovered = false;
-      if (this.appSets.videoPreviewHover != "video") return;
+      if (this.sets.videoPreviewHover != "none") this.isHovered = false;
+      if (this.sets.videoPreviewHover != "video") return;
       for (const timeout in this.timeouts) clearTimeout(this.timeouts[timeout]);
       // this.$refs.video.src = "";
     },
@@ -480,7 +464,7 @@ export default {
     },
   },
   watch: {
-    "pageSets.view"(view) {
+    "page.view"(view) {
       if (view == "2") this.initFrames();
     },
   },

@@ -53,28 +53,26 @@ export default {
     ],
   }),
   computed: {
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
+    page() {
+      return this.$store.state.Page;
     },
     badge() {
-      const index = this.limits.findIndex((i) => i.value == this.sets.limit);
+      const index = this.limits.findIndex((i) => i.value == this.page.limit);
       if (index > -1) return this.limits[index].text;
       else return 25;
     },
     limit() {
-      const index = this.limits.findIndex((i) => i.value == this.sets.limit);
+      const index = this.limits.findIndex((i) => i.value == this.page.limit);
       if (index > -1) return this.limits[index].value;
       else return 1000;
     },
   },
   methods: {
     update(val) {
-      this.sets.limit = val;
+      this.$store.commit("updateStatePage", {
+        key: "limit",
+        value: val,
+      });
       this.$root.$emit("setItemsLimit", val);
     },
   },

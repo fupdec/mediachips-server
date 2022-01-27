@@ -59,30 +59,11 @@ export default {
     ],
   }),
   computed: {
-    pageSets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "pageSettings",
-          value: _.cloneDeep(value),
-        });
-      },
-    },
-    appSets: {
-      get() {
-        return this.$store.state.settings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "settings",
-          value: _.cloneDeep(value),
-        });
-      },
+    page() {
+      return this.$store.state.Page;
     },
     index() {
-      return this.list.findIndex((i) => i.val == this.pageSets.view);
+      return this.list.findIndex((i) => i.val == this.page.view);
     },
     view() {
       return this.list[this.index] ? this.list[this.index].val : "";
@@ -111,7 +92,10 @@ export default {
       }
     },
     update(val) {
-      this.pageSets.view = val;
+      this.$store.commit("updateStatePage", {
+        key: "view",
+        value: val,
+      });
       this.$root.$emit("setItemsView", val);
     },
   },

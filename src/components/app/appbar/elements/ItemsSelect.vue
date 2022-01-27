@@ -21,20 +21,20 @@ export default {
         return this.$store.state.isSelect;
       },
       set(value) {
-        this.$store.commit("updateState", {
+        this.$store.commit("updateStatePage", {
           key: "isSelect",
           value: value,
         });
       },
     },
     page() {
-      return this.$store.state.page;
+      return this.$store.state.Page;
     },
   },
   methods: {
     toggleSelect() {
-      this.$store.commit("updateState", {
-        key: "selected",
+      this.$store.commit("updateStatePage", {
+        key: "selection",
         value: [],
       });
       this.isSelect = !this.isSelect;

@@ -10,7 +10,7 @@
             offset-y="23"
           >
             <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-              <v-icon>mdi-text-box-search-outline</v-icon>
+              <v-icon>mdi-text-search</v-icon>
             </v-btn>
           </v-badge>
         </template>
@@ -69,7 +69,7 @@ export default {
       return Vue.prototype.$checkCurrentPage("media") ? "path" : "name";
     },
     filters() {
-      return this.$store.state.filters;
+      return this.$store.state.Page.filters;
     },
     index() {
       return this.filters.findIndex((i) => i.by == this.by && i.appbar == true);

@@ -9,8 +9,8 @@
     </div>
 
     <v-pagination
-      v-show="items.length && !isInfiniteScroll"
-      :value="pageSets.page"
+      v-show="itemsOnPage.length && !isInfiniteScroll"
+      :value="page.page"
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
@@ -18,11 +18,11 @@
     />
 
     <v-container
-      v-if="filters.length > 0"
+      v-if="page.filters.length > 0"
       fluid
       class="d-flex justify-center align-start"
     >
-      <FiltersChips :filters="filters" />
+      <FiltersChips :filters="page.filters" />
     </v-container>
 
     <Loading v-show="isQueryRun" />
@@ -32,37 +32,37 @@
       fluid
       class="wide-image videos-selection"
       :class="[
-        `card-size-${pageSets.size}`,
-        `gap-size-${appSets.gapSize}`,
-        { 'card-grid': pageSets.view == '1' },
-        { 'line-grid': pageSets.view == '2' },
+        `card-size-${page.size}`,
+        `gap-size-${sets.gapSize}`,
+        { 'card-grid': page.view == '1' },
+        { 'line-grid': page.view == '2' },
       ]"
     >
       <ItemVideo
-        v-for="(i, x) in items"
+        v-for="(i, x) in itemsOnPage"
         :key="i.id"
         :video="i"
-        :items="items"
         :reg="reg"
         :x="x"
       />
     </v-container>
+
     <v-container
       v-else-if="isMetaPage"
       fluid
       :class="[
-        `card-size-${pageSets.size}`,
-        `gap-size-${appSets.gapSize}`,
-        { 'card-grid': pageSets.view == '1' },
-        { 'chips-grid': pageSets.view == '2' },
+        `card-size-${page.size}`,
+        `gap-size-${sets.gapSize}`,
+        { 'card-grid': page.view == '1' },
+        { 'chips-grid': page.view == '2' },
       ]"
     >
-      <ItemMeta v-for="i in items" :key="i.id" :item="i" :meta="meta" />
+      <ItemMeta v-for="i in itemsOnPage" :key="i.id" :item="i" :meta="meta" />
     </v-container>
 
     <v-pagination
-      v-show="items.length && !isInfiniteScroll"
-      :value="pageSets.page"
+      v-show="itemsOnPage.length && !isInfiniteScroll"
+      :value="page.page"
       @input="changePage($event)"
       :length="pages"
       total-visible="5"
@@ -79,13 +79,13 @@
       <div>There is no items matching the filters</div>
     </div>
 
-    <div v-if="items.length && isInfiniteScroll" class="text-center py-6">
+    <div v-if="itemsOnPage.length && isInfiniteScroll" class="text-center py-6">
       <Loading
-        v-if="loader.show && pageSets.page != pages"
+        v-if="loader.show && page.page != pages"
         v-intersect="infiniteScrolling"
       />
       <v-btn
-        v-if="pageSets.page == pages"
+        v-if="page.page == pages"
         class="mb-4"
         color="primary"
         rounded
@@ -96,7 +96,7 @@
       </v-btn>
     </div>
 
-    <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
+    <div v-show="sets.navigationSide == '2'" class="py-6"></div>
   </div>
 </template>
 
@@ -113,7 +113,6 @@ export default {
   name: "Items",
   components: {
     vuescroll,
-    ItemsAppbar: () => import("@/components/app/appbar/ItemsAppbar.vue"),
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
@@ -121,10 +120,16 @@ export default {
   },
   mixins: [GeneratingThumbsForVideos, Keys],
   async beforeMount() {
-    this.page.items = [];
+    this.itemsOnPage = [];
+    this.$store.commit("updateStatePage", {
+      key: "isSelect",
+      value: false,
+    });
+    this.$store.commit("updateStatePage", {
+      key: "selection",
+      value: [],
+    });
     await this.init();
-    this.$store.state.selected = [];
-    this.$store.state.isSelect = false;
   },
   mounted() {
     this.$root.$on("setItemsFilters", async (val) => {
@@ -136,13 +141,16 @@ export default {
       this.getItemsFromDb();
     });
     this.$root.$on("setItemsLimit", (val) => {
-      this.pageSets.page = 1;
-      if (val == 101) this.items = [];
+      this.$store.commit("updateStatePage", {
+        key: "page",
+        value: 1,
+      });
+      if (val == 101) this.itemsOnPage = [];
       this.updatePageSetting({
         page: 1,
         limit: val,
       });
-      this.getItems();
+      this.getItemsOnPage();
     });
     this.$root.$on("setItemsSortDir", (val) => {
       this.updatePageSetting({
@@ -174,7 +182,7 @@ export default {
   },
   data: () => ({
     meta: null,
-    items: [],
+    itemsOnPage: [],
     total: 1,
     totalInDb: 0,
     pages: 0,
@@ -188,49 +196,11 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    page: {
-      get() {
-        return this.$store.state.page;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "page",
-          value: value,
-        });
-      },
+    page() {
+      return this.$store.state.Page;
     },
-    pageSets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "pageSettings",
-          value: _.cloneDeep(value),
-        });
-      },
-    },
-    appSets: {
-      get() {
-        return this.$store.state.settings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "settings",
-          value: _.cloneDeep(value),
-        });
-      },
-    },
-    filters: {
-      get() {
-        return this.$store.state.filters;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "filters",
-          value: _.cloneDeep(value),
-        });
-      },
+    sets() {
+      return this.$store.state.settings;
     },
     route() {
       return this.$route.path;
@@ -248,7 +218,7 @@ export default {
       return +this.$router.history.current.query.metaId;
     },
     isInfiniteScroll() {
-      return this.pageSets.limit === 101;
+      return this.page.limit === 101;
     },
   },
   methods: {
@@ -266,17 +236,21 @@ export default {
       await axios
         .get(this.apiUrl + "/api/SavedFilter/page" + query)
         .then((res) => {
-          this.filters =
+          const filters =
             res.data.filters.map((i) => {
-              let by = i.filterRow.by
-              if (/\d/.test(by)) i.filterRow.by = +by
+              let by = i.filterRow.by;
+              if (/\d/.test(by)) i.filterRow.by = +by;
               delete i.filterRow.createdAt;
               delete i.filterRow.updatedAt;
               return i.filterRow;
             }) || [];
-          this.$store.commit("updateState", {
+          this.$store.commit("updateStatePage", {
+            key: "filters",
+            value: filters,
+          });
+          this.$store.commit("updateStatePage", {
             key: "savedFilter",
-            value: _.cloneDeep(res.data.savedFilter) || {},
+            value: res.data.savedFilter || {},
           });
         })
         .catch((e) => {
@@ -294,17 +268,35 @@ export default {
       await axios
         .get(this.apiUrl + url + query)
         .then((res) => {
-          this.pageSets = res.data;
+          this.$store.commit("updateStatePage", {
+            key: "page",
+            value: res.data.page,
+          });
+          this.$store.commit("updateStatePage", {
+            key: "limit",
+            value: res.data.limit,
+          });
+          this.$store.commit("updateStatePage", {
+            key: "size",
+            value: res.data.size,
+          });
+          this.$store.commit("updateStatePage", {
+            key: "view",
+            value: res.data.view,
+          });
+          this.$store.commit("updateStatePage", {
+            key: "sortBy",
+            value: res.data.sortBy,
+          });
+          this.$store.commit("updateStatePage", {
+            key: "sortDir",
+            value: res.data.sortDir,
+          });
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    /**
-     * Updating settings for page.
-     * @param {string} option - name of a column in table pageSettings.
-     * @param {any} value - value in the column.
-     */
     updatePageSetting(data) {
       let query = "";
       if (this.isMetaPage) {
@@ -347,9 +339,9 @@ export default {
     async getItemsFromDb() {
       let url = "/api/";
       let sets = {};
-      sets.sortBy = this.pageSets.sortBy;
-      sets.sortDir = this.pageSets.sortDir;
-      sets.filters = _.cloneDeep(this.filters);
+      sets.sortBy = this.page.sortBy;
+      sets.sortDir = this.page.sortDir;
+      sets.filters = _.cloneDeep(this.page.filters);
       if (this.isMetaPage) {
         url += "item/filter";
         sets.metaId = this.$route.query.metaId;
@@ -367,60 +359,59 @@ export default {
         data: sets,
       })
         .then((res) => {
-          this.isQueryRun = false;
           clearTimeout(this.loader.timeout);
           this.loader.timeout = setTimeout(() => {
             this.loader.show = true;
           }, 500);
-          const items = res.data.items;
-          this.page.items = _.cloneDeep(items);
-          this.total = items.length;
+          this.isQueryRun = false;
+          this.$store.commit("updateStatePage", {
+            key: "items",
+            value: res.data.items,
+          });
+          this.total = res.data.items.length;
           this.totalInDb = res.data.total;
-          this.items = [];
-          this.pageSets.page = 1;
-          this.getItems();
+          this.itemsOnPage = [];
+          this.page.page = 1;
+          this.getItemsOnPage();
         })
         .catch((e) => {
           this.isQueryRun = false;
           console.log(e);
         });
     },
-    getItems() {
-      const countPages = () => {
-        const limit = this.isInfiniteScroll ? 25 : this.pageSets.limit;
-        const start = (this.pageSets.page - 1) * limit;
-        const end = start + limit;
-        const pages = Math.ceil(this.total / limit);
-        return {
-          start,
-          end,
-          pages,
-        };
-      };
-
+    getItemsOnPage() {
       const items = _.cloneDeep(this.page.items);
-      const { start, end, pages } = countPages();
+      const limit = this.isInfiniteScroll ? 25 : this.page.limit;
+      const start = (this.page.page - 1) * limit;
+      const end = start + limit;
+      const pages = Math.ceil(this.total / limit);
       this.pages = pages;
       if (this.isInfiniteScroll) {
-        this.items = [...this.items, ...items.slice(start, end)];
+        this.itemsOnPage = [...this.itemsOnPage, ...items.slice(start, end)];
       } else {
-        this.items = items.slice(start, end);
+        this.itemsOnPage = items.slice(start, end);
       }
       // TODO jump to the fisrt page if current page greater than total pages
     },
-    changePage(e) {
-      this.pageSets.page = e;
-      this.getItems();
-      this.updatePageSetting({ page: e });
+    changePage(val) {
+      this.$store.commit("updateStatePage", {
+        key: "page",
+        value: val,
+      });
+      this.getItemsOnPage();
+      this.updatePageSetting({ page: val });
     },
     infiniteScrolling() {
-      if (this.pageSets.page >= this.pages) return;
-      this.pageSets.page++;
-      this.getItems();
+      if (this.page.page >= this.pages) return;
+      this.$store.commit("updateStatePage", {
+        key: "page",
+        value: this.page.page + 1,
+      });
+      this.getItemsOnPage();
     },
   },
   watch: {
-    "pageSets.size"(val, old) {
+    "page.size"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ size: val });
     },

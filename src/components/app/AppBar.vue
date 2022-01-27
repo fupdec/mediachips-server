@@ -10,14 +10,14 @@
       <img :src="logoPath" alt="mediaChips" width="28" height="28" />
     </v-btn> -->
 
-        <div v-if="isSelect" class="d-flex align-center">
+        <div v-if="page.isSelect" class="d-flex align-center">
           <v-btn @click="toggleSelect" icon class="mr-2">
             <v-icon>mdi-close</v-icon>
           </v-btn>
 
           {{
-            selected.length
-              ? `${selected.length} selected`
+            page.selection.length
+              ? `${page.selection.length} selected`
               : `Please select ${page.name.toLowerCase()}`
           }}
         </div>
@@ -73,89 +73,39 @@ export default {
     collapse: false,
   }),
   computed: {
-    logoPath() {
-      return path.join(__dirname, "/icons/icon.png");
-    },
-    isScrolled() {
-      return this.$store.state.isScrolled;
-    },
+    // logoPath() {
+    //   return path.join(__dirname, "/icons/icon.png");
+    // },
     color() {
-      if (this.$vuetify.theme.dark) return this.appSets.appColorDarkHeader;
-      return this.appSets.appColorLightHeader;
+      if (this.$vuetify.theme.dark) return this.sets.appColorDarkHeader;
+      return this.sets.appColorLightHeader;
     },
     gradient() {
-      if (this.appSets.headerGradient == "0") return "";
+      if (this.sets.headerGradient == "0") return "";
       let gradient = "";
-      if (this.$vuetify.theme.dark) gradient = this.appSets.headerGradientDark;
-      else gradient = this.appSets.headerGradientLight;
+      if (this.$vuetify.theme.dark) gradient = this.sets.headerGradientDark;
+      else gradient = this.sets.headerGradientLight;
       gradient = gradient.replace("linear-gradient(", "");
       gradient = gradient.replace(")", "");
       return gradient;
     },
     page: {
       get() {
-        return this.$store.state.page;
+        return this.$store.state.Page;
       },
       set(value) {
-        this.$store.commit("updateState", {
-          key: "page",
-          value: value,
-        });
+        this.$store.state.Page = _.cloneDeep(value);
       },
     },
-    appSets: {
-      get() {
-        return this.$store.state.settings;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "settings",
-          value: _.cloneDeep(value),
-        });
-      },
-    },
-    isSelect: {
-      get() {
-        return this.$store.state.isSelect;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "isSelect",
-          value: value,
-        });
-      },
-    },
-    selected: {
-      get() {
-        return this.$store.state.selected;
-      },
-      set(value) {
-        this.$store.commit("updateState", {
-          key: "selected",
-          value: value,
-        });
-      },
+    sets() {
+      return this.$store.state.settings;
     },
     // tabs() { return this.$store.getters.tabs },
-    nav: {
-      get() {
-        return this.$store.state.navDrawer;
-      },
-      set(value) {
-        this.$store.state.navDrawer = value;
-      },
-    },
   },
   methods: {
-    toggleNavbar() {
-      this.nav = !this.nav;
-    },
     toggleSelect() {
-      this.$store.commit("updateState", {
-        key: "selected",
-        value: [],
-      });
-      this.isSelect = !this.isSelect;
+      this.page.isSelect = !this.page.isSelect;
+      this.page.selection = [];
     },
     register() {
       if (this.$router.history.current.name !== "Settings")

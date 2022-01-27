@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-            <v-icon v-if="sets.sortDir == 'asc'">mdi-sort-ascending</v-icon>
+            <v-icon v-if="page.sortDir == 'asc'">mdi-sort-ascending</v-icon>
             <v-icon v-else>mdi-sort-descending</v-icon>
           </v-btn>
         </template>
@@ -17,7 +17,7 @@
       <v-list-item @click="toggleDir">
         <v-list-item-content>
           <v-list-item-title>
-            <span v-if="sets.sortDir == 'asc'">
+            <span v-if="page.sortDir == 'asc'">
               <v-icon left> mdi-sort-ascending </v-icon>
               Ascending
             </span>
@@ -89,18 +89,10 @@ export default {
   }),
   computed: {
     page() {
-      return this.$store.state.page;
-    },
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
+      return this.$store.state.Page;
     },
     index() {
-      return this.list.findIndex((i) => i.by == this.sets.sortBy);
+      return this.list.findIndex((i) => i.by == this.page.sortBy);
     },
     sortBy() {
       return this.list[this.index] ? this.list[this.index].by : "";
@@ -127,11 +119,18 @@ export default {
       }
     },
     toggleDir() {
-      this.sets.sortDir = this.sets.sortDir === "asc" ? "desc" : "asc";
-      this.$root.$emit("setItemsSortDir", this.sets.sortDir);
+      const val = this.page.sortDir === "asc" ? "desc" : "asc"
+      this.$store.commit("updateStatePage", {
+        key: "sortDir",
+        value: val,
+      });
+      this.$root.$emit("setItemsSortDir", val);
     },
     update(val) {
-      this.sets.sortBy = val;
+      this.$store.commit("updateStatePage", {
+        key: "sortBy",
+        value: val,
+      });
       this.$root.$emit("setItemsSortBy", val);
     },
   },

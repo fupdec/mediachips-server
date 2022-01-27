@@ -2,7 +2,7 @@
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
       <v-btn @click="dialogFilter = true" v-on="on" icon>
-        <v-badge :value="filters" :content="filters" overlap left>
+        <v-badge :value="badge" :content="badge" overlap left>
           <v-icon>mdi-filter-outline</v-icon>
         </v-badge>
       </v-btn>
@@ -25,10 +25,10 @@ export default {
   }),
   computed: {
     page() {
-      return this.$store.state.page;
+      return this.$store.state.Page;
     },
-    filters() {
-      return this.$store.state.filters.length;
+    badge() {
+      return this.$store.state.Page.filters.length;
     },
   },
 };

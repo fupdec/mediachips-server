@@ -1,7 +1,7 @@
 <template>
   <v-lazy>
     <v-card
-      v-if="pageSets.view == '1'"
+      v-if="page.view == '1'"
       :class="{ favorite: item.favorite }"
       class="meta-card"
       outlined
@@ -118,7 +118,7 @@
       </div>
 
       <v-overlay
-        :value="isSelect"
+        :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         absolute
@@ -130,7 +130,7 @@
     </v-card>
 
     <v-chip
-      v-else-if="pageSets.view == '2'"
+      v-else-if="page.view == '2'"
       @mousedown="stopSmoothScroll($event)"
       class="meta-chip"
       :color="item.color || '#777777'"
@@ -145,7 +145,7 @@
       <div class="ml-2">{{ item.name }}</div>
       
       <v-overlay
-        :value="isSelect"
+        :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         absolute
@@ -195,8 +195,8 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    pageSets() {
-      return this.$store.state.pageSettings;
+    page() {
+      return this.$store.state.Page;
     },
   },
   methods: {

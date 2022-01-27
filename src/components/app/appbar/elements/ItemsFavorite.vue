@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     filters() {
-      return this.$store.state.filters;
+      return this.$store.state.Page.filters;
     },
     index() {
       return this.filters.findIndex(

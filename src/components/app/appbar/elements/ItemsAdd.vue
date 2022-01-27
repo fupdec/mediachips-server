@@ -96,15 +96,7 @@ export default {
   }),
   computed: {
     page() {
-      return this.$store.state.page;
-    },
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
+      return this.$store.state.Page;
     },
     content() {
       if (typeof this.searchString == "string")
@@ -142,11 +134,6 @@ export default {
         if (valid !== true) break;
       }
       return valid;
-    },
-  },
-  watch: {
-    "sets.query"(val) {
-      this.searchString = val;
     },
   },
 };

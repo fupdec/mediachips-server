@@ -56,28 +56,26 @@ export default {
     ],
   }),
   computed: {
-    sets: {
-      get() {
-        return this.$store.state.pageSettings;
-      },
-      set(value) {
-        return (this.$store.state.pageSettings = value);
-      },
+    page() {
+      return this.$store.state.Page;
     },
     badge() {
-      const index = this.sizes.findIndex((i) => i.value == this.sets.size);
+      const index = this.sizes.findIndex((i) => i.value == this.page.size);
       if (index > -1) return this.sizes[index].text;
       else return "M";
     },
     size() {
-      const index = this.sizes.findIndex((i) => i.value == this.sets.size);
+      const index = this.sizes.findIndex((i) => i.value == this.page.size);
       if (index > -1) return this.sizes[index].value;
       else return 3;
     },
   },
   methods: {
     update(val) {
-      this.sets.size = val;
+      this.$store.commit("updateStatePage", {
+        key: "size",
+        value: val,
+      });
     },
   },
 };

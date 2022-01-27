@@ -180,7 +180,7 @@ export default {
       return this.$store.state.localhost;
     },
     page() {
-      return this.$store.state.page;
+      return this.$store.state.Page;
     },
     isMetaPage() {
       return Vue.prototype.$checkCurrentPage("meta");
@@ -195,7 +195,7 @@ export default {
       return +this.$router.history.current.query.metaId;
     },
     filtersStore() {
-      return this.$store.state.filters;
+      return this.$store.state.Page.filters;
     },
   },
   methods: {
@@ -244,7 +244,7 @@ export default {
         a.text > b.text ? 1 : b.text > a.text ? -1 : 0
       );
 
-      this.filters = _.cloneDeep(this.$store.state.filters);
+      this.filters = _.cloneDeep(this.$store.state.Page.filters);
     },
     add() {
       this.filters.push({
@@ -314,7 +314,7 @@ export default {
       this.$root.$emit("setItemsFilters");
     },
     async addFilterRows() {
-      let savedFilter = this.$store.state.savedFilter;
+      let savedFilter = this.$store.state.Page.savedFilter;
       for (let f of this.filters) {
         await axios({
           method: "post",
