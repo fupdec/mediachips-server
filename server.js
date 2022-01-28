@@ -44,7 +44,7 @@ for (const name of Object.keys(nets)) {
   }
 }
 let config = require(configPath)
-config.ip = ip || '192.168.0.1'
+config.ip = ip || 'localhost'
 
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
   if (err) return console.log(err)
