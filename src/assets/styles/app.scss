@@ -157,11 +157,12 @@ html {
   span {
     white-space: nowrap;
   }
-  .aliases {
+  .synonyms {
     opacity: 0.5;
     overflow: hidden;
     white-space: nowrap;
     margin-left: 10px;
+    max-width: 350px;
   }
   .small-flag {
     transform: scale(0.5) !important;

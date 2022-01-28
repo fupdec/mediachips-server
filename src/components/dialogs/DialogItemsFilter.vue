@@ -195,18 +195,48 @@ export default {
   methods: {
     async init() {
       this.listBy = [];
-      this.listBy = [...this.listBy, ...this.cols.standart];
+
+      this.listBy.push({ header: "Default" });
+      let defaults = this.cols.standart;
+      defaults.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
+      this.listBy = [...this.listBy, ...defaults];
 
       if (this.isMediaPage) {
-        this.listBy = [...this.listBy, ...this.cols.media];
+        this.listBy.push({ header: "File" });
+
+        let media = this.cols.media;
+        media.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
+        this.listBy = [...this.listBy, ...media];
+
         if (this.typeId == 1) {
-          this.listBy = [...this.listBy, ...this.cols.video];
+          this.listBy.push({ header: "Video" });
+
+          let video = this.cols.video;
+          video.sort((a, b) =>
+            a.text > b.text ? 1 : b.text > a.text ? -1 : 0
+          );
+          this.listBy = [...this.listBy, ...video];
         }
       } else if (this.isMetaPage) {
-        this.listBy = [...this.listBy, ...this.cols.metaItem];
+        this.listBy.push({ header: "Item" });
+        let metaItem = this.cols.metaItem;
+        metaItem.sort((a, b) =>
+          a.text > b.text ? 1 : b.text > a.text ? -1 : 0
+        );
+        this.listBy = [...this.listBy, ...metaItem];
       }
 
-      const assigned = this.$store.state.Page.assigned;
+      let assigned = this.$store.state.Page.assigned;
+
+      assigned.sort((a, b) =>
+        a["meta.name"] > b["meta.name"]
+          ? 1
+          : b["meta.name"] > a["meta.name"]
+          ? -1
+          : 0
+      );
+
+      if (assigned.length) this.listBy.push({ header: "Meta" });
 
       for (let i of assigned) {
         this.listBy.push({
@@ -216,10 +246,6 @@ export default {
           text: i["meta.name"],
         });
       }
-
-      this.listBy.sort((a, b) =>
-        a.text > b.text ? 1 : b.text > a.text ? -1 : 0
-      );
 
       this.filters = _.cloneDeep(this.$store.state.Page.filters);
     },

@@ -30,14 +30,26 @@
         <template v-slot:selection="data">
           <v-icon>mdi-{{ data.item.icon }}</v-icon>
           <span class="mx-2">{{ data.item.text }}</span>
-          <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
+          <v-icon small left>{{ getIconType(data.item.type) }}</v-icon>
         </template>
         <template v-slot:item="data">
-          <div class="d-flex justify-space-between" style="width: 100%">
-            <v-icon>mdi-{{ data.item.icon }}</v-icon>
-            <span class="mx-2" style="width: 100%">{{ data.item.text }}</span>
-            <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
-          </div>
+          <template v-if="typeof data.item !== 'object'">
+            <v-list-item-content v-text="data.item" />
+          </template>
+          <template v-else>
+            <v-list-item-avatar>
+              <v-icon>mdi-{{ data.item.icon }}</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title>
+                <b> {{ data.item.text }} </b>
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
+                <span v-html="data.item.type" class="ml-1" />
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
         </template>
       </v-autocomplete>
 
@@ -170,7 +182,7 @@
               </v-icon>
             </span>
             <span>{{ data.item.name }}</span>
-            <span v-if="meta.metaSetting.synonyms" class="aliases">
+            <span v-if="meta.metaSetting.synonyms" class="synonyms">
               {{ data.item.synonyms }}
             </span>
           </div>
@@ -344,6 +356,7 @@ export default {
       }
     },
     filterBy(filter, queryText, itemText) {
+      if (filter.header) return false;
       let text = filter.text.toLowerCase();
       let query = queryText.toLowerCase();
       return text.includes(query);
