@@ -121,16 +121,14 @@
         <v-img :src="images.main" position="top" />
       </v-avatar>
       <div class="ml-2">{{ item.name }}</div>
-      
+
       <v-overlay
         :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         absolute
       >
-        <v-icon v-if="isSelected">
-          mdi-checkbox-marked-outline
-        </v-icon>
+        <v-icon v-if="isSelected"> mdi-checkbox-marked-outline </v-icon>
       </v-overlay>
     </v-chip>
   </v-lazy>

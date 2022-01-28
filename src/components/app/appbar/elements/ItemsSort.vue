@@ -12,39 +12,41 @@
       </v-tooltip>
     </template>
 
-    <v-list dense>
-      <v-subheader>Sort Direction</v-subheader>
-      <v-list-item @click="toggleDir">
-        <v-list-item-content>
-          <v-list-item-title>
-            <span v-if="page.sortDir == 'asc'">
-              <v-icon left> mdi-sort-ascending </v-icon>
-              Ascending
-            </span>
-            <span v-else>
-              <v-icon left> mdi-sort-descending </v-icon>
-              Descending
-            </span>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-subheader>Sort By</v-subheader>
-      <v-list-item-group
-        :value="sortBy"
-        @change="update($event)"
-        mandatory
-        color="primary"
-      >
-        <v-list-item v-for="i in list" :key="i.by" :value="i.by">
+    <v-card min-width="150" max-height="50vh">
+      <v-list dense>
+        <v-subheader>Sort Direction</v-subheader>
+        <v-list-item @click="toggleDir">
           <v-list-item-content>
             <v-list-item-title>
-              <v-icon left>mdi-{{ i.icon }}</v-icon>
-              {{ i.text }}
+              <span v-if="page.sortDir == 'asc'">
+                <v-icon left> mdi-sort-ascending </v-icon>
+                Ascending
+              </span>
+              <span v-else>
+                <v-icon left> mdi-sort-descending </v-icon>
+                Descending
+              </span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list-item-group>
-    </v-list>
+        <v-subheader>Sort By</v-subheader>
+        <v-list-item-group
+          :value="sortBy"
+          @change="update($event)"
+          mandatory
+          color="primary"
+        >
+          <v-list-item v-for="i in list" :key="i.by" :value="i.by">
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-icon left>mdi-{{ i.icon }}</v-icon>
+                {{ i.text }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-card>
   </v-menu>
 </template>
 
@@ -119,7 +121,7 @@ export default {
       }
     },
     toggleDir() {
-      const val = this.page.sortDir === "asc" ? "desc" : "asc"
+      const val = this.page.sortDir === "asc" ? "desc" : "asc";
       this.$store.commit("updateStatePage", {
         key: "sortDir",
         value: val,

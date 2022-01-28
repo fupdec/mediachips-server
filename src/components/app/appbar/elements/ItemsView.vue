@@ -11,7 +11,7 @@
       </v-tooltip>
     </template>
 
-    <v-card width="150">
+    <v-card min-width="150" max-height="50vh">
       <v-list dense>
         <v-subheader>View</v-subheader>
         <v-list-item-group
@@ -20,7 +20,7 @@
           mandatory
           color="primary"
         >
-          <v-list-item v-for="i in list" :key="i.val" :value="i.val">
+          <v-list-item v-for="(i, x) in list" :key="x" :value="i.val">
             <v-list-item-content>
               <v-list-item-title>
                 <v-icon left>mdi-{{ i.icon }}</v-icon>

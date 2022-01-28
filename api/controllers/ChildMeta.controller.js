@@ -37,7 +37,20 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {};
 
 // Update a ChildMeta by the id in the request
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  ChildMeta.update(req.body.data, {
+    where: {
+      metaId: req.body.metaId,
+      childMetaId: req.body.childMetaId
+    }
+  }).then((data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
 
 // Delete a ChildMeta with the specified id in the request
 exports.delete = (req, res) => {

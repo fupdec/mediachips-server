@@ -8,6 +8,7 @@
     <ItemsLimit />
     <ItemsSize />
     <ItemsView />
+    <ItemsVisibility />
     <ItemsSelect />
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
     ItemsLimit: () => import("@/components/app/appbar/elements/ItemsLimit.vue"),
     ItemsSize: () => import("@/components/app/appbar/elements/ItemsSize.vue"),
     ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
+    ItemsVisibility: () => import("@/components/app/appbar/elements/ItemsVisibility.vue"),
     ItemsSelect: () =>
       import("@/components/app/appbar/elements/ItemsSelect.vue"),
   },

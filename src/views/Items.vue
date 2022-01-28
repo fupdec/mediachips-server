@@ -108,6 +108,7 @@ import axios from "axios";
 import vuescroll from "vuescroll";
 import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";
 import Keys from "@/mixins/Keys";
+import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
   name: "Items",
@@ -118,7 +119,7 @@ export default {
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
-  mixins: [GeneratingThumbsForVideos, Keys],
+  mixins: [GeneratingThumbsForVideos, ComputedForItemsPage, Keys],
   async beforeMount() {
     this.itemsOnPage = [];
     this.$store.commit("updateStatePage", {
@@ -171,6 +172,9 @@ export default {
         view: val,
       });
     });
+    this.$root.$on("updateAssignedMeta", async () => {
+      await this.getAssignedMeta();
+    });
     this.$nextTick(async () => {});
   },
   beforeDestroy() {
@@ -178,6 +182,7 @@ export default {
     this.$root.$off("setItemsLimit");
     this.$root.$off("setItemsSortDir");
     this.$root.$off("setItemsSortBy");
+    this.$root.$off("updateAssignedMeta");
     if (this.isInfiniteScroll) this.updatePageSetting({ page: 1 });
   },
   data: () => ({
@@ -193,30 +198,6 @@ export default {
     },
   }),
   computed: {
-    apiUrl() {
-      return this.$store.state.localhost;
-    },
-    page() {
-      return this.$store.state.Page;
-    },
-    sets() {
-      return this.$store.state.settings;
-    },
-    route() {
-      return this.$route.path;
-    },
-    isMetaPage() {
-      return Vue.prototype.$checkCurrentPage("meta");
-    },
-    isMediaPage() {
-      return Vue.prototype.$checkCurrentPage("media");
-    },
-    typeId() {
-      return +this.$route.query.typeId;
-    },
-    metaId() {
-      return +this.$route.query.metaId;
-    },
     isInfiniteScroll() {
       return this.page.limit === 101;
     },
@@ -404,7 +385,10 @@ export default {
       await axios
         .get(this.apiUrl + url)
         .then((res) => {
-          this.$store.state.Page.assigned = res.data;
+          this.$store.commit("updateStatePage", {
+            key: "assigned",
+            value: res.data,
+          });
         })
         .catch((e) => {
           console.log(e);

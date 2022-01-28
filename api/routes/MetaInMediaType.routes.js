@@ -13,7 +13,7 @@ module.exports = app => {
   router.get("/:id", MetaInMediaType.findOne);
 
   // Update a MetaInMediaType with id
-  router.put("/:id", MetaInMediaType.update);
+  router.put("/", MetaInMediaType.update);
 
   // Delete a MetaInMediaType with id
   router.delete("/:id", MetaInMediaType.delete);

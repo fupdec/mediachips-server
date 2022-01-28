@@ -13,7 +13,7 @@ module.exports = app => {
   router.get("/:id", ChildMeta.findAll);
 
   // Update a ChildMeta with id
-  router.put("/:id", ChildMeta.update);
+  router.put("/", ChildMeta.update);
 
   // Delete a ChildMeta with ChildMetaId
   router.delete("/:id", ChildMeta.delete);

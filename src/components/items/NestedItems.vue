@@ -15,26 +15,28 @@
     </v-chip>
 
     <v-chip
-      v-for="i in items"
-      :key="i.itemId + Date.now()"
+      v-for="(i, x) in items"
+      :key="i['item.name'] + x"
       @mouseover.stop="hoverImage($event, i['item.metaId'], i.itemId)"
       @mouseleave.stop="$store.state.hover.show = false"
       :color="i['item.color']"
       :text-color="getTextColor(i['item.color'])"
+      v-show="checkShow(i['item.metaId'])"
     >
       <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
       {{ i["item.name"] }}
     </v-chip>
 
     <v-chip
-      v-for="(v, i) in values"
-      :key="i"
+      v-for="(i, x) in values"
+      :key="i.metaId + x"
       label
       outlined
-      :title="v.meta.name"
+      :title="i.meta.name"
+      v-show="checkShow(i.metaId)"
     >
-      <v-icon class="mr-1">mdi-{{ v.meta.icon }}</v-icon>
-      {{ v.value }}
+      <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+      {{ i.value }}
     </v-chip>
 
     <!-- Parse meta -->
@@ -72,6 +74,7 @@
 
 <script>
 import Vue from "vue";
+import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
   name: "NestedItems",
@@ -80,6 +83,13 @@ export default {
     values: Array,
     metadata: Object,
     type: String,
+  },
+  mixins: [ComputedForItemsPage],
+  data: () => ({}),
+  computed: {
+    assigned() {
+      return this.$store.state.Page.assigned;
+    },
   },
   methods: {
     getTextColor(color) {
@@ -90,6 +100,14 @@ export default {
     },
     hoverImage(event, metaId, itemId) {
       Vue.prototype.$showHoverImage(event, metaId, itemId);
+    },
+    checkShow(metaId) {
+      let assigned = this.assigned;
+      let itemName = "metaId";
+      if (this.isMetaPage) itemName = "childMetaId";
+      let x = assigned.findIndex((i) => i[itemName] == metaId);
+      if (x > -1) return assigned[x].show == 1 ? true : false;
+      else return false;
     },
   },
 };

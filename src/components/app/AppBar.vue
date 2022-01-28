@@ -52,7 +52,6 @@
 
 
 <script>
-const path = require("path");
 import vuescroll from "vuescroll";
 import Keys from "@/mixins/Keys";
 
@@ -89,13 +88,8 @@ export default {
       gradient = gradient.replace(")", "");
       return gradient;
     },
-    page: {
-      get() {
-        return this.$store.state.Page;
-      },
-      set(value) {
-        this.$store.state.Page = _.cloneDeep(value);
-      },
+    page() {
+      return this.$store.state.Page;
     },
     sets() {
       return this.$store.state.settings;
@@ -104,8 +98,14 @@ export default {
   },
   methods: {
     toggleSelect() {
-      this.page.isSelect = !this.page.isSelect;
-      this.page.selection = [];
+      this.$store.commit("updateStatePage", {
+        key: "isSelect",
+        value: !this.page.isSelect,
+      });
+      this.$store.commit("updateStatePage", {
+        key: "selection",
+        value: [],
+      });
     },
     register() {
       if (this.$router.history.current.name !== "Settings")
