@@ -212,10 +212,10 @@ export default {
       return Vue.prototype.$checkCurrentPage("media");
     },
     typeId() {
-      return +this.$router.history.current.query.typeId;
+      return +this.$route.query.typeId;
     },
     metaId() {
-      return +this.$router.history.current.query.metaId;
+      return +this.$route.query.metaId;
     },
     isInfiniteScroll() {
       return this.page.limit === 101;
@@ -226,6 +226,7 @@ export default {
       if (this.isMetaPage) await this.getMeta();
       else if (this.isMediaPage) await this.getMedia();
       await this.getPageSettings();
+      await this.getAssignedMeta();
       await this.getFilters();
       await this.getItemsFromDb();
     },
@@ -300,9 +301,9 @@ export default {
     updatePageSetting(data) {
       let query = "";
       if (this.isMetaPage) {
-        query = `?metaId=${this.$route.query.metaId}`;
+        query = `?metaId=${this.metaId}`;
       } else if (this.isMediaPage) {
-        query = `?typeId=${this.$route.query.typeId}`;
+        query = `?typeId=${this.typeId}`;
       }
       axios({
         method: "put",
@@ -312,7 +313,7 @@ export default {
     },
     async getMeta() {
       await axios
-        .get(this.apiUrl + "/api/meta/" + this.$route.query.metaId)
+        .get(this.apiUrl + "/api/meta/" + this.metaId)
         .then((res) => {
           this.meta = res.data;
           this.page.name = this.meta.name;
@@ -325,7 +326,7 @@ export default {
     },
     async getMedia() {
       await axios
-        .get(this.apiUrl + "/api/MediaType/" + this.$route.query.typeId)
+        .get(this.apiUrl + "/api/MediaType/" + this.typeId)
         .then((res) => {
           const mediaType = res.data;
           this.page.name = mediaType.name;
@@ -344,11 +345,11 @@ export default {
       sets.filters = _.cloneDeep(this.page.filters);
       if (this.isMetaPage) {
         url += "item/filter";
-        sets.metaId = this.$route.query.metaId;
+        sets.metaId = this.metaId;
         sets.query = Vue.prototype.$filterItems(sets, "items");
       } else if (this.isMediaPage) {
         url += "media/filter";
-        sets.typeId = this.$route.query.typeId;
+        sets.typeId = this.typeId;
         sets.query = Vue.prototype.$filterItems(sets, "media");
       }
       this.isQueryRun = true;
@@ -392,6 +393,22 @@ export default {
         this.itemsOnPage = items.slice(start, end);
       }
       // TODO jump to the fisrt page if current page greater than total pages
+    },
+    async getAssignedMeta() {
+      let url = "/api/";
+      if (this.isMediaPage) {
+        url += "MetaInMediaType?typeId=" + this.typeId;
+      } else if (this.isMetaPage) {
+        url += "ChildMeta?metaId=" + this.metaId;
+      }
+      await axios
+        .get(this.apiUrl + url)
+        .then((res) => {
+          this.$store.state.Page.assigned = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     changePage(val) {
       this.$store.commit("updateStatePage", {

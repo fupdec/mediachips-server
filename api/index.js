@@ -79,11 +79,19 @@ PageSetting.belongsTo(MediaType, {
 })
 
 MetaInMediaType.removeAttribute('id')
-MediaType.belongsToMany(Meta, {
-  through: MetaInMediaType,
+Meta.hasMany(MetaInMediaType, {
+  foreignKey: 'metaId',
+  onDelete: "cascade"
+})
+MetaInMediaType.belongsTo(Meta, {
+  foreignKey: 'metaId'
+})
+MediaType.hasMany(MetaInMediaType, {
   foreignKey: 'typeId',
-  otherKey: 'metaId',
-  unique: false
+  onDelete: "cascade"
+})
+MetaInMediaType.belongsTo(MediaType, {
+  foreignKey: 'typeId'
 })
 
 Meta.hasOne(Item, {

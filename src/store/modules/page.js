@@ -18,6 +18,7 @@ const Page = {
     isScrolled: false,
     savedFilter: {},
     filters: [],
+    assigned: [], // assigned meta
   }),
   mutations: {
     updateStatePage(state, {

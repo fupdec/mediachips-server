@@ -9,12 +9,13 @@
               <div class="top">Media</div>
             </div>
           </th>
-          <th><span>Videos</span></th>
-          <th><span>Pictures</span></th>
+          <th v-for="i of mediaTypes" :key="i.id">
+            <span>{{ i.name }}</span>
+          </th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="i of metaAll" :key="i.id">
+      <tbody v-if="inited">
+        <tr v-for="i of meta" :key="i.id">
           <td>
             <div class="d-flex justify-space-between align-center">
               <span>
@@ -24,14 +25,12 @@
               <v-icon left :title="i.type">mdi-{{ getIcon(i.type) }}</v-icon>
             </div>
           </td>
-          <th>
-            <v-icon v-if="isMetaAssigned(i.id)" color="success"
-              >mdi-checkbox-marked-circle</v-icon
-            >
+
+          <th v-for="j of mediaTypes" :key="j.id">
+            <v-icon v-if="checkAssignment(i.id, j.id)" color="success">
+              mdi-checkbox-marked-circle
+            </v-icon>
             <v-icon v-else>mdi-minus</v-icon>
-          </th>
-          <th>
-            <v-icon>mdi-minus</v-icon>
           </th>
         </tr>
       </tbody>
@@ -42,50 +41,56 @@
 
 <script>
 import axios from "axios";
+import Vue from "vue";
 
 export default {
   name: "TableMetaInMediaTypes",
   components: {},
   mounted() {
     this.$nextTick(() => {
-      this.getMetaInMediaTypes();
+      this.init();
     });
   },
   data: () => ({
-    metaInMediaTypes: [],
-    metaAll: [],
+    assigned: {},
+    inited: false,
   }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
     },
+    mediaTypes() {
+      return this.$store.state.mediaTypes;
+    },
+    meta() {
+      return this.$store.state.meta;
+    },
   },
   methods: {
-    getMetaInMediaTypes() {
-      let url = `/api/MetaInMediaType`;
-      axios
-        .get(this.apiUrl + url)
+    async init() {
+      for (let i of this.mediaTypes) {
+        this.assigned[i.id] = await this.getMetaInMediaTypes(i.id);
+      }
+      this.inited = true;
+    },
+    async getMetaInMediaTypes(typeId) {
+      let assigned = [];
+      await axios
+        .get(this.apiUrl + `/api/MetaInMediaType?typeId=${typeId}`)
         .then((res) => {
-          this.metaInMediaTypes = res.data.assigned;
-          this.metaAll = res.data.meta;
+          assigned = res.data;
         })
         .catch((e) => {
           console.log(e);
         });
+      return assigned;
     },
-    isMetaAssigned(metaId) {
-      let assigned = this.metaInMediaTypes.map((i) => i["Meta.id"]);
+    checkAssignment(metaId, typeId) {
+      let assigned = this.assigned[typeId].map((i) => i.metaId);
       return assigned.includes(metaId);
     },
     getIcon(type) {
-      if (type === "string") return "alphabetical";
-      if (type === "date") return "calendar";
-      if (type === "number") return "numeric";
-      if (type === "array") return "code-array";
-      if (type === "boolean") return "toggle-switch";
-      if (type === "rating") return "star";
-      if (type === "cards") return "card-bulleted";
-      return "shape";
+      return Vue.prototype.$getIconDataType(type);
     },
   },
 };

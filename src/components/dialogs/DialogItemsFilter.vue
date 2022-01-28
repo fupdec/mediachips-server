@@ -153,9 +153,6 @@ export default {
       this.removeAll();
       this.apply();
     });
-    this.$nextTick(async () => {
-      await this.init();
-    });
   },
   beforeDestroy() {
     this.$root.$off("runSearch");
@@ -189,47 +186,27 @@ export default {
       return Vue.prototype.$checkCurrentPage("media");
     },
     typeId() {
-      return +this.$router.history.current.query.typeId;
+      return +this.$route.query.typeId;
     },
     metaId() {
-      return +this.$router.history.current.query.metaId;
-    },
-    filtersStore() {
-      return this.$store.state.Page.filters;
+      return +this.$route.query.metaId;
     },
   },
   methods: {
     async init() {
-      let assigned = [];
+      this.listBy = [];
       this.listBy = [...this.listBy, ...this.cols.standart];
 
       if (this.isMediaPage) {
         this.listBy = [...this.listBy, ...this.cols.media];
         if (this.typeId == 1) {
           this.listBy = [...this.listBy, ...this.cols.video];
-
-          await axios
-            .get(this.apiUrl + "/api/MetaInMediaType")
-            .then((res) => {
-              assigned = res.data.assigned;
-              assigned = assigned.filter((i) => i.id == this.typeId);
-            })
-            .catch((e) => {
-              console.log(e);
-            });
         }
       } else if (this.isMetaPage) {
         this.listBy = [...this.listBy, ...this.cols.metaItem];
-
-        await axios
-          .get(this.apiUrl + "/api/ChildMeta?metaId=" + this.metaId)
-          .then((res) => {
-            assigned = res.data;
-          })
-          .catch((e) => {
-            console.log(e);
-          });
       }
+
+      const assigned = this.$store.state.Page.assigned;
 
       for (let i of assigned) {
         this.listBy.push({
@@ -351,9 +328,9 @@ export default {
   },
   watch: {
     dialog() {
-      this.filters = _.cloneDeep(this.filtersStore);
+      this.init();
     },
-    filtersStore(val) {
+    "page.filters"(val) {
       this.filters = _.cloneDeep(val);
     },
   },

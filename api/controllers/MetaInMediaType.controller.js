@@ -1,29 +1,27 @@
-const db = require("../index.js");
-const MediaType = db.MediaType;
-const Meta = db.Meta;
-const Op = db.Sequelize.Op;
+const {
+  MetaInMediaType,
+  Meta
+} = require("../index.js");
 
 // Create and Save a new MetaInMediaType
 exports.create = (req, res) => {};
 
 // Retrieve all MetaInMediaType from the database.
 exports.findAll = async (req, res) => {
-  let response = {}
-  MediaType.findAll({
-      include: {
-        model: Meta
-      },
-      raw: true
+  MetaInMediaType.findAll({
+    where: {
+      typeId: req.query.typeId
+    },
+    include: [Meta],
+    raw: true
+  }).then(async (data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    console.log(err)
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
     })
-    .then(async data => {
-      response.assigned = data
-      response.meta = await Meta.findAll()
-      res.status(201).send(response)
-    }).catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
-      })
-    })
+  })
 };
 
 // Find a single MetaInMediaType with an id
