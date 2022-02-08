@@ -1,17 +1,10 @@
 <template>
   <v-form ref="form" v-model="valid">
-    <v-btn
-      v-show="index != 0"
-      @click="toggleUnion"
-      outlined
-      rounded
-      x-small
-      class="mb-2"
-    >
+    <v-btn v-show="index != 0" @click="toggleUnion" rounded plain small>
       {{ filter.union === "AND" ? "AND" : "OR" }}
     </v-btn>
 
-    <v-card outlined class="filter-row pa-2 mb-2">
+    <v-card outlined class="filter-row pa-2">
       <v-autocomplete
         @input="setBy($event)"
         :value="filter.by"
@@ -23,14 +16,14 @@
         label="By"
         class="by"
         outlined
-        dense
-        hide-selected
         hide-details
       >
         <template v-slot:selection="data">
-          <v-icon>mdi-{{ data.item.icon }}</v-icon>
-          <span class="mx-2">{{ data.item.text }}</span>
-          <v-icon small left>{{ getIconType(data.item.type) }}</v-icon>
+          <v-chip label>
+            <v-icon left>mdi-{{ data.item.icon }}</v-icon>
+            <span v-html="data.item.text" class="mr-2" />
+            <v-icon small>{{ getIconType(data.item.type) }}</v-icon>
+          </v-chip>
         </template>
         <template v-slot:item="data">
           <template v-if="typeof data.item !== 'object'">
@@ -64,13 +57,13 @@
         label="Condition"
         class="cond mx-sm-2"
         outlined
-        dense
-        hide-selected
         hide-details
       >
         <template v-slot:selection="data">
-          <v-icon>mdi-{{ data.item.icon }}</v-icon>
-          <span class="mx-2">{{ data.item.text }}</span>
+          <v-chip label>
+            <v-icon left>mdi-{{ data.item.icon }}</v-icon>
+            <span v-html="data.item.text" />
+          </v-chip>
         </template>
         <template v-slot:item="data">
           <div class="list-item">
@@ -91,7 +84,6 @@
         label="String"
         class="val"
         outlined
-        dense
         hide-details
       />
 
@@ -107,7 +99,6 @@
         label="Number"
         class="val"
         outlined
-        dense
         hide-details
       />
 
@@ -122,7 +113,6 @@
         label="Date"
         class="val"
         outlined
-        dense
         readonly
         hide-details
       />
@@ -144,7 +134,6 @@
         class="val"
         outlined
         multiple
-        dense
         hide-selected
         hide-details
       >

@@ -56,7 +56,7 @@
           <div>No filters</div>
         </div>
 
-        <v-card-actions class="pb-4">
+        <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             @click="add"
@@ -64,7 +64,6 @@
             color="success"
             rounded
             depressed
-            small
           >
             <v-icon left>mdi-plus</v-icon> Add
           </v-btn>
@@ -75,7 +74,6 @@
             color="error"
             depressed
             rounded
-            small
           >
             <v-icon left>mdi-close</v-icon> Remove all
           </v-btn>
