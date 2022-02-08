@@ -17,7 +17,7 @@
       <v-card-actions>
         <div class="caption">Notifications</div>
         <v-spacer></v-spacer>
-        <v-btn icon x-small @click="clearAll">
+        <v-btn v-if="notifications.length > 0" @click="clearAll" icon x-small>
           <v-icon>mdi-notification-clear-all</v-icon>
         </v-btn>
       </v-card-actions>
@@ -42,7 +42,7 @@
             </div>
           </v-alert>
 
-          <div v-if="notifications.length == 0" class="text-center py-2">
+          <div v-if="notifications.length == 0" class="text-center py-3">
             <v-icon class="mb-2">mdi-ghost-outline</v-icon>
             <div class="caption">No new notifications</div>
           </div>

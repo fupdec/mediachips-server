@@ -5,10 +5,7 @@
     <ItemsSearch />
     <ItemsFavorite />
     <ItemsSort />
-    <ItemsLimit />
-    <ItemsSize />
-    <ItemsView />
-    <ItemsVisibility />
+    <ItemsAppearance />
     <ItemsSelect />
   </div>
 </template>
@@ -28,10 +25,7 @@ export default {
     ItemsSort: () => import("@/components/app/appbar/elements/ItemsSort.vue"),
     ItemsFavorite: () =>
       import("@/components/app/appbar/elements/ItemsFavorite.vue"),
-    ItemsLimit: () => import("@/components/app/appbar/elements/ItemsLimit.vue"),
-    ItemsSize: () => import("@/components/app/appbar/elements/ItemsSize.vue"),
-    ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
-    ItemsVisibility: () => import("@/components/app/appbar/elements/ItemsVisibility.vue"),
+    ItemsAppearance: () => import("@/components/app/appbar/elements/ItemsAppearance.vue"),
     ItemsSelect: () =>
       import("@/components/app/appbar/elements/ItemsSelect.vue"),
   },

@@ -7,16 +7,50 @@
             <v-icon>mdi-eye-outline</v-icon>
           </v-btn>
         </template>
-        <span> Visibility of Elements </span>
+        <span> Appearance </span>
       </v-tooltip>
     </template>
 
     <v-card min-width="150" max-height="50vh">
       <v-list dense>
-        <v-subheader>Meta</v-subheader>
+        <v-subheader>Items Per Page</v-subheader>
+        <v-btn-toggle
+          :value="page.limit"
+          @change="updateLimit($event)"
+          color="primary"
+          mandatory
+          dense
+          group
+        >
+          <v-btn class="ma-0" :value="25">25</v-btn>
+          <v-btn class="ma-0" :value="50">50</v-btn>
+          <v-btn class="ma-0" :value="75">75</v-btn>
+          <v-btn class="ma-0" :value="99">99</v-btn>
+          <v-btn class="ma-0" :value="101">∞</v-btn>
+        </v-btn-toggle>
 
+        <v-subheader>Item Size</v-subheader>
+        <v-btn-toggle
+          :value="page.size"
+          @change="updateSize($event)"
+          color="primary"
+          mandatory
+          dense
+          group
+        >
+          <v-btn class="ma-0" :value="1">XS</v-btn>
+          <v-btn class="ma-0" :value="2">S</v-btn>
+          <v-btn class="ma-0" :value="3">M</v-btn>
+          <v-btn class="ma-0" :value="4">L</v-btn>
+          <v-btn class="ma-0" :value="5">XL</v-btn>
+        </v-btn-toggle>
+
+        <v-subheader>View</v-subheader>
+        <ItemsView />
+
+        <v-subheader v-if="page.assigned.length">Meta</v-subheader>
         <v-list-item
-          v-for="(i, x) in assigned"
+          v-for="(i, x) in page.assigned"
           :key="x"
           @click="toggle(i)"
           link
@@ -43,15 +77,16 @@ import axios from "axios";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
-  name: "ItemsView",
+  name: "ItemsAppearance",
   components: {
     vuescroll,
+    ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
   },
   mixins: [ComputedForItemsPage],
   data: () => ({}),
   computed: {
-    assigned() {
-      return this.$store.state.Page.assigned;
+    page() {
+      return this.$store.state.Page;
     },
   },
   methods: {
@@ -76,6 +111,19 @@ export default {
         data: data,
       });
       this.$root.$emit("updateAssignedMeta");
+    },
+    updateLimit(val) {
+      this.$store.commit("updateStatePage", {
+        key: "limit",
+        value: val,
+      });
+      this.$root.$emit("setItemsLimit", val);
+    },
+    updateSize(val) {
+      this.$store.commit("updateStatePage", {
+        key: "size",
+        value: val,
+      });
     },
   },
 };

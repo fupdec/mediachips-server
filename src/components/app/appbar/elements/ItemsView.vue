@@ -1,49 +1,27 @@
 <template>
-  <v-menu offset-y nudge-bottom="10">
-    <template #activator="{ on: onMenu }">
-      <v-tooltip bottom>
-        <template #activator="{ on: onTooltip }">
-          <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-            <v-icon>mdi-view-grid-outline</v-icon>
-          </v-btn>
-        </template>
-        <span> View: {{ text }} </span>
-      </v-tooltip>
-    </template>
-
-    <v-card min-width="150" max-height="50vh">
-      <v-list dense>
-        <v-subheader>View</v-subheader>
-        <v-list-item-group
-          :value="view"
-          @change="update($event)"
-          mandatory
-          color="primary"
-        >
-          <v-list-item v-for="(i, x) in list" :key="x" :value="i.val">
-            <v-list-item-content>
-              <v-list-item-title>
-                <v-icon left>mdi-{{ i.icon }}</v-icon>
-                {{ i.text }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </v-card>
-  </v-menu>
+  <v-list-item-group
+    :value="view"
+    @change="update($event)"
+    mandatory
+    color="primary"
+  >
+    <v-list-item v-for="(i, x) in list" :key="x" :value="i.val">
+      <v-list-item-content>
+        <v-list-item-title>
+          <v-icon left>mdi-{{ i.icon }}</v-icon>
+          {{ i.text }}
+        </v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
+  </v-list-item-group>
 </template>
 
 
 <script>
-import vuescroll from "vuescroll";
 import Vue from "vue";
 
 export default {
   name: "ItemsView",
-  components: {
-    vuescroll,
-  },
   mounted() {
     this.$nextTick(async () => {
       this.init();
