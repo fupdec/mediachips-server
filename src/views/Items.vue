@@ -8,6 +8,14 @@
       <span v-else class="body-1 text--secondary ml-2">({{ total }})</span>
     </div>
 
+    <v-container
+      v-if="page.filters.length > 0"
+      fluid
+      class="d-flex justify-center align-start"
+    >
+      <FiltersChips :filters="page.filters" />
+    </v-container>
+
     <v-pagination
       v-show="itemsOnPage.length && !isInfiniteScroll"
       :value="page.page"
@@ -16,14 +24,6 @@
       total-visible="5"
       class="pt-2 pb-1"
     />
-
-    <v-container
-      v-if="page.filters.length > 0"
-      fluid
-      class="d-flex justify-center align-start"
-    >
-      <FiltersChips :filters="page.filters" />
-    </v-container>
 
     <Loading v-show="isQueryRun" />
 

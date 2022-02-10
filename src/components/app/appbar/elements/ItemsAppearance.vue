@@ -4,10 +4,10 @@
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
           <v-btn v-on="{ ...onMenu, ...onTooltip }" icon>
-            <v-icon>mdi-eye-outline</v-icon>
+            <v-icon>mdi-tune</v-icon>
           </v-btn>
         </template>
-        <span> Appearance </span>
+        <span> Item Settings </span>
       </v-tooltip>
     </template>
 
