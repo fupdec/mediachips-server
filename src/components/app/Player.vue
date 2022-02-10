@@ -6,11 +6,12 @@
       :class="{ fullscreen: p.fullscreen }"
       id="player"
       @mousedown="stopSmoothScroll($event)"
+      @mousemove="moveOverPlayer"
     >
       <div class="player-wrapper">
         <div
           class="video-wrapper"
-          @click="p.paused ? play() : pause()"
+          @click="togglePause"
           @dblclick="toggleFullscreen"
           @click.middle="toggleFullscreen"
           @mousedown="clickOnVideo($event)"
@@ -19,6 +20,7 @@
           tabindex="-1"
         >
           <video ref="videoPlayer" autoplay />
+
           <div v-if="p.playbackError && reg" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
             <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
@@ -28,6 +30,7 @@
               <span>Play in the system player</span>
             </v-btn>
           </div>
+
           <div v-if="!reg && p.nowPlaying > 9" class="reg-block">
             <div class="mb-2">Application not registered</div>
             <div class="caption">
@@ -35,21 +38,31 @@
               of the playlist.
             </div>
           </div>
+
           <div v-if="p.playbackError" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
             <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
             <div class="mb-4">The video file is missing.</div>
           </div>
-          <div v-show="p.statusText" class="status-text">
+
+          <v-chip
+            v-show="p.statusText"
+            class="status-text ma-2"
+            color="#00000066"
+            dark
+          >
             <v-icon dark left>mdi-{{ p.statusIcon }}</v-icon>
             {{ p.statusText }}
-          </div>
+          </v-chip>
         </div>
+
         <Controls
           ref="controls"
+          v-show="isControlsVisible"
           @toggleFullscreen="toggleFullscreen"
           @togglePictureInPicture="togglePictureInPicture"
           @play="playVideoObject($event)"
+          @showControls="showControls"
         />
       </div>
       <Playlist @play="playVideoObject($event)" />
@@ -92,6 +105,10 @@ export default {
       this.loadSrc(video);
     });
   },
+  data: () => ({
+    timeoutControls: -1,
+    isControlsVisible: true,
+  }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
@@ -163,11 +180,13 @@ export default {
       }
     },
     toggleFullscreen() {
+      this.showControls();
       if (this.p.fullscreen) document.exitFullscreen();
       else document.getElementById("player").requestFullscreen();
       this.p.fullscreen = !this.p.fullscreen;
     },
     async togglePictureInPicture() {
+      this.showControls();
       if (this.p.player !== document.pictureInPictureElement) {
         await this.p.player.requestPictureInPicture();
       } else await document.exitPictureInPicture();
@@ -184,12 +203,6 @@ export default {
       event.preventDefault();
       event.stopPropagation();
     },
-    play() {
-      this.$store.dispatch("playerPlay");
-    },
-    pause() {
-      this.$store.dispatch("playerPause");
-    },
     changeVolume(e) {
       let volume = (this.p.player.volume - e.deltaY / 1000 / 2).toFixed(2);
       if (volume < 0) volume = 0;
@@ -204,7 +217,7 @@ export default {
     handleKey(e) {
       switch (true) {
         case e.key === " ":
-          this.$refs.controls.togglePause();
+          this.togglePause();
           break;
         case e.key === "ArrowRight":
           this.$store.dispatch("playerJumpTo", {
@@ -270,6 +283,22 @@ export default {
     },
     playVideoObject(video) {
       this.loadSrc(video);
+    },
+    togglePause() {
+      this.$refs.controls.togglePause();
+    },
+    moveOverPlayer(e) {
+      if (!e.movementX > 0 || !e.movementY > 0) return;
+      this.showControls();
+      if (!this.p.fullscreen || this.p.mouseOverControls) return;
+      if (this.p.paused) return;
+      this.timeoutControls = setTimeout(() => {
+        this.isControlsVisible = false;
+      }, 1000);
+    },
+    showControls() {
+      this.isControlsVisible = true;
+      clearTimeout(this.timeoutControls);
     },
   },
   watch: {

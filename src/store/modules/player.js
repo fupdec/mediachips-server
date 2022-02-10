@@ -10,6 +10,7 @@ const Player = {
     statusTimeout: -1,
     playlistVisible: false,
     marksVisible: false,
+    mouseOverControls: false,
     // Video 
     duration: 1,
     volume: 1,
@@ -20,6 +21,7 @@ const Player = {
     seekTime: 0,
     seeking: false,
     playbackError: null,
+    timeRemain: false,
     // Playlist
     isPlaylistVisible: false,
     nowPlaying: 0,

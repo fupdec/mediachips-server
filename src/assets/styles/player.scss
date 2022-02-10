@@ -5,24 +5,12 @@
   height: 100%;
   background: #000;
   &.fullscreen {
-    .controls {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      width: 80%;
-      min-width: 800px;
-      border-radius: 5px 5px 0 0 !important;
-      margin: auto;
-    }
     .video-wrapper {
       max-height: 100%;
     }
     .marks-wrapper,
     .playlist-wrapper {
-      .items {
-        height: calc(100vh - 80px) !important;
-      }
+      height: calc(100vh - 100px);
     }
   }
   .player-wrapper {
@@ -108,8 +96,12 @@
   text-align: center;
 }
 .controls {
-  position: relative;
-  padding-top: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-image: linear-gradient(0, rgba(0, 0, 0, 0.8), transparent);
   .timeline {
     position: relative;
     &:hover {
@@ -119,10 +111,25 @@
         transform: translateX(-1vw) translateY(-15px);
         border-radius: 0 0 2px 2px;
       }
+      .v-slider__track-container {
+        height: 6px;
+      }
+      .v-slider__thumb {
+        height: 16px;
+        width: 16px;
+      }
     }
-    .v-slider {
-      margin: 0;
-    }
+  }
+  .v-slider__track-container {
+    transition: 0.3s all ease;
+    box-shadow: 0 0 7px 1px #0000007a;
+  }
+  .v-slider__thumb-container {
+    box-shadow: 0 0 7px 2px #0000007a;
+  }
+  .v-slider__track-background,
+  .v-slider__track-fill {
+    border-radius: 5px;
   }
   .mark {
     cursor: pointer;
@@ -149,15 +156,15 @@
       height: 18px;
     }
   }
-  .duration {
-    display: flex;
-  }
   .volume {
-    min-width: 60px;
-    max-width: 100px;
-    .v-input__prepend-outer {
-      margin-right: 0;
+    &:hover {
+      .v-slider__track-container {
+        height: 5px;
+      }
     }
+  }
+  .volume-slider {
+    width: 85px;
   }
   // .hoverable {
   //   &:hover {
@@ -196,7 +203,8 @@
   }
   .playlist-wrapper {
     .video-name {
-      b, .path {
+      b,
+      .path {
         background-color: rgba(0, 0, 0, 0.6);
       }
     }
@@ -206,12 +214,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0 5px;
   font-size: 1.5vw;
   display: flex;
   align-items: center;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.363);
 }
 
 .marks-wrapper {
@@ -219,9 +224,10 @@
   top: 10px;
   left: 10px;
   min-width: 18vw;
-  .items {
-    height: calc(100vh - 116px) !important;
-  }
+  height: calc(100vh - 20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   .v-card__title {
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -273,7 +279,7 @@
   }
   .delete {
     opacity: 0;
-    transition: .3s;
+    transition: 0.3s;
     position: absolute;
     left: 0;
     bottom: 0;
@@ -288,9 +294,10 @@
   top: 10px;
   right: 10px;
   min-width: 18vw;
-  .items {
-    height: calc(100vh - 116px) !important;
-  }
+  height: calc(100vh - 20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   .v-card__title {
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -309,7 +316,8 @@
     left: 0px;
     right: 0px;
     overflow: hidden;
-    b, .path {
+    b,
+    .path {
       background-color: rgba(255, 255, 255, 0.7);
     }
     b {
@@ -386,8 +394,6 @@
         }
       }
     }
-  }
-  .player-wrapper {
     .controls {
       .buttons {
         display: flex;
@@ -395,6 +401,8 @@
       }
     }
   }
+  .seek-buttons,
+  .mark-buttons,
   .toggle-picture-in-picture {
     display: none;
   }
