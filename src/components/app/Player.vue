@@ -1,17 +1,16 @@
 <template>
-  <v-dialog :value="isPlayerActive" @input="closePlayer" eager>
+  <v-dialog :value="p.active" @input="closePlayer" eager>
     <div
       ref="player"
       class="player"
-      :class="{ fullscreen }"
+      :class="{ fullscreen: p.fullscreen }"
       id="player"
       @mousedown="stopSmoothScroll($event)"
-      @mousemove="moveOverPlayer"
     >
       <div class="player-wrapper">
         <div
           class="video-wrapper"
-          @click="paused ? play() : pause()"
+          @click="p.paused ? play() : pause()"
           @dblclick="toggleFullscreen"
           @click.middle="toggleFullscreen"
           @mousedown="clickOnVideo($event)"
@@ -20,57 +19,56 @@
           tabindex="-1"
         >
           <video ref="videoPlayer" autoplay />
-          <div v-if="playbackError && reg" class="video-error">
+          <div v-if="p.playbackError && reg" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
-            <div>{{ getFileNameFromPath(playlist[nowPlaying].path) }}</div>
+            <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
             <div class="mb-4">Video format not supported.</div>
             <v-btn @click="playVideoInSystemPlayer" color="primary" small>
               <v-icon left>mdi-television-play</v-icon>
               <span>Play in the system player</span>
             </v-btn>
           </div>
-          <div v-if="!reg && nowPlaying > 4" class="reg-block">
+          <div v-if="!reg && p.nowPlaying > 9" class="reg-block">
             <div class="mb-2">Application not registered</div>
             <div class="caption">
               In the unregistered version, you can only play the first 5 videos
               of the playlist.
             </div>
           </div>
-          <div v-if="playbackError" class="video-error">
+          <div v-if="p.playbackError" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
-            <div>{{ getFileNameFromPath(playlist[nowPlaying].path) }}</div>
+            <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
             <div class="mb-4">The video file is missing.</div>
           </div>
-          <div v-show="statusText" class="status-text">
-            <v-icon dark left>mdi-{{ statusIcon }}</v-icon>
-            {{ statusText }}
+          <div v-show="p.statusText" class="status-text">
+            <v-icon dark left>mdi-{{ p.statusIcon }}</v-icon>
+            {{ p.statusText }}
           </div>
         </div>
         <Controls
           ref="controls"
-          v-show="isControlsVisible"
           @toggleFullscreen="toggleFullscreen"
           @togglePictureInPicture="togglePictureInPicture"
           @play="playVideoObject($event)"
         />
       </div>
       <Playlist @play="playVideoObject($event)" />
-      <Markers />
+      <Marks />
     </div>
   </v-dialog>
 </template>
 
 
 <script>
-const path = require("path");
-
 import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
 import Controls from "./player/Controls.vue";
 import Playlist from "./player/Playlist.vue";
-import Markers from "./player/Markers.vue";
+import Marks from "./player/Marks.vue";
+import Keys from "@/mixins/Keys";
+const path = require("path");
 
 export default {
   name: "Player",
@@ -78,211 +76,105 @@ export default {
     vuescroll,
     Controls,
     Playlist,
-    Markers,
+    Marks,
   },
+  mixins: [Keys],
   mounted() {
-    this.player = this.$refs.videoPlayer;
+    this.p.player = this.$refs.videoPlayer;
     this.initPlayer();
     document.addEventListener("mousemove", this.controlsMove, false);
     document.addEventListener("mouseup", this.controlsUp, false);
     this.$root.$on("playVideo", (video, videos) => {
-      this.playlist = videos.map((i) => ({
+      this.p.playlist = videos.map((i) => ({
         ...i,
         ...{ thumb: path.join(__dirname, "/images/ghost.png") },
       }));
       this.loadSrc(video);
     });
   },
-  data: () => ({
-    moveTimeout: -1,
-    isControlsVisible: true,
-    reg: true,
-  }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    player: {
+    p: {
       get() {
-        return this.$store.state.Player.player;
+        return this.$store.state.Player;
       },
       set(value) {
-        this.$store.state.Player.player = value;
+        this.$store.state.Player = value;
       },
-    },
-    statusText() {
-      return this.$store.state.Player.statusText;
-    },
-    statusIcon() {
-      return this.$store.state.Player.statusIcon;
-    },
-    fullscreen: {
-      get() {
-        return this.$store.state.Player.fullscreen;
-      },
-      set(value) {
-        this.$store.state.Player.fullscreen = value;
-      },
-    },
-    isPlayerActive: {
-      get() {
-        return this.$store.state.Player.active;
-      },
-      set(value) {
-        this.$store.state.Player.active = value;
-      },
-    },
-    playlist: {
-      get() {
-        return this.$store.state.Player.playlist;
-      },
-      set(value) {
-        this.$store.state.Player.playlist = value;
-      },
-    },
-    nowPlaying: {
-      get() {
-        return this.$store.state.Player.nowPlaying;
-      },
-      set(value) {
-        this.$store.state.Player.nowPlaying = value;
-      },
-    },
-    volume: {
-      get() {
-        return this.$store.state.Player.volume;
-      },
-      set(value) {
-        this.$store.state.Player.volume = value;
-      },
-    },
-    duration: {
-      get() {
-        return this.$store.state.Player.duration;
-      },
-      set(value) {
-        this.$store.state.Player.duration = value;
-      },
-    },
-    paused: {
-      get() {
-      return this.$store.state.Player.paused;
-      },
-      set(value) {
-        this.$store.state.Player.paused = value;
-      },
-    },
-    currentTime: {
-      get() {
-        return this.$store.state.Player.currentTime;
-      },
-      set(value) {
-        this.$store.state.Player.currentTime = value;
-      },
-    },
-    playbackError: {
-      get() {
-        return this.$store.state.Player.playbackError;
-      },
-      set(value) {
-        this.$store.state.Player.playbackError = value;
-      },
-    },
-    markers: {
-      get() {
-        return this.$store.state.Player.markers;
-      },
-      set(value) {
-        this.$store.state.Player.markers = value;
-      },
-    },
-    mouseOverControls() {
-      return this.$store.state.Player.mouseOverControls;
     },
   },
   methods: {
     closePlayer() {
-      this.player.pause();
-      this.player.src = null;
-      this.currentTime = 0;
-      this.isPlayerActive = false;
-      this.paused = false;
+      this.p.player.pause();
+      this.p.player.src = null;
+      this.p.currentTime = 0;
+      this.p.active = false;
+      this.p.paused = false;
     },
     initPlayer() {
-      this.player.addEventListener("loadedmetadata", () => {
-        this.duration = this.player.duration;
+      this.p.player.addEventListener("loadedmetadata", () => {
+        this.p.duration = this.p.player.duration;
       });
-      this.player.addEventListener("ended", () => {
-        if (this.playlistMode.includes("autoplay")) this.$refs.controls.next();
+      this.p.player.addEventListener("ended", () => {
+        if (this.p.playlistMode.includes("autoplay"))
+          this.$refs.controls.next();
       });
-      this.player.addEventListener("error", () => {
-        this.playbackError = true;
+      this.p.player.addEventListener("error", () => {
+        this.p.playbackError = true;
       });
     },
     loadSrc(video) {
-      this.player.src = this.apiUrl + "/api/video/" + video.id;
-      this.getMarkers(video);
+      this.p.player.src = this.apiUrl + "/api/video/" + video.id;
+      this.getMarks(video);
       this.$store.commit("trackCurrentTime");
       let fileName = this.getFileNameFromPath(video.path);
-      this.nowPlaying = _.findIndex(this.playlist, (i) => i.id == video.id);
+      this.p.nowPlaying = _.findIndex(this.p.playlist, (i) => i.id == video.id);
       this.$store.dispatch("changePlayerStatusText", {
-        text: `${this.nowPlaying + 1}. ${fileName}`,
+        text: `${this.p.nowPlaying + 1}. ${fileName}`,
         icon: "playlist-play",
       });
-      this.playbackError = false;
-      if (!this.reg && this.nowPlaying > 4) this.player.src = "";
+      this.p.playbackError = false;
+      if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
     },
     getFileNameFromPath(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
     },
-    async getMarkers(video) {
+    async getMarks(video) {
       await axios
-        .get(this.apiUrl + "/api/Marker/video/" + video.id)
+        .get(this.apiUrl + "/api/Mark/video/" + video.id)
         .then((res) => {
-          this.markers = res.data;
+          this.p.marks = res.data;
         })
         .catch((e) => {
           console.log(e);
         });
       // creating mark thumb
-      for (let mark of this.markers) {
+      for (let mark of this.p.marks) {
         let time = new Date(1000 * mark.time).toISOString().substr(11, 8);
-        let imgPath = "/userfiles/media/markers/" + mark.id + ".jpg";
+        let imgPath = "/userfiles/media/marks/" + mark.id + ".jpg";
         await Vue.prototype
           .$createThumb(time, video.path, imgPath, 180)
           .then(() => {
-            this.$root.$emit("updateMarkerImage", mark.id);
+            this.$root.$emit("updateMarkImage", mark.id);
           })
           .catch((e) => console.log(e));
       }
     },
-    moveOverPlayer(e) {
-      if (!e.movementX > 0 || !e.movementY > 0) return;
-      if (!this.fullscreen || this.mouseOverControls) {
-        this.isControlsVisible = true;
-        clearTimeout(this.moveTimeout);
-        return;
-      }
-      this.isControlsVisible = true;
-      clearTimeout(this.moveTimeout);
-      this.moveTimeout = setTimeout(() => {
-        this.isControlsVisible = false;
-      }, 1000);
-    },
     toggleFullscreen() {
-      if (this.fullscreen) document.exitFullscreen();
+      if (this.p.fullscreen) document.exitFullscreen();
       else document.getElementById("player").requestFullscreen();
-      this.fullscreen = !this.fullscreen;
-      this.isControlsVisible = true;
+      this.p.fullscreen = !this.p.fullscreen;
     },
     async togglePictureInPicture() {
-      if (this.player !== document.pictureInPictureElement) {
-        await this.player.requestPictureInPicture();
+      if (this.p.player !== document.pictureInPictureElement) {
+        await this.p.player.requestPictureInPicture();
       } else await document.exitPictureInPicture();
     },
     playVideoInSystemPlayer() {
       // TODO remake this
-      shell.openPath(this.playlist[this.nowPlaying].path);
+      shell.openPath(this.p.playlist[this.p.nowPlaying].path);
     },
     // ***************************************************************
     // *************************** CONTROLS **************************
@@ -299,11 +191,11 @@ export default {
       this.$store.dispatch("playerPause");
     },
     changeVolume(e) {
-      let volume = (this.player.volume - e.deltaY / 1000 / 2).toFixed(2);
+      let volume = (this.p.player.volume - e.deltaY / 1000 / 2).toFixed(2);
       if (volume < 0) volume = 0;
       if (volume > 1) volume = 1;
-      this.player.volume = volume;
-      this.volume = volume;
+      this.p.player.volume = volume;
+      this.p.volume = volume;
       this.$store.dispatch("changePlayerStatusText", {
         text: (volume * 100).toFixed() + " %",
         icon: "volume-high",
@@ -316,12 +208,12 @@ export default {
           break;
         case e.key === "ArrowRight":
           this.$store.dispatch("playerJumpTo", {
-            time: this.player.currentTime + 10,
+            time: this.p.player.currentTime + 10,
           });
           break;
         case e.key === "ArrowLeft":
           this.$store.dispatch("playerJumpTo", {
-            time: this.player.currentTime - 10,
+            time: this.p.player.currentTime - 10,
           });
           break;
         case e.key === "ArrowUp":
@@ -337,13 +229,13 @@ export default {
           this.$refs.controls.togglePlaylist();
           break;
         case e.key === "m":
-          this.$refs.controls.toggleMarkers();
+          this.$refs.controls.toggleMarks();
           break;
         case e.key === ",":
-          this.$refs.controls.jumpToPrevMarker();
+          this.$refs.controls.jumpToPrevMark();
           break;
         case e.key === ".":
-          this.$refs.controls.jumpToNextMarker();
+          this.$refs.controls.jumpToNextMark();
           break;
         case e.key === "z":
           this.$refs.controls.prev();
@@ -355,13 +247,13 @@ export default {
           this.$refs.controls.stop();
           break;
         case e.key === "1":
-          this.addMarker("favorite"); // TODO make it
+          this.addMark("favorite"); // TODO make it
           break;
         case e.key === "2":
-          this.openDialogMarkerBookmark(); // TODO make it
+          this.openDialogMarkBookmark(); // TODO make it
           break;
         case e.key === "Escape":
-          this.fullscreen ? this.toggleFullscreen() : "";
+          this.p.fullscreen ? this.toggleFullscreen() : "";
           break;
       }
     },
@@ -376,16 +268,13 @@ export default {
           break;
       }
     },
-    // ***************************************************************
-    // *************************** Emitted ***************************
-    // ***************************************************************
     playVideoObject(video) {
       this.loadSrc(video);
     },
   },
   watch: {
-    volume(newValue, oldValue) {
-      if (newValue !== oldValue) this.player.volume = newValue;
+    "p.volume"(newValue, oldValue) {
+      if (newValue !== oldValue) this.p.player.volume = newValue;
     },
   },
 };

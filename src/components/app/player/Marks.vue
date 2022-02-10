@@ -1,21 +1,16 @@
 <template>
-  <v-card
-    v-show="isMarkersVisible"
-    class="markers-wrapper"
-    elevation="20"
-    outlined
-  >
+  <v-card v-show="p.marksVisible" class="marks-wrapper" elevation="20" outlined>
     <v-card-actions class="pa-1">
       <v-icon left>mdi-map-mark</v-icon>
-      <span>Markers</span>
+      <span>Marks</span>
       <v-spacer></v-spacer>
-      <v-btn @click="isMarkersVisible = false" icon>
+      <v-btn @click="p.marksVisible = false" icon>
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
     <v-card-actions class="pa-0">
       <v-btn-toggle
-        v-model="markersType"
+        v-model="marksType"
         tile
         dense
         mandatory
@@ -25,21 +20,21 @@
       >
         <v-btn
           value="favorite"
-          :style="`width:${100 / (metaMarkers.length + 2)}%`"
+          :style="`width:${100 / (metaMarks.length + 2)}%`"
         >
           <v-icon>mdi-heart</v-icon>
         </v-btn>
         <v-btn
           value="bookmark"
-          :style="`width:${100 / (metaMarkers.length + 2)}%`"
+          :style="`width:${100 / (metaMarks.length + 2)}%`"
         >
           <v-icon>mdi-bookmark</v-icon>
         </v-btn>
         <v-btn
-          v-for="m in metaMarkers"
+          v-for="m in metaMarks"
           :key="m.id"
           :value="m.id"
-          :style="`width:${100 / (metaMarkers.length + 2)}%`"
+          :style="`width:${100 / (metaMarks.length + 2)}%`"
         >
           <v-icon>mdi-{{ m.settings.icon }}</v-icon>
         </v-btn>
@@ -47,9 +42,9 @@
     </v-card-actions>
     <vuescroll class="items">
       <v-card-text class="pa-0">
-        <div v-if="markers.length">
-          <div v-for="mark in markers" :key="mark.id" class="mark-wrapper">
-            <div v-if="markersType.includes(mark.type)">
+        <div v-if="p.marks.length">
+          <div v-for="mark in p.marks" :key="mark.id" class="mark-wrapper">
+            <div v-if="marksType.includes(mark.type)">
               <div @click="jumpTo(mark.time)" class="mark">
                 <v-img :src="mark.thumb" :aspect-ratio="16 / 9" class="thumb">
                   <span class="time">{{ getDuration(mark.time) }}</span>
@@ -66,7 +61,7 @@
                 </v-img>
               </div>
               <v-btn
-                @click="openDialogRemoveMarker(mark)"
+                @click="openDialogRemoveMark(mark)"
                 height="25"
                 width="25"
                 outlined
@@ -80,8 +75,8 @@
           </div>
         </div>
         <div v-else class="text-center pt-6">
-          <span>No markers</span><br />
-          <v-icon size="60">mdi-close</v-icon>
+          <v-icon class="mb-2" large>mdi-ghost-outline</v-icon> <br />
+          <span>No marks</span>
         </div>
       </v-card-text>
     </vuescroll>
@@ -96,54 +91,46 @@ import vuescroll from "vuescroll";
 const path = require("path");
 
 export default {
-  name: "Markers",
+  name: "Marks",
   props: {},
   components: {
     vuescroll,
   },
   mounted() {
-    this.$root.$on("updateMarkerImage", (id) => {
-      if (this.markers.some((i) => i.id === id)) this.getThumbs();
+    this.$root.$on("updateMarkImage", (id) => {
+      if (this.p.marks.some((i) => i.id === id)) this.getThumbs();
     });
   },
   data: () => ({
-    markerBookmarkText: "",
-    metaForMarker: "",
-    markerMetaId: null,
+    markBookmarkText: "",
+    metaForMark: "",
+    markMetaId: null,
     nameForNewMetaCard: "",
-    dialogMarkerMeta: false,
+    dialogMarkMeta: false,
     dialogAddNewMetaCard: false,
     dialogListView: false,
-    dialogMarkerBookmark: false,
-    dialogRemoveMarker: false,
-    markerForRemove: {},
-    markersType: ["favorite", "bookmark", "meta"],
+    dialogMarkBookmark: false,
+    dialogRemoveMark: false,
+    markForRemove: {},
+    marksType: ["favorite", "bookmark", "meta"],
   }),
   computed: {
-    isMarkersVisible: {
+    p: {
       get() {
-        return this.$store.state.Player.markersVisible;
+        return this.$store.state.Player;
       },
       set(value) {
-        this.$store.state.Player.markersVisible = value;
+        this.$store.state.Player = value;
       },
     },
-    markers: {
-      get() {
-        return this.$store.state.Player.markers;
-      },
-      set(value) {
-        this.$store.state.Player.markers = value;
-      },
-    },
-    metaMarkers() {
+    metaMarks() {
       return [];
     },
   },
   methods: {
     async getThumbs() {
-      for (let i of this.markers) {
-        let p = path.join(__dirname, `/userfiles/media/markers/${i.id}.jpg`);
+      for (let i of this.p.marks) {
+        let p = path.join(__dirname, `/userfiles/media/marks/${i.id}.jpg`);
         i.thumb = await Vue.prototype.$getLocalImage(p);
       }
     },
@@ -169,7 +156,7 @@ export default {
     },
   },
   watch: {
-    markers() {
+    "p.marks"() {
       this.getThumbs();
     },
   },

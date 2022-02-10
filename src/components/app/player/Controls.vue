@@ -1,45 +1,32 @@
 <template>
-  <v-card
-    class="controls"
-    tile
-    @mouseenter="mouseOverControls = true"
-    @mouseleave="mouseOverControls = false"
-    :style="{
-      opacity:
-        fullscreen && hideControls && !mouseOverControls && !paused
-          ? 0
-          : fullscreen
-          ? 0.7
-          : 1,
-    }"
-  >
+  <div class="controls">
     <v-card-actions class="timeline py-1 px-0 mx-3">
       <v-slider
-        :value="seeking ? seekTime : currentTime"
+        :value="p.seeking ? p.seekTime : p.currentTime"
         hide-details
         min="0"
         step="0.1"
-        :max="duration"
+        :max="p.duration"
         @start="startSeeking($event)"
         @end="seek($event)"
         @mousedown="handleMouseSeek($event)"
       />
       <Mark
-        v-for="(mark, i) in markers"
+        v-for="(mark, i) in p.marks"
         :key="i"
         :mark="mark"
-        :position="`left: ${(mark.time / duration) * 100}%;`"
+        :position="`left: ${(mark.time / p.duration) * 100}%;`"
       />
     </v-card-actions>
     <v-card-actions class="buttons pa-1">
       <v-btn-toggle class="remove-active compact">
         <v-btn
-          @click="paused ? play() : pause()"
+          @click="p.paused ? play() : pause()"
           small
           class="ml-1"
-          :title="paused ? 'Play' : 'Pause'"
+          :title="p.paused ? 'Play' : 'Pause'"
         >
-          <v-icon v-if="paused">mdi-play</v-icon>
+          <v-icon v-if="p.paused">mdi-play</v-icon>
           <v-icon v-else>mdi-pause</v-icon>
         </v-btn>
       </v-btn-toggle>
@@ -68,9 +55,9 @@
         <v-btn
           @click="toggleFullscreen"
           small
-          :title="fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+          :title="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
         >
-          <v-icon v-if="fullscreen">mdi-fullscreen-exit</v-icon>
+          <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
           <v-icon v-else>mdi-fullscreen</v-icon>
         </v-btn>
         <v-btn
@@ -96,46 +83,46 @@
           <v-icon small>mdi-step-forward-2</v-icon>
         </v-btn>
       </v-btn-toggle>
-      <v-btn-toggle class="mx-4 remove-active marker-buttons compact">
+      <v-btn-toggle class="mx-4 remove-active mark-buttons compact">
         <v-btn
-          @click="toggleMarkers"
-          :color="isMarkersVisible ? 'primary' : ''"
+          @click="p.marksVisible = !p.marksVisible"
+          :color="p.marksVisible ? 'primary' : ''"
           small
-          title="Markers List"
+          title="Marks List"
         >
           <v-icon>mdi-map-marker</v-icon>
         </v-btn>
         <v-btn
-          @click="jumpToPrevMarker"
+          @click="jumpToPrevMark"
           small
-          class="marker-prev"
-          title="Previous Marker"
+          class="mark-prev"
+          title="Previous Mark"
         >
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <v-btn
-          @click="jumpToNextMarker"
+          @click="jumpToNextMark"
           small
-          class="marker-next"
-          title="Next Marker"
+          class="mark-next"
+          title="Next Mark"
         >
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
         <v-menu offset-y nudge-top="40" nudge-right="400" attach=".controls">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" small title="Add Marker">
+            <v-btn v-bind="attrs" v-on="on" small title="Add Mark">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
 
           <!-- <v-btn-toggle class="remove-active">
-                  <v-btn @click="addMarker('favorite')" title="Favorite">
+                  <v-btn @click="addMark('favorite')" title="Favorite">
                     <v-icon size="20">mdi-heart</v-icon> 
                   </v-btn>
-                  <v-btn @click="openDialogMarkerBookmark" title="Bookmark">
+                  <v-btn @click="openDialogMarkBookmark" title="Bookmark">
                     <v-icon size="20">mdi-bookmark</v-icon> 
                   </v-btn>
-                  <v-btn v-for="m in metaMarkers" :key="m.id" :value="m.id" @click="openDialogMarkerMeta(m.id)" :title="m.settings.name">
+                  <v-btn v-for="m in metaMarks" :key="m.id" :value="m.id" @click="openDialogMarkMeta(m.id)" :title="m.settings.name">
                     <v-icon size="20">mdi-{{m.settings.icon}}</v-icon>
                   </v-btn>
                 </v-btn-toggle> -->
@@ -144,7 +131,7 @@
       <v-btn-toggle class="remove-active compact">
         <v-btn
           @click="togglePlaylist"
-          :color="isPlaylistVisible ? 'primary' : ''"
+          :color="p.playlistVisible ? 'primary' : ''"
           small
           title="Playlist"
         >
@@ -158,23 +145,23 @@
       </v-btn-toggle>
       <v-spacer></v-spacer>
       <div class="duration mx-2">
-        <div class="time-start">{{ msToTime(currentTime) }}</div>
+        <div class="time-start">{{ msToTime(p.currentTime) }}</div>
         <span class="mx-1">/</span>
-        <div class="time-end">{{ msToTime(duration) }}</div>
+        <div class="time-end">{{ msToTime(p.duration) }}</div>
       </div>
       <v-slider
-        v-model="volume"
+        v-model="p.volume"
         value="1"
         min="0"
         step="0.05"
         max="1"
         hide-details
         :prepend-icon="volumeIcon"
-        @click:prepend="toggleMute"
+        @click:prepend="p.muted = !p.muted"
         class="volume"
       />
     </v-card-actions>
-  </v-card>
+  </div>
 </template>
 
 
@@ -189,141 +176,46 @@ export default {
   components: {
     Mark,
   },
-  mounted() {},
-  data: () => ({}),
   computed: {
-    player: {
+    p: {
       get() {
-        return this.$store.state.Player.player;
+        return this.$store.state.Player;
       },
       set(value) {
-        this.$store.state.Player.player = value;
-      },
-    },
-    playlist() {
-      return this.$store.state.Player.playlist;
-    },
-    nowPlaying: {
-      get() {
-        return this.$store.state.Player.nowPlaying;
-      },
-      set(value) {
-        this.$store.state.Player.nowPlaying = value;
+        this.$store.state.Player = value;
       },
     },
     isPrevDisabled() {
-      if (this.playlistMode.includes("shuffle")) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
-        return shuffleIndex == 0 && !this.playlistMode.includes("loop");
-      } else return this.nowPlaying == 0 && !this.playlistMode.includes("loop");
+      if (this.p.playlistMode.includes("shuffle")) {
+        let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
+        return shuffleIndex == 0 && !this.p.playlistMode.includes("loop");
+      } else
+        return this.p.nowPlaying == 0 && !this.p.playlistMode.includes("loop");
     },
     isNextDisabled() {
-      if (this.playlistMode.includes("shuffle")) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
+      if (this.p.playlistMode.includes("shuffle")) {
+        let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
         return (
-          shuffleIndex + 1 >= this.playlist.length &&
-          !this.playlistMode.includes("loop")
+          shuffleIndex + 1 >= this.p.playlist.length &&
+          !this.p.playlistMode.includes("loop")
         );
       } else
         return (
-          this.nowPlaying + 1 >= this.playlist.length &&
-          !this.playlistMode.includes("loop")
+          this.p.nowPlaying + 1 >= this.p.playlist.length &&
+          !this.p.playlistMode.includes("loop")
         );
     },
     volumeIcon() {
-      if (this.muted) return "mdi-volume-mute";
-      if (this.volume > 0.7) return "mdi-volume-high";
-      if (this.volume > 0.3) return "mdi-volume-medium";
+      if (this.p.muted) return "mdi-volume-mute";
+      if (this.p.volume > 0.7) return "mdi-volume-high";
+      if (this.p.volume > 0.3) return "mdi-volume-medium";
       return "mdi-volume-low";
-    },
-    fullscreen() {
-      return this.$store.state.Player.fullscreen;
-    },
-    playlistShuffle() {
-      return this.$store.state.Player.playlistShuffle;
-    },
-    isPlaylistVisible: {
-      get() {
-        return this.$store.state.Player.playlistVisible;
-      },
-      set(value) {
-        this.$store.state.Player.playlistVisible = value;
-      },
-    },
-    isMarkersVisible: {
-      get() {
-        return this.$store.state.Player.markersVisible;
-      },
-      set(value) {
-        this.$store.state.Player.markersVisible = value;
-      },
-    },
-    markers() {
-      return this.$store.state.Player.markers;
-    },
-    volume: {
-      get() {
-        return this.$store.state.Player.volume;
-      },
-      set(value) {
-        this.$store.state.Player.volume = value;
-      },
-    },
-    duration() {
-      return this.$store.state.Player.duration;
-    },
-    muted: {
-      get() {
-        return this.$store.state.Player.muted;
-      },
-      set(value) {
-        this.$store.state.Player.muted = value;
-      },
-    },
-    paused() {
-      return this.$store.state.Player.paused;
-    },
-    seeking: {
-      get() {
-        return this.$store.state.Player.seeking;
-      },
-      set(value) {
-        this.$store.state.Player.seeking = value;
-      },
-    },
-    seekTime: {
-      get() {
-        return this.$store.state.Player.seekTime;
-      },
-      set(value) {
-        this.$store.state.Player.seekTime = value;
-      },
-    },
-    currentTime() {
-      return this.$store.state.Player.currentTime;
-    },
-    hideControls() {
-      return this.$store.state.Player.hideControls;
-    },
-    mouseOverControls: {
-      get() {
-        return this.$store.state.Player.mouseOverControls;
-      },
-      set(value) {
-        this.$store.state.Player.mouseOverControls = value;
-      },
-    },
-    playlistMode() {
-      return this.$store.state.Player.playlistMode;
     },
   },
   methods: {
     msToTime(time) {
       return Vue.prototype.$getReadableDuration(time);
     },
-    // ***************************************************************
-    // *************************** CONTROLS **************************
-    // ***************************************************************
     toggleFullscreen() {
       this.$emit("toggleFullscreen");
     },
@@ -340,82 +232,78 @@ export default {
       this.$store.dispatch("playerStop");
     },
     togglePause() {
-      this.paused ? this.play() : this.pause();
+      this.p.paused ? this.play() : this.pause();
     },
     prev() {
       if (this.isPrevDisabled) return;
-      let isLoopMode = this.playlistMode.includes("loop");
+      let isLoopMode = this.p.playlistMode.includes("loop");
 
-      if (this.playlistMode.includes("shuffle")) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
+      if (this.p.playlistMode.includes("shuffle")) {
+        let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
         shuffleIndex = shuffleIndex - 1;
         if (isLoopMode && shuffleIndex < 0)
-          shuffleIndex = this.playlist.length - 1; // if loop mode
-        this.nowPlaying = this.playlistShuffle[shuffleIndex];
+          shuffleIndex = this.p.playlist.length - 1; // if loop mode
+        this.p.nowPlaying = this.p.playlistShuffle[shuffleIndex];
       } else {
-        this.nowPlaying = this.nowPlaying - 1;
-        if (isLoopMode && this.nowPlaying < 0)
-          this.nowPlaying = this.playlist.length - 1; // if loop
+        this.p.nowPlaying = this.p.nowPlaying - 1;
+        if (isLoopMode && this.p.nowPlaying < 0)
+          this.p.nowPlaying = this.p.playlist.length - 1; // if loop
       }
-      this.$emit("play", this.playlist[this.nowPlaying]);
-      if (this.isPlaylistVisible) this.$root.$emit("scrollToNowPlaying");
+      this.$emit("play", this.p.playlist[this.p.nowPlaying]);
+      if (this.p.playlistVisible) this.$root.$emit("scrollToNowPlaying");
     },
     next() {
       if (this.isNextDisabled) return;
-      let isLoopMode = this.playlistMode.includes("loop");
+      let isLoopMode = this.p.playlistMode.includes("loop");
 
-      if (this.playlistMode.includes("shuffle")) {
-        let shuffleIndex = this.playlistShuffle.indexOf(this.nowPlaying);
+      if (this.p.playlistMode.includes("shuffle")) {
+        let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
         shuffleIndex = shuffleIndex + 1;
-        if (isLoopMode && shuffleIndex == this.playlist.length)
+        if (isLoopMode && shuffleIndex == this.p.playlist.length)
           shuffleIndex = 0; // if loop mode
-        this.nowPlaying = this.playlistShuffle[shuffleIndex];
+        this.p.nowPlaying = this.p.playlistShuffle[shuffleIndex];
       } else {
-        this.nowPlaying = this.nowPlaying + 1;
-        if (isLoopMode && this.nowPlaying > this.playlist.length - 1)
-          this.nowPlaying = 0; // if loop mode
+        this.p.nowPlaying = this.p.nowPlaying + 1;
+        if (isLoopMode && this.p.nowPlaying > this.p.playlist.length - 1)
+          this.p.nowPlaying = 0; // if loop mode
       }
-      this.$emit("play", this.playlist[this.nowPlaying]);
+      this.$emit("play", this.p.playlist[this.p.nowPlaying]);
 
-      if (this.isPlaylistVisible) this.$root.$emit("scrollToNowPlaying");
+      if (this.p.playlistVisible) this.$root.$emit("scrollToNowPlaying");
     },
     startSeeking(time) {
-      this.seeking = true;
-      this.seekTime = time;
+      this.p.seeking = true;
+      this.p.seekTime = time;
     },
     seek(time) {
-      this.seeking = false;
+      this.p.seeking = false;
       this.jumpTo(time);
     },
     jumpTo(time) {
       this.$store.dispatch("playerJumpTo", { time });
     },
     jumpToSeconds(time) {
-      this.jumpTo(this.player.currentTime + time);
+      this.jumpTo(this.p.currentTime + time);
     },
-    jumpToPrevMarker() {
-      let markers = _.orderBy(this.markers, "time", ["desc"]);
-      let currentTime = this.player.currentTime - 5;
-      for (let marker of markers) {
-        if (marker.time < currentTime) {
-          this.jumpTo(marker.time);
+    jumpToPrevMark() {
+      let marks = _.orderBy(this.p.marks, "time", ["desc"]);
+      let currentTime = this.p.currentTime - 5;
+      for (let mark of marks) {
+        if (mark.time < currentTime) {
+          this.jumpTo(mark.time);
           break;
         }
       }
     },
-    jumpToNextMarker() {
-      let markers = this.markers;
-      let currentTime = this.player.currentTime;
-      for (let marker of markers) {
-        if (marker.time > currentTime) {
-          this.jumpTo(marker.time);
+    jumpToNextMark() {
+      let marks = this.p.marks;
+      let currentTime = this.p.currentTime;
+      for (let mark of marks) {
+        if (mark.time > currentTime) {
+          this.jumpTo(mark.time);
           break;
         }
       }
-    },
-    toggleMute() {
-      this.player.muted = !this.player.muted;
-      this.muted = !this.muted;
     },
     handleMouseSeek(e) {
       let btnCode = e.button;
@@ -424,25 +312,22 @@ export default {
         // case 1: // clearInterval(this.currentTimeTracker); break
         // case 2: // clearInterval(this.currentTimeTracker); break
         case 3:
-          this.jumpToPrevMarker();
+          this.jumpToPrevMark();
           break;
         case 4:
-          this.jumpToNextMarker();
+          this.jumpToNextMark();
           break;
       }
     },
-    toggleMarkers() {
-      this.isMarkersVisible = !this.isMarkersVisible;
-    },
     togglePlaylist() {
-      this.isPlaylistVisible = !this.isPlaylistVisible;
-      if (!this.isPlaylistVisible) return;
+      this.p.playlistVisible = !this.p.playlistVisible;
+      if (!this.p.playlistVisible) return;
       this.$root.$emit("scrollToNowPlaying");
     },
     async setAsThumb() {
-      let video = this.playlist[this.nowPlaying];
+      let video = this.p.playlist[this.p.nowPlaying];
       let imgPath = "/userfiles/media/thumbs/" + video.id + ".jpg";
-      let time = new Date(this.player.currentTime * 1000)
+      let time = new Date(this.p.currentTime * 1000)
         .toISOString()
         .substr(11, 8);
       await Vue.prototype
@@ -453,7 +338,6 @@ export default {
         .catch((e) => console.log(e));
     },
   },
-  watch: {},
 };
 </script>
 

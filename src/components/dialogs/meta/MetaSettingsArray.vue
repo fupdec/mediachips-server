@@ -25,11 +25,11 @@
               <template v-slot:activator="{ on }">
                 <v-icon v-on="on" left>mdi-map-marker</v-icon>
               </template>
-              <span>Markers on timeline in built-in player</span>
+              <span>Marks on timeline in built-in player</span>
             </v-tooltip>
             <v-switch
-              v-model="settings.markers"
-              label="Markers in player"
+              v-model="settings.marks"
+              label="Marks in player"
               class="ma-0 pa-0"
               hide-details
             />
@@ -281,7 +281,7 @@ export default {
       career: false,
       scraper: false,
       nested: false,
-      markers: false,
+      marks: false,
     },
   }),
   computed: {},

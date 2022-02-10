@@ -18,7 +18,7 @@
     .video-wrapper {
       max-height: 100%;
     }
-    .markers-wrapper,
+    .marks-wrapper,
     .playlist-wrapper {
       .items {
         height: calc(100vh - 80px) !important;
@@ -31,13 +31,13 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    &.markers {
+    &.marks {
       width: calc(100% - 18vw);
     }
     &.playlist {
       width: calc(100% - 18vw);
     }
-    &.markers.playlist {
+    &.marks.playlist {
       width: calc(100% - 36vw);
     }
   }
@@ -113,7 +113,7 @@
   .timeline {
     position: relative;
     &:hover {
-      .marker {
+      .mark {
         width: 2vw;
         height: 10px;
         transform: translateX(-1vw) translateY(-15px);
@@ -124,7 +124,7 @@
       margin: 0;
     }
   }
-  .marker {
+  .mark {
     cursor: pointer;
     position: absolute;
     width: 1px;
@@ -186,7 +186,7 @@
   }
 }
 .theme--dark {
-  .markers-wrapper {
+  .marks-wrapper {
     .mark {
       .name,
       .time {
@@ -214,7 +214,7 @@
   background-color: rgba(0, 0, 0, 0.363);
 }
 
-.markers-wrapper {
+.marks-wrapper {
   position: fixed;
   top: 10px;
   left: 10px;
@@ -378,10 +378,10 @@
 }
 @media (max-width: 920px) {
   .player-wrapper {
-    &.markers {
-      .marker-buttons {
-        .marker-prev,
-        .marker-next {
+    &.marks {
+      .mark-buttons {
+        .mark-prev,
+        .mark-next {
           display: none;
         }
       }

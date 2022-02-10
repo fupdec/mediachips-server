@@ -1,7 +1,7 @@
 <template>
   <div
     @click="jumpTo"
-    class="marker"
+    class="mark"
     :style="position + `background-color:${color}`"
   >
     <v-sheet class="tooltip text-center" outlined rounded>
@@ -19,7 +19,6 @@
 
 <script>
 import Vue from "vue";
-
 const path = require("path");
 
 export default {
@@ -28,10 +27,9 @@ export default {
     mark: Object,
     position: String,
   },
-  components: {},
   mounted() {
     this.getImg();
-    this.$root.$on("updateMarkerImage", (id) => {
+    this.$root.$on("updateMarkImage", (id) => {
       if (this.mark.id === id) this.getImg();
     });
   },
@@ -61,7 +59,7 @@ export default {
     async getImg() {
       let imgPath = path.join(
         __dirname,
-        "/userfiles/media/markers/",
+        "/userfiles/media/marks/",
         this.mark.id + ".jpg"
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
@@ -70,6 +68,5 @@ export default {
       this.$store.dispatch("playerJumpTo", { time: this.mark.time });
     },
   },
-  watch: {},
 };
 </script>

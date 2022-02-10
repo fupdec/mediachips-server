@@ -1,21 +1,21 @@
 const db = require("../index.js");
 const {
   Item,
-  Marker,
+  Mark,
   Meta,
   MetaSetting
 } = require("../index.js");
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Marker
+// Create and Save a new Mark
 exports.create = (req, res) => {};
 
-// Retrieve all Marker for video from the database.
+// Retrieve all Mark for video from the database.
 exports.findAll = (req, res) => {};
 
-// Retrieve all Marker for video from the database.
+// Retrieve all Mark for video from the database.
 exports.findAllForVideo = (req, res) => {
-  Marker.findAll({
+  Mark.findAll({
       where: {
         mediaId: req.params.id
       },
@@ -25,18 +25,18 @@ exports.findAllForVideo = (req, res) => {
       include: [Item],
       raw: true
     })
-    .then(async markers => {
-      for (let marker of markers) {
+    .then(async marks => {
+      for (let mark of marks) {
         let meta = await Meta.findOne({
           where: {
-            id: marker['item.metaId']
+            id: mark['item.metaId']
           },
           include: [MetaSetting],
           raw: true
         })
-        marker.meta = meta
+        mark.meta = meta
       }
-      res.status(201).send(markers)
+      res.status(201).send(marks)
     }).catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while performing query."
@@ -44,14 +44,14 @@ exports.findAllForVideo = (req, res) => {
     })
 };
 
-// Find a single Marker with an id
+// Find a single Mark with an id
 exports.findOne = (req, res) => {};
 
-// Update a Marker by the id in the request
+// Update a Mark by the id in the request
 exports.update = (req, res) => {};
 
-// Delete a Marker with the specified id in the request
+// Delete a Mark with the specified id in the request
 exports.delete = (req, res) => {};
 
-// Delete all Marker from the database.
+// Delete all Mark from the database.
 exports.deleteAll = (req, res) => {};

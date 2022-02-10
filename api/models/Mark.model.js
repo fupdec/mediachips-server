@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const Marker = sequelize.define(
-    'marker', {
+  const Mark = sequelize.define(
+    'mark', {
       type: Sequelize.TEXT,
       text: Sequelize.TEXT,
       time: Sequelize.INTEGER,
@@ -10,5 +10,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   )
 
-  return Marker;
+  return Mark;
 };

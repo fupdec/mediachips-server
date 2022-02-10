@@ -20,7 +20,7 @@ const Item = require("./models/Item.model")(sequelize, Sequelize);
 const ItemsInFilterRow = require("./models/ItemsInFilterRow.model")(sequelize, Sequelize);
 const ItemsInItem = require("./models/ItemsInItem.model")(sequelize, Sequelize);
 const ItemsInMedia = require("./models/ItemsInMedia.model")(sequelize, Sequelize);
-const Marker = require("./models/Marker.model")(sequelize, Sequelize);
+const Mark = require("./models/Mark.model")(sequelize, Sequelize);
 const Media = require("./models/Media.model")(sequelize, Sequelize);
 const MediaType = require("./models/MediaType.model")(sequelize, Sequelize);
 const Meta = require("./models/Meta.model")(sequelize, Sequelize);
@@ -164,18 +164,18 @@ Item.belongsToMany(Meta, {
   unique: false
 })
 
-Item.hasMany(Marker, {
+Item.hasMany(Mark, {
   foreignKey: 'itemId',
   onDelete: "cascade"
 })
-Marker.belongsTo(Item, {
+Mark.belongsTo(Item, {
   foreignKey: 'itemId'
 })
-Media.hasMany(Marker, {
+Media.hasMany(Mark, {
   foreignKey: 'mediaId',
   onDelete: "cascade"
 })
-Marker.belongsTo(Media, {
+Mark.belongsTo(Media, {
   foreignKey: 'mediaId'
 })
 
@@ -280,7 +280,7 @@ db.Item = Item
 db.ItemsInFilterRow = ItemsInFilterRow
 db.ItemsInItem = ItemsInItem
 db.ItemsInMedia = ItemsInMedia
-db.Marker = Marker
+db.Mark = Mark
 db.Media = Media
 db.MediaType = MediaType
 db.Meta = Meta

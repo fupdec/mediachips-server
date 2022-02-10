@@ -11,7 +11,7 @@ const {
   ValuesInItem,
   MetaInMediaType,
   PageSetting,
-  Marker,
+  Mark,
   ChildMeta,
   SavedFilter
 } = require("../index.js");
@@ -73,7 +73,7 @@ exports.importDatabase = async (req, res) => {
     return new Promise((resolve) => {
       const Videos = require(path.join(tempPath, 'databases', 'dbv.json'))
       const Playlists = require(path.join(tempPath, 'databases', 'dbpl.json'))
-      const Markers = require(path.join(tempPath, 'databases', 'dbm.json'))
+      const Marks = require(path.join(tempPath, 'databases', 'dbm.json'))
       const Meta = require(path.join(tempPath, 'databases', 'meta.json'))
       const Settings = require(path.join(tempPath, 'dbs.json'))
 
@@ -83,7 +83,7 @@ exports.importDatabase = async (req, res) => {
         videos: [],
         videoMetadata: [],
         playlists: [],
-        markers: [],
+        marks: [],
         onlyMeta: [],
         metaInItems: [],
         childMeta: [],
@@ -115,7 +115,7 @@ exports.importDatabase = async (req, res) => {
         createdAt: (new Date(i.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
         updatedAt: (new Date(i.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
       }))
-      obj.markers = Markers.markers.map(i => ({
+      obj.marks = Marks.markers.map(i => ({
         time: i.time,
         videoId: i.videoId,
         text: ['favorite', 'bookmark'].includes(i.type.toLowerCase()) ? i.name : null,
@@ -153,7 +153,7 @@ exports.importDatabase = async (req, res) => {
                 "career": false,
                 "scraper": false,
                 "nested": false,
-                "markers": false,
+                "marks": false,
               },
               ...m.settings
             },
@@ -363,19 +363,19 @@ exports.importDatabase = async (req, res) => {
     //   }
     // }
   }).then(async () => {
-    let markers = []
-    for (let marker of obj.markers) {
-      let found = mediaIds.find(x => x.oldId === marker.videoId)
+    let marks = []
+    for (let mark of obj.marks) {
+      let found = mediaIds.find(x => x.oldId === mark.videoId)
       if (!found) continue
-      marker.mediaId = found.id
-      if (marker.type === 'meta') {
-        let foundItem = itemsIds.find(x => x.oldId === marker.oldItemId)
+      mark.mediaId = found.id
+      if (mark.type === 'meta') {
+        let foundItem = itemsIds.find(x => x.oldId === mark.oldItemId)
         if (!foundItem) continue
-        else marker.itemId = foundItem.id
+        else mark.itemId = foundItem.id
       }
-      markers.push(marker)
+      marks.push(mark)
     }
-    await Marker.bulkCreate(markers)
+    await Mark.bulkCreate(marks)
   }).then(async () => { // meta in videos
     let itemsInMedia = []
     let valuesInMedia = []

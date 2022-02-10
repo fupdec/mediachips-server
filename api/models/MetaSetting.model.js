@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      markers: {
+      marks: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
