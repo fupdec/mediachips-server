@@ -1,6 +1,6 @@
 <script>
 import StringCrypto from "string-crypto";
-import Vue from 'vue'
+import Vue from "vue";
 
 export default {
   data: () => ({
@@ -12,14 +12,13 @@ export default {
       iterations: 10,
       digest: "sha512",
     },
+    reg: false,
   }),
   computed: {
     registration: {
       get() {
-        if (this.$store.state.settings.registration.length)
-          return JSON.parse(
-            this.decrypt(this.$store.state.settings.registration)
-          );
+        let r = this.$store.state.settings.registration;
+        if (r.length) return JSON.parse(this.decrypt(r));
         else return "";
       },
       set(value) {
@@ -35,20 +34,29 @@ export default {
         this.$store.state.settings = value;
       },
     },
-    reg() {
-      if (!this.registration) return false;
+    machineId() {
+      return this.$store.state.machineId;
+    },
+  },
+  methods: {
+    checkReg() {
+      if (this.registration.length == 0) {
+        this.reg = false;
+        return;
+      }
       let today = new Date();
       today = today.toISOString().substring(0, 10);
-      if (today > this.registration.license_expiry) return false;
+      if (today > this.registration.license_expiry) {
+        this.reg = false;
+        return;
+      }
       let arr = [
         this.registration.fingerprint_1,
         this.registration.fingerprint_2,
         this.registration.fingerprint_3,
       ];
-      return arr.includes(this.$store.state.machineId);
+      this.reg = arr.includes(this.machineId);
     },
-  },
-  methods: {
     async setOption(value, option) {
       this.appSets[option] = value;
       await Vue.prototype.$setOption(option, value);
@@ -60,6 +68,11 @@ export default {
     decrypt(string) {
       const { decryptString } = new StringCrypto(this.secretOptions);
       return decryptString(string, this.secret);
+    },
+  },
+  watch: {
+    machineId(e) {
+      this.checkReg();
     },
   },
 };

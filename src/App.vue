@@ -158,7 +158,10 @@ export default {
       await axios
         .get(this.apiUrl + "/api/Task/getMachineId")
         .then((res) => {
-          this.$store.state.machineId = res.data;
+          this.$store.commit("updateState", {
+            key: "machineId",
+            value: res.data,
+          });
         })
         .catch((e) => {
           // console.log(e);

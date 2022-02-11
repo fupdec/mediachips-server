@@ -38,6 +38,7 @@ export default new Vuex.Store({
     updateFoldersData: 0,
     tasks: [],
     settings: Settings,
+    machineId: null,
   }),
   mutations: {
     updateState(state, {
