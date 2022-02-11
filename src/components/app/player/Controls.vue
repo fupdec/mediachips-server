@@ -31,7 +31,10 @@
       <v-btn @click="p.paused ? play() : pause()" icon dark>
         <v-icon v-if="p.paused" large>mdi-play</v-icon>
         <v-icon v-else large>mdi-pause</v-icon>
-        <div class="tip" v-html="p.paused ? 'Play' : 'Pause'" />
+        <div class="tip" style="left: 0">
+          <span class="mr-2" v-html="p.paused ? 'Play' : 'Pause'" />
+          <b class="kbd" v-html="'Space'" />
+        </div>
       </v-btn>
 
       <!-- NAVIGATION -->
@@ -40,7 +43,10 @@
           <v-icon>mdi-skip-previous</v-icon>
           <div class="tip" style="left: 0">
             <div v-if="!isPrevDisabled" class="video-thumb">
-              <div class="overline">Previous Video:</div>
+              <div>
+                <span class="overline mr-2">Previous Video:</span>
+                <b class="kbd" v-html="'z'" />
+              </div>
               <v-img
                 :src="prevVideo.thumb"
                 :aspect-ratio="16 / 9"
@@ -54,14 +60,20 @@
 
         <v-btn @click="stop" icon dark>
           <v-icon>mdi-stop</v-icon>
-          <div class="tip" v-html="'Stop Playing'" />
+          <div class="tip">
+            <span class="mr-2" v-html="'Stop Playing'" />
+            <b class="kbd" v-html="'x'" />
+          </div>
         </v-btn>
 
         <v-btn @click="next" :disabled="isNextDisabled" icon dark>
           <v-icon>mdi-skip-next</v-icon>
           <div class="tip" style="left: 0">
             <div v-if="!isNextDisabled" class="video-thumb">
-              <div class="overline">Next Video:</div>
+              <div>
+                <span class="overline mr-2">Next Video:</span>
+                <b class="kbd" v-html="'c'" />
+              </div>
               <v-img
                 :src="nextVideo.thumb"
                 :aspect-ratio="16 / 9"
@@ -100,15 +112,21 @@
       <v-chip outlined dark class="px-0 mx-2">
         <v-btn @click="togglePlaylist" icon dark>
           <v-icon>mdi-format-list-bulleted</v-icon>
-          <div class="tip" v-html="'Playlist'" />
+          <div class="tip">
+            <span class="mr-2">Playlist</span>
+            <b class="kbd" v-html="'p'" />
+          </div>
         </v-btn>
       </v-chip>
 
       <!-- MARKS  -->
       <v-chip outlined dark class="mark-buttons px-0">
-        <v-btn @click="p.marksVisible = !p.marksVisible" icon dark>
+        <v-btn @click="toggleMarks" icon dark>
           <v-icon>mdi-map-marker</v-icon>
-          <div class="tip" v-html="'Marks List'" />
+          <div class="tip">
+            <span class="mr-2">Marks List</span>
+            <b class="kbd" v-html="'m'" />
+          </div>
         </v-btn>
 
         <v-menu offset-y nudge-top="40" nudge-right="400" attach=".controls">
@@ -140,7 +158,10 @@
           dark
         >
           <v-icon>mdi-chevron-left</v-icon>
-          <div class="tip" v-html="'Previous Mark'" />
+          <div class="tip">
+            <span class="mr-2">Previous Mark</span>
+            <b class="kbd" v-html="'<'" />
+          </div>
         </v-btn>
 
         <v-btn
@@ -151,7 +172,10 @@
           dark
         >
           <v-icon>mdi-chevron-right</v-icon>
-          <div class="tip" v-html="'Next Mark'" />
+          <div class="tip">
+            <span class="mr-2">Next Mark</span>
+            <b class="kbd" v-html="'>'" />
+          </div>
         </v-btn>
       </v-chip>
 
@@ -192,10 +216,13 @@
         <v-btn @click="toggleFullscreen" icon dark>
           <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
           <v-icon v-else>mdi-fullscreen</v-icon>
-          <div
-            class="tip"
-            v-html="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
-          />
+          <div class="tip">
+            <span
+              class="mr-2"
+              v-html="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+            />
+            <b class="kbd" v-html="'f'" />
+          </div>
         </v-btn>
 
         <v-btn
@@ -208,12 +235,15 @@
           <div class="tip" v-html="'Picture-in-Picture Mode'" />
         </v-btn>
       </v-chip>
-      
+
       <!-- VOLUME -->
       <v-chip outlined dark class="volume px-0">
-        <v-btn @click="p.muted = !p.muted" icon dark>
-          <v-icon>{{ volumeIcon }}</v-icon>
-          <div class="tip" v-html="'Mute'" />
+        <v-btn @click="toggleMute" icon dark>
+          <v-icon>mdi-{{ volumeIcon }}</v-icon>
+          <div class="tip">
+            <span class="mr-2" v-html="'Mute'" />
+            <b class="kbd" v-html="'m'" />
+          </div>
         </v-btn>
         <v-slider
           v-model="p.volume"
@@ -278,10 +308,10 @@ export default {
       return this.p.playlist[this.p.nowPlaying + 1];
     },
     volumeIcon() {
-      if (this.p.muted) return "mdi-volume-mute";
-      if (this.p.volume > 0.7) return "mdi-volume-high";
-      if (this.p.volume > 0.3) return "mdi-volume-medium";
-      return "mdi-volume-low";
+      if (this.p.muted) return "volume-mute";
+      if (this.p.volume > 0.7) return "volume-high";
+      if (this.p.volume > 0.3) return "volume-medium";
+      return "volume-low";
     },
   },
   methods: {
@@ -404,6 +434,18 @@ export default {
       this.p.playlistVisible = !this.p.playlistVisible;
       if (!this.p.playlistVisible) return;
       this.$root.$emit("scrollToNowPlaying");
+    },
+    toggleMarks() {
+      this.p.marksVisible = !this.p.marksVisible;
+    },
+    toggleMute() {
+      this.p.muted = !this.p.muted;
+      let text = (this.p.volume * 100).toFixed() + " %";
+      if (this.p.muted) text = "Muted";
+      this.$store.dispatch("changePlayerStatusText", {
+        text: text,
+        icon: this.volumeIcon,
+      });
     },
     async setAsThumb() {
       let video = this.p.playlist[this.p.nowPlaying];

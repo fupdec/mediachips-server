@@ -221,6 +221,12 @@
       opacity: 0;
       transition: transform 0.3s 0.2s ease, opacity 0.1s ease-out;
     }
+    .kbd {
+      border: 1px solid #fff;
+      border-radius: 3px;
+      padding: 0 5px;
+      line-height: 1;
+    }
   }
   .volume {
     &:hover {

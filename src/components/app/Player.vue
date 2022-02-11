@@ -241,10 +241,13 @@ export default {
         case e.key === "f":
           this.toggleFullscreen();
           break;
+        case e.key === "m":
+          this.$refs.controls.toggleMute();
+          break;
         case e.key === "p":
           this.$refs.controls.togglePlaylist();
           break;
-        case e.key === "m":
+        case e.key === "i":
           this.$refs.controls.toggleMarks();
           break;
         case e.key === ",":
@@ -269,7 +272,7 @@ export default {
           this.openDialogMarkBookmark(); // TODO make it
           break;
         case e.key === "Escape":
-          this.p.fullscreen ? this.toggleFullscreen() : "";
+          if (this.p.fullscreen) this.toggleFullscreen(); // TODO fix it
           break;
       }
     },
