@@ -107,7 +107,6 @@ export default {
   beforeDestroy() {
     this.$root.$off("scrollToNowPlaying");
   },
-  data: () => ({}),
   computed: {
     p: {
       get() {
@@ -129,6 +128,7 @@ export default {
       }
     },
     play(index) {
+      this.p.paused = false;
       if (this.p.playlistMode.includes("shuffle")) {
         let indexes = [];
         for (let i = 0; i < this.p.playlist.length; i++) indexes.push(i);
@@ -154,10 +154,10 @@ export default {
     },
   },
   watch: {
-    'p.playlist'() {
+    "p.playlist"() {
       this.getThumbs();
     },
-    'p.playlistMode'(mode, oldMode) {
+    "p.playlistMode"(mode, oldMode) {
       if (!mode.includes("shuffle") && oldMode.includes("shuffle")) return;
       let index = [];
       for (let i = 0; i < this.p.playlist.length; i++) index.push(i);

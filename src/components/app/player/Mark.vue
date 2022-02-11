@@ -1,17 +1,21 @@
 <template>
-  <div
-    @click="jumpTo"
-    class="mark"
-    :style="position + `background-color:${color}`"
-  >
-    <v-sheet class="tooltip text-center" outlined rounded>
-      <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb" />
-      <v-chip small class="mr-1 px-1 py-0">
-        <v-icon small class="mr-1" :color="color"> mdi-{{ icon }} </v-icon>
+  <div @click="jumpTo" class="mark" :style="position">
+    <span class="breaker"></span>
+    
+    <v-icon :color="color" class="mark-icon">mdi-{{ icon }}</v-icon>
+
+    <v-sheet class="tooltip text-center" :color="color" outlined rounded>
+      <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb">
+        <span class="time" v-html="time" />
+      </v-img>
+
+      <span class="mark-name">
+        <v-icon v-if="mark.type == 'meta'" small class="mr-1">
+          mdi-{{ mark.meta.icon }}
+        </v-icon>
         <span v-if="mark.type == 'meta'" v-html="mark['item.name']" />
         <span v-else v-html="mark.name" />
-      </v-chip>
-      <v-chip label small class="pa-1 py-0">{{ duration }}</v-chip>
+      </span>
     </v-sheet>
   </div>
 </template>
@@ -38,10 +42,9 @@ export default {
   }),
   computed: {
     icon() {
-      let icon = "map-marker";
+      let icon = "tooltip";
       if (this.mark.type == "favorite") icon = "heart";
       else if (this.mark.type == "bookmark") icon = "bookmark";
-      else if (this.mark.type == "meta") icon = this.mark.meta.icon;
       return icon;
     },
     color() {
@@ -51,7 +54,7 @@ export default {
       else if (this.mark.type == "meta") color = this.mark["item.color"];
       return color;
     },
-    duration() {
+    time() {
       return Vue.prototype.$getReadableDuration(this.mark.time);
     },
   },

@@ -150,7 +150,7 @@ export default {
       this.p.nowPlaying = _.findIndex(this.p.playlist, (i) => i.id == video.id);
       this.$store.dispatch("changePlayerStatusText", {
         text: `${this.p.nowPlaying + 1}. ${fileName}`,
-        icon: "playlist-play",
+        icon: "format-list-bulleted",
       });
       this.p.playbackError = false;
       if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
@@ -179,6 +179,18 @@ export default {
           .catch((e) => console.log(e));
       }
     },
+    playVideoInSystemPlayer() {
+      // TODO remake this
+      shell.openPath(this.p.playlist[this.p.nowPlaying].path);
+    },
+    stopSmoothScroll(event) {
+      if (event.button != 1) return;
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    // ***************************************************************
+    // *************************** CONTROLS **************************
+    // ***************************************************************
     toggleFullscreen() {
       this.showControls();
       if (this.p.fullscreen) document.exitFullscreen();
@@ -187,21 +199,12 @@ export default {
     },
     async togglePictureInPicture() {
       this.showControls();
-      if (this.p.player !== document.pictureInPictureElement) {
+      if (this.p.fullscreen) {
+        document.exitFullscreen();
+        this.p.fullscreen = false;
+      }
+      if (this.p.player !== document.pictureInPictureElement)
         await this.p.player.requestPictureInPicture();
-      } else await document.exitPictureInPicture();
-    },
-    playVideoInSystemPlayer() {
-      // TODO remake this
-      shell.openPath(this.p.playlist[this.p.nowPlaying].path);
-    },
-    // ***************************************************************
-    // *************************** CONTROLS **************************
-    // ***************************************************************
-    stopSmoothScroll(event) {
-      if (event.button != 1) return;
-      event.preventDefault();
-      event.stopPropagation();
     },
     changeVolume(e) {
       let volume = (this.p.player.volume - e.deltaY / 1000 / 2).toFixed(2);

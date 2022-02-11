@@ -2,15 +2,16 @@
   <div
     @mouseenter="p.mouseOverControls = true"
     @mouseleave="p.mouseOverControls = false"
-    class="controls"
+    class="controls px-6"
   >
-    <v-card-actions class="timeline px-4 py-0">
+    <v-card-actions class="timeline pa-0">
       <v-slider
         :value="p.seeking ? p.seekTime : p.currentTime"
         @start="startSeeking($event)"
         @end="seek($event)"
         @mousedown="handleMouseSeek($event)"
         track-color="#ffffff60"
+        class="pt-4"
         color="white"
         step="0.1"
         min="0"
@@ -19,109 +20,102 @@
       />
 
       <Mark
-        v-for="(mark, i) in p.marks"
-        :key="i"
-        :mark="mark"
-        :position="`left: ${(mark.time / p.duration) * 100}%;`"
+        v-for="(i, x) in p.marks"
+        :key="x"
+        :mark="i"
+        :position="`left: calc(${(i.time / p.duration) * 100}%);`"
       />
     </v-card-actions>
 
-    <v-card-actions class="buttons pa-4 pt-0">
-      <v-btn
-        @click="p.paused ? play() : pause()"
-        :title="p.paused ? 'Play' : 'Pause'"
-        class="ml-1"
-        icon
-        dark
-      >
+    <v-card-actions class="buttons pb-4 px-0 pt-0">
+      <v-btn @click="p.paused ? play() : pause()" icon dark>
         <v-icon v-if="p.paused" large>mdi-play</v-icon>
         <v-icon v-else large>mdi-pause</v-icon>
+        <div class="tip" v-html="p.paused ? 'Play' : 'Pause'" />
       </v-btn>
 
       <!-- NAVIGATION -->
-      <v-chip outlined dark class="px-0 mx-2">
-        <v-btn
-          @click="prev"
-          :disabled="isPrevDisabled"
-          title="Previous Video"
-          icon
-          dark
-        >
+      <v-chip outlined dark class="px-0 ml-3">
+        <v-btn @click="prev" :disabled="isPrevDisabled" icon dark>
           <v-icon>mdi-skip-previous</v-icon>
+          <div class="tip" style="left: 0">
+            <div v-if="!isPrevDisabled" class="video-thumb">
+              <div class="overline">Previous Video:</div>
+              <v-img
+                :src="prevVideo.thumb"
+                :aspect-ratio="16 / 9"
+                width="300px"
+                class="mt-1 mb-2"
+              />
+              <div class="name">{{ getFileNameFromPath(prevVideo.path) }}</div>
+            </div>
+          </div>
         </v-btn>
 
-        <v-btn @click="stop" title="Stop Playing" icon dark>
+        <v-btn @click="stop" icon dark>
           <v-icon>mdi-stop</v-icon>
+          <div class="tip" v-html="'Stop Playing'" />
         </v-btn>
 
-        <v-btn
-          @click="next"
-          :disabled="isNextDisabled"
-          title="Next Video"
-          icon
-          dark
-        >
+        <v-btn @click="next" :disabled="isNextDisabled" icon dark>
           <v-icon>mdi-skip-next</v-icon>
+          <div class="tip" style="left: 0">
+            <div v-if="!isNextDisabled" class="video-thumb">
+              <div class="overline">Next Video:</div>
+              <v-img
+                :src="nextVideo.thumb"
+                :aspect-ratio="16 / 9"
+                width="300px"
+                class="mt-1 mb-2"
+              />
+              <div class="name">{{ getFileNameFromPath(nextVideo.path) }}</div>
+            </div>
+          </div>
         </v-btn>
       </v-chip>
 
-      <!-- SCREEN -->
-      <v-chip outlined dark class="px-0">
-        <v-btn
-          @click="toggleFullscreen"
-          :title="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
-          icon
-          dark
-        >
-          <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
-          <v-icon v-else>mdi-fullscreen</v-icon>
-        </v-btn>
+      <!-- TIME -->
+      <v-btn
+        @click="p.timeRemain = !p.timeRemain"
+        class="px-2 mx-2 body-2"
+        text
+        rounded
+        small
+        dark
+      >
+        <div v-if="!p.timeRemain">{{ msToTime(p.currentTime) }}</div>
+        <div v-else>- {{ msToTime(p.duration - p.currentTime) }}</div>
+        <span class="mx-1">/</span>
+        <div>{{ msToTime(p.duration) }}</div>
+        <div
+          v-html="'Switch between elapsed and remaining time'"
+          class="tip body-2"
+          style="left: 0"
+        />
+      </v-btn>
 
-        <v-btn
-          @click="togglePictureInPicture"
-          class="toggle-picture-in-picture"
-          title="Picture-in-Picture Mode"
-          icon
-          dark
-        >
-          <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
-        </v-btn>
-      </v-chip>
+      <v-spacer></v-spacer>
 
-      <!-- FAST SEEK -->
-      <v-chip outlined dark class="seek-buttons px-0 mx-2">
-        <v-btn @click="jumpToSeconds(-5)" title="- 5 seconds" icon dark>
-          <v-icon size="20">mdi-chevron-triple-left</v-icon>
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(-2)" title="- 2 seconds" icon dark>
-          <v-icon size="20">mdi-chevron-double-left</v-icon>
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(2)" title="+ 2 seconds" icon dark>
-          <v-icon size="20">mdi-chevron-double-right</v-icon>
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(5)" title="+ 5 seconds" icon dark>
-          <v-icon size="20">mdi-chevron-triple-right</v-icon>
+      <!-- PLAYLIST -->
+      <v-chip outlined dark class="px-0 mx-2">
+        <v-btn @click="togglePlaylist" icon dark>
+          <v-icon>mdi-format-list-bulleted</v-icon>
+          <div class="tip" v-html="'Playlist'" />
         </v-btn>
       </v-chip>
 
       <!-- MARKS  -->
       <v-chip outlined dark class="mark-buttons px-0">
-        <v-btn
-          @click="p.marksVisible = !p.marksVisible"
-          title="Marks List"
-          icon
-          dark
-        >
+        <v-btn @click="p.marksVisible = !p.marksVisible" icon dark>
           <v-icon>mdi-map-marker</v-icon>
+          <div class="tip" v-html="'Marks List'" />
         </v-btn>
 
         <v-menu offset-y nudge-top="40" nudge-right="400" attach=".controls">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" title="Add Mark" icon dark>
+            <v-btn v-bind="attrs" v-on="on" icon dark>
               <v-icon>mdi-plus</v-icon>
+              <div class="tip" v-html="'Add Mark'" />
             </v-btn>
           </template>
 
@@ -140,43 +134,86 @@
 
         <v-btn
           @click="jumpToPrevMark"
+          :disabled="p.marks.length == 0"
           class="mark-prev"
-          title="Previous Mark"
           icon
           dark
         >
           <v-icon>mdi-chevron-left</v-icon>
+          <div class="tip" v-html="'Previous Mark'" />
         </v-btn>
 
         <v-btn
           @click="jumpToNextMark"
+          :disabled="p.marks.length == 0"
           class="mark-next"
-          title="Next Mark"
           icon
           dark
         >
           <v-icon>mdi-chevron-right</v-icon>
+          <div class="tip" v-html="'Next Mark'" />
         </v-btn>
       </v-chip>
 
-      <!-- PLAYLIST -->
       <v-chip outlined dark class="px-0 mx-2">
-        <v-btn @click="togglePlaylist" title="Playlist" icon dark>
-          <v-icon>mdi-format-list-bulleted</v-icon>
+        <v-btn @click="setAsThumb" icon dark>
+          <v-icon>mdi-image-outline</v-icon>
+          <div class="tip" v-html="'Set Frame as Thumb'" />
         </v-btn>
       </v-chip>
 
-      <v-chip outlined dark class="px-0">
-        <v-btn @click="setAsThumb" title="Set Frame as Thumb" icon dark>
-          <v-icon>mdi-image-outline</v-icon>
+      <!-- FAST SEEK -->
+      <v-chip outlined dark class="seek-buttons px-0">
+        <v-btn @click="jumpToSeconds(-5)" icon dark>
+          <v-icon size="20">mdi-chevron-triple-left</v-icon>
+          <div class="tip" v-html="'- 5 seconds'" />
+        </v-btn>
+
+        <v-btn @click="jumpToSeconds(-2)" icon dark>
+          <v-icon size="20">mdi-chevron-double-left</v-icon>
+          <div class="tip" v-html="'- 2 seconds'" />
+        </v-btn>
+
+        <v-btn @click="jumpToSeconds(2)" icon dark>
+          <v-icon size="20">mdi-chevron-double-right</v-icon>
+          <div class="tip" v-html="'+ 2 seconds'" />
+        </v-btn>
+
+        <v-btn @click="jumpToSeconds(5)" icon dark>
+          <v-icon size="20">mdi-chevron-triple-right</v-icon>
+          <div class="tip" v-html="'+ 5 seconds'" />
         </v-btn>
       </v-chip>
 
       <v-spacer></v-spacer>
 
-      <v-chip outlined dark class="volume px-0 mx-2">
-        <v-btn @click="p.muted = !p.muted" title="Mute" icon dark>
+      <!-- SCREEN -->
+      <v-chip outlined dark class="px-0 mx-2">
+        <v-btn @click="toggleFullscreen" icon dark>
+          <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
+          <v-icon v-else>mdi-fullscreen</v-icon>
+          <div
+            class="tip"
+            v-html="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+          />
+        </v-btn>
+
+        <v-btn
+          @click="togglePictureInPicture"
+          class="toggle-picture-in-picture"
+          icon
+          dark
+        >
+          <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
+          <div class="tip" v-html="'Picture-in-Picture Mode'" />
+        </v-btn>
+      </v-chip>
+      
+      <!-- VOLUME -->
+      <v-chip outlined dark class="volume px-0">
+        <v-btn @click="p.muted = !p.muted" icon dark>
           <v-icon>{{ volumeIcon }}</v-icon>
+          <div class="tip" v-html="'Mute'" />
         </v-btn>
         <v-slider
           v-model="p.volume"
@@ -188,19 +225,6 @@
           max="1"
           hide-details
         />
-      </v-chip>
-
-      <v-chip
-        @click="p.timeRemain = !p.timeRemain"
-        class="body-1 mr-2"
-        title="Switch between elapsed and remaining time"
-        outlined
-        dark
-      >
-        <div v-if="!p.timeRemain">{{ msToTime(p.currentTime) }}</div>
-        <div v-else>- {{ msToTime(p.duration - p.currentTime) }}</div>
-        <span class="mx-1">/</span>
-        <div>{{ msToTime(p.duration) }}</div>
       </v-chip>
     </v-card-actions>
   </div>
@@ -247,6 +271,12 @@ export default {
           !this.p.playlistMode.includes("loop")
         );
     },
+    prevVideo() {
+      return this.p.playlist[this.p.nowPlaying - 1];
+    },
+    nextVideo() {
+      return this.p.playlist[this.p.nowPlaying + 1];
+    },
     volumeIcon() {
       if (this.p.muted) return "mdi-volume-mute";
       if (this.p.volume > 0.7) return "mdi-volume-high";
@@ -257,6 +287,9 @@ export default {
   methods: {
     msToTime(time) {
       return Vue.prototype.$getReadableDuration(time);
+    },
+    getFileNameFromPath(filePath) {
+      return Vue.prototype.$getFileNameFromPath(filePath);
     },
     toggleFullscreen() {
       this.$emit("toggleFullscreen");
@@ -282,6 +315,7 @@ export default {
     },
     prev() {
       if (this.isPrevDisabled) return;
+      this.p.paused = false;
       let isLoopMode = this.p.playlistMode.includes("loop");
 
       if (this.p.playlistMode.includes("shuffle")) {
@@ -300,6 +334,7 @@ export default {
     },
     next() {
       if (this.isNextDisabled) return;
+      this.p.paused = false;
       let isLoopMode = this.p.playlistMode.includes("loop");
 
       if (this.p.playlistMode.includes("shuffle")) {
