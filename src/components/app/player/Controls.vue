@@ -140,7 +140,7 @@
         </v-menu>
 
         <v-btn
-          @click="jumpToPrevMark"
+          @click="jumpToMark('prev')"
           :disabled="p.marks.length == 0"
           class="mark-prev"
           icon
@@ -154,7 +154,7 @@
         </v-btn>
 
         <v-btn
-          @click="jumpToNextMark"
+          @click="jumpToMark('next')"
           :disabled="p.marks.length == 0"
           class="mark-next"
           icon
@@ -392,7 +392,7 @@ export default {
     },
     wheelSeek(e) {
       if (e.altKey) {
-        e.deltaY > 0 ? this.jumpToPrevMark() : this.jumpToNextMark();
+        e.deltaY > 0 ? this.jumpToMark("prev") : this.jumpToMark("next");
         return;
       }
       let s = e.deltaY / -20;
@@ -406,22 +406,31 @@ export default {
     jumpToSeconds(time) {
       this.jumpTo(this.p.currentTime + time);
     },
-    jumpToPrevMark() {
-      let marks = _.orderBy(this.p.marks, "time", ["desc"]);
-      let currentTime = this.p.currentTime - 5;
-      for (let mark of marks) {
-        if (mark.time < currentTime) {
-          this.jumpTo(mark.time);
-          break;
-        }
+    jumpToMark(type) {
+      let marks = [];
+      let currentTime = 0;
+
+      if (type == "prev") {
+        marks = _.orderBy(this.p.marks, "time", ["desc"]);
+        currentTime = this.p.currentTime - 5;
+      } else if (type == "next") {
+        marks = this.p.marks;
+        currentTime = this.p.currentTime;
       }
-    },
-    jumpToNextMark() {
-      let marks = this.p.marks;
-      let currentTime = this.p.currentTime;
+
       for (let mark of marks) {
-        if (mark.time > currentTime) {
+        if (
+          (type == "prev" && mark.time < currentTime) ||
+          (type == "next" && mark.time > currentTime)
+        ) {
           this.jumpTo(mark.time);
+          let text = "";
+          if (mark.type == "meta") text = mark["item.name"];
+          else text = mark.name;
+          this.$store.dispatch("changePlayerStatusText", {
+            text: text,
+            icon: "tooltip",
+          });
           break;
         }
       }
@@ -433,10 +442,10 @@ export default {
         // case 1: // clearInterval(this.currentTimeTracker); break
         // case 2: // clearInterval(this.currentTimeTracker); break
         case 3:
-          this.jumpToPrevMark();
+          this.jumpToMark("prev");
           break;
         case 4:
-          this.jumpToNextMark();
+          this.jumpToMark("next");
           break;
       }
     },
