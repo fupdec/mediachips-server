@@ -90,7 +90,6 @@
 import _ from "lodash";
 import Vue from "vue";
 import vuescroll from "vuescroll";
-import Keys from "@/mixins/Keys";
 const path = require("path");
 
 export default {
@@ -98,7 +97,6 @@ export default {
   components: {
     vuescroll,
   },
-  mixins: [Keys],
   mounted() {
     this.$root.$on("scrollToNowPlaying", () => {
       this.scrollToNowPlaying();
@@ -115,6 +113,9 @@ export default {
       set(value) {
         this.$store.state.Player = value;
       },
+    },
+    reg() {
+      return this.$store.getters.reg;
     },
   },
   methods: {

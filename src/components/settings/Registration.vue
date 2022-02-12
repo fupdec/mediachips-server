@@ -11,7 +11,7 @@
 
       <v-col cols="12" sm="6" align="center">
         <v-btn
-          v-if="registration.license_type !== 'Lifetime'"
+          v-if="regInfo.license_type !== 'Lifetime'"
           @click="openLink('https://mediachips.app/')"
           color="primary"
           class="mb-2"
@@ -22,7 +22,7 @@
         </v-btn>
 
         <v-btn
-          v-if="registration.license_type !== 'Month'"
+          v-if="regInfo.license_type !== 'Month'"
           @click="openLink('https://patreon.com/mediachips')"
           color="#ff424d"
           rounded
@@ -30,7 +30,7 @@
         >
           <v-icon left>mdi-patreon</v-icon>
           {{
-            registration.license_type !== "Lifetime"
+            regInfo.license_type !== "Lifetime"
               ? "Subscribe monthly"
               : "Support development"
           }}
@@ -38,18 +38,13 @@
       </v-col>
     </v-row>
 
-    <div
-      v-if="registration"
-      class="d-flex justify-space-between flex-wrap mt-4"
-    >
+    <div v-if="regInfo" class="d-flex justify-space-between flex-wrap mt-4">
       <div class="">
         <div>
           License key:
-          <span class="user-select">{{
-            registration.license_code || "??"
-          }}</span>
+          <span class="user-select">{{ regInfo.license_code || "??" }}</span>
         </div>
-        <div>Expiration date: {{ registration.license_expiry || "??" }}</div>
+        <div>Expiration date: {{ regInfo.license_expiry || "??" }}</div>
       </div>
 
       <span class="d-flex flex-column align-center">
@@ -233,18 +228,13 @@
 
 
 <script>
-import Keys from "@/mixins/Keys";
-
 const axios = require("axios");
-// const shell = require("electron").shell;
+// const shell = require("electron").shell; // TODO check it
 
 export default {
   name: "Registration",
-  components: {},
-  mixins: [Keys],
   mounted() {
-    if (this.registration.length == 0)
-      this.registration = JSON.stringify(this.defaultLicenseObject);
+    if (this.regInfo.length == 0) this.regInfo = JSON.stringify(this.cleanObj);
   },
   data: () => ({
     dialog: false,
@@ -257,7 +247,7 @@ export default {
     isKeyExpired: false,
     checkingStatus: "",
     registrationStatus: "",
-    defaultLicenseObject: {
+    cleanObj: {
       license_code: "",
       license_created: "",
       license_expiry: "",
@@ -273,14 +263,25 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    machineId() {
-      return this.$store.state.machineId;
+    r() {
+      return this.$store.state.Reg;
+    },
+    reg() {
+      return this.$store.getters.reg;
+    },
+    regInfo: {
+      get() {
+        return this.$store.getters.regInfo;
+      },
+      set(value) {
+        this.$store.dispatch("updateRegInfo", value);
+      },
     },
   },
   methods: {
     openDialog() {
       this.step = 1;
-      this.licenseKey = this.registration.license_code || "";
+      this.licenseKey = this.regInfo.license_code || "";
       this.dialog = true;
       this.checkingStatus = "";
     },
@@ -298,7 +299,12 @@ export default {
       this.$refs.license.validate();
       if (!this.valid) return;
       this.isQueryRun = true;
-      let query = `${this.domain}check?api_key=${this.apiKey}&license_code=${this.licenseKey}`;
+      let query =
+        this.r.domain +
+        "check?api_key=" +
+        this.r.apiKey +
+        "&license_code=" +
+        this.licenseKey;
       axios
         .get(query)
         .then((res) => {
@@ -317,7 +323,8 @@ export default {
               let today = new Date();
               today = today.toISOString().substring(0, 10);
               this.isKeyExpired = today > res.data.license_expiry;
-              if (fingerprints.includes(this.machineId)) ++numberOfActivations; // if this device already activated
+              if (fingerprints.includes(this.r.machineId))
+                ++numberOfActivations; // if this device already activated
               this.licenseExpiryDate = res.data.license_expiry;
               this.numberOfActivations = numberOfActivations;
               this.step = 2;
@@ -342,13 +349,20 @@ export default {
     },
     register() {
       this.isQueryRun = true;
-      let query = `${this.domain}activate?api_key=${this.apiKey}&license_code=${this.licenseKey}&fingerprint=${this.machineId}`;
+      let query =
+        this.r.domain +
+        "activate?api_key=" +
+        this.r.apiKey +
+        "&license_code=" +
+        this.licenseKey +
+        "&fingerprint=" +
+        this.r.machineId;
       axios
         .get(query)
         .then((res) => {
           if (res.status === 200) {
             this.registrationStatus = res.data.message;
-            this.registration = JSON.stringify(res.data.license);
+            this.regInfo = JSON.stringify(res.data.license);
             this.step = 3;
           } else {
             this.$store.commit("setNotification", {
@@ -367,13 +381,19 @@ export default {
         });
     },
     deactivateKey() {
-      let code = this.registration.license_code;
-      let query = `${this.domain}deactivate?api_key=${this.apiKey}&license_code=${code}&fingerprint=${this.machineId}`;
+      let query =
+        this.r.domain +
+        "deactivate?api_key=" +
+        this.r.apiKey +
+        "&license_code=" +
+        this.regInfo.license_code +
+        "&fingerprint=" +
+        this.r.machineId;
       axios
         .get(query)
         .then((res) => {
           if (res.status === 200) {
-            this.registration = JSON.stringify(this.defaultLicenseObject);
+            this.regInfo = JSON.stringify(this.cleanObj);
             this.$store.commit("setNotification", {
               type: "info",
               text: res.data.message,

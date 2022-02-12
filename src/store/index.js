@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Page from './modules/page.js'
 import Player from './modules/player.js'
+import Reg from './modules/reg.js'
 const Settings = require('./../../default-settings.js')
 
 Vue.use(Vuex)
@@ -38,7 +39,6 @@ export default new Vuex.Store({
     updateFoldersData: 0,
     tasks: [],
     settings: Settings,
-    machineId: null,
   }),
   mutations: {
     updateState(state, {
@@ -84,5 +84,6 @@ export default new Vuex.Store({
   modules: {
     Page,
     Player,
+    Reg,
   }
 })

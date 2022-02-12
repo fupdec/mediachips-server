@@ -53,11 +53,9 @@
 
 <script>
 import vuescroll from "vuescroll";
-import Keys from "@/mixins/Keys";
 
 export default {
   name: "AppBar",
-  mixins: [Keys],
   components: {
     vuescroll,
     // Tabs: () => import('@/components/elements/Tabs.vue'),
@@ -93,6 +91,9 @@ export default {
     },
     sets() {
       return this.$store.state.settings;
+    },
+    reg() {
+      return this.$store.getters.reg;
     },
     // tabs() { return this.$store.getters.tabs },
   },

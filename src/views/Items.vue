@@ -107,7 +107,6 @@ import Vue from "vue";
 import axios from "axios";
 import vuescroll from "vuescroll";
 import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";
-import Keys from "@/mixins/Keys";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
@@ -119,7 +118,7 @@ export default {
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
-  mixins: [GeneratingThumbsForVideos, ComputedForItemsPage, Keys],
+  mixins: [GeneratingThumbsForVideos, ComputedForItemsPage],
   async beforeMount() {
     this.itemsOnPage = [];
     this.$store.commit("updateStatePage", {
@@ -200,6 +199,9 @@ export default {
   computed: {
     isInfiniteScroll() {
       return this.page.limit === 101;
+    },
+    reg() {
+      return this.$store.getters.reg;
     },
   },
   methods: {

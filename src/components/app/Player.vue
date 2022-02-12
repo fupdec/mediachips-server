@@ -80,7 +80,6 @@ import vuescroll from "vuescroll";
 import Controls from "./player/Controls.vue";
 import Playlist from "./player/Playlist.vue";
 import Marks from "./player/Marks.vue";
-import Keys from "@/mixins/Keys";
 const path = require("path");
 
 export default {
@@ -91,7 +90,6 @@ export default {
     Playlist,
     Marks,
   },
-  mixins: [Keys],
   mounted() {
     this.p.player = this.$refs.videoPlayer;
     this.initPlayer();
@@ -120,6 +118,9 @@ export default {
       set(value) {
         this.$store.state.Player = value;
       },
+    },
+    reg() {
+      return this.$store.getters.reg;
     },
   },
   methods: {
