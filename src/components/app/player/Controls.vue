@@ -4,7 +4,7 @@
     @mouseleave="p.mouseOverControls = false"
     class="controls px-6"
   >
-    <v-card-actions class="timeline pa-0">
+    <v-card-actions @wheel="wheelSeek" class="timeline pa-0">
       <v-slider
         :value="p.seeking ? p.seekTime : p.currentTime"
         @start="startSeeking($event)"
@@ -108,21 +108,10 @@
 
       <v-spacer></v-spacer>
 
-      <!-- PLAYLIST -->
-      <v-chip outlined dark class="px-0 mx-2">
-        <v-btn @click="togglePlaylist" icon dark>
-          <v-icon>mdi-format-list-bulleted</v-icon>
-          <div class="tip">
-            <span class="mr-2">Playlist</span>
-            <b class="kbd" v-html="'p'" />
-          </div>
-        </v-btn>
-      </v-chip>
-
       <!-- MARKS  -->
       <v-chip outlined dark class="mark-buttons px-0">
         <v-btn @click="toggleMarks" icon dark>
-          <v-icon>mdi-map-marker</v-icon>
+          <v-icon size="20">mdi-tooltip</v-icon>
           <div class="tip">
             <span class="mr-2">Marks List</span>
             <b class="kbd" v-html="'m'" />
@@ -179,7 +168,18 @@
         </v-btn>
       </v-chip>
 
+      <!-- PLAYLIST -->
       <v-chip outlined dark class="px-0 mx-2">
+        <v-btn @click="togglePlaylist" icon dark>
+          <v-icon>mdi-format-list-bulleted</v-icon>
+          <div class="tip">
+            <span class="mr-2">Playlist</span>
+            <b class="kbd" v-html="'p'" />
+          </div>
+        </v-btn>
+      </v-chip>
+
+      <v-chip outlined dark class="px-0">
         <v-btn @click="setAsThumb" icon dark>
           <v-icon>mdi-image-outline</v-icon>
           <div class="tip" v-html="'Set Frame as Thumb'" />
@@ -187,7 +187,7 @@
       </v-chip>
 
       <!-- FAST SEEK -->
-      <v-chip outlined dark class="seek-buttons px-0">
+      <!-- <v-chip outlined dark class="seek-buttons px-0">
         <v-btn @click="jumpToSeconds(-5)" icon dark>
           <v-icon size="20">mdi-chevron-triple-left</v-icon>
           <div class="tip" v-html="'- 5 seconds'" />
@@ -207,7 +207,7 @@
           <v-icon size="20">mdi-chevron-triple-right</v-icon>
           <div class="tip" v-html="'+ 5 seconds'" />
         </v-btn>
-      </v-chip>
+      </v-chip> -->
 
       <v-spacer></v-spacer>
 
@@ -237,7 +237,7 @@
       </v-chip>
 
       <!-- VOLUME -->
-      <v-chip outlined dark class="volume px-0">
+      <v-chip @wheel="changeVolume" outlined dark class="volume px-0">
         <v-btn @click="toggleMute" icon dark>
           <v-icon>mdi-{{ volumeIcon }}</v-icon>
           <div class="tip">
@@ -390,6 +390,16 @@ export default {
       this.p.seeking = false;
       this.jumpTo(time);
     },
+    wheelSeek(e) {
+      if (e.altKey) {
+        e.deltaY > 0 ? this.jumpToPrevMark() : this.jumpToNextMark();
+        return;
+      }
+      let s = e.deltaY / -20;
+      if (e.shiftKey) s = s * 2;
+      else if (e.ctrlKey) s = s / 2;
+      this.jumpToSeconds(s);
+    },
     jumpTo(time) {
       this.$store.dispatch("playerJumpTo", { time });
     },
@@ -446,6 +456,9 @@ export default {
         text: text,
         icon: this.volumeIcon,
       });
+    },
+    changeVolume(e) {
+      this.$emit("changeVolume", e);
     },
     async setAsThumb() {
       let video = this.p.playlist[this.p.nowPlaying];

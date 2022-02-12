@@ -1,7 +1,7 @@
 <template>
   <v-card v-show="p.marksVisible" class="marks-wrapper" elevation="20" outlined>
     <v-card-actions class="pa-1">
-      <v-icon left>mdi-map-mark</v-icon>
+      <v-icon left>mdi-tooltip</v-icon>
       <span>Marks</span>
       <v-spacer></v-spacer>
       <v-btn @click="p.marksVisible = false" icon>

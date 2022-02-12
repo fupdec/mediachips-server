@@ -62,6 +62,7 @@
           @toggleFullscreen="toggleFullscreen"
           @togglePictureInPicture="togglePictureInPicture"
           @play="playVideoObject($event)"
+          @changeVolume="changeVolume($event)"
           @showControls="showControls"
         />
       </div>

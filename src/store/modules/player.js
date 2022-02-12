@@ -92,6 +92,8 @@ const Player = {
     }, {
       time
     }) {
+      if (time < 0) time = 0
+      else if (time > state.duration) time = state.duration
       state.player.currentTime = time;
       state.currentTime = time;
       dispatch("changePlayerStatusText", {
