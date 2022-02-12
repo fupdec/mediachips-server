@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="p.active" @input="closePlayer" eager>
+  <v-dialog :value="p.active" @input="closePlayer" eager width="2000">
     <div
       ref="player"
       class="player"
