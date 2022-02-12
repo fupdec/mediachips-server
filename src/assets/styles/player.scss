@@ -155,9 +155,10 @@
       filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.4));
       &:hover {
         opacity: 1;
+        z-index: 1;
         & + .tooltip {
           opacity: 1;
-          transform: translateY(0) scale(1);
+          transform: scale(1);
         }
       }
     }
@@ -169,12 +170,12 @@
       left: -10vw;
       font-size: 14px;
       overflow: hidden;
-      transform: translateY(80px) scale(0);
+      transform: scale(0);
       opacity: 0;
-      transition: transform 0.2s 0.1s ease-in, opacity 0.1s ease;
+      transition: transform 0.01s ease, opacity 0.2s 0.1s ease;
       &:hover {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: scale(1);
       }
     }
     .thumb {
