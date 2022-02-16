@@ -86,6 +86,7 @@
       />
       <v-btn
         v-if="page.page == pages"
+        @click="scrollTop"
         class="mb-4"
         color="primary"
         rounded
@@ -409,6 +410,10 @@ export default {
         value: this.page.page + 1,
       });
       this.getItemsOnPage();
+    },
+    scrollTop() {
+      const main = document.getElementsByClassName("v-main__wrap")[0];
+      main.scrollTop = 0;
     },
   },
   watch: {
