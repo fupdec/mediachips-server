@@ -148,7 +148,6 @@
             :label="meta.metaSetting.chipLabel"
             :outlined="meta.metaSetting.chipOutlined"
             class="my-1 px-2"
-            small
           >
             <span>{{ data.item.name }}</span>
           </v-chip>
