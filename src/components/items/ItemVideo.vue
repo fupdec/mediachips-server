@@ -178,7 +178,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
-import Item from "@/mixins/Item";
+import ComputedForItem from "@/mixins/ComputedForItem";
 import NestedItems from "./NestedItems.vue";
 
 const path = require("path");
@@ -206,7 +206,7 @@ export default {
     x: Number,
   },
   components: { NestedItems },
-  mixins: [Item],
+  mixins: [ComputedForItem],
   beforeMount() {
     this.getMetadata();
     this.getMeta();

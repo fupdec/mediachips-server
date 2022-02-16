@@ -4,6 +4,8 @@ const Home = () => import('../views/Home.vue')
 const ItemsAppbar = () => import('@/components/app/appbar/ItemsAppbar.vue')
 const Items = () => import('../views/Items.vue')
 const Settings = () => import('../views/Settings.vue')
+const ItemAppbar = () => import('@/components/app/appbar/ItemAppbar.vue')
+const Item = () => import('../views/Item.vue')
 
 Vue.use(VueRouter)
 
@@ -29,6 +31,14 @@ const routes = [
     name: 'Settings',
     components: {
       default: Settings,
+    }
+  },
+  {
+    path: '/item',
+    name: 'Item',
+    components: {
+      default: Item,
+      appbar: ItemAppbar,
     }
   },
 ]

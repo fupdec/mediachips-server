@@ -7,7 +7,7 @@
       outlined
       hover
     >
-      <div class="img-container">
+      <div @click="openItemPage" class="img-container">
         <v-icon
           v-if="meta.metaSetting.color"
           class="meta-color"
@@ -137,7 +137,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import Item from "@/mixins/Item";
+import ComputedForItem from "@/mixins/ComputedForItem";
 import NestedItems from "./NestedItems.vue";
 
 const path = require("path");
@@ -149,7 +149,7 @@ export default {
     meta: Object,
   },
   components: { NestedItems },
-  mixins: [Item],
+  mixins: [ComputedForItem],
   mounted() {
     this.$nextTick(() => {
       this.getImages();
@@ -178,6 +178,9 @@ export default {
     },
   },
   methods: {
+    openItemPage() {
+      this.$router.push(`/item/?metaId=${this.meta.id}&itemId=${this.item.id}`);
+    },
     async getImages() {
       const imageTypes = ["main", "alt", "custom1", "custom2"];
       const settings = this.meta.metaSetting.imageTypes;

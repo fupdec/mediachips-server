@@ -28,7 +28,19 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single Item with an id
-exports.findOne = (req, res) => {};
+exports.findOne = (req, res) => {
+  Item.findOne({
+    where: {
+      id: req.params.id
+    }
+  }).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
 
 // Retrieve all Item from the database.
 exports.getAll = (req, res) => {
@@ -51,6 +63,3 @@ exports.delete = (req, res) => {};
 
 // Delete all Item from the database.
 exports.deleteAll = (req, res) => {};
-
-// Find all published Item
-exports.findAllPublished = (req, res) => {};
