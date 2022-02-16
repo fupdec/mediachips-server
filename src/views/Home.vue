@@ -6,8 +6,8 @@
         <b> {{ localhost }} </b>
       </v-alert>
       <v-alert type="info" outlined>
-        The current version 0.1.0-alpha only works with database backups from
-        application version 0.11.1-beta <br />
+        The current version 0.2.0-alpha only works with database backups from
+        application version 0.11.1-beta or 0.11.2-beta <br />
         To import your database, first specify the exact path to the backup
         archive
       </v-alert>
