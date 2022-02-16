@@ -314,6 +314,10 @@
     flex-wrap: nowrap;
     white-space: nowrap;
   }
+  .items {
+    overflow-y: auto;
+    height: 100%;
+  }
   .mark {
     cursor: pointer;
     &-wrapper {
@@ -383,6 +387,10 @@
   .v-card__title {
     flex-wrap: nowrap;
     white-space: nowrap;
+  }
+  .items {
+    overflow-y: auto;
+    height: 100%;
   }
   .video-item {
     position: relative;

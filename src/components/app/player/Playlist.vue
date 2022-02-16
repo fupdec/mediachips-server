@@ -13,6 +13,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
+
     <v-card-actions class="pa-0">
       <v-btn-toggle
         v-model="p.playlistMode"
@@ -48,7 +49,8 @@
         </v-tooltip>
       </v-btn-toggle>
     </v-card-actions>
-    <vuescroll ref="playlist" class="items">
+
+    <div class="items">
       <v-card-text class="pa-0">
         <v-list dense class="pa-0">
           <v-list-item-group v-model="p.nowPlaying" mandatory color="primary">
@@ -81,7 +83,7 @@
           </v-list-item-group>
         </v-list>
       </v-card-text>
-    </vuescroll>
+    </div>
   </v-card>
 </template>
 
@@ -89,14 +91,10 @@
 <script>
 import _ from "lodash";
 import Vue from "vue";
-import vuescroll from "vuescroll";
 const path = require("path");
 
 export default {
   name: "Playlist",
-  components: {
-    vuescroll,
-  },
   mounted() {
     this.$root.$on("scrollToNowPlaying", () => {
       this.scrollToNowPlaying();
@@ -151,7 +149,7 @@ export default {
     scrollToNowPlaying() {
       const height =
         (this.p.nowPlaying * document.documentElement.clientWidth) / 10;
-      this.$refs.playlist.scrollTo({ y: height }, 50);
+      // TODO create autoscroll function
     },
   },
   watch: {

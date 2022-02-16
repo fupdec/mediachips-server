@@ -13,7 +13,7 @@
       </v-tooltip>
     </template>
 
-    <v-card width="300">
+    <v-card width="450">
       <v-card-actions>
         <div class="caption">Tasks</div>
       </v-card-actions>
@@ -46,14 +46,8 @@
 
 
 <script>
-import vuescroll from "vuescroll";
-
 export default {
   name: "Tasks",
-  components: {
-    vuescroll,
-  },
-  data: () => ({}),
   mounted() {
     this.$nextTick(() => {});
   },

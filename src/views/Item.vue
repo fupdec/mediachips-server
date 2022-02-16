@@ -52,14 +52,12 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 import NestedItems from "@/components/items/NestedItems.vue";
 const path = require("path");
 
 export default {
   name: "Item",
   components: {
-    vuescroll,
     NestedItems,
   },
   async mounted() {

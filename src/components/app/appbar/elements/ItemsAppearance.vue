@@ -72,14 +72,12 @@
 
 
 <script>
-import vuescroll from "vuescroll";
 import axios from "axios";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
   name: "ItemsAppearance",
   components: {
-    vuescroll,
     ItemsView: () => import("@/components/app/appbar/elements/ItemsView.vue"),
   },
   mixins: [ComputedForItemsPage],

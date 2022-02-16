@@ -5,25 +5,27 @@
     </template>
 
     <div class="app-bar-container px-1">
-      <vuescroll>
-        <!-- <v-btn @click="toggleNavbar" icon class="ml-0">
+      <div class="scrollable">
+        <div class="scrollable-child">
+          <!-- <v-btn @click="toggleNavbar" icon class="ml-0">
       <img :src="logoPath" alt="mediaChips" width="28" height="28" />
     </v-btn> -->
 
-        <div v-if="page.isSelect" class="d-flex align-center">
-          <v-btn @click="toggleSelect" icon class="mr-2">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
+          <div v-if="page.isSelect" class="d-flex align-center">
+            <v-btn @click="toggleSelect" icon class="mr-2">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
 
-          {{
-            page.selection.length
-              ? `${page.selection.length} selected`
-              : `Please select ${page.name.toLowerCase()}`
-          }}
+            {{
+              page.selection.length
+                ? `${page.selection.length} selected`
+                : `Please select ${page.name.toLowerCase()}`
+            }}
+          </div>
+
+          <router-view v-else name="appbar" :key="$route.fullPath" />
         </div>
-
-        <router-view v-else name="appbar" :key="$route.fullPath" />
-      </vuescroll>
+      </div>
 
       <v-spacer></v-spacer>
 
@@ -52,12 +54,9 @@
 
 
 <script>
-import vuescroll from "vuescroll";
-
 export default {
   name: "AppBar",
   components: {
-    vuescroll,
     // Tabs: () => import('@/components/elements/Tabs.vue'),
     GlobalSearch: () =>
       import("@/components/app/appbar/elements/GlobalSearch.vue"),

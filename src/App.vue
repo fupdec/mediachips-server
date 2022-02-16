@@ -6,10 +6,8 @@
     <Player v-show="isPlayerActive" />
 
     <v-main app>
-      <vuescroll ref="scroll" @handle-scroll="handleScroll">
-        <AppBar />
-        <router-view :key="$route.fullPath" />
-      </vuescroll>
+      <AppBar />
+      <router-view :key="$route.fullPath" />
     </v-main>
 
     <HoverImage />
@@ -31,7 +29,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 /* TODO
  * countries array
  * playlists: remake as meta
@@ -41,7 +38,6 @@ import vuescroll from "vuescroll";
 export default {
   name: "App",
   components: {
-    vuescroll,
     AppBar: () => import("@/components/app/AppBar.vue"),
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
@@ -149,10 +145,6 @@ export default {
     },
     closeApp() {
       // TODO close app
-    },
-    handleScroll(vertical) {
-      if (vertical.scrollTop > 10) this.$store.state.isScrolled = true;
-      else this.$store.state.isScrolled = false;
     },
     async getMachineId() {
       await axios

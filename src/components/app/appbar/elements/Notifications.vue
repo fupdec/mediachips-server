@@ -13,7 +13,7 @@
       </v-tooltip>
     </template>
 
-    <v-card width="300">
+    <v-card width="450">
       <v-card-actions>
         <div class="caption">Notifications</div>
         <v-spacer></v-spacer>
@@ -24,8 +24,8 @@
 
       <v-divider></v-divider>
 
-      <vuescroll>
-        <v-card-text class="pa-1" style="max-height: 500px">
+      <v-card-text class="py-2 px-1">
+        <div class="px-1 notifications-wrap">
           <v-alert
             v-for="(i, x) in notifications"
             :key="i.id"
@@ -41,32 +41,24 @@
               <v-icon @click="close(x)" :color="i.type" right>mdi-close</v-icon>
             </div>
           </v-alert>
+        </div>
 
-          <div v-if="notifications.length == 0" class="text-center py-3">
-            <v-icon class="mb-2">mdi-ghost-outline</v-icon>
-            <div class="caption">No new notifications</div>
-          </div>
-        </v-card-text>
-      </vuescroll>
+        <div v-if="notifications.length == 0" class="text-center py-3">
+          <v-icon class="mb-2">mdi-ghost-outline</v-icon>
+          <div class="caption">No new notifications</div>
+        </div>
+      </v-card-text>
     </v-card>
   </v-menu>
 </template>
 
 
 <script>
-import vuescroll from "vuescroll";
-
 export default {
   name: "Notifications",
-  components: {
-    vuescroll,
-  },
   data: () => ({
     dialog: false,
   }),
-  mounted() {
-    this.$nextTick(() => {});
-  },
   computed: {
     notifications: {
       get() {
@@ -93,3 +85,14 @@ export default {
   },
 };
 </script>
+
+
+<style lang="scss" scoped>
+.notifications-wrap {
+  max-height: calc(60vh - 60px);
+  overflow: auto;
+  .v-alert:last-of-type {
+    margin-bottom: 0 !important;
+  }
+}
+</style>

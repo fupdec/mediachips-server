@@ -30,67 +30,65 @@
 
         <v-divider></v-divider>
 
-        <vuescroll>
-          <v-card-text class="px-4">
-            <v-form
-              v-model="valid"
-              ref="form"
-              class="flex-grow-1"
-              @submit.prevent
-            >
-              <v-text-field v-model="name" :rules="[nameRules]" label="Name" />
-              <v-text-field
-                v-if="meta.type == 'array'"
-                v-model="singular"
-                :rules="[nameRules]"
-                label="Singular name"
-              />
-              <v-text-field
-                v-model="metaHint"
-                label="Hint"
-                hint="This text under the field is the hint"
-              />
-
-              <div class="text--secondary caption mt-2 mb-1">Icon</div>
-              <div class="d-flex align-center">
-                <v-icon large left>mdi-{{ metaIcon }}</v-icon>
-                <v-btn @click="dialogIcons = true" small rounded outlined>
-                  <v-icon left>mdi-shape-plus</v-icon>
-                  Change icon
-                </v-btn>
-              </div>
-            </v-form>
-
-            <!-- Rating -->
-            <MetaSettingsRating
-              v-if="meta.type == 'rating'"
-              @update="updateRating($event)"
-              :meta="meta"
-            />
-
-            <!-- String -->
-            <v-switch
-              v-if="meta.type == 'string'"
-              v-model="isLink"
-              label="Link to an Internet address"
-              hide-details
-            />
-
-            <!-- Array -->
-            <MetaSettingsArray
+        <v-card-text class="pa-4">
+          <v-form
+            v-model="valid"
+            ref="form"
+            class="flex-grow-1"
+            @submit.prevent
+          >
+            <v-text-field v-model="name" :rules="[nameRules]" label="Name" />
+            <v-text-field
               v-if="meta.type == 'array'"
-              @update="updateSettingsArray($event)"
-              :meta="meta"
+              v-model="singular"
+              :rules="[nameRules]"
+              label="Singular name"
+            />
+            <v-text-field
+              v-model="metaHint"
+              label="Hint"
+              hint="This text under the field is the hint"
             />
 
-            <div class="mt-6 text-right">
-              <v-btn @click="dialogDeleteMeta = true" color="error" depressed>
-                <v-icon left>mdi-delete</v-icon>
-                Delete meta
+            <div class="text--secondary caption mt-2 mb-1">Icon</div>
+            <div class="d-flex align-center">
+              <v-icon large left>mdi-{{ metaIcon }}</v-icon>
+              <v-btn @click="dialogIcons = true" small rounded outlined>
+                <v-icon left>mdi-shape-plus</v-icon>
+                Change icon
               </v-btn>
             </div>
-          </v-card-text>
-        </vuescroll>
+          </v-form>
+
+          <!-- Rating -->
+          <MetaSettingsRating
+            v-if="meta.type == 'rating'"
+            @update="updateRating($event)"
+            :meta="meta"
+          />
+
+          <!-- String -->
+          <v-switch
+            v-if="meta.type == 'string'"
+            v-model="isLink"
+            label="Link to an Internet address"
+            hide-details
+          />
+
+          <!-- Array -->
+          <MetaSettingsArray
+            v-if="meta.type == 'array'"
+            @update="updateSettingsArray($event)"
+            :meta="meta"
+          />
+
+          <div class="mt-6 text-right">
+            <v-btn @click="dialogDeleteMeta = true" color="error" depressed>
+              <v-icon left>mdi-delete</v-icon>
+              Delete meta
+            </v-btn>
+          </div>
+        </v-card-text>
       </v-card>
     </v-dialog>
 
@@ -130,7 +128,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 
 export default {
   name: "DialogMetaEdit",
@@ -140,7 +137,6 @@ export default {
   },
   name: "DialogEditMetaRating",
   components: {
-    vuescroll,
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
     MetaSettingsArray: () =>
       import("@/components/dialogs/meta/MetaSettingsArray.vue"),

@@ -62,6 +62,27 @@ html {
   display: flex;
   width: 100%;
 }
+.scrollable {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  &.vertical {
+    height: 100%;
+    .scrollable-child {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+  &-child {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0; /* Increase/Decrease this value for cross-browser compatibility */
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
 .v-pagination {
   &__item--active {
     pointer-events: none;

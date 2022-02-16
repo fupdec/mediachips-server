@@ -8,6 +8,7 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-actions>
+
     <v-card-actions class="pa-0">
       <v-btn-toggle
         v-model="marksType"
@@ -40,7 +41,8 @@
         </v-btn>
       </v-btn-toggle>
     </v-card-actions>
-    <vuescroll class="items">
+
+    <div class="items">
       <v-card-text class="pa-0">
         <div v-if="p.marks.length">
           <div v-for="mark in p.marks" :key="mark.id" class="mark-wrapper">
@@ -79,23 +81,17 @@
           <span>No marks</span>
         </div>
       </v-card-text>
-    </vuescroll>
+    </div>
   </v-card>
 </template>
 
 
 <script>
 import Vue from "vue";
-import vuescroll from "vuescroll";
-
 const path = require("path");
 
 export default {
   name: "Marks",
-  props: {},
-  components: {
-    vuescroll,
-  },
   mounted() {
     this.$root.$on("updateMarkImage", (id) => {
       if (this.p.marks.some((i) => i.id === id)) this.getThumbs();

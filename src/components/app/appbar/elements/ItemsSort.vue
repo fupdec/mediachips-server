@@ -52,14 +52,10 @@
 
 
 <script>
-import vuescroll from "vuescroll";
 import Vue from "vue";
 
 export default {
   name: "ItemsSort",
-  components: {
-    vuescroll,
-  },
   mounted() {
     this.$nextTick(async () => {
       this.init();

@@ -205,12 +205,6 @@
           vuedraggable
         </span>
         <span
-          @click="openLink('https://github.com/YvesCoding/vuescroll')"
-          class="mr-2"
-        >
-          vuescroll
-        </span>
-        <span
           @click="openLink('https://github.com/Simonwep/selection')"
           class="mr-2"
         >

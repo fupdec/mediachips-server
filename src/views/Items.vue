@@ -105,14 +105,12 @@
 import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
   name: "Items",
   components: {
-    vuescroll,
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),

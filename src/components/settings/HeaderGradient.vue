@@ -30,49 +30,48 @@
           </div>
         </v-card>
 
-        <vuescroll>
-          <v-card-text>
-            <draggable v-model="colors" v-bind="dragOptions">
-              <transition-group>
-                <div
-                  v-for="(color, index) in colors"
-                  :key="color.id"
-                  class="d-flex justify-center align-center mb-4"
-                >
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" icon class="mr-4">
-                        <v-icon>mdi-drag</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Drag to change order</span>
-                  </v-tooltip>
-                  <v-btn @click="openDialogPalette(index)" outlined rounded>
-                    <v-icon left :color="color.hex">mdi-circle</v-icon>
-                    {{ "Change Color" }}
-                  </v-btn>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-btn
-                        v-on="on"
-                        @click="lockColor(index)"
-                        fab
-                        small
-                        class="ml-4"
-                      >
-                        <v-icon v-if="color.disabled" size="20">
-                          mdi-lock
-                        </v-icon>
-                        <v-icon v-else size="20">mdi-lock-open-variant</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Exclude from color randomization</span>
-                  </v-tooltip>
-                </div>
-              </transition-group>
-            </draggable>
-          </v-card-text>
-        </vuescroll>
+        <v-card-text class="py-4">
+          <draggable v-model="colors" v-bind="dragOptions">
+            <transition-group>
+              <div
+                v-for="(color, index) in colors"
+                :key="color.id"
+                class="d-flex justify-center align-center mb-4"
+              >
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" icon class="mr-4">
+                      <v-icon>mdi-drag</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Drag to change order</span>
+                </v-tooltip>
+                <v-btn @click="openDialogPalette(index)" outlined rounded>
+                  <v-icon left :color="color.hex">mdi-circle</v-icon>
+                  {{ "Change Color" }}
+                </v-btn>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      v-on="on"
+                      @click="lockColor(index)"
+                      fab
+                      small
+                      class="ml-4"
+                    >
+                      <v-icon v-if="color.disabled" size="20">
+                        mdi-lock
+                      </v-icon>
+                      <v-icon v-else size="20">mdi-lock-open-variant</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Exclude from color randomization</span>
+                </v-tooltip>
+              </div>
+            </transition-group>
+          </draggable>
+        </v-card-text>
+
         <v-card-actions class="pa-4 pt-0">
           <v-btn @click="addColor" fab x-small outlined>
             <v-icon>mdi-plus</v-icon>
@@ -111,7 +110,6 @@
 
 
 <script>
-import vuescroll from "vuescroll";
 import draggable from "vuedraggable";
 
 export default {
@@ -119,7 +117,7 @@ export default {
   props: {
     themeDark: Boolean,
   },
-  components: { vuescroll, draggable },
+  components: { draggable },
   mounted() {
     this.$nextTick(() => {
       this.dialogHeaderGradient = true;

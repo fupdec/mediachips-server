@@ -15,7 +15,6 @@ const Page = {
     icon: "shape",
     isSelect: false,
     selection: [],
-    isScrolled: false,
     savedFilter: {},
     filters: [],
     assigned: [], // assigned meta

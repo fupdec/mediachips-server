@@ -18,89 +18,87 @@
 
         <v-divider></v-divider>
 
-        <vuescroll>
-          <v-card-text class="px-4">
-            <v-alert
-              v-show="type == 'array' || type == 'rating'"
-              type="info"
-              text
-              dense
-              class="body-2"
+        <v-card-text class="pa-4">
+          <v-alert
+            v-show="type == 'array' || type == 'rating'"
+            type="info"
+            text
+            dense
+            class="body-2"
+          >
+            After adding, a dialog with detailed settings will appear
+          </v-alert>
+          <v-alert
+            v-show="type == 'array'"
+            type="info"
+            text
+            dense
+            class="body-2"
+          >
+            You can view and manage array items on the meta page. A link to
+            the meta page will appear in the navigation menu.
+          </v-alert>
+          <v-form
+            v-model="valid"
+            ref="form"
+            class="flex-grow-1"
+            @submit.prevent
+          >
+            <v-select
+              v-model="type"
+              label="Type"
+              :items="[
+                'array',
+                'string',
+                'number',
+                'boolean',
+                'date',
+                'rating',
+              ]"
+              :rules="[(value) => !!value || 'Type is required']"
+              :hint="getHint()"
+              menu-props="offset-y"
             >
-              After adding, a dialog with detailed settings will appear
-            </v-alert>
-            <v-alert
-              v-show="type == 'array'"
-              type="info"
-              text
-              dense
-              class="body-2"
-            >
-              You can view and manage array items on the meta page. A link to
-              the meta page will appear in the navigation menu.
-            </v-alert>
-            <v-form
-              v-model="valid"
-              ref="form"
-              class="flex-grow-1"
-              @submit.prevent
-            >
-              <v-select
-                v-model="type"
-                label="Type"
-                :items="[
-                  'array',
-                  'string',
-                  'number',
-                  'boolean',
-                  'date',
-                  'rating',
-                ]"
-                :rules="[(value) => !!value || 'Type is required']"
-                :hint="getHint()"
-                menu-props="offset-y"
-              >
-                <template v-slot:selection="data">
-                  <v-icon left>{{ getIcon(data.item) }}</v-icon>
-                  <span class="mr-2">{{ data.item }}</span>
-                </template>
-                <template v-slot:item="data">
-                  <v-icon left>{{ getIcon(data.item) }}</v-icon>
-                  <span>{{ data.item }}</span>
-                </template>
-              </v-select>
+              <template v-slot:selection="data">
+                <v-icon left>{{ getIcon(data.item) }}</v-icon>
+                <span class="mr-2">{{ data.item }}</span>
+              </template>
+              <template v-slot:item="data">
+                <v-icon left>{{ getIcon(data.item) }}</v-icon>
+                <span>{{ data.item }}</span>
+              </template>
+            </v-select>
 
-              <v-text-field v-model="name" :rules="[nameRules]" label="Name" />
-              <v-text-field
-                v-if="type == 'array'"
-                v-model="singular"
-                :rules="[nameRules]"
-                label="Singular name"
-              />
-              <v-text-field
-                v-model="metaHint"
-                label="Hint"
-                hint="This text under the field is the hint"
-              />
+            <v-text-field v-model="name" :rules="[nameRules]" label="Name" />
+            <v-text-field
+              v-if="type == 'array'"
+              v-model="singular"
+              :rules="[nameRules]"
+              label="Singular name"
+            />
+            <v-text-field
+              v-model="metaHint"
+              label="Hint"
+              hint="This text under the field is the hint"
+            />
 
-              <div class="text--secondary caption mt-2 mb-1">Icon</div>
-              <div class="d-flex align-center">
-                <v-icon large left>mdi-{{ metaIcon }}</v-icon>
-                <v-btn @click="dialogIcons = true" small rounded outlined>
-                  <v-icon left>mdi-shape-plus</v-icon>
-                  Change icon
-                </v-btn>
-              </div>
+            <div class="text--secondary caption mt-2 mb-1">Icon</div>
+            <div class="d-flex align-center">
+              <v-icon large left>mdi-{{ metaIcon }}</v-icon>
+              <v-btn @click="dialogIcons = true" small rounded outlined>
+                <v-icon left>mdi-shape-plus</v-icon>
+                Change icon
+              </v-btn>
+            </div>
 
-              <v-switch
-                v-if="type == 'string'"
-                v-model="isLink"
-                label="Link to an Internet address"
-                hide-details
-              />
-            </v-form>
-          </v-card-text>
-        </vuescroll>
+            <v-switch
+              v-if="type == 'string'"
+              v-model="isLink"
+              label="Link to an Internet address"
+              hide-details
+            />
+          </v-form>
+        </v-card-text>
       </v-card>
     </v-dialog>
 
@@ -116,7 +114,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 
 export default {
   props: {
@@ -124,7 +121,6 @@ export default {
   },
   name: "DialogMetaAdd",
   components: {
-    vuescroll,
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
   },
   mounted() {

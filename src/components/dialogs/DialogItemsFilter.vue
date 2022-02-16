@@ -30,26 +30,24 @@
 
         <v-divider></v-divider>
 
-        <vuescroll>
-          <v-card-text class="text-center px-2 px-sm-4">
-            <FilterRow
-              v-for="(f, i) in filters"
-              :key="i"
-              :filter="f"
-              :index="i"
-              :listBy="listBy"
-              ref="filterRow"
-              @setBy="setBy($event, i)"
-              @setCond="setCond($event, i)"
-              @setVal="setVal($event, i)"
-              @setUnion="setUnion($event, i)"
-              @remove="remove(i)"
-              @duplicate="duplicate(i)"
-              @pickDate="pickDate(i)"
-              @valid="validate($event)"
-            />
-          </v-card-text>
-        </vuescroll>
+        <v-card-text class="text-center py-4 px-2 px-sm-4">
+          <FilterRow
+            v-for="(f, i) in filters"
+            :key="i"
+            :filter="f"
+            :index="i"
+            :listBy="listBy"
+            ref="filterRow"
+            @setBy="setBy($event, i)"
+            @setCond="setCond($event, i)"
+            @setVal="setVal($event, i)"
+            @setUnion="setUnion($event, i)"
+            @remove="remove(i)"
+            @duplicate="duplicate(i)"
+            @pickDate="pickDate(i)"
+            @valid="validate($event)"
+          />
+        </v-card-text>
 
         <div v-if="filters.length == 0" class="text-center pb-6 overline">
           <v-icon large class="mb-2">mdi-ghost-outline</v-icon>
@@ -97,7 +95,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 import Cols from "../../../filter-cols";
 
 export default {
@@ -105,7 +102,6 @@ export default {
     dialog: Boolean,
   },
   components: {
-    vuescroll,
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mounted() {

@@ -77,7 +77,6 @@
 import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
-import vuescroll from "vuescroll";
 import Controls from "./player/Controls.vue";
 import Playlist from "./player/Playlist.vue";
 import Marks from "./player/Marks.vue";
@@ -86,7 +85,6 @@ const path = require("path");
 export default {
   name: "Player",
   components: {
-    vuescroll,
     Controls,
     Playlist,
     Marks,
