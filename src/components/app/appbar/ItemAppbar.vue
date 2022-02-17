@@ -1,11 +1,11 @@
 <template>
   <div class="d-flex">
-    <!-- <ItemsFilter />
+    <ItemsFilter />
     <ItemsSearch />
     <ItemsFavorite />
     <ItemsSort />
     <ItemsAppearance />
-    <ItemsSelect /> -->
+    <ItemsSelect />
   </div>
 </template>
 

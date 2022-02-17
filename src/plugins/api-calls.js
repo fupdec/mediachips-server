@@ -89,14 +89,12 @@ const ApiCalls = {
           })
       })
     }
-    Vue.prototype.$setPageOption = function (option, value) {
+    Vue.prototype.$createDbEntry = function (value, model) {
       return new Promise((resolve, reject) => {
         axios({
-            method: 'put',
-            url: options.store.state.localhost + "/api/Setting/" + option,
-            data: {
-              value
-            }
+            method: 'post',
+            url: options.store.state.localhost + "/api/" + model,
+            data: value
           })
           .then(res => {
             resolve(res)

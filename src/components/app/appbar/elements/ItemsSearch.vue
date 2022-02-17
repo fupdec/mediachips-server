@@ -66,7 +66,7 @@ export default {
       else return "";
     },
     by() {
-      return Vue.prototype.$checkCurrentPage("media") ? "path" : "name";
+      return Vue.prototype.$checkCurrentPage("meta") ? "name" : "path";
     },
     filters() {
       return this.$store.state.Page.filters;

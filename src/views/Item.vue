@@ -1,50 +1,70 @@
 <template>
-  <div class="item-header" :style="gradient">
-    <v-img
-      v-if="images.main"
-      :src="images.main"
-      :aspect-ratio="meta.metaSetting.imageAspectRatio"
-      position="top"
-      class="main-img"
-      max-width="300"
-      width="300"
-    >
-    </v-img>
-
-    <div class="description">
-      <div class="meta-name">
-        <v-icon left>mdi-{{ meta.icon }}</v-icon>
-        <div class="text-h5">{{ meta.name }}</div>
-        <v-icon v-if="item.favorite" right color="pink">mdi-heart</v-icon>
+  <div>
+    <div class="item-header" :style="gradient">
+      <div class="main-img">
+        <v-img
+          v-if="images.main"
+          :src="images.main"
+          :aspect-ratio="meta.metaSetting.imageAspectRatio"
+          position="top"
+        >
+        </v-img>
       </div>
 
-      <div class="text-h1">{{ item.name }}</div>
+      <div class="description">
+        <div class="meta-name">
+          <v-icon left>mdi-{{ meta.icon }}</v-icon>
+          <div class="text">{{ meta.name }}</div>
+          <v-icon v-if="item.favorite" right color="pink">mdi-heart</v-icon>
+        </div>
 
-      <v-chip-group
-        column
-        class="mt-2"
-      >
-        <v-chip
-          v-for="(i, x) in items"
-          :key="i['item.name'] + x"
-          :color="i['item.color']"
-          class="ma-2 px-2"
-        >
-          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-          {{ i["item.name"] }}
-        </v-chip>
+        <div class="item-name">{{ item.name }}</div>
 
-        <v-chip
-          v-for="(i, x) in values"
-          :key="i.metaId + x"
-          :title="i.meta.name"
-          class="ma-2 px-2"
-        >
-          <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-          {{ i.value }}
-        </v-chip>
-      </v-chip-group>
+        <v-chip-group column>
+          <v-chip
+            v-for="(i, x) in items"
+            :key="i['item.name'] + x"
+            :color="i['item.color']"
+            class="ma-2 px-2"
+          >
+            <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+            {{ i["item.name"] }}
+          </v-chip>
+
+          <v-chip
+            v-for="(i, x) in values"
+            :key="i.metaId + x"
+            :title="i.meta.name"
+            class="ma-2 px-2"
+          >
+            <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+            {{ i.value }}
+          </v-chip>
+        </v-chip-group>
+      </div>
     </div>
+
+    <!-- <v-tabs
+      v-model="tab"
+      background-color="transparent"
+      slider-size="5"
+      icons-and-text
+      grow
+      show-arrows
+      class="fullwidth-tabs transparent-tabs"
+    >
+      <v-tab href="#videos">
+        Videos
+        <v-icon>mdi-video</v-icon>
+      </v-tab>
+    </v-tabs>
+
+    <v-tabs-items v-model="tab" class="fullwidth-tabs transparent-tabs">
+      <v-tab-item value="videos">
+        <Items />
+      </v-tab-item>
+    </v-tabs-items> -->
+    <Items />
   </div>
 </template>
 
@@ -52,18 +72,36 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import NestedItems from "@/components/items/NestedItems.vue";
 const path = require("path");
 
 export default {
   name: "Item",
   components: {
-    NestedItems,
+    Items: () => import("@/views/Items.vue"),
+  },
+  async beforeMount() {
+    const filter = await Vue.prototype.$createDbEntry(
+      {
+        name: null,
+        itemId: this.itemId,
+        typeId: 1,
+      },
+      "SavedFilter"
+    );
+    await Vue.prototype.$createDbEntry(
+      {
+        filterId: filter.data[0].id,
+        itemId: this.itemId,
+        typeId: 1,
+      },
+      "PageSetting"
+    );
   },
   async mounted() {
     await this.init();
   },
   data: () => ({
+    tab: null,
     meta: {},
     item: {},
     images: {

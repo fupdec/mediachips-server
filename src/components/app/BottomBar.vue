@@ -18,7 +18,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
-                :to="`/media?typeId=${type.id}&tabId=default`"
+                :to="`/media?typeId=${type.id}`"
                 :title="type.name"
                 color="secondary"
                 exact
@@ -35,7 +35,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
-                :to="`/meta?metaId=${i.id}&tabId=default`"
+                :to="`/meta?metaId=${i.id}`"
                 :title="i.name"
                 color="secondary"
                 exact
@@ -67,7 +67,7 @@
                 <v-list-item
                   v-for="i in hiddenMeta"
                   :key="i.id + 1"
-                  :to="`/meta?metaId=${i.id}&tabId=default`"
+                  :to="`/meta?metaId=${i.id}`"
                   color="secondary"
                   link
                   exact

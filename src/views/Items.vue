@@ -28,7 +28,7 @@
     <Loading v-show="isQueryRun" />
 
     <v-container
-      v-if="isMediaPage"
+      v-if="isMediaPage || isItemPage"
       fluid
       class="wide-image videos-selection"
       :class="[
@@ -206,7 +206,7 @@ export default {
   methods: {
     async init() {
       if (this.isMetaPage) await this.getMeta();
-      else if (this.isMediaPage) await this.getMedia();
+      else if (this.isMediaPage || this.isItemPage) await this.getMedia();
       await this.getPageSettings();
       await this.getAssignedMeta();
       await this.getFilters();
@@ -214,8 +214,14 @@ export default {
     },
     async getFilters() {
       let query = "?";
-      if (this.metaId) query += `metaId=${this.metaId}`;
-      if (this.typeId) query += `&typeId=${this.typeId}`;
+      if (this.isMediaPage) {
+        if (this.typeId) query += `typeId=${this.typeId}`;
+      } else if (this.isItemPage) {
+        if (this.itemId) query += `itemId=${this.itemId}`;
+        if (this.typeId) query += `&typeId=${this.typeId}`;
+      } else if (this.isMetaPage) {
+        if (this.metaId) query += `metaId=${this.metaId}`;
+      }
       await axios
         .get(this.apiUrl + "/api/SavedFilter/page" + query)
         .then((res) => {
@@ -235,9 +241,28 @@ export default {
             key: "savedFilter",
             value: res.data.savedFilter || {},
           });
+          if (this.isItemPage) this.initFilterForItemPage();
         })
         .catch((e) => {
           console.log(e);
+        });
+    },
+    initFilterForItemPage() {
+      const index = this.page.filters.findIndex(
+        (i) => i.metaId == this.metaId && i.lock == true
+      );
+      if (index < 0)
+        this.page.filters.push({
+          id: null,
+          by: this.metaId,
+          type: "array",
+          cond: "in",
+          val: [this.itemId],
+          flag: null,
+          lock: true,
+          appbar: false,
+          union: "AND",
+          metaId: this.metaId,
         });
     },
     async getPageSettings() {
@@ -245,7 +270,9 @@ export default {
       if (this.isMetaPage) {
         query = `?metaId=${this.meta.id}`;
       } else if (this.isMediaPage) {
-        query = `?typeId=${1}`;
+        query = `?typeId=${this.typeId}`;
+      } else if (this.isItemPage) {
+        query = `?typeId=${this.typeId}&itemId=${this.itemId}`;
       }
       let url = "/api/PageSetting";
       await axios
@@ -329,7 +356,7 @@ export default {
         url += "item/filter";
         sets.metaId = this.metaId;
         sets.query = Vue.prototype.$filterItems(sets, "items");
-      } else if (this.isMediaPage) {
+      } else if (this.isMediaPage || this.isItemPage) {
         url += "media/filter";
         sets.typeId = this.typeId;
         sets.query = Vue.prototype.$filterItems(sets, "media");
@@ -378,7 +405,7 @@ export default {
     },
     async getAssignedMeta() {
       let url = "/api/";
-      if (this.isMediaPage) {
+      if (this.isMediaPage || this.isItemPage) {
         url += "MetaInMediaType?typeId=" + this.typeId;
       } else if (this.isMetaPage) {
         url += "ChildMeta?metaId=" + this.metaId;

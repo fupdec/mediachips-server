@@ -93,9 +93,9 @@
 
 
 <script>
-import Vue from "vue";
 import axios from "axios";
 import Cols from "../../../filter-cols";
+import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
 export default {
   props: {
@@ -104,6 +104,7 @@ export default {
   components: {
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
+  mixins: [ComputedForItemsPage],
   mounted() {
     this.$root.$on("runSearch", (values) => {
       const { index, by, string } = values;
@@ -119,6 +120,7 @@ export default {
           lock: false,
           appbar: true,
           union: "AND",
+          metaId: null,
         });
       this.apply();
     });
@@ -136,6 +138,7 @@ export default {
           lock: false,
           appbar: true,
           union: "AND",
+          metaId: null,
         });
       this.apply();
     });
@@ -166,26 +169,6 @@ export default {
     },
     cols: Cols,
   }),
-  computed: {
-    apiUrl() {
-      return this.$store.state.localhost;
-    },
-    page() {
-      return this.$store.state.Page;
-    },
-    isMetaPage() {
-      return Vue.prototype.$checkCurrentPage("meta");
-    },
-    isMediaPage() {
-      return Vue.prototype.$checkCurrentPage("media");
-    },
-    typeId() {
-      return +this.$route.query.typeId;
-    },
-    metaId() {
-      return +this.$route.query.metaId;
-    },
-  },
   methods: {
     async init() {
       this.listBy = [];
@@ -195,7 +178,7 @@ export default {
       defaults.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
       this.listBy = [...this.listBy, ...defaults];
 
-      if (this.isMediaPage) {
+      if (this.isMediaPage || this.isItemPage) {
         this.listBy.push({ header: "File" });
 
         let media = this.cols.media;
@@ -323,7 +306,7 @@ export default {
           },
         })
           .then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((e) => {
             console.log(e);

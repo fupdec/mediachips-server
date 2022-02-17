@@ -7,7 +7,9 @@ const {
 
 // Create and Save a new SavedFilter
 exports.create = (req, res) => {
-  SavedFilter.create(req.body)
+  SavedFilter.findOrCreate({
+      where: req.body
+    })
     .then(data => {
       res.status(201).send(data)
     })
@@ -41,12 +43,14 @@ exports.findOne = (req, res) => {
 
 // Find a single SavedFilter with an id
 exports.findOneForPage = (req, res) => {
+  const q = req.query
   SavedFilter
     .findOne({
       where: {
-        name: req.query.name ? req.query.name : null,
-        metaId: req.query.metaId ? +req.query.metaId : null,
-        typeId: req.query.typeId ? +req.query.typeId : null,
+        name: q.name ? q.name : null,
+        metaId: q.metaId ? +q.metaId : null,
+        typeId: q.typeId ? +q.typeId : null,
+        itemId: q.itemId ? +q.itemId : null,
       }
     })
     .then(async data => {

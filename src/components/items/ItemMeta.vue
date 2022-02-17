@@ -179,7 +179,13 @@ export default {
   },
   methods: {
     openItemPage() {
-      this.$router.push(`/item/?metaId=${this.meta.id}&itemId=${this.item.id}`);
+      let url =
+        "/item?metaId=" +
+        this.meta.id +
+        "&itemId=" +
+        this.item.id +
+        "&typeId=1";
+      this.$router.push(url);
     },
     async getImages() {
       const imageTypes = ["main", "alt", "custom1", "custom2"];

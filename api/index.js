@@ -77,6 +77,13 @@ MediaType.hasOne(PageSetting, {
 PageSetting.belongsTo(MediaType, {
   foreignKey: 'typeId'
 })
+Item.hasOne(PageSetting, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+PageSetting.belongsTo(Item, {
+  foreignKey: 'itemId'
+})
 
 MetaInMediaType.removeAttribute('id')
 Meta.hasMany(MetaInMediaType, {
@@ -224,6 +231,13 @@ MediaType.hasMany(SavedFilter, {
 })
 SavedFilter.belongsTo(MediaType, {
   foreignKey: 'typeId'
+})
+Item.hasMany(SavedFilter, {
+  foreignKey: 'itemId',
+  onDelete: "cascade"
+})
+SavedFilter.belongsTo(Item, {
+  foreignKey: 'itemId'
 })
 SavedFilter.hasMany(PageSetting, {
   foreignKey: 'filterId',

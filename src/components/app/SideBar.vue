@@ -24,7 +24,7 @@
             :key="type.name + type.id"
             link
             exact
-            :to="`/media?typeId=${type.id}&tabId=default`"
+            :to="`/media?typeId=${type.id}`"
             active-class="secondary--text"
             color="secondary"
             draggable="false"
@@ -42,7 +42,7 @@
             :key="i.id"
             link
             exact
-            :to="`/meta?metaId=${i.id}&tabId=default`"
+            :to="`/meta?metaId=${i.id}`"
             active-class="secondary--text"
             color="secondary"
             draggable="false"
@@ -70,7 +70,7 @@
               :key="i.id + 1"
               link
               exact
-              :to="`/meta?metaId=${i.id}&tabId=default`"
+              :to="`/meta?metaId=${i.id}`"
               active-class="secondary--text"
               color="secondary"
               draggable="false"

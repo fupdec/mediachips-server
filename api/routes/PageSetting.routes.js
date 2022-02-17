@@ -3,6 +3,9 @@ module.exports = app => {
 
   const router = require("express").Router();
 
+  // Find or Create a new PageSetting
+  router.post("/", PageSetting.create);
+
   // Retrieve all settings for one page
   router.get("/", PageSetting.findOne);
 

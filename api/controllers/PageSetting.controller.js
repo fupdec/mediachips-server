@@ -1,8 +1,21 @@
-const db = require("../index.js");
 const {
   PageSetting
 } = require("../index.js");
-const Op = db.Sequelize.Op;
+
+// Create and Save a new SavedFilter
+exports.create = (req, res) => {
+  PageSetting.findOrCreate({
+      where: req.body
+    })
+    .then(data => {
+      res.status(201).send(data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Find a single option with a name in the request
 exports.findOne = (req, res) => {
