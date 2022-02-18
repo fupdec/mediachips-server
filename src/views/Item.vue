@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="item-header" :style="gradient">
+    <div class="item-header pa-3 pa-sm-6" :style="gradient">
       <div class="main-img">
         <v-img
           v-if="images.main"
@@ -15,10 +15,29 @@
         <div class="meta-name">
           <v-icon left>mdi-{{ meta.icon }}</v-icon>
           <div class="text">{{ meta.name }}</div>
-          <v-icon v-if="item.favorite" right color="pink">mdi-heart</v-icon>
         </div>
 
         <div class="item-name">{{ item.name }}</div>
+
+        <div class="d-flex my-2">
+          <v-rating
+            v-if="meta.metaSetting.rating"
+            :value="item.rating"
+            dense
+            half-increments
+            hover
+            clearable
+            color="yellow darken-2"
+            background-color="grey"
+            empty-icon="mdi-star-outline"
+            half-icon="mdi-star-half-full"
+          />
+
+          <div v-if="meta.metaSetting.favorite">
+            <v-icon v-if="item.favorite" right color="pink">mdi-heart</v-icon>
+            <v-icon v-else right>mdi-heart-outline</v-icon>
+          </div>
+        </div>
 
         <v-chip-group column>
           <v-chip
@@ -102,7 +121,9 @@ export default {
   },
   data: () => ({
     tab: null,
-    meta: {},
+    meta: {
+      metaSetting: {},
+    },
     item: {},
     images: {
       main: null,
@@ -125,8 +146,17 @@ export default {
       return +this.$route.query.itemId;
     },
     gradient() {
-      let color = this.item.color || "#777";
-      return `background-image: linear-gradient(180deg, ${color}, transparent);`;
+      let back = "background-image: ";
+      if (this.images.header && !this.images.header.includes("ghost")) {
+        if (this.$vuetify.theme.dark)
+          back += `linear-gradient(0deg, #121212, transparent, transparent)`;
+        else back += `linear-gradient(0deg, #fff, transparent, transparent)`;
+        back += `, url(${this.images.header})`;
+      } else {
+        let color = this.item.color || "#777";
+        back += `linear-gradient(180deg, ${color}, transparent)`;
+      }
+      return back;
     },
     isColorDark() {
       return Vue.prototype.$getLocalImage(this.item.color);

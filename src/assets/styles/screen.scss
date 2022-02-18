@@ -1,41 +1,4 @@
-@media (max-width: 480px) {
-  .card-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    &.card-size {
-      &-1 {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      }
-      &-2 {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      }
-      &-4 {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      }
-      &-5 {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      }
-    }
-  }
-  .card-grid.wide-image {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    &.card-size {
-      &-1 {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-      }
-      &-2 {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-      }
-      &-4 {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-      }
-      &-5 {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-      }
-    }
-  }
-}
-
-@media (min-width: 480px) {
+@media (hover: hover) {
   // scrollbar
   .scrollable {
     ::-webkit-scrollbar {
@@ -78,7 +41,56 @@
 }
 
 @media (max-width: 480px) {
-  .settings-tabs {
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    &.card-size {
+      &-1 {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+      &-2 {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+      &-4 {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+      &-5 {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+    }
+  }
+  .card-grid.wide-image {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+    &.card-size {
+      &-1 {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+      }
+      &-2 {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+      }
+      &-4 {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+      }
+      &-5 {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .item-header {
+    flex-wrap: wrap;
+    .main-img {
+      width: 100%;
+      .v-image {
+        min-width: 100%;
+      }
+    }
+    .description {
+      margin-left: 0;
+    }
+  }
+  .fullwidth-tabs {
     &.v-tabs {
       max-width: 100vw;
     }

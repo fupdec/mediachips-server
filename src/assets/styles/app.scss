@@ -1098,7 +1098,7 @@ html {
     background-color: var(--v-accent-base) !important;
   }
 }
-.settings-tabs {
+.transparent-tabs {
   &.v-tabs-items,
   .v-tabs-bar,
   .v-sheet,
@@ -1584,18 +1584,32 @@ html {
 // item page
 .item-header {
   display: flex;
+  background-size: cover;
   .main-img {
-    margin: 30px;
-    box-shadow: 0 0 25px 0px #5a5a5a80;
+    .v-image {
+      width: 300px;
+      box-shadow: 0 0 25px 0px #5a5a5a80;
+    }
   }
   .description {
+    margin-left: 25px;
+    margin-top: 25px;
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
+    width: 100%;
+    .v-icon {
+      text-shadow: 0 0 8px #5a5a5a99;
+    }
   }
   .meta-name {
     display: flex;
     margin-bottom: 10px;
+    text-shadow: 0 0 8px #5a5a5a99;
+  }
+  .item-name {
+    line-height: 1;
+    font-size: 4rem;
+    text-shadow: 0 0 5px #5a5a5a99;
   }
 }
 // storyboard

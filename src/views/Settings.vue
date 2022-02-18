@@ -10,7 +10,7 @@
       show-arrows
       center-active
       icons-and-text
-      class="settings-tabs"
+      class="fullwidth-tabs transparent-tabs"
     >
       <v-tab href="#app" draggable="false">
         App <v-icon>mdi-application-cog-outline</v-icon>
@@ -34,7 +34,7 @@
 
     <v-divider></v-divider>
 
-    <v-tabs-items v-model="tab" class="settings-tabs">
+    <v-tabs-items v-model="tab" class="fullwidth-tabs transparent-tabs">
       <v-tab-item value="app">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <!-- <WatchedFolders /> -->
