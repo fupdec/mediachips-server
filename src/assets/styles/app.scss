@@ -195,13 +195,16 @@ html {
   position: fixed !important;
   z-index: 999 !important;
   border-radius: 10px;
-  border: 1px solid #5a5a5a;
+  border: 1px solid rgba(90, 90, 90, 0.5);
   background-color: rgba(150, 150, 150, 0.9);
   width: 160px;
   height: 160px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  animation: appearing 0.2s 0.5s forwards;
+  transition: all 0.3s ease;
 }
 .group-buttons {
   .v-btn {
@@ -508,7 +511,7 @@ html {
   }
   &:hover {
     .preview {
-      animation-name: preview;
+      animation-name: appearing;
     }
     .btn-play {
       opacity: 0.2;
@@ -547,14 +550,6 @@ html {
     height: 100%;
     width: 20px;
     background-image: linear-gradient(to right, transparent, #fff);
-  }
-}
-@keyframes preview {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 // END VIDEOS
@@ -1318,7 +1313,7 @@ html {
     top: -0.25em;
     right: 20%;
     opacity: 0.8;
-    text-shadow: 2px 2px 3px #00000070;
+    text-shadow: 0px 0px 3px #00000070;
     &::before {
       font-size: 1.8em;
     }
