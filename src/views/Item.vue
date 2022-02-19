@@ -2,13 +2,32 @@
   <div>
     <div class="item-header pa-3 pa-sm-6" :style="gradient">
       <div class="main-img">
-        <v-img
-          v-if="images.main"
-          :src="images.main"
-          :aspect-ratio="meta.metaSetting.imageAspectRatio"
-          position="top"
-        >
-        </v-img>
+        <v-hover>
+          <template v-slot:default="{ hover }">
+            <v-card elevation="5">
+              <v-img
+                v-if="images.main"
+                :src="images.main"
+                :aspect-ratio="meta.metaSetting.imageAspectRatio"
+                position="top"
+              />
+
+              <v-fade-transition>
+                <v-overlay v-if="hover" absolute>
+                  <v-btn
+                    @click="dialogEditImage = true"
+                    large
+                    rounded
+                    color="primary"
+                  >
+                    <v-icon left>mdi-pencil</v-icon>
+                    <span>Edit image</span>
+                  </v-btn>
+                </v-overlay>
+              </v-fade-transition>
+            </v-card>
+          </template>
+        </v-hover>
       </div>
 
       <div class="description">
@@ -84,6 +103,13 @@
       </v-tab-item>
     </v-tabs-items> -->
     <Items />
+    <DialogEditImage
+      v-if="dialogEditImage"
+      @close="dialogEditImage = false"
+      :dialog="dialogEditImage"
+      :image="images.main"
+      :options="cropperOps"
+    />
   </div>
 </template>
 
@@ -97,6 +123,7 @@ export default {
   name: "Item",
   components: {
     Items: () => import("@/views/Items.vue"),
+    DialogEditImage: () => import("@/components/dialogs/DialogEditImage.vue"),
   },
   async beforeMount() {
     const filter = await Vue.prototype.$createDbEntry(
@@ -131,6 +158,10 @@ export default {
     },
     items: [],
     values: [],
+    dialogEditImage: false,
+    cropperOps: {
+      aspectRatio: 1,
+    },
   }),
   computed: {
     apiUrl() {
@@ -169,6 +200,7 @@ export default {
       await this.getImages();
       await this.getItems();
       await this.getValues();
+      this.cropperOps.aspectRatio = this.meta.metaSetting.imageAspectRatio;
     },
     async getMeta() {
       await axios

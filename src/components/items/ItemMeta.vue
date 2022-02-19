@@ -67,6 +67,26 @@
           :title="item.bookmark"
           v-html="'mdi-bookmark'"
         />
+
+        <v-btn
+          @click.stop="editImages"
+          fab
+          small
+          color="primary"
+          class="btn-edit-images"
+        >
+          <v-icon>mdi-image-edit-outline</v-icon>
+        </v-btn>
+
+        <v-btn
+          @click.stop="editItem"
+          fab
+          small
+          color="primary"
+          class="btn-edit"
+        >
+          <v-icon>mdi-square-edit-outline</v-icon>
+        </v-btn>
       </div>
 
       <v-icon
@@ -235,6 +255,10 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+    editItem() {},
+    editImages() {
+      console.log("ad");
     },
   },
   watch: {},
