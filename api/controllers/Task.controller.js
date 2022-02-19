@@ -555,6 +555,14 @@ const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.as
 ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
+const getLocalPath = (outputPath) => {
+  return path.join(
+    __dirname,
+    '../../',
+    outputPath
+  )
+}
+
 exports.createThumb = async (req, res) => {
   /** 
    * Creating an image by taking a frame from a video.
@@ -594,11 +602,7 @@ exports.createThumb = async (req, res) => {
     return
   }
 
-  let outputPath = path.join(
-    __dirname,
-    '../../',
-    req.body.outputPath
-  )
+  let outputPath = getLocalPath(req.body.outputPath)
   createThumb(req.body.timestamp, req.body.inputPath, outputPath, req.body.width)
     .then(thumbResult => {
       res.status(201).send(thumbResult)
@@ -846,13 +850,9 @@ exports.getMachineId = async (req, res) => {
 const Jimp = require('jimp');
 
 exports.createImage = (req, res) => {
-  const outputPath = path.join(
-    __dirname,
-    '../../',
-    req.body.outputPath
-  )
+  const outputPath = getLocalPath(req.body.outputPath)
   const buf = Buffer.from(req.body.image, 'base64');
-  
+
   Jimp.read(buf)
     .then(image => {
       return image
@@ -866,4 +866,18 @@ exports.createImage = (req, res) => {
       console.log(e)
       res.status(400).send(e)
     })
+};
+
+exports.deleteImage = (req, res) => {
+  const filePath = getLocalPath(req.body.path)
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      res.status(400).send(err)
+    } else {
+      res.status(201).send({
+        message: 'successfully deleted local image'
+      })
+    }
+  })
 };

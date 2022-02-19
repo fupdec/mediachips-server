@@ -9,6 +9,9 @@ module.exports = app => {
   // creating image that recived from cropper
   router.post("/createImage", Task.createImage);
 
+  // deleting image from userfiles directory
+  router.post("/deleteImage", Task.deleteImage);
+
   // creating thumbnail for video
   router.post("/createThumb", Task.createThumb);
 
@@ -21,5 +24,5 @@ module.exports = app => {
   // check serial key
   router.get("/getMachineId", Task.getMachineId);
 
-  app.use('/api/Task/', router);
+  app.use('/api/Task', router);
 };

@@ -55,6 +55,24 @@ const ApiCalls = {
           })
       })
     }
+    Vue.prototype.$deleteLocalImage = async function (imgPath) {
+      return new Promise((resolve, reject) => {
+        axios({
+            method: 'post',
+            url: options.store.state.localhost + '/api/Task/deleteImage',
+            data: {
+              path: imgPath,
+            }
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
     Vue.prototype.$createThumb = function (timestamp, inputPath, outputPath, width, overwrite) {
       return new Promise((resolve, reject) => {
         axios({

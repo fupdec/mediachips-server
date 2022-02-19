@@ -16,6 +16,10 @@
               <v-icon left>mdi-close</v-icon> Close
             </v-btn>
             <v-spacer class="ma-sm-2 ma-1"></v-spacer>
+            <v-btn @click="dialogDeleteImage = true" color="error" depressed>
+              <v-icon left>mdi-delete</v-icon> Delete
+            </v-btn>
+            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
             <v-btn @click="crop" color="success" depressed>
               <v-icon left>mdi-crop</v-icon> Save
             </v-btn>
@@ -44,6 +48,14 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <DialogDeleteConfirm
+      v-if="dialogDeleteImage"
+      @close="dialogDeleteImage = false"
+      @delete="deleteImage"
+      :dialog="dialogDeleteImage"
+      :text="textDialogDelete"
+    />
   </div>
 </template>
 
@@ -69,22 +81,32 @@ export default {
     dialog: Boolean,
     image: String,
     options: Object,
-    output: String,
+    imagePath: String,
   },
-  components: { Cropper, FilePond },
+  components: {
+    Cropper,
+    FilePond,
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
+  },
   mounted() {
     this.$nextTick(() => {
       this.src = this.image;
     });
   },
   data: () => ({
+    dialogDeleteImage: false,
     // cropper
     src: null,
     // filepond
     uploadedImageError: null,
     uploadedImage: null,
   }),
-  computed: {},
+  computed: {
+    textDialogDelete() {
+      return "The image will be removed.\r Are you sure?";
+    },
+  },
   methods: {
     // filepond
     handleFileError(error) {
@@ -97,11 +119,19 @@ export default {
       }
       this.src = this.$refs.pond.getFiles()[0].getFileEncodeDataURL();
     },
+    async deleteImage() {
+      this.src = "";
+      this.dialogDeleteImage = false;
+      await Vue.prototype.$deleteLocalImage(this.imagePath);
+      this.close();
+      this.$emit("edited");
+    },
     async crop() {
       let { canvas } = this.$refs.cropper.getResult();
       let imgBuffer = canvas.toDataURL();
       imgBuffer = imgBuffer.replace(/^data:image\/\w+;base64,/, "");
-      await Vue.prototype.$createImage(imgBuffer, this.output);
+      await Vue.prototype.$createImage(imgBuffer, this.imagePath);
+      this.close();
       this.$emit("edited");
     },
     close() {

@@ -110,7 +110,7 @@
       :dialog="dialogEditImage"
       :image="images.main"
       :options="cropperOps"
-      :output="outputImgPath"
+      :imagePath="imgPath"
     />
   </div>
 </template>
@@ -162,7 +162,7 @@ export default {
     values: [],
     // editing image
     dialogEditImage: false,
-    outputImgPath: "",
+    imgPath: "",
     cropperOps: {
       aspectRatio: 1,
     },
@@ -202,12 +202,11 @@ export default {
       await this.getItems();
       await this.getValues();
       this.cropperOps.aspectRatio = this.meta.metaSetting.imageAspectRatio;
-      let imgPath = path.join(
+      this.imgPath = path.join(
         __dirname,
         "/userfiles/media/meta/",
         this.metaId + "/" + this.itemId + "_main.jpg"
       );
-      this.outputImgPath = imgPath;
     },
     async getMeta() {
       await axios

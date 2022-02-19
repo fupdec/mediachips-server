@@ -92,29 +92,13 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogDeleteMeta">
-      <v-card>
-        <v-card-text class="text-center">
-          <v-icon large color="error" class="py-6"> mdi-alert-outline </v-icon>
-          <div class="error--text">
-            The meta will be removed from all assigned media and items.
-            <div v-if="meta.type == 'array'">
-              And it will also delete all items of this meta.
-            </div>
-            Are you sure?
-          </div>
-        </v-card-text>
-        <v-card-actions class="pb-4">
-          <v-btn @click="dialogDeleteMeta = false" plain>
-            <v-icon left>mdi-close</v-icon> Cancel
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="deleteMeta" color="error" plain>
-            <v-icon left>mdi-check</v-icon> Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogDeleteConfirm
+      v-if="dialogDeleteMeta"
+      @close="dialogDeleteMeta = false"
+      @delete="deleteMeta"
+      :dialog="dialogDeleteMeta"
+      :text="textDialogDelete"
+    />
 
     <DialogIcons
       v-if="dialogIcons"
@@ -135,9 +119,10 @@ export default {
     dialog: Boolean,
     meta: Object,
   },
-  name: "DialogEditMetaRating",
   components: {
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
     MetaSettingsArray: () =>
       import("@/components/dialogs/meta/MetaSettingsArray.vue"),
     MetaSettingsRating: () =>
@@ -164,6 +149,13 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    textDialogDelete() {
+      let t = "The meta will be removed from all assigned media and items.\n";
+      if (this.meta.type == "array")
+        t += "And it will also delete all items of this meta.\n";
+      t += "Are you sure?";
+      return t;
     },
   },
   methods: {

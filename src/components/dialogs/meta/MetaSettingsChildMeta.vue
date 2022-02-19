@@ -119,26 +119,13 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogRemove">
-      <v-card>
-        <v-card-text class="text-center">
-          <v-icon large color="error" class="py-6"> mdi-alert-outline </v-icon>
-          <div class="error--text">
-            The meta will be removed from all items. <br />
-            Are you sure?
-          </div>
-        </v-card-text>
-        <v-card-actions class="pb-4">
-          <v-btn @click="dialogRemove = false" plain>
-            <v-icon left>mdi-close</v-icon> Cancel
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="removeMeta" color="error" plain>
-            <v-icon left>mdi-check</v-icon> Remove
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogDeleteConfirm
+      v-if="dialogRemove"
+      @close="dialogRemove = false"
+      @delete="removeMeta"
+      :dialog="dialogRemove"
+      :text="textForRemove"
+    />
   </div>
 </template>
 
@@ -152,7 +139,10 @@ export default {
   props: {
     meta: Object,
   },
-  components: {},
+  components: {
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
+  },
   mounted() {
     this.$nextTick(() => {
       this.getChildMeta();
@@ -170,6 +160,9 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    textForRemove() {
+      return "The meta will be removed from all items.\n Are you sure?";
     },
   },
   methods: {
