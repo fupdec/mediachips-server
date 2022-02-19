@@ -105,10 +105,12 @@
     <Items />
     <DialogEditImage
       v-if="dialogEditImage"
+      @edited="getImages"
       @close="dialogEditImage = false"
       :dialog="dialogEditImage"
       :image="images.main"
       :options="cropperOps"
+      :output="outputImgPath"
     />
   </div>
 </template>
@@ -158,7 +160,9 @@ export default {
     },
     items: [],
     values: [],
+    // editing image
     dialogEditImage: false,
+    outputImgPath: "",
     cropperOps: {
       aspectRatio: 1,
     },
@@ -189,9 +193,6 @@ export default {
       }
       return back;
     },
-    isColorDark() {
-      return Vue.prototype.$getLocalImage(this.item.color);
-    },
   },
   methods: {
     async init() {
@@ -201,6 +202,12 @@ export default {
       await this.getItems();
       await this.getValues();
       this.cropperOps.aspectRatio = this.meta.metaSetting.imageAspectRatio;
+      let imgPath = path.join(
+        __dirname,
+        "/userfiles/media/meta/",
+        this.metaId + "/" + this.itemId + "_main.jpg"
+      );
+      this.outputImgPath = imgPath;
     },
     async getMeta() {
       await axios

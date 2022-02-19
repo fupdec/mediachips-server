@@ -6,6 +6,9 @@ module.exports = app => {
   // importing old database from JSON
   router.post("/importDatabase", Task.importDatabase);
 
+  // creating image that recived from cropper
+  router.post("/createImage", Task.createImage);
+
   // creating thumbnail for video
   router.post("/createThumb", Task.createThumb);
 

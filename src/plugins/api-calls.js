@@ -36,6 +36,25 @@ const ApiCalls = {
         })
       return result
     }
+    Vue.prototype.$createImage = function (image, outputPath) {
+      return new Promise((resolve, reject) => {
+        axios({
+            method: 'post',
+            url: options.store.state.localhost + '/api/Task/createImage',
+            data: {
+              image,
+              outputPath,
+            }
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(e => {
+            console.log(e)
+            reject(e)
+          })
+      })
+    }
     Vue.prototype.$createThumb = function (timestamp, inputPath, outputPath, width, overwrite) {
       return new Promise((resolve, reject) => {
         axios({

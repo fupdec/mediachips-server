@@ -40,7 +40,6 @@
             :stencil-props="options"
             ref="cropper"
             class="cropper"
-            :min-height="20"
           />
         </v-card-text>
       </v-card>
@@ -50,6 +49,8 @@
 
 
 <script>
+import Vue from "vue";
+
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 
@@ -68,6 +69,7 @@ export default {
     dialog: Boolean,
     image: String,
     options: Object,
+    output: String,
   },
   components: { Cropper, FilePond },
   mounted() {
@@ -95,7 +97,13 @@ export default {
       }
       this.src = this.$refs.pond.getFiles()[0].getFileEncodeDataURL();
     },
-    crop() {},
+    async crop() {
+      let { canvas } = this.$refs.cropper.getResult();
+      let imgBuffer = canvas.toDataURL();
+      imgBuffer = imgBuffer.replace(/^data:image\/\w+;base64,/, "");
+      await Vue.prototype.$createImage(imgBuffer, this.output);
+      this.$emit("edited");
+    },
     close() {
       this.$emit("close");
     },

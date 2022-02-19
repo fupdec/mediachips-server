@@ -841,3 +841,29 @@ exports.getMachineId = async (req, res) => {
     res.status(201).send(id)
   })
 };
+
+
+const Jimp = require('jimp');
+
+exports.createImage = (req, res) => {
+  const outputPath = path.join(
+    __dirname,
+    '../../',
+    req.body.outputPath
+  )
+  const buf = Buffer.from(req.body.image, 'base64');
+  
+  Jimp.read(buf)
+    .then(image => {
+      return image
+        // .resize(sizes.width, sizes.height)
+        .quality(85)
+        .write(outputPath)
+    }).then(image => {
+      res.status(201).send(image)
+    })
+    .catch(e => {
+      console.log(e)
+      res.status(400).send(e)
+    })
+};
