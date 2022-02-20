@@ -125,6 +125,14 @@
           mdi-checkbox-marked-outline
         </v-icon>
       </v-overlay>
+
+      <DialogItemImages
+        v-if="dialogImages"
+        @close="dialogImages = false"
+        :dialog="dialogImages"
+        :item="item"
+        :meta="meta"
+      />
     </v-card>
 
     <v-chip
@@ -158,7 +166,6 @@
 import Vue from "vue";
 import axios from "axios";
 import ComputedForItem from "@/mixins/ComputedForItem";
-import NestedItems from "./NestedItems.vue";
 
 const path = require("path");
 
@@ -168,7 +175,10 @@ export default {
     item: Object,
     meta: Object,
   },
-  components: { NestedItems },
+  components: {
+    NestedItems: () => import("@/components/items/NestedItems.vue"),
+    DialogItemImages: () => import("@/components/dialogs/DialogItemImages.vue"),
+  },
   mixins: [ComputedForItem],
   mounted() {
     this.$nextTick(() => {
@@ -188,6 +198,7 @@ export default {
     },
     items: [],
     values: [],
+    dialogImages: false,
   }),
   computed: {
     apiUrl() {
@@ -258,7 +269,7 @@ export default {
     },
     editItem() {},
     editImages() {
-      console.log("ad");
+      this.dialogImages = true;
     },
   },
   watch: {},

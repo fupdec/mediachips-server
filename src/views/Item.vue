@@ -2,31 +2,19 @@
   <div>
     <div class="item-header pa-3 pa-sm-6" :style="gradient">
       <div class="main-img">
-        <v-hover>
-          <template v-slot:default="{ hover }">
-            <v-card elevation="5">
-              <v-img
-                v-if="images.main"
-                :src="images.main"
-                :aspect-ratio="meta.metaSetting.imageAspectRatio"
-                position="top"
-              />
-
-              <v-fade-transition>
-                <v-overlay v-if="hover" absolute>
-                  <v-btn
-                    @click="dialogEditImage = true"
-                    large
-                    rounded
-                    color="primary"
-                  >
-                    <v-icon left>mdi-pencil</v-icon>
-                    <span>Edit image</span>
-                  </v-btn>
-                </v-overlay>
-              </v-fade-transition>
-            </v-card>
-          </template>
+        <v-hover v-slot="{ hover }">
+          <v-img
+            @click="dialogEditImage = true"
+            :src="images.main"
+            :aspect-ratio="meta.metaSetting.imageAspectRatio"
+            style="cursor: pointer"
+          >
+            <v-fade-transition>
+              <v-overlay v-if="hover" absolute>
+                <v-icon size="80">mdi-image-edit-outline</v-icon>
+              </v-overlay>
+            </v-fade-transition>
+          </v-img>
         </v-hover>
       </div>
 
