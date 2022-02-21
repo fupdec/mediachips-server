@@ -2,6 +2,7 @@
   <v-lazy>
     <v-card
       v-if="page.view == '1'"
+      @click="dialogAbout = true"
       :class="{ favorite: item.favorite }"
       class="meta-card"
       outlined
@@ -126,10 +127,10 @@
         </v-icon>
       </v-overlay>
 
-      <DialogItemImages
-        v-if="dialogImages"
-        @close="dialogImages = false"
-        :dialog="dialogImages"
+      <DialogItemAbout
+        v-if="dialogAbout"
+        @close="dialogAbout = false"
+        :dialog="dialogAbout"
         :item="item"
         :meta="meta"
       />
@@ -177,7 +178,7 @@ export default {
   },
   components: {
     NestedItems: () => import("@/components/items/NestedItems.vue"),
-    DialogItemImages: () => import("@/components/dialogs/DialogItemImages.vue"),
+    DialogItemAbout: () => import("@/components/dialogs/DialogItemAbout.vue"),
   },
   mixins: [ComputedForItem],
   mounted() {
@@ -198,7 +199,7 @@ export default {
     },
     items: [],
     values: [],
-    dialogImages: false,
+    dialogAbout: false,
   }),
   computed: {
     apiUrl() {
@@ -269,7 +270,7 @@ export default {
     },
     editItem() {},
     editImages() {
-      this.dialogImages = true;
+      this.dialogAbout = true;
     },
   },
   watch: {},
