@@ -1,6 +1,12 @@
 <template>
   <div>
-    <v-dialog v-if="dialog" :value="dialog" @input="close" scrollable>
+    <v-dialog
+      v-if="dialog"
+      :value="dialog"
+      @input="close"
+      fullscreen
+      scrollable
+    >
       <v-card>
         <div class="d-flex justify-space-between align-center">
           <div class="headline mx-4">{{ item.name }}</div>
@@ -20,31 +26,45 @@
 
         <v-divider></v-divider>
 
-        <v-card-text class="d-flex pa-2 pa-sm-4">
-          <v-carousel ref="images">
-            <v-carousel-item
-              v-for="(i, x) in images"
-              :key="x"
-              @wheel="scrollImage"
+        <v-card-text class="d-flex flex-sm-nowrap flex-wrap pa-2 pa-sm-4">
+          <div>
+            <v-carousel
+              ref="images"
+              :hide-delimiters="images.length == 0"
+              :show-arrows="images.length > 1"
+              show-arrows-on-hover
             >
-              <v-hover v-slot="{ hover }">
-                <v-img
-                  @click="edit(i)"
-                  width="300"
-                  contain
-                  :src="i.src"
-                  :aspect-ratio="i.ar"
-                >
-                  <span>{{ i.type }}</span>
-                  <v-fade-transition>
-                    <v-overlay v-if="hover" absolute>
-                      <v-icon size="80">mdi-image-edit-outline</v-icon>
-                    </v-overlay>
-                  </v-fade-transition>
-                </v-img>
-              </v-hover>
-            </v-carousel-item>
-          </v-carousel>
+              <v-carousel-item
+                v-for="(i, x) in images"
+                :key="x"
+                @wheel="scrollImage"
+              >
+                <v-hover v-slot="{ hover }">
+                  <v-img
+                    @click="edit(i)"
+                    width="300"
+                    contain
+                    :src="i.src"
+                    :aspect-ratio="i.ar"
+                  >
+                    <span>{{ i.type }}</span>
+                    <v-fade-transition>
+                      <v-overlay v-if="hover" absolute>
+                        <v-icon size="80">mdi-image-edit-outline</v-icon>
+                      </v-overlay>
+                    </v-fade-transition>
+                  </v-img>
+                </v-hover>
+              </v-carousel-item>
+            </v-carousel>
+          </div>
+
+          <div style="width: 100%">
+            <ItemEditing
+              :item="item"
+              :meta="meta"
+            />
+          </div>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -75,6 +95,7 @@ export default {
   },
   components: {
     DialogEditImage: () => import("@/components/dialogs/DialogEditImage.vue"),
+    ItemEditing: () => import("@/components/items/ItemEditing.vue"),
   },
   mounted() {
     this.$nextTick(() => {
@@ -91,7 +112,6 @@ export default {
     },
     debounce: 0,
   }),
-  computed: {},
   methods: {
     async getImages() {
       this.images = [];
@@ -133,6 +153,7 @@ export default {
       }
     },
     scrollImage(e) {
+      e.preventDefault();
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         if (e.deltaY < 0) this.$refs.images.next();

@@ -117,65 +117,17 @@
         hide-details
       />
 
-      <v-autocomplete
+      <MetaInputArray
         v-if="filter.type === 'array'"
         @input="setVal($event)"
+        :metaId="filter.by"
+        :cond="filter.cond"
         :value="filter.val"
-        :items="listItems"
-        item-value="id"
         :disabled="
           filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
-        :menu-props="{ contentClass: 'list-with-preview' }"
-        :ref="filter.by"
-        :filter="filterItems"
-        :rules="[validVal]"
-        label="Values"
-        class="val"
-        outlined
-        multiple
-        hide-selected
-        hide-details
-      >
-        <template v-slot:selection="data">
-          <v-chip
-            v-bind="data.attrs"
-            @click="removeItem(data.item.id)"
-            @mouseover.stop="showHoverImage($event, data.item.id)"
-            @mouseleave.stop="$store.state.hover.show = false"
-            :input-value="data.selected"
-            :color="data.item.color"
-            :label="meta.metaSetting.chipLabel"
-            :outlined="meta.metaSetting.chipOutlined"
-            class="my-1 px-2"
-          >
-            <span>{{ data.item.name }}</span>
-          </v-chip>
-        </template>
-        <template v-slot:item="data">
-          <div
-            @mouseover.stop="showHoverImage($event, data.item.id)"
-            @mouseleave.stop="$store.state.hover.show = false"
-            class="list-item"
-          >
-            <span v-if="meta.metaSetting.favorite">
-              <v-icon v-if="data.item.favorite" color="pink" left size="14">
-                mdi-heart
-              </v-icon>
-              <v-icon v-else left size="14"> mdi-heart-outline </v-icon>
-            </span>
-            <span v-if="meta.metaSetting.color">
-              <v-icon :color="data.item.color || ''" left x-small>
-                mdi-circle
-              </v-icon>
-            </span>
-            <span>{{ data.item.name }}</span>
-            <span v-if="meta.metaSetting.synonyms" class="synonyms">
-              {{ data.item.synonyms }}
-            </span>
-          </div>
-        </template>
-      </v-autocomplete>
+        dialog="filtering"
+      />
 
       <v-card-actions class="pa-0">
         <v-btn
@@ -213,18 +165,16 @@
 
 <script>
 import Vue from "vue";
-import axios from "axios";
 
 export default {
+  name: "FilterRow",
   props: {
     filter: Object,
     index: Number,
     listBy: Array,
   },
-  mounted() {
-    this.$nextTick(() => {
-      if (typeof this.filter.by == "number") this.getItems(this.filter.by);
-    });
+  components: {
+    MetaInputArray: () => import("@/components/meta/input/MetaInputArray.vue"),
   },
   data: () => ({
     valid: false,
@@ -253,95 +203,14 @@ export default {
     duplicate() {
       this.$emit("duplicate");
     },
-    async getItems(metaId) {
-      let sets = {};
-      sets.metaId = metaId;
-      sets.page = 0;
-      sets.limit = 10000;
-      sets.sortBy = "name";
-      sets.sortDir = "asc";
-      sets.filters = [];
-      sets.query = Vue.prototype.$filterItems(sets, "items");
-
-      await axios
-        .get(this.apiUrl + "/api/meta/" + metaId)
-        .then((res) => {
-          this.meta = res.data;
-        })
-        .catch((e) => {
-          this.listItems = [];
-          console.log(e);
-        });
-
-      await axios({
-        method: "post",
-        url: this.apiUrl + "/api/item/filter",
-        data: sets,
-      })
-        .then((res) => {
-          this.listItems = res.data.items;
-        })
-        .catch((e) => {
-          this.listItems = [];
-          console.log(e);
-        });
-    },
-    getHint() {},
     getIconType(type) {
       return Vue.prototype.$getIconDataType(type);
-    },
-    showHoverImage(event, itemId) {
-      Vue.prototype.$showHoverImage(event, this.filter.by, itemId);
-    },
-    removeItem(item) {
-      const index = this.filter.val.indexOf(item);
-      if (index > -1) this.filter.val.splice(index, 1);
-      this.$store.state.hover.show = false;
     },
     remove() {
       this.$emit("remove");
     },
     getListCond(type) {
       return Vue.prototype.$getListCond(type);
-    },
-    filterItems(itemObj, queryText, itemText) {
-      let item = _.cloneDeep(itemObj);
-      let query = queryText.toLowerCase();
-
-      function foundByChars(text, query) {
-        text = text.toLowerCase();
-        let foundCharIndex = 0;
-        let foundAllChars = false;
-        for (let i = 0; i < query.length; i++) {
-          const char = query.charAt(i);
-          const x = text.indexOf(char, foundCharIndex);
-          if (x > -1) (foundAllChars = true), (foundCharIndex = x + 1);
-          else return false;
-        }
-        return foundAllChars;
-      }
-
-      let filtersDefault = this.$store.state.settings.typingFiltersDefault;
-
-      if (filtersDefault) {
-        let x = item.name.toLowerCase().indexOf(query);
-        if (x > -1) return true;
-        else {
-          if (!item.synonyms) return false;
-          for (let i of item.synonyms) {
-            let indexSub = i.toLowerCase().indexOf(query);
-            if (indexSub > -1) return true;
-          }
-          return false;
-        }
-      } else {
-        if (foundByChars(item.name, query)) return true;
-        else {
-          if (!item.synonyms) return false;
-          for (let i of item.synonyms) return foundByChars(i, query);
-          return false;
-        }
-      }
     },
     filterBy(filter, queryText, itemText) {
       if (filter.header) return false;
@@ -363,9 +232,6 @@ export default {
     },
   },
   watch: {
-    async "filter.by"(val) {
-      if (typeof val == "number") await this.getItems(val);
-    },
     valid(val) {
       this.$emit("valid", val);
     },
