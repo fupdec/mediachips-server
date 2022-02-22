@@ -1,21 +1,31 @@
 <template>
   <div @click="jumpTo" class="mark" :style="position">
     <span class="breaker"></span>
-    
-    <v-icon :color="color" class="mark-icon">mdi-{{ icon }}</v-icon>
+
+    <div class="mark-icon">
+      <v-icon :color="color">mdi-{{ icon }}</v-icon>
+      <v-icon
+        v-if="mark.type == 'meta'"
+        :color="colorMetaIcon"
+        class="meta-icon"
+        size="14"
+      >
+        mdi-{{ mark.meta.icon }}
+      </v-icon>
+    </div>
 
     <v-sheet class="tooltip text-center" :color="color" outlined rounded>
       <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb">
-        <span class="time" v-html="time" />
+        <v-sheet class="time" v-html="time" />
       </v-img>
 
-      <span class="mark-name">
+      <v-sheet v-if="mark.type !== 'favorite'" class="mark-name">
         <v-icon v-if="mark.type == 'meta'" small class="mr-1">
           mdi-{{ mark.meta.icon }}
         </v-icon>
         <span v-if="mark.type == 'meta'" v-html="mark['item.name']" />
         <span v-else v-html="mark.name" />
-      </span>
+      </v-sheet>
     </v-sheet>
   </div>
 </template>
@@ -53,6 +63,10 @@ export default {
       else if (this.mark.type == "bookmark") color = "#f44336";
       else if (this.mark.type == "meta") color = this.mark["item.color"];
       return color;
+    },
+    colorMetaIcon() {
+      const isDark = Vue.prototype.$checkColorForDarkText(this.color);
+      return isDark ? "white" : "black";
     },
     time() {
       return Vue.prototype.$getReadableDuration(this.mark.time);

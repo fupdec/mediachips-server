@@ -147,7 +147,7 @@
     .mark-icon {
       position: absolute;
       bottom: 0;
-      left: 0;
+      left: -11px;
       right: 0;
       opacity: 0;
       transform: scale(0);
@@ -161,6 +161,12 @@
           transform: scale(1);
         }
       }
+    }
+    .meta-icon {
+      position: absolute;
+      top: 0;
+      padding-top: 3px;
+      padding-left: 50%;
     }
     .tooltip {
       position: absolute;
@@ -186,14 +192,12 @@
       position: absolute;
       bottom: 0;
       right: 0;
-      background-color: rgba(255, 255, 255, 0.75);
       border-radius: 3px;
       padding: 0px 2px;
       white-space: nowrap;
     }
     .mark-name {
-      background-color: white;
-      border-radius: 15px;
+      border-radius: 3px;
       padding: 3px 5px;
       white-space: nowrap;
     }
