@@ -1,5 +1,10 @@
 <template>
-  <v-menu offset-y nudge-bottom="10" :close-on-content-click="false">
+  <v-menu
+    offset-y
+    nudge-bottom="10"
+    content-class="search-menu"
+    :close-on-content-click="false"
+  >
     <template #activator="{ on: onMenu }">
       <v-tooltip bottom>
         <template #activator="{ on: onTooltip }">
@@ -17,31 +22,24 @@
         <span>Quick Search by {{ by }}</span>
       </v-tooltip>
     </template>
-    <v-card width="350">
-      <div class="pa-2 d-flex">
-        <v-text-field
-          :value="searchString"
-          @input="update($event)"
-          autofocus
-          @click:clear="clear"
-          @keypress.enter="search"
-          outlined
-          dense
-          hide-details
-          clearable
-          class="pt-0"
-        />
-        <v-btn
-          @click="search"
-          class="ml-2"
-          color="primary"
-          depressed
-          height="40"
-        >
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-      </div>
-    </v-card>
+
+    <v-sheet>
+      <v-text-field
+        :value="searchString"
+        @input="update($event)"
+        @click:clear="clear"
+        @click:append="search"
+        @keypress.enter="search"
+        append-icon="mdi-magnify"
+        outlined
+        rounded
+        dense
+        autofocus
+        hide-details
+        clearable
+        class="pt-0"
+      />
+    </v-sheet>
   </v-menu>
 </template>
 
@@ -102,3 +100,13 @@ export default {
   },
 };
 </script>
+
+
+<style lang="scss">
+.search-menu {
+  border-radius: 50px;
+  .v-input__slot {
+    padding: 0 14px !important;
+  }
+}
+</style>
