@@ -491,8 +491,19 @@
       }
     }
   }
-  .seek-buttons,
-  .mark-buttons,
+}
+@media (max-width: 480px) {
+  .player {
+    .time,
+    .volume,
+    .mark-buttons,
+    .playlist-buttons,
+    .action-buttons {
+      display: none;
+    }
+  }
+}
+@media (hover: none) {
   .toggle-picture-in-picture {
     display: none;
   }

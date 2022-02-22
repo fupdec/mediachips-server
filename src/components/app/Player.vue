@@ -193,8 +193,20 @@ export default {
     // ***************************************************************
     toggleFullscreen() {
       this.showControls();
-      if (this.p.fullscreen) document.exitFullscreen();
-      else document.getElementById("player").requestFullscreen();
+      if (this.p.fullscreen) {
+        screen.orientation.unlock();
+        document.exitFullscreen();
+      } else {
+        document.getElementById("player").requestFullscreen();
+        screen.orientation
+          .lock("landscape")
+          .then(() => {
+            // alert("Locked");
+          })
+          .catch((error) => {
+            // alert(error);
+          });
+      }
       this.p.fullscreen = !this.p.fullscreen;
     },
     async togglePictureInPicture() {

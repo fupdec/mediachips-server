@@ -89,7 +89,7 @@
       <!-- TIME -->
       <v-btn
         @click="p.timeRemain = !p.timeRemain"
-        class="px-2 mx-2 body-2"
+        class="time px-2 mx-2 body-2"
         text
         rounded
         small
@@ -169,7 +169,7 @@
       </v-chip>
 
       <!-- PLAYLIST -->
-      <v-chip outlined dark class="px-0 mx-2">
+      <v-chip outlined dark class="playlist-buttons px-0 mx-2">
         <v-btn @click="togglePlaylist" icon dark>
           <v-icon>mdi-format-list-bulleted</v-icon>
           <div class="tip">
@@ -179,7 +179,7 @@
         </v-btn>
       </v-chip>
 
-      <v-chip outlined dark class="px-0">
+      <v-chip outlined dark class="action-buttons px-0">
         <v-btn @click="setAsThumb" icon dark>
           <v-icon>mdi-image-outline</v-icon>
           <div class="tip" v-html="'Set Frame as Thumb'" />
