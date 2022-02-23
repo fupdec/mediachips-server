@@ -204,7 +204,7 @@ exports.importDatabase = async (req, res) => {
           let cards = Meta.cards.filter(card => card.metaId == m.id).map(i => ({
             oldId: i.id,
             name: i.meta.name,
-            synonyms: i.meta.synonyms ? i.meta.synonyms.join() : null,
+            synonyms: i.meta.synonyms ? i.meta.synonyms.join(', ') : null,
             rating: i.meta.rating || 0,
             favorite: i.meta.favorite || false,
             bookmark: i.meta.bookmark || null,
