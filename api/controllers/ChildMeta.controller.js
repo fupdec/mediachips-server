@@ -1,6 +1,7 @@
 const {
   ChildMeta,
-  Meta
+  Meta,
+  MetaSetting
 } = require("../index.js");
 
 // Create and Save a new ChildMeta
@@ -22,8 +23,10 @@ exports.findAll = (req, res) => {
     where: {
       metaId: req.query.metaId
     },
-    include: [Meta],
-    raw: true
+    include: [{
+      model: Meta,
+      include: [MetaSetting]
+    }],
   }).then(async (data) => {
     res.status(201).send(data)
   }).catch(err => {

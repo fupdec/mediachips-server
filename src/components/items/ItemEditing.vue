@@ -3,7 +3,7 @@
     <v-form v-model="valid" ref="form" @submit.prevent>
       <v-container fluid>
         <v-row>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="6" lg="4">
             <v-text-field
               v-model="vals.name"
               :rules="[nameRules]"
@@ -12,7 +12,7 @@
             />
           </v-col>
 
-          <v-col v-if="meta.metaSetting.synonyms" cols="12" md="6">
+          <v-col v-if="meta.metaSetting.synonyms" cols="12" md="6" lg="4">
             <v-text-field
               v-model="vals.synonyms"
               label="Synonyms"
@@ -24,6 +24,7 @@
             v-if="meta.metaSetting.rating || meta.metaSetting.favorite"
             cols="12"
             md="6"
+            lg="4"
           >
             <div class="d-flex justify-space-between">
               <div
@@ -67,46 +68,84 @@
             </div>
           </v-col>
 
-          <v-col v-if="meta.metaSetting.color" cols="12" md="6" class="mt-3">
+          <v-col
+            v-if="meta.metaSetting.color"
+            cols="12"
+            md="6"
+            lg="4"
+            class="mt-3"
+          >
             <v-icon :color="vals.color" left>mdi-circle</v-icon>
             <v-btn @click="openDialogColor" outlined rounded>
               Change Color
             </v-btn>
           </v-col>
 
-          <v-col v-for="(i, x) in assigned" :key="x" cols="12" md="6">
+          <v-col v-for="(i, x) in assigned" :key="x" cols="12" md="6" lg="4">
             <MetaInputArray
-              v-if="i['meta.type'] === 'array'"
-              @input="setVal($event, i['meta.id'])"
+              v-if="i.meta.type === 'array'"
+              @input="setVal($event, i.meta.id)"
               :value="vals[i.childMetaId]"
               :metaId="i.childMetaId"
-              :prependIcon="'mdi-' + i['meta.icon']"
+              :prependIcon="'mdi-' + i.meta.icon"
             />
 
             <v-text-field
-              v-if="i['meta.type'] === 'number' || i['meta.type'] === 'string'"
+              v-if="i.meta.type === 'number' || i.meta.type === 'string'"
               v-model="vals[i.childMetaId]"
-              :label="i['meta.name']"
-              :hint="i['meta.hint']"
-              :prependIcon="'mdi-' + i['meta.icon']"
-              :type="i['meta.type'] === 'number' ? 'number' : 'text'"
+              :label="i.meta.name"
+              :hint="i.meta.hint"
+              :prependIcon="'mdi-' + i.meta.icon"
+              :type="i.meta.type === 'number' ? 'number' : 'text'"
               persistent-hint
             />
 
             <v-text-field
-              v-if="i['meta.type'] === 'date'"
+              v-if="i.meta.type === 'date'"
               @click="pickDate"
               :value="vals[i.childMetaId]"
-              :label="i['meta.name']"
-              :hint="i['meta.hint']"
-              :prependIcon="'mdi-' + i['meta.icon']"
+              :label="i.meta.name"
+              :hint="i.meta.hint"
+              :prependIcon="'mdi-' + i.meta.icon"
               persistent-hint
               readonly
             />
-            <!-- TODO add rating, color, country -->
+
+            <div v-if="i.meta.type === 'rating'" class="d-flex flex-column">
+              <div class="text--secondary caption">
+                {{ i.meta.name }}
+              </div>
+              <div class="d-flex">
+                <v-icon v-html="showIcons ? `mdi-${i.meta.icon}` : ''" left />
+                <v-rating
+                  :value="vals[i.childMetaId]"
+                  @input="setVal($event, i.childMetaId)"
+                  :length="i.meta.metaSetting.ratingMax"
+                  :full-icon="`mdi-${i.meta.metaSetting.ratingIcon}`"
+                  :empty-icon="`mdi-${
+                    i.meta.metaSetting.ratingIconEmpty ||
+                    i.meta.metaSetting.ratingIcon
+                  }`"
+                  :half-increments="i.meta.metaSetting.ratingHalf"
+                  :half-icon="`mdi-${
+                    i.meta.metaSetting.ratingIconHalf ||
+                    i.meta.metaSetting.ratingIcon
+                  }`"
+                  :color="i.meta.metaSetting.ratingColor"
+                  background-color="grey"
+                  class="meta-rating"
+                  clearable
+                  hover
+                />
+              </div>
+              <div class="text--secondary caption">
+                {{ i.meta.hint }}
+              </div>
+            </div>
+            <!-- TODO add color, country -->
           </v-col>
 
-          <v-col v-if="meta.metaSetting.bookmark" cols="12" md="6">
+          <v-col v-if="meta.metaSetting.bookmark" cols="12" md="6" lg="4">
             <v-textarea
               v-model="vals.bookmark"
               :prepend-icon="showIcons ? 'mdi-bookmark' : ''"

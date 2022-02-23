@@ -26,7 +26,7 @@
 
         <v-divider></v-divider>
 
-        <v-card-text class="d-flex flex-sm-nowrap flex-wrap pa-2 pa-sm-4">
+        <v-card-text class="item-about pa-2 pa-sm-4">
           <div>
             <v-carousel
               ref="images"

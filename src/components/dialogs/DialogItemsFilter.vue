@@ -206,21 +206,17 @@ export default {
       let assigned = this.$store.state.Page.assigned;
 
       assigned.sort((a, b) =>
-        a["meta.name"] > b["meta.name"]
-          ? 1
-          : b["meta.name"] > a["meta.name"]
-          ? -1
-          : 0
+        a.meta.name > b.meta.name ? 1 : b.meta.name > a.meta.name ? -1 : 0
       );
 
       if (assigned.length) this.listBy.push({ header: "Meta" });
 
       for (let i of assigned) {
         this.listBy.push({
-          by: i["meta.id"],
-          type: i["meta.type"],
-          icon: i["meta.icon"],
-          text: i["meta.name"],
+          by: i.meta.id,
+          type: i.meta.type,
+          icon: i.meta.icon,
+          text: i.meta.name,
         });
       }
 

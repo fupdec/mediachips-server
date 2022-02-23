@@ -57,12 +57,13 @@
         >
           <v-list-item-content>
             <v-list-item-title>
-              <v-icon left>mdi-{{ i["meta.icon"] }}</v-icon>
-              {{ i["meta.name"] }}
+              <v-icon left>mdi-{{ i.meta.icon }}</v-icon>
+              {{ i.meta.name }}
             </v-list-item-title>
           </v-list-item-content>
           <v-list-item-icon>
             <v-icon v-if="i.show"> mdi-check </v-icon>
+            <v-icon v-else> mdi-eye-off-outline </v-icon>
           </v-list-item-icon>
         </v-list-item>
       </v-list>
@@ -89,10 +90,9 @@ export default {
   },
   methods: {
     async toggle(meta) {
-      let val = meta.show === 1 ? 0 : 1;
       let url = this.apiUrl + "/api/";
       let data = {
-        data: { show: val },
+        data: { show: !meta.show },
       };
       if (this.isMetaPage) {
         url += "ChildMeta";
