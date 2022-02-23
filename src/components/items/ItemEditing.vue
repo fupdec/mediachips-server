@@ -91,12 +91,21 @@
             />
 
             <v-text-field
-              v-if="i.meta.type === 'number' || i.meta.type === 'string'"
+              v-if="i.meta.type === 'number'"
               v-model="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="'mdi-' + i.meta.icon"
-              :type="i.meta.type === 'number' ? 'number' : 'text'"
+              type="number"
+              persistent-hint
+            />
+
+            <v-text-field
+              v-if="i.meta.type === 'string'"
+              v-model="vals[i.childMetaId]"
+              :label="i.meta.name"
+              :hint="i.meta.hint"
+              :prependIcon="'mdi-' + i.meta.icon"
               persistent-hint
             />
 
@@ -251,11 +260,26 @@ export default {
         this.$set(this.vals, metaId, val);
       };
 
+      const assigned = this.assigned;
       // creating all meta and their values
-      for (let i of this.assigned) changeVal(i.childMetaId, null);
+      for (let i of assigned) changeVal(i.childMetaId, null);
 
       // parsing values and place their value into meta values
-      for (let i of values) changeVal(i.metaId, i.value);
+      for (let i of values) {
+        let v = i.value;
+        let x = assigned.findIndex((j) => j.childMetaId == i.metaId);
+        if (x > -1) {
+          let type = assigned[x].meta.type;
+          if (type === "rating") {
+            v = Number(v);
+            if (isNaN(v)) v = 0;
+          } else if (type === "number") {
+            v = Number(v);
+            if (isNaN(v)) v = null;
+          }
+        }
+        changeVal(i.metaId, v);
+      }
 
       // parsing items. creating array and place it into meta values
       let pi = {}; // parsed items
