@@ -74,7 +74,6 @@
 
 
 <script>
-import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
 import Controls from "./player/Controls.vue";

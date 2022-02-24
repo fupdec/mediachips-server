@@ -1,5 +1,6 @@
 const {
   MetaInMediaType,
+  MetaSetting,
   Meta
 } = require("../index.js");
 
@@ -12,8 +13,10 @@ exports.findAll = async (req, res) => {
     where: {
       typeId: req.query.typeId
     },
-    include: [Meta],
-    raw: true
+    include: [{
+      model: Meta,
+      include: [MetaSetting]
+    }],
   }).then(async (data) => {
     res.status(201).send(data)
   }).catch(err => {

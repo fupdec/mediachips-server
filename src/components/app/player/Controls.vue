@@ -262,7 +262,6 @@
 
 
 <script>
-import _ from "lodash";
 import Vue from "vue";
 import Mark from "./Mark.vue";
 

@@ -205,15 +205,8 @@ export default {
   },
   data: () => ({
     valid: false,
-    vals: {
-      name: "",
-      color: "#777",
-      synonyms: "",
-      rating: 0,
-      favorite: false,
-      country: "",
-      bookmark: "",
-    },
+    vals: {},
+    old: {},
     datePicker: {
       dialog: false,
       index: -1,
@@ -287,6 +280,8 @@ export default {
         else pi[i.metaId].push(i.itemId);
       }
       for (let i in pi) changeVal(i, pi[i]);
+
+      this.old = _.cloneDeep(this.vals);
       // TODO after deleling assigned meta (child meta) also delete values
     },
     nameRules(string) {

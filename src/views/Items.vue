@@ -103,7 +103,6 @@
 
 
 <script>
-import _ from "lodash";
 import Vue from "vue";
 import axios from "axios";
 import GeneratingThumbsForVideos from "@/mixins/GeneratingThumbsForVideos";

@@ -89,7 +89,6 @@
 
 
 <script>
-import _ from "lodash";
 import Vue from "vue";
 const path = require("path");
 

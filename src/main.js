@@ -5,11 +5,19 @@ import vuetify from './plugins/vuetify.js'
 import Readable from './plugins/readable.js'
 import ApiCalls from './plugins/api-calls.js'
 import App from './App.vue'
+import _ from 'lodash'
 
+Vue.set(Vue.prototype, '$_', _)
 Vue.config.productionTip = false
 
-Vue.use(Readable, { store, router })
-Vue.use(ApiCalls, { store, router })
+Vue.use(Readable, {
+  store,
+  router
+})
+Vue.use(ApiCalls, {
+  store,
+  router
+})
 
 new Vue({
   router,
