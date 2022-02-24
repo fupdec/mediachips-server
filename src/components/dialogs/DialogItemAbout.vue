@@ -4,27 +4,16 @@
       v-if="dialog"
       :value="dialog"
       @input="close"
-      fullscreen
+      :fullscreen="$vuetify.breakpoint.mobile"
       scrollable
     >
       <v-card>
-        <div class="d-flex justify-space-between align-center">
-          <div class="headline mx-4">{{ item.name }}</div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="close" outlined>
-              <v-icon left>mdi-close</v-icon> Close
-            </v-btn>
-          </div>
-        </div>
-
-        <v-divider></v-divider>
+        <DialogHeader
+          @close="close"
+          :header="`Editing: ${item.name}`"
+          :buttons="buttons"
+          closable
+        />
 
         <v-card-text class="item-about pa-2 pa-sm-4">
           <div>
@@ -60,10 +49,7 @@
           </div>
 
           <div style="width: 100%">
-            <ItemEditing
-              :item="item"
-              :meta="meta"
-            />
+            <ItemEditing ref="editing" :item="item" :meta="meta" />
           </div>
         </v-card-text>
       </v-card>
@@ -84,6 +70,7 @@
 
 <script>
 import Vue from "vue";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 const path = require("path");
 
 export default {
@@ -94,13 +81,13 @@ export default {
     meta: Object,
   },
   components: {
+    DialogHeader,
     DialogEditImage: () => import("@/components/dialogs/DialogEditImage.vue"),
     ItemEditing: () => import("@/components/items/ItemEditing.vue"),
   },
   mounted() {
-    this.$nextTick(() => {
-      this.getImages();
-    });
+    this.initButtons();
+    this.getImages();
   },
   data: () => ({
     images: [],
@@ -111,8 +98,20 @@ export default {
       aspectRatio: 1,
     },
     debounce: 0,
+    buttons: [],
   }),
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "content-save",
+        text: "Save",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.save();
+        },
+      });
+    },
     async getImages() {
       this.images = [];
       const imageTypes = [
@@ -165,6 +164,9 @@ export default {
       this.selectedImage = i.src;
       this.imgPath = i.path;
       this.cropperOps.aspectRatio = i.ar;
+    },
+    save() {
+      this.$refs.editing.save();
     },
     close() {
       this.$emit("close");

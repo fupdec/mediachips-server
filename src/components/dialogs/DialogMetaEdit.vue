@@ -4,31 +4,17 @@
       v-if="dialog"
       :value="dialog"
       @input="close"
+      :fullscreen="$vuetify.breakpoint.mobile"
       scrollable
       width="600"
     >
       <v-card>
-        <div class="d-flex justify-space-between">
-          <div class="headline ma-4">Settings of meta "{{ meta.name }}"</div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="close" outlined>
-              <v-icon left>mdi-close</v-icon> Cancel
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="apply" color="success" depressed>
-              <v-icon left>mdi-check</v-icon> Apply
-            </v-btn>
-          </div>
-        </div>
-
-        <v-divider></v-divider>
+        <DialogHeader
+          @close="close"
+          :header="`Meta: ${meta.name}`"
+          :buttons="buttons"
+          closable
+        />
 
         <v-card-text class="pa-4">
           <v-form
@@ -81,13 +67,6 @@
             @update="updateSettingsArray($event)"
             :meta="meta"
           />
-
-          <div class="mt-6 text-right">
-            <v-btn @click="dialogDeleteMeta = true" color="error" depressed>
-              <v-icon left>mdi-delete</v-icon>
-              Delete meta
-            </v-btn>
-          </div>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -112,6 +91,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   name: "DialogMetaEdit",
@@ -120,6 +100,7 @@ export default {
     meta: Object,
   },
   components: {
+    DialogHeader,
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
     DialogDeleteConfirm: () =>
       import("@/components/dialogs/DialogDeleteConfirm.vue"),
@@ -129,10 +110,9 @@ export default {
       import("@/components/dialogs/meta/MetaSettingsRating.vue"),
   },
   mounted() {
-    this.$nextTick(() => {
-      this.initMeta();
-      this.getSettings();
-    });
+    this.initButtons();
+    this.initMeta();
+    this.getSettings();
   },
   data: () => ({
     dialogIcons: false,
@@ -145,6 +125,7 @@ export default {
     isLink: false,
     rating: {},
     settingsArray: {},
+    buttons: [],
   }),
   computed: {
     apiUrl() {
@@ -159,6 +140,28 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push(
+        {
+          icon: "delete",
+          text: "Delete",
+          color: "error",
+          outlined: false,
+          function: () => {
+            dialogDeleteMeta = true;
+          },
+        },
+        {
+          icon: "check",
+          text: "Apply",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.apply();
+          },
+        }
+      );
+    },
     initMeta() {
       const meta = this.meta;
       this.name = meta.name;

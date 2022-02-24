@@ -8,15 +8,12 @@
       width="450"
     >
       <v-card>
-        <div class="d-flex pa-4">
-          <div class="headline">Adding new meta</div>
-          <v-spacer class="mx-2"></v-spacer>
-          <v-btn @click="addMeta" color="success" depressed>
-            <v-icon left>mdi-plus</v-icon> Add
-          </v-btn>
-        </div>
-
-        <v-divider></v-divider>
+        <DialogHeader
+          @close="close"
+          :header="`Adding new meta`"
+          :buttons="buttons"
+          closable
+        />
 
         <v-card-text class="pa-4">
           <v-alert
@@ -35,8 +32,8 @@
             dense
             class="body-2"
           >
-            You can view and manage array items on the meta page. A link to
-            the meta page will appear in the navigation menu.
+            You can view and manage array items on the meta page. A link to the
+            meta page will appear in the navigation menu.
           </v-alert>
           <v-form
             v-model="valid"
@@ -114,6 +111,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   props: {
@@ -121,10 +119,11 @@ export default {
   },
   name: "DialogMetaAdd",
   components: {
+    DialogHeader,
     DialogIcons: () => import("@/components/dialogs/DialogIcons.vue"),
   },
   mounted() {
-    this.$nextTick(function () {});
+    this.initButtons();
   },
   data: () => ({
     dialogIcons: false,
@@ -135,6 +134,7 @@ export default {
     metaHint: "",
     metaIcon: "shape",
     isLink: false,
+    buttons: [],
   }),
   computed: {
     apiUrl() {
@@ -142,6 +142,17 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "plus",
+        text: "Add",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.addMeta();
+        },
+      });
+    },
     changeIcon(icon) {
       this.dialogIcons = false;
       this.metaIcon = icon;

@@ -1,32 +1,13 @@
 <template>
   <div>
-    <v-dialog v-if="dialog" :value="dialog" persistent scrollable width="800">
+    <v-dialog v-if="dialog" :value="dialog" scrollable width="800">
       <v-card>
-        <div class="d-flex justify-space-between align-center">
-          <div class="headline mx-4">Editing image</div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="close" outlined>
-              <v-icon left>mdi-close</v-icon> Close
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="dialogDeleteImage = true" color="error" depressed>
-              <v-icon left>mdi-delete</v-icon> Delete
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="crop" color="success" depressed>
-              <v-icon left>mdi-crop</v-icon> Save
-            </v-btn>
-          </div>
-        </div>
-
-        <v-divider></v-divider>
+        <DialogHeader
+          @close="close"
+          header="Editing image"
+          :buttons="buttons"
+          closable
+        />
 
         <v-card-text class="d-flex flex-column pa-4">
           <file-pond
@@ -62,6 +43,7 @@
 
 <script>
 import Vue from "vue";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
@@ -86,12 +68,14 @@ export default {
   components: {
     Cropper,
     FilePond,
+    DialogHeader,
     DialogDeleteConfirm: () =>
       import("@/components/dialogs/DialogDeleteConfirm.vue"),
   },
   mounted() {
     this.$nextTick(() => {
       this.src = this.image;
+      this.initButtons();
     });
   },
   data: () => ({
@@ -101,6 +85,7 @@ export default {
     // filepond
     uploadedImageError: null,
     uploadedImage: null,
+    buttons: [],
   }),
   computed: {
     textDialogDelete() {
@@ -108,6 +93,26 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "delete",
+        text: "Delete",
+        color: "error",
+        outlined: false,
+        function: () => {
+          this.dialogDeleteImage = true;
+        },
+      });
+      this.buttons.push({
+        icon: "content-save",
+        text: "Save",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.crop();
+        },
+      });
+    },
     // filepond
     handleFileError(error) {
       this.uploadedImageError = error;

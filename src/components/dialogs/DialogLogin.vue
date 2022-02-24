@@ -1,27 +1,7 @@
 <template>
   <v-dialog :value="login" @input="close" width="500" overlay-opacity="1">
     <v-card>
-      <div class="d-flex justify-space-between">
-        <div class="headline ma-4">Welcome!</div>
-        <div
-          class="
-            d-flex
-            flex-sm-row flex-column-reverse
-            justify-end
-            ma-sm-4 ma-2
-          "
-        >
-          <v-btn @click="close" outlined>
-            <v-icon left>mdi-close</v-icon> Exit
-          </v-btn>
-          <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-          <v-btn @click="logIn" color="success" depressed>
-            <v-icon left>mdi-login</v-icon> Log in
-          </v-btn>
-        </div>
-      </div>
-
-      <v-divider></v-divider>
+      <DialogHeader @close="close" header="Welcome!" :buttons="buttons" />
 
       <v-card-text>
         <v-text-field
@@ -58,16 +38,24 @@
 
 
 <script>
+import DialogHeader from "@/components/elements/DialogHeader.vue";
+
 export default {
   name: "DialogLogin",
   props: {
     login: Boolean,
   },
-  mounted() {},
+  components: {
+    DialogHeader,
+  },
+  mounted() {
+    this.initButtons();
+  },
   data: () => ({
     password: "",
     showPassword: false,
     error: false,
+    buttons: [],
   }),
   computed: {
     sets: {
@@ -80,6 +68,27 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push(
+        {
+          icon: "close",
+          text: "Exit",
+          outlined: true,
+          function: () => {
+            this.close();
+          },
+        },
+        {
+          icon: "login",
+          text: "Log in",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.logIn();
+          },
+        }
+      );
+    },
     logIn() {
       this.error = this.sets.phrase !== this.password;
       if (!this.error) this.$emit("success");

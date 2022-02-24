@@ -1,15 +1,7 @@
 <template>
   <v-dialog v-if="dialog" :value="dialog" @input="close" width="800" scrollable>
     <v-card>
-      <div class="d-flex pa-4">
-        <div class="headline">Icon selection</div>
-        <v-spacer class="mx-2"></v-spacer>
-        <v-btn @click="close" outlined>
-          <v-icon left>mdi-close</v-icon> Cancel
-        </v-btn>
-      </div>
-      
-      <v-divider></v-divider>
+      <DialogHeader @close="close" header="Icon selection" closable />
 
       <v-card-text class="text-center px-4">
         <v-data-iterator
@@ -54,15 +46,16 @@
 
 <script>
 import icons from "@/assets/material-icons.json";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   name: "DialogIcons",
   props: {},
-  components: {},
+  components: {
+    DialogHeader,
+  },
   mounted() {
-    this.$nextTick(function () {
-      this.dialog = true;
-    });
+    this.dialog = true;
   },
   data: () => ({
     dialog: false,

@@ -1,27 +1,25 @@
 <template>
-  <div>
-    <v-alert type="info" text dense dismissible class="body-2">
+  <v-card outlined>
+    <v-alert color="info" text dismissible border="left" class="body-2 mb-2">
       Changes are applied immediately and are irreversible
     </v-alert>
 
     <v-btn
       @click="openDialogAdd"
       color="success"
-      small
       rounded
       depressed
-      class="mr-4"
+      class="ma-2"
     >
       <v-icon left>mdi-plus</v-icon> Add
     </v-btn>
 
     <v-btn
       @click="dialogRemove = true"
+      :disabled="selectedForRemove.length == 0"
       color="error"
-      small
       rounded
       depressed
-      :disabled="selectedForRemove.length == 0"
     >
       <v-icon left>mdi-close</v-icon> Remove
     </v-btn>
@@ -32,45 +30,29 @@
       active-class="primary--text"
       multiple
       column
-      class="mt-4"
     >
       <v-chip v-for="m in childMeta" :key="m.id" outlined style="margin: 6px">
-        <v-icon size="20" left>mdi-{{ m["meta.icon"] }}</v-icon>
-        {{ m["meta.name"] }}
-        <v-icon right small>{{ getIcon(m["meta.type"]) }}</v-icon>
+        <v-icon size="20" left>mdi-{{ m.meta.icon }}</v-icon>
+        {{ m.meta.name }}
+        <v-icon right small>{{ getIcon(m.meta.type) }}</v-icon>
       </v-chip>
     </v-chip-group>
 
     <div v-else class="text-center my-4">
       <v-icon large class="mb-2">mdi-ghost-outline</v-icon>
-      <div>No meta added</div>
+      <div>No child meta</div>
     </div>
 
     <v-dialog v-if="dialogAdd" v-model="dialogAdd" scrollable width="580">
       <v-card>
-        <div class="d-flex justify-space-between">
-          <div class="headline ma-4">Selecting meta</div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="dialogAdd = false" outlined>
-              <v-icon left>mdi-close</v-icon> Cancel
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="addMeta" color="success" depressed>
-              <v-icon left>mdi-check</v-icon> Apply
-            </v-btn>
-          </div>
-        </div>
+        <DialogHeader
+          @close="dialogAdd = false"
+          :header="`Adding child meta`"
+          :buttons="buttons"
+          closable
+        />
 
-        <v-divider class="mb-4"></v-divider>
-
-        <v-card-text>
+        <v-card-text class="mt-4">
           <v-data-iterator
             :items="metaForAdd"
             :search="search"
@@ -126,13 +108,14 @@
       :dialog="dialogRemove"
       :text="textForRemove"
     />
-  </div>
+  </v-card>
 </template>
 
 
 <script>
 import Vue from "vue";
 import axios from "axios";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   name: "MetaSettingsChildMeta",
@@ -140,13 +123,13 @@ export default {
     meta: Object,
   },
   components: {
+    DialogHeader,
     DialogDeleteConfirm: () =>
       import("@/components/dialogs/DialogDeleteConfirm.vue"),
   },
   mounted() {
-    this.$nextTick(() => {
-      this.getChildMeta();
-    });
+    this.initButtons();
+    this.getChildMeta();
   },
   data: () => ({
     childMeta: [],
@@ -156,6 +139,7 @@ export default {
     dialogAdd: false,
     dialogRemove: false,
     search: "",
+    buttons: [],
   }),
   computed: {
     apiUrl() {
@@ -166,6 +150,17 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "check",
+        text: "Apply",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.addMeta();
+        },
+      });
+    },
     async getChildMeta() {
       await axios
         .get(this.apiUrl + "/api/ChildMeta?metaId=" + this.meta.id)

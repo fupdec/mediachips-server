@@ -8,29 +8,12 @@
       <div>
         <v-dialog v-model="dialogNames" scrollable width="600">
           <v-card>
-            <div class="d-flex justify-space-between align-center">
-              <div class="headline ma-sm-4 ma-2">
-                Adding New {{ page.name }}
-              </div>
-              <div
-                class="
-                  d-flex
-                  flex-sm-row flex-column-reverse
-                  justify-end
-                  ma-sm-4 ma-2
-                "
-              >
-                <v-btn @click="dialogNames = false" outlined>
-                  <v-icon left>mdi-close</v-icon> Cancel
-                </v-btn>
-                <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-                <v-btn @click="add" color="success" depressed>
-                  <v-icon left>mdi-plus</v-icon> Add
-                </v-btn>
-              </div>
-            </div>
-
-            <v-divider></v-divider>
+            <DialogHeader
+              @close="dialogNames = false"
+              :header="`Adding New ${page.name}`"
+              :buttons="buttons"
+              closable
+            />
 
             <v-card-text class="pa-sm-4 pa-2">
               <v-alert type="info" text dense dismissible class="body-2">
@@ -84,15 +67,23 @@
 
 <script>
 import Vue from "vue";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   name: "ItemsAdd",
+  components: {
+    DialogHeader,
+  },
+  mounted() {
+    this.initButtons();
+  },
   data: () => ({
     names: "",
     dups: [],
     added: [],
     valid: false,
     dialogNames: false,
+    buttons: [],
   }),
   computed: {
     page() {
@@ -105,6 +96,17 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "plus",
+        text: "Add",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.add();
+        },
+      });
+    },
     async add() {
       await this.$refs.form.validate();
       if (!this.valid) return;

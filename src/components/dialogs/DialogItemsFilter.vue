@@ -8,27 +8,12 @@
       width="1200"
     >
       <v-card>
-        <div class="d-flex justify-space-between align-center">
-          <div class="headline mx-4">Filter {{ page.name }}</div>
-          <div
-            class="
-              d-flex
-              flex-sm-row flex-column-reverse
-              justify-end
-              ma-sm-4 ma-2
-            "
-          >
-            <v-btn @click="dialogSavedFilters = true" outlined>
-              <v-icon left>mdi-content-save</v-icon> Save / load
-            </v-btn>
-            <v-spacer class="ma-sm-2 ma-1"></v-spacer>
-            <v-btn @click="apply" color="success" depressed>
-              <v-icon left>mdi-check</v-icon> Apply
-            </v-btn>
-          </div>
-        </div>
-
-        <v-divider></v-divider>
+        <DialogHeader
+          @close="close"
+          :header="`Filter ${page.name}`"
+          :buttons="buttons"
+          closable
+        />
 
         <v-card-text class="text-center py-4 px-2 px-sm-4">
           <FilterRow
@@ -96,12 +81,14 @@
 import axios from "axios";
 import Cols from "../../../filter-cols";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
   props: {
     dialog: Boolean,
   },
   components: {
+    DialogHeader,
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
   },
   mixins: [ComputedForItemsPage],
@@ -150,6 +137,7 @@ export default {
       this.removeAll();
       this.apply();
     });
+    this.initButtons();
   },
   beforeDestroy() {
     this.$root.$off("runSearch");
@@ -168,8 +156,20 @@ export default {
       value: null,
     },
     cols: Cols,
+    buttons: [],
   }),
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "check",
+        text: "Apply",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.apply();
+        },
+      });
+    },
     async init() {
       this.listBy = [];
 

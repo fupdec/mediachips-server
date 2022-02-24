@@ -10,7 +10,7 @@
     :menu-props="{ contentClass: 'list-with-preview' }"
     :label="meta.name"
     :hint="meta.hint"
-    :prepend-inner-icon="prependIcon"
+    :prepend-icon="prependIcon"
     :persistent-hint="view.persistentHint"
     :hide-details="view.hideDetails"
     :outlined="view.outlined"

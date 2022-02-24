@@ -8,7 +8,7 @@
               v-model="vals.name"
               :rules="[nameRules]"
               label="Name"
-              :prepend-inner-icon="showIcons ? 'mdi-alphabetical-variant' : ''"
+              :prepend-icon="showIcons ? 'mdi-alphabetical-variant' : ''"
             />
           </v-col>
 
@@ -16,7 +16,7 @@
             <v-text-field
               v-model="vals.synonyms"
               label="Synonyms"
-              :prepend-inner-icon="showIcons ? 'mdi-alphabetical' : ''"
+              :prepend-icon="showIcons ? 'mdi-alphabetical' : ''"
             />
           </v-col>
 
@@ -87,7 +87,7 @@
               @input="setVal($event, i.meta.id)"
               :value="vals[i.childMetaId]"
               :metaId="i.childMetaId"
-              :prependIcon="'mdi-' + i.meta.icon"
+              :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
             />
 
             <v-text-field
@@ -95,7 +95,7 @@
               v-model="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
-              :prependIcon="'mdi-' + i.meta.icon"
+              :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               type="number"
               persistent-hint
             />
@@ -105,7 +105,7 @@
               v-model="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
-              :prependIcon="'mdi-' + i.meta.icon"
+              :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               persistent-hint
             />
 
@@ -115,13 +115,16 @@
               :value="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
-              :prependIcon="'mdi-' + i.meta.icon"
+              :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               persistent-hint
               readonly
             />
 
             <div v-if="i.meta.type === 'rating'" class="d-flex flex-column">
-              <div class="text--secondary caption">
+              <div
+                class="text--secondary caption"
+                :class="[{ 'pl-9': showIcons }]"
+              >
                 {{ i.meta.name }}
               </div>
               <div class="d-flex">
@@ -147,7 +150,10 @@
                   hover
                 />
               </div>
-              <div class="text--secondary caption">
+              <div
+                class="text--secondary caption"
+                :class="[{ 'pl-9': showIcons }]"
+              >
                 {{ i.meta.hint }}
               </div>
             </div>
@@ -226,7 +232,7 @@ export default {
       return this.$store.state.localhost;
     },
     showIcons() {
-      return true;
+      return this.$store.state.settings.showIconsOfMetaInEditingDialog == 1;
     },
     assigned() {
       return this.$store.state.Page.assigned;
@@ -305,6 +311,10 @@ export default {
     setDate(date) {
       this.datePicker.dialog = false;
       this.val = date;
+    },
+    save() {
+      if (!this.valid) return
+      console.log("saved");
     },
   },
 };
