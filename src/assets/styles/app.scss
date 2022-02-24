@@ -1580,7 +1580,9 @@ pre {
   }
 }
 .item-about {
-  display: flex;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 300px auto;
 }
 // item page
 .item-header {

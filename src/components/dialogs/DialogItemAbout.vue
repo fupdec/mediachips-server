@@ -5,6 +5,7 @@
       :value="dialog"
       @input="close"
       :fullscreen="$vuetify.breakpoint.mobile"
+      width="1200"
       scrollable
     >
       <v-card>
@@ -16,41 +17,31 @@
         />
 
         <v-card-text class="item-about pa-2 pa-sm-4">
-          <div>
-            <v-carousel
-              ref="images"
-              :hide-delimiters="images.length == 0"
-              :show-arrows="images.length > 1"
-              show-arrows-on-hover
+          <v-carousel
+            ref="images"
+            :hide-delimiters="images.length == 0"
+            :show-arrows="images.length > 1"
+            show-arrows-on-hover
+          >
+            <v-carousel-item
+              v-for="(i, x) in images"
+              :key="x"
+              @wheel="scrollImage"
             >
-              <v-carousel-item
-                v-for="(i, x) in images"
-                :key="x"
-                @wheel="scrollImage"
-              >
-                <v-hover v-slot="{ hover }">
-                  <v-img
-                    @click="edit(i)"
-                    width="300"
-                    contain
-                    :src="i.src"
-                    :aspect-ratio="i.ar"
-                  >
-                    <span>{{ i.type }}</span>
-                    <v-fade-transition>
-                      <v-overlay v-if="hover" absolute>
-                        <v-icon size="80">mdi-image-edit-outline</v-icon>
-                      </v-overlay>
-                    </v-fade-transition>
-                  </v-img>
-                </v-hover>
-              </v-carousel-item>
-            </v-carousel>
-          </div>
+              <v-hover v-slot="{ hover }">
+                <v-img @click="edit(i)" :src="i.src" :aspect-ratio="i.ar">
+                  <v-chip small label class="pa-2 ma-2">{{ i.type }}</v-chip>
+                  <v-fade-transition>
+                    <v-overlay v-if="hover" absolute>
+                      <v-icon size="80">mdi-image-edit-outline</v-icon>
+                    </v-overlay>
+                  </v-fade-transition>
+                </v-img>
+              </v-hover>
+            </v-carousel-item>
+          </v-carousel>
 
-          <div style="width: 100%">
-            <ItemEditing ref="editing" :item="item" :meta="meta" />
-          </div>
+          <ItemEditing ref="editing" :item="item" :meta="meta" />
         </v-card-text>
       </v-card>
     </v-dialog>

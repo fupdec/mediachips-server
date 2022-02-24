@@ -41,9 +41,6 @@
 }
 
 @media (max-width: 960px) {
-  .item-about {
-    flex-wrap: wrap;
-  }
   .filter-row {
     flex-direction: column;
     .by {
@@ -58,6 +55,12 @@
       width: 100%;
       margin-bottom: 10px;
     }
+  }
+}
+
+@media (max-width: 640px) {
+  .item-about {
+    grid-template: "a";
   }
 }
 

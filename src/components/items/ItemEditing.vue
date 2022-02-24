@@ -3,7 +3,7 @@
     <v-form v-model="valid" ref="form" @submit.prevent>
       <v-container fluid>
         <v-row>
-          <v-col cols="12" md="6" lg="4">
+          <v-col cols="12" lg="6">
             <v-text-field
               v-model="vals.name"
               :rules="[nameRules]"
@@ -12,7 +12,7 @@
             />
           </v-col>
 
-          <v-col v-if="meta.metaSetting.synonyms" cols="12" md="6" lg="4">
+          <v-col v-if="meta.metaSetting.synonyms" cols="12" lg="6">
             <v-text-field
               v-model="vals.synonyms"
               label="Synonyms"
@@ -23,8 +23,7 @@
           <v-col
             v-if="meta.metaSetting.rating || meta.metaSetting.favorite"
             cols="12"
-            md="6"
-            lg="4"
+            lg="6"
           >
             <div class="d-flex justify-space-between">
               <div
@@ -68,20 +67,14 @@
             </div>
           </v-col>
 
-          <v-col
-            v-if="meta.metaSetting.color"
-            cols="12"
-            md="6"
-            lg="4"
-            class="mt-3"
-          >
+          <v-col v-if="meta.metaSetting.color" cols="12" lg="6" class="mt-3">
             <v-icon :color="vals.color" left>mdi-circle</v-icon>
             <v-btn @click="openDialogColor" outlined rounded>
               Change Color
             </v-btn>
           </v-col>
 
-          <v-col v-for="(i, x) in assigned" :key="x" cols="12" md="6" lg="4">
+          <v-col v-for="(i, x) in assigned" :key="x" cols="12" lg="6">
             <MetaInputArray
               v-if="i.meta.type === 'array'"
               @input="setVal($event, i.meta.id)"
@@ -160,7 +153,7 @@
             <!-- TODO add color, country -->
           </v-col>
 
-          <v-col v-if="meta.metaSetting.bookmark" cols="12" md="6" lg="4">
+          <v-col v-if="meta.metaSetting.bookmark" cols="12" lg="6">
             <v-textarea
               v-model="vals.bookmark"
               :prepend-icon="showIcons ? 'mdi-bookmark' : ''"
@@ -313,7 +306,7 @@ export default {
       this.val = date;
     },
     save() {
-      if (!this.valid) return
+      if (!this.valid) return;
       console.log("saved");
     },
   },
