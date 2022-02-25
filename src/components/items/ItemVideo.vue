@@ -65,8 +65,17 @@
 
         <div
           v-if="isHovered && sets.videoPreviewHover == 'timeline'"
+          :class="[
+            { 'no-file': frameLost && !isFileExists },
+            { 'no-frame': frameLost },
+          ]"
           class="timeline"
         >
+          <div
+            v-show="frameLost"
+            class="text-gen"
+            v-html="'Creation of frames in progress...'"
+          />
           <img :src="frame" />
           <div class="sections">
             <div
@@ -128,8 +137,18 @@
         ref="story"
         class="story"
       >
-        <v-sheet class="video-card-title" v-html="fileName" />
-        <div v-if="!reg && x > 9" class="reg-block">App not registered</div>
+        <v-sheet class="video-card-title">
+          <v-icon v-if="!isFileExists" color="error">mdi-file-alert</v-icon>
+          {{ fileName }}
+        </v-sheet>
+        <div v-if="framesLost && isFileExists" class="message">
+          <v-sheet v-html="'Creation of frames in progress...'" />
+        </div>
+        <div
+          v-if="!reg && x > 9"
+          class="reg-block"
+          v-html="'App not registered'"
+        />
 
         <div label outlined class="resolution">
           <div
@@ -152,6 +171,7 @@
 
       <div class="description">
         <NestedItems
+          :item="video"
           :items="items"
           :values="values"
           :metadata="nestedMetadata"
@@ -197,21 +217,25 @@ export default {
   },
   components: { NestedItems },
   mixins: [ComputedForItem],
-  beforeMount() {
-    this.getMetadata();
-    this.getMeta();
-    this.getValues();
-    this.getImg();
-    this.checkFileExists();
+  async beforeMount() {
+    await this.getMetadata();
+    await this.getMeta();
+    await this.getValues();
+    await this.getImg();
+    if (this.page.view == "2") await this.initFrames();
+    await this.checkFileExists();
   },
   mounted() {
     this.$root.$on("updateVideoThumb", (id) => {
       if (this.video.id === id) this.getImg();
     });
-    if (this.page.view == "2") this.initFrames();
+    this.$root.$on("updateVideoFrames", (id) => {
+      if (this.video.id === id) this.initFrames();
+    });
   },
   beforeDestroy() {
     this.$root.$off("updateVideoThumb");
+    this.$root.$off("updateVideoFrames");
   },
   data: () => ({
     metadata: {},
@@ -260,6 +284,14 @@ export default {
     },
     sets() {
       return this.$store.state.settings;
+    },
+    frameLost() {
+      if (this.frame) return this.frame.includes("ghost.png");
+      else return true;
+    },
+    framesLost() {
+      if (this.frames[0]) return this.frames[0] == this.thumb;
+      else return true;
     },
     // metaAssignedToVideos() { return this.$store.state.Settings.metaAssignedToVideos },
     // view() { return this.$store.state.Settings.videoView || 0 },
@@ -379,10 +411,16 @@ export default {
       this.$refs.storyWrapper.style.left = 0;
     },
     async initFrames() {
+      this.frames = [];
       for (let i = 0; i < this.timelines.length; i++) {
         const progress = this.timelines[i];
         const imgPath = this.getFrameImgUrl(progress);
-        this.frames.push(await Vue.prototype.$getLocalImage(imgPath));
+        let img = await Vue.prototype.$getLocalImage(imgPath);
+        if (i == 0 && img.includes("ghost.png")) {
+          this.frames = [];
+          for (let j of this.timelines) this.frames.push(this.thumb);
+          break;
+        } else this.frames.push(img);
       }
     },
     getDur(secs) {

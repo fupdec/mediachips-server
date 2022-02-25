@@ -96,7 +96,7 @@
       :value="page.page"
       @input="changePage($event)"
       :length="pages"
-      total-visible="5"
+      :total-visible="$vuetify.breakpoint.xs ? 5 : sets.numberOfPagesLimit"
       class="pb-10 pt-2"
     />
 

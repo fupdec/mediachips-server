@@ -816,10 +816,8 @@ exports.createTimeline = async (req, res) => {
         framePromises.push(this.createFrame(timestamps[i], output))
       }
 
-      await Promise.all(framePromises)
-        .catch(err => {
-          // console.log(err)
-        })
+      const result = await Promise.all(framePromises)
+      return result
     }
   }
 

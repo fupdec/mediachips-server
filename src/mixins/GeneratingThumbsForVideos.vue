@@ -130,6 +130,7 @@ export default {
           data: video,
         })
           .then((res) => {
+            this.$root.$emit("updateVideoFrames", video.id);
             resolve(res);
           })
           .catch((e) => {
