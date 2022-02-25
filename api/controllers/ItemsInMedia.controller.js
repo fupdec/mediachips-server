@@ -1,10 +1,8 @@
-const db = require("../index.js");
 const {
   Item,
   ItemsInMedia,
   Meta
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
 // Create and Save a new ItemsInMedia
 exports.create = (req, res) => {};
@@ -20,24 +18,11 @@ exports.findAll = (req, res) => {
     include: [{
       model: Item,
       attributes: ['name', 'color', 'metaId'],
-    }],
-    raw: true
-  }).then(async (data) => {
-    let result = []
-    for (let val of data) {
-      await Meta.findByPk(val['item.metaId'], {
+      include: [{
+        model: Meta,
         attributes: ['name', 'icon'],
-        raw: true,
-      }).then(meta => {
-        result.push({
-          ...val,
-          ...{
-            meta: meta
-          }
-        })
-      })
-    }
-    return result
+      }],
+    }],
   }).then(data => {
     res.status(201).send(data)
   }).catch(err => {

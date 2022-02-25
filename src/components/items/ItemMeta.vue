@@ -106,14 +106,7 @@
           v-html="item.synonyms"
         />
 
-        <v-chip label outlined title="Number of videos">
-          <v-icon class="mr-1">mdi-video-outline</v-icon> {{ numberOfMedia }}
-        </v-chip>
-        <v-chip label outlined title="Number of views">
-          <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
-        </v-chip>
-
-        <NestedItems :items="items" :values="values" />
+        <NestedItems :item="item" :items="items" :values="values" type="meta" />
       </div>
 
       <v-overlay
@@ -182,15 +175,11 @@ export default {
   },
   mixins: [ComputedForItem],
   mounted() {
-    this.$nextTick(() => {
-      this.getImages();
-      this.countMediaInItem();
-      this.getItems();
-      this.getValues();
-    });
+    this.getImages();
+    this.getItems();
+    this.getValues();
   },
   data: () => ({
-    numberOfMedia: 0,
     images: {
       main: null,
       alt: null,
@@ -234,17 +223,6 @@ export default {
         if (i !== "main" && src.includes("ghost.png")) this.images[i] = null;
         else this.images[i] = src;
       }
-    },
-    countMediaInItem() {
-      let url = `/api/media/countInItem?typeId=1&itemId=${this.item.id}`;
-      axios
-        .get(this.apiUrl + url)
-        .then((res) => {
-          this.numberOfMedia = res.data.count;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     },
     getItems() {
       let url = `/api/ItemsInItem?itemId=${this.item.id}`;

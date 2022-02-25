@@ -16,24 +16,9 @@ exports.findAll = (req, res) => {
     where: {
       itemId: req.query.itemId
     },
-    raw: true
-  }).then(async (data) => {
-    let result = []
-    for (let val of data) {
-      const foundMeta = await Meta.findByPk(val.metaId, {
-        raw: true,
-      })
-      if (foundMeta) {
-        val = {
-          ...val,
-          ...{
-            meta: foundMeta
-          }
-        }
-        result.push(val)
-      }
-    }
-    res.status(201).send(result)
+    include: [Meta],
+  }).then((data) => {
+    res.status(201).send(data)
   }).catch(err => {
     res.status(500).send({
       message: err.message || "Some error occurred while performing query."

@@ -49,12 +49,12 @@
         <v-chip-group column>
           <v-chip
             v-for="(i, x) in items"
-            :key="i['item.name'] + x"
-            :color="i['item.color']"
+            :key="i.item.name + x"
+            :color="i.item.color"
             class="ma-2 px-2"
           >
-            <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
-            {{ i["item.name"] }}
+            <v-icon class="mr-1">mdi-{{ i.item.meta.icon }}</v-icon>
+            {{ i.item.name }}
           </v-chip>
 
           <v-chip

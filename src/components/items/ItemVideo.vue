@@ -77,6 +77,7 @@
         <div class="video-card-title" :title="fileName" v-html="fileName" />
 
         <NestedItems
+          :item="video"
           :items="items"
           :values="values"
           :metadata="nestedMetadata"
@@ -179,24 +180,8 @@ import Vue from "vue";
 import axios from "axios";
 import ComputedForItem from "@/mixins/ComputedForItem";
 import NestedItems from "./NestedItems.vue";
-
 const path = require("path");
-// const { dialog } = require('electron').remote
-// const { clipboard } = require('electron')
-// const shell = require('electron').shell
-// const fs = require('fs')
-// const path = require('path')
-// const ffmpeg = require('fluent-ffmpeg')
-// const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked')
-// ffmpeg.setFfprobePath(pathToFfprobe)
 
-// import Functions from '@/mixins/Functions'
-// import ShowImageFunction from '@/mixins/ShowImageFunction'
-// import LabelFunctions from '@/mixins/LabelFunctions'
-// import { ipcRenderer } from 'electron'
-// import MetaGetters from '@/mixins/MetaGetters'
-// const express = require("express")
-// const app = express()
 export default {
   name: "ItemVideo",
   props: {
