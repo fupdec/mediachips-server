@@ -6,6 +6,9 @@ module.exports = app => {
   // importing old database from JSON
   router.post("/importDatabase", Task.importDatabase);
 
+  // check if file exists on local machine
+  router.post("/checkFileExists", Task.checkFileExists);
+
   // creating image that recived from cropper
   router.post("/createImage", Task.createImage);
 

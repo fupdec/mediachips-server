@@ -21,8 +21,14 @@
 
         <v-img :src="thumb" :aspect-ratio="16 / 9" />
 
-        <v-btn @click="openPlayer" color="white" class="btn-play" icon outlined>
-          <v-icon>mdi-play</v-icon>
+        <v-btn
+          @click="openPlayer"
+          :color="isFileExists ? 'white' : 'error'"
+          class="btn-play"
+          icon
+          fab
+        >
+          <v-icon x-large>mdi-play</v-icon>
         </v-btn>
 
         <v-rating
@@ -196,6 +202,7 @@ export default {
     this.getMeta();
     this.getValues();
     this.getImg();
+    this.checkFileExists();
   },
   mounted() {
     this.$root.$on("updateVideoThumb", (id) => {
@@ -217,6 +224,7 @@ export default {
     section: 0,
     timelines: [5, 15, 25, 35, 45, 55, 65, 75, 85, 95],
     timeouts: {},
+    isFileExists: true,
   }),
   computed: {
     apiUrl() {
@@ -311,6 +319,12 @@ export default {
         });
     },
     openPlayer() {
+      if (!this.isFileExists) {
+        this.$store.state.dialogError = true;
+        let text = `File not found on path: \n"${this.video.path}"`;
+        this.$store.state.dialogErrorText = text;
+        return;
+      }
       this.$store.state.Player.active = true;
       let items = _.cloneDeep(this.$store.state.Page.items);
       if (items.length > this.x + 50) {
@@ -373,6 +387,10 @@ export default {
     },
     getDur(secs) {
       return Vue.prototype.$getReadableDuration(secs);
+    },
+    async checkFileExists() {
+      let res = await Vue.prototype.$checkFileExists(this.video.path);
+      this.isFileExists = res.status == 201;
     },
   },
   watch: {

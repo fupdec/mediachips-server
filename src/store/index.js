@@ -38,6 +38,8 @@ export default new Vuex.Store({
     clipboardMeta: {},
     updateFoldersData: 0,
     tasks: [],
+    dialogError: false,
+    dialogErrorText: null,
     settings: Settings,
   }),
   mutations: {

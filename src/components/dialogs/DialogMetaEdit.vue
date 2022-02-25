@@ -148,7 +148,7 @@ export default {
           color: "error",
           outlined: false,
           function: () => {
-            dialogDeleteMeta = true;
+            this.dialogDeleteMeta = true;
           },
         },
         {

@@ -22,6 +22,8 @@
     </v-dialog>
 
     <DialogLogin :login="login" @close="closeApp" @success="login = false" />
+
+    <DialogError v-if="$store.state.dialogError" />
   </v-app>
 </template>
 
@@ -45,6 +47,7 @@ export default {
     DialogLogin: () => import("@/components/dialogs/DialogLogin.vue"),
     HoverImage: () => import("@/components/app/HoverImage.vue"),
     Snackbars: () => import("@/components/app/Snackbars.vue"),
+    DialogError: () => import("@/components/dialogs/DialogError.vue"),
   },
   async beforeMount() {},
   async mounted() {

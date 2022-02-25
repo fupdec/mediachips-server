@@ -555,6 +555,12 @@ const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.as
 ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
+exports.checkFileExists = async (req, res) => {
+  const filePath = path.join(req.body.path)
+  if (fs.existsSync(filePath)) res.send(201).status()
+  else res.send(400).status()
+}
+
 const getLocalPath = (outputPath) => {
   return path.join(
     __dirname,
