@@ -148,6 +148,25 @@
           <v-btn outlined value="xl">XL</v-btn>
         </v-btn-toggle>
       </div>
+
+      <div class="pt-6">
+        <span class="mr-6">Number of visible pages in pagination</span>
+        <v-btn-toggle
+          :value="sets.numberOfPagesLimit"
+          @change="setOption($event, 'numberOfPagesLimit')"
+          color="primary"
+          class="ma-2 ma-sm-0"
+          dense
+          mandatory
+        >
+          <v-btn outlined value="5">5</v-btn>
+          <v-btn outlined value="7">7</v-btn>
+          <v-btn outlined value="9">9</v-btn>
+          <v-btn outlined value="11">11</v-btn>
+          <v-btn outlined value="13">13</v-btn>
+          <v-btn outlined value="15">15</v-btn>
+        </v-btn-toggle>
+      </div>
     </v-card>
 
     <v-card outlined class="mt-6 pa-4 mx-2">

@@ -25,7 +25,7 @@
         :value="page.page"
         @input="changePage($event)"
         :length="pages"
-        total-visible="5"
+        :total-visible="$vuetify.breakpoint.xs ? 5 : sets.numberOfPagesLimit"
       />
 
       <v-menu v-if="pages > 4" :close-on-content-click="false" offset-y>

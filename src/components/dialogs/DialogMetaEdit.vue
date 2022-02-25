@@ -4,7 +4,7 @@
       v-if="dialog"
       :value="dialog"
       @input="close"
-      :fullscreen="$vuetify.breakpoint.mobile"
+      :fullscreen="$vuetify.breakpoint.xs"
       scrollable
       width="600"
     >
