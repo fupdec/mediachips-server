@@ -10,20 +10,51 @@
 
     <v-container
       v-if="page.filters.length > 0"
-      fluid
       class="d-flex justify-center align-start"
+      fluid
     >
       <FiltersChips :filters="page.filters" />
     </v-container>
 
-    <v-pagination
-      v-show="itemsOnPage.length && !isInfiniteScroll"
-      :value="page.page"
-      @input="changePage($event)"
-      :length="pages"
-      total-visible="5"
-      class="pt-2 pb-1"
-    />
+    <v-container
+      v-if="itemsOnPage.length && !isInfiniteScroll"
+      class="d-flex justify-center align-center"
+      fluid
+    >
+      <v-pagination
+        :value="page.page"
+        @input="changePage($event)"
+        :length="pages"
+        total-visible="5"
+      />
+
+      <v-menu v-if="pages > 4" :close-on-content-click="false" offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-bind="attrs" v-on="on" icon>
+            <v-icon>mdi-redo</v-icon>
+          </v-btn>
+        </template>
+
+        <v-card>
+          <v-card-text>
+            <div>Jump to page</div>
+            <v-text-field
+              v-model="page.jumpPage"
+              @keypress.enter="jumpToPage(page.jumpPage)"
+              type="number"
+              autofocus
+              dense
+              outlined
+              hide-details
+              class="my-4"
+            />
+            <v-btn @click="jumpToPage($event)" color="success" block depressed>
+              <v-icon left>mdi-check</v-icon> Apply
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-menu>
+    </v-container>
 
     <Loading v-show="isQueryRun" />
 
@@ -440,6 +471,15 @@ export default {
     scrollTop() {
       const main = document.getElementsByClassName("v-main__wrap")[0];
       main.scrollTop = 0;
+    },
+    jumpToPage() {
+      if (this.page.jumpPage === null) return;
+      let val = Number(this.page.jumpPage);
+      if (val < 1) val = 1;
+      else if (val > this.pages) val = this.pages;
+      if (val !== this.page.page) this.page.page = val;
+      this.page.jumpPage = val;
+      this.changePage(val);
     },
   },
   watch: {

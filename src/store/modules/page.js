@@ -3,6 +3,7 @@ import _ from "lodash";
 const Page = {
   state: () => ({
     page: 1,
+    jumpPage: null,
     limit: 20,
     filterId: null,
     size: 3,
