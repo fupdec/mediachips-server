@@ -117,6 +117,9 @@ export default {
         this.$store.state.Player = value;
       },
     },
+    page() {
+      return this.$store.state.Page;
+    },
     reg() {
       return this.$store.getters.reg;
     },
@@ -128,6 +131,7 @@ export default {
       this.p.currentTime = 0;
       this.p.active = false;
       this.p.paused = false;
+      document.title = this.page.name + " - mediaChips";
     },
     initPlayer() {
       this.p.player.addEventListener("loadedmetadata", () => {
@@ -151,6 +155,7 @@ export default {
         text: `${this.p.nowPlaying + 1}. ${fileName}`,
         icon: "format-list-bulleted",
       });
+      document.title = `Playing: ${fileName}` + " - mediaChips";
       this.p.playbackError = false;
       if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
     },

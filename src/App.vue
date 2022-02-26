@@ -76,6 +76,9 @@ export default {
     isPlayerActive() {
       return this.$store.state.Player.active;
     },
+    page() {
+      return this.$store.state.Page;
+    },
     sets: {
       get() {
         return this.$store.state.settings;
@@ -158,6 +161,14 @@ export default {
         .catch((e) => {
           // console.log(e);
         });
+    },
+  },
+  watch: {
+    $route(to) {
+      document.title = to.name + " - mediaChips";
+    },
+    "page.name"(name) {
+      document.title = name + " - mediaChips";
     },
   },
 };
