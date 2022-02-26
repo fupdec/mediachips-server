@@ -43,8 +43,6 @@
       </v-tab-item>
       <v-tab-item value="appearance">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <DarkMode />
-          <ThemeColors />
           <Appearance />
         </v-card>
       </v-tab-item>
@@ -79,8 +77,6 @@
 export default {
   name: "Settings",
   components: {
-    DarkMode: () => import("@/components/settings/DarkMode.vue"),
-    ThemeColors: () => import("@/components/settings/ThemeColors.vue"),
     Appearance: () => import("@/components/settings/Appearance.vue"),
     WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
     MetaList: () => import("@/components/settings/MetaList.vue"),

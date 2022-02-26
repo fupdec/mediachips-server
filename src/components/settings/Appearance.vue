@@ -1,211 +1,214 @@
 <template>
-  <div>
-    <v-card outlined class="mt-6 pa-4 mx-2">
-      <div class="headline text-center pb-6">App</div>
-
-      <div class="d-flex">
-        <span class="mr-4">Navigation bar</span>
-        <v-radio-group
-          :value="sets.navigationSide"
-          @change="setOption($event, 'navigationSide')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Side" value="1"></v-radio>
-          <v-radio label="Bottom" value="2"></v-radio>
-        </v-radio-group>
-      </div>
-
-      <div class="pt-4 d-flex align-center flex-wrap">
-        <span class="mr-4">Zoom {{ Math.floor(sets.zoom * 100) }}%</span>
-        <v-slider
-          :value="sets.zoom"
-          @change="setOption($event, 'zoom')"
-          @click:prepend="zoomOut"
-          @click:append="zoomIn"
-          min="0.5"
-          step="0.01"
-          max="2"
-          hide-details
-          prepend-icon="mdi-magnify-minus-outline"
-          append-icon="mdi-magnify-plus-outline"
-          style="max-width: 300px"
-        />
-        <v-btn @click="setOption(1, 'zoom')" class="ma-2" outlined rounded>
-          <v-icon left size="18">mdi-restore</v-icon> Reset
-        </v-btn>
-      </div>
-    </v-card>
-
-    <v-card outlined class="mt-6 pa-4 mx-2">
-      <div class="headline text-center pb-6">Page</div>
-
-      <div class="d-flex">
-        <span class="mr-6">Position of header image on meta item's page</span>
-        <v-radio-group
-          :value="sets.showHeaderImageAboveProfile"
-          @change="setOption($event, 'showHeaderImageAboveProfile')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Behind" value="0"></v-radio>
-          <v-radio label="Above" value="1"></v-radio>
-        </v-radio-group>
-      </div>
-
-      <div class="pt-7 d-flex">
-        <span class="mr-6">Saved filters under header</span>
-        <v-radio-group
-          :value="sets.showSavedFilters"
-          @change="setOption($event, 'showSavedFilters')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Hide" value="0"></v-radio>
-          <v-radio label="Show" value="1"></v-radio>
-        </v-radio-group>
-      </div>
-
-      <div class="pt-7 d-flex flex-wrap align-center">
-        <span class="mr-6">Icons of meta in editing dialog</span>
-        <v-radio-group
-          :value="sets.showIconsOfMetaInEditingDialog"
-          @change="setOption($event, 'showIconsOfMetaInEditingDialog')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Hide" value="0"></v-radio>
-          <v-radio label="Show" value="1"></v-radio>
-        </v-radio-group>
-        <v-spacer></v-spacer>
-        <v-text-field
-          value="Sample"
-          dense
-          class="pa-0 ma-2 ma-sm-0"
-          readonly
-          hide-details
-          style="max-width: 200px"
-          :prepend-inner-icon="
-            sets.showIconsOfMetaInEditingDialog == '1' ? `mdi-account` : ''
-          "
-        />
-      </div>
-
-      <div class="pt-7 d-flex flex-wrap">
-        <span class="mr-6">Icons instead of text on filter chips</span>
-        <v-radio-group
-          :value="sets.showIconsInsteadTextOnFiltersChips"
-          @change="setOption($event, 'showIconsInsteadTextOnFiltersChips')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Hide" value="0"></v-radio>
-          <v-radio label="Show" value="1"></v-radio>
-        </v-radio-group>
-        <v-spacer></v-spacer>
-        <div class="ma-2 ma-sm-0">
-          <v-btn color="error" class="mr-4" fab x-small depressed>
-            <v-icon>mdi-filter-off</v-icon>
-          </v-btn>
-          <v-chip
-            v-if="sets.showIconsInsteadTextOnFiltersChips == '0'"
-            small
-            color="primary"
-          >
-            "Name" not equal "Sample"
-          </v-chip>
-          <v-chip v-else small color="primary">
-            <v-icon>mdi-alphabetical-variant</v-icon>
-            <v-icon>mdi-not-equal-variant</v-icon> "Sample"
-          </v-chip>
+  <div class="mx-4">
+    <v-checkbox
+      v-model="sets.darkMode"
+      @change="setOption($event, 'darkMode')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Dark Mode</div>
+          <div class="subtitle-2 mt-1">Come to the dark side</div>
         </div>
-      </div>
+      </template>
+    </v-checkbox>
 
-      <div class="pt-6">
-        <span class="mr-6">Gap in Card Grid</span>
-        <v-btn-toggle
-          :value="sets.gapSize"
-          @change="setOption($event, 'gapSize')"
-          color="primary"
-          class="ma-2 ma-sm-0"
-          dense
-          mandatory
-        >
-          <v-btn outlined value="xs">XS</v-btn>
-          <v-btn outlined value="s">S</v-btn>
-          <v-btn outlined value="m">M</v-btn>
-          <v-btn outlined value="l">L</v-btn>
-          <v-btn outlined value="xl">XL</v-btn>
-        </v-btn-toggle>
-      </div>
+    <v-checkbox
+      v-model="sets.navigationSide"
+      @change="setOption($event, 'navigationSide')"
+      false-value="1"
+      true-value="2"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="text--primary ml-2">Navigation bar at the bottom</div>
+      </template>
+    </v-checkbox>
 
-      <div class="pt-6">
-        <span class="mr-6">Number of visible pages in pagination</span>
-        <v-btn-toggle
-          :value="sets.numberOfPagesLimit"
-          @change="setOption($event, 'numberOfPagesLimit')"
-          color="primary"
-          class="ma-2 ma-sm-0"
-          dense
-          mandatory
-        >
-          <v-btn outlined value="5">5</v-btn>
-          <v-btn outlined value="7">7</v-btn>
-          <v-btn outlined value="9">9</v-btn>
-          <v-btn outlined value="11">11</v-btn>
-          <v-btn outlined value="13">13</v-btn>
-          <v-btn outlined value="15">15</v-btn>
-        </v-btn-toggle>
+    <div class="d-flex flex-wrap align-center mt-4">
+      <div class="text--primary">
+        <span>Scale</span>
+        <div class="subtitle-2">{{ Math.floor(sets.zoom * 100) }}%</div>
       </div>
-    </v-card>
+      <v-slider
+        :value="sets.zoom"
+        @change="setOption($event, 'zoom')"
+        @click:prepend="zoomOut"
+        @click:append="zoomIn"
+        prepend-icon="mdi-magnify-minus-outline"
+        append-icon="mdi-magnify-plus-outline"
+        style="max-width: 300px"
+        class="mx-4"
+        min="0.5"
+        step="0.01"
+        max="2"
+        hide-details
+      />
+      <v-btn v-if="sets.zoom != '1'" @click="setOption(1, 'zoom')" small icon>
+        <v-icon>mdi-restore</v-icon>
+      </v-btn>
+    </div>
 
-    <v-card outlined class="mt-6 pa-4 mx-2">
-      <div class="headline text-center pb-6">Cards</div>
+    <v-checkbox
+      v-model="sets.headerGradient"
+      @change="setOption($event, 'headerGradient')"
+      false-value="0"
+      true-value="1"
+      class="mt-6"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Gradient</div>
+          <div class="subtitle-2 mt-1">
+            Use multiple colors for app bar background
+          </div>
+        </div>
+      </template>
+    </v-checkbox>
 
-      <div class="d-flex">
-        <span class="mr-6">
-          Position of icons
-          <v-icon color="yellow darken-2">mdi-star</v-icon> rating and
-          <v-icon color="pink">mdi-heart</v-icon> favorite
-        </span>
-        <v-radio-group
-          :value="sets.ratingAndFavoriteInCard"
-          @change="setOption($event, 'ratingAndFavoriteInCard')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Above image" value="0"></v-radio>
-          <v-radio label="In description" value="1"></v-radio>
-        </v-radio-group>
+    <ThemeColors />
+
+    <v-divider class="mt-8 mb-2" />
+    <div class="subtitle-2 text-right mb-4">Page</div>
+
+    <v-checkbox
+      v-model="sets.showSavedFilters"
+      @change="setOption($event, 'showSavedFilters')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Saved filters</div>
+          <div class="subtitle-2 mt-1">On the item page, under the heading</div>
+        </div>
+      </template>
+    </v-checkbox>
+
+    <v-checkbox
+      v-model="sets.showIconsOfMetaInEditingDialog"
+      @change="setOption($event, 'showIconsOfMetaInEditingDialog')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Meta icons in the item edit dialog</div>
+          <div class="d-flex align-center subtitle-2">
+            <span class="mr-2">Sample</span>
+            <v-text-field
+              value="John"
+              class="pa-0 ma-0"
+              style="max-width: 150px"
+              :prepend-icon="
+                sets.showIconsOfMetaInEditingDialog == '1' ? `mdi-account` : ''
+              "
+              hide-details
+              readonly
+              dense
+            />
+          </div>
+        </div>
+      </template>
+    </v-checkbox>
+
+    <v-checkbox
+      v-model="sets.showIconsInsteadTextOnFiltersChips"
+      @change="setOption($event, 'showIconsInsteadTextOnFiltersChips')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Icons in filter chips</div>
+          <div class="subtitle-2 mt-1">
+            <span class="mr-2">Sample</span>
+            <v-chip
+              v-if="sets.showIconsInsteadTextOnFiltersChips == '0'"
+              color="primary"
+              small
+            >
+              "Actor" not equal "John"
+            </v-chip>
+            <v-chip v-else color="primary" small>
+              <v-icon>mdi-account</v-icon>
+              <v-icon>mdi-not-equal-variant</v-icon> "John"
+            </v-chip>
+          </div>
+        </div>
+      </template>
+    </v-checkbox>
+
+    <div class="d-flex align-center flex-wrap mb-4">
+      <div class="text--primary mb-2 mr-4">Gap between items</div>
+      <v-btn-toggle
+        :value="sets.gapSize"
+        @change="setOption($event, 'gapSize')"
+        color="primary"
+        class="mb-2"
+        dense
+        mandatory
+      >
+        <v-btn outlined value="xs">XS</v-btn>
+        <v-btn outlined value="s">S</v-btn>
+        <v-btn outlined value="m">M</v-btn>
+        <v-btn outlined value="l">L</v-btn>
+        <v-btn outlined value="xl">XL</v-btn>
+      </v-btn-toggle>
+    </div>
+
+    <div class="d-flex align-center flex-wrap">
+      <div class="text--primary mb-2 mr-4">
+        Number of visible pages in pagination
       </div>
+      <v-btn-toggle
+        :value="sets.numberOfPagesLimit"
+        @change="setOption($event, 'numberOfPagesLimit')"
+        color="primary"
+        class="mb-2"
+        dense
+        mandatory
+      >
+        <v-btn outlined value="5">5</v-btn>
+        <v-btn outlined value="7">7</v-btn>
+        <v-btn outlined value="9">9</v-btn>
+        <v-btn outlined value="11">11</v-btn>
+        <v-btn outlined value="13">13</v-btn>
+        <v-btn outlined value="15">15</v-btn>
+      </v-btn-toggle>
+    </div>
 
-      <div class="pt-7 d-flex">
-        <span class="mr-6">Empty meta value in card</span>
-        <v-radio-group
-          :value="sets.showEmptyMetaValueInCard"
-          @change="setOption($event, 'showEmptyMetaValueInCard')"
-          mandatory
-          row
-          hide-details
-          class="mt-0 pt-0"
-        >
-          <v-radio label="Hide" value="0"></v-radio>
-          <v-radio label="Show" value="1"></v-radio>
-        </v-radio-group>
-      </div>
-    </v-card>
+    <v-divider class="mt-8 mb-2" />
+    <div class="subtitle-2 text-right mb-4">Cards</div>
+
+    <v-checkbox
+      v-model="sets.ratingAndFavoriteInCard"
+      @change="setOption($event, 'ratingAndFavoriteInCard')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="text--primary ml-2">Rating and favorite in description</div>
+      </template>
+    </v-checkbox>
+
+    <v-checkbox
+      v-model="sets.showEmptyMetaValueInCard"
+      @change="setOption($event, 'showEmptyMetaValueInCard')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="text--primary ml-2">Show empty meta value</div>
+      </template>
+    </v-checkbox>
   </div>
 </template>
 
@@ -215,12 +218,9 @@ import Vue from "vue";
 
 export default {
   name: "Appearance",
-  mounted() {
-    this.$nextTick(async () => {});
+  components: {
+    ThemeColors: () => import("@/components/settings/ThemeColors.vue"),
   },
-  data: () => ({
-    darkMode: false,
-  }),
   computed: {
     sets: {
       get() {
@@ -243,6 +243,11 @@ export default {
     zoomIn() {
       const zoom = +this.sets.zoom + 0.01 || 2;
       this.setOption(zoom, "zoom");
+    },
+  },
+  watch: {
+    "sets.darkMode"(val) {
+      this.$vuetify.theme.dark = val == "1";
     },
   },
 };

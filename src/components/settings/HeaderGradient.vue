@@ -55,13 +55,10 @@
                     <v-btn
                       v-on="on"
                       @click="lockColor(index)"
-                      fab
-                      small
                       class="ml-4"
+                      icon
                     >
-                      <v-icon v-if="color.disabled" size="20">
-                        mdi-lock
-                      </v-icon>
+                      <v-icon v-if="color.disabled"> mdi-lock </v-icon>
                       <v-icon v-else size="20">mdi-lock-open-variant</v-icon>
                     </v-btn>
                   </template>

@@ -1,7 +1,7 @@
 <template>
   <div class="mt-6">
-    <v-divider class="mb-4" />
-    <div class="text--secondary mb-6">General</div>
+    <v-divider class="mb-2" />
+    <div class="text--secondary text-right">General</div>
 
     <v-checkbox v-model="settings.hidden">
       <template v-slot:label>
@@ -49,9 +49,8 @@
       </template>
     </v-checkbox>
 
-    <v-divider class="mb-4" />
-
-    <div class="text--secondary mb-6">Specific meta in items</div>
+    <v-divider class="mb-2" />
+    <div class="text--secondary text-right">Specific meta in items</div>
 
     <v-checkbox v-model="settings.rating">
       <template v-slot:label>
@@ -94,9 +93,8 @@
       </template>
     </v-checkbox>
 
-    <v-divider class="mb-4" />
-
-    <div class="text--secondary mb-6">Appearance of items</div>
+    <v-divider class="mb-2" />
+    <div class="text--secondary text-right mb-4">Appearance of items</div>
 
     <div class="text--primary subtitle-1">Aspect ratio of images</div>
     <v-radio-group
