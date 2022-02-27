@@ -1,6 +1,12 @@
 <template>
   <div>
-    <v-dialog v-if="dialog" :value="dialog" scrollable width="800">
+    <v-dialog
+      v-if="dialog"
+      :value="dialog"
+      :fullscreen="$vuetify.breakpoint.xs"
+      scrollable
+      width="800"
+    >
       <v-card>
         <DialogHeader
           @close="close"
@@ -20,12 +26,25 @@
             ref="pond"
           />
 
-          <Cropper
-            :src="src"
-            :stencil-props="options"
-            ref="cropper"
-            class="cropper"
-          />
+          <div class="cropper-block">
+            <Cropper
+              @change="updateSize($event)"
+              :src="src"
+              :stencil-props="options"
+              :auto-zoom="true"
+              ref="cropper"
+              class="cropper"
+            />
+            <div v-if="width && height" class="cropper-size">
+              <v-icon v-if="width < 500" color="error" class="mr-1" small>
+                mdi-alert
+              </v-icon>
+              <v-icon v-else color="success" class="mr-1" small>
+                mdi-check
+              </v-icon>
+              {{ width }} x {{ height }}
+            </div>
+          </div>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -82,6 +101,8 @@ export default {
     dialogDeleteImage: false,
     // cropper
     src: null,
+    width: null,
+    height: null,
     // filepond
     uploadedImageError: null,
     uploadedImage: null,
@@ -138,6 +159,10 @@ export default {
       await Vue.prototype.$createImage(imgBuffer, this.imagePath);
       this.close();
       this.$emit("edited");
+    },
+    updateSize({ coordinates }) {
+      this.width = Math.round(coordinates.width);
+      this.height = Math.round(coordinates.height);
     },
     close() {
       this.$emit("close");

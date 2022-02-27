@@ -2,7 +2,6 @@
   <v-lazy>
     <v-card
       v-if="page.view == '1'"
-      @click="dialogAbout = true"
       :class="{ favorite: item.favorite }"
       class="meta-card"
       outlined
@@ -70,17 +69,7 @@
         />
 
         <v-btn
-          @click.stop="editImages"
-          fab
-          small
-          color="primary"
-          class="btn-edit-images"
-        >
-          <v-icon>mdi-image-edit-outline</v-icon>
-        </v-btn>
-
-        <v-btn
-          @click.stop="editItem"
+          @click.stop="dialogAbout = true"
           fab
           small
           color="primary"
@@ -245,10 +234,6 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-    },
-    editItem() {},
-    editImages() {
-      this.dialogAbout = true;
     },
   },
   watch: {},
