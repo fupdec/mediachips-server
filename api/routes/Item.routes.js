@@ -9,6 +9,9 @@ module.exports = app => {
   // Retrieve all Items that match the filter
   router.post("/filter", Item.findAll);
 
+  // Retrieve all Items that with name
+  router.post("/search", Item.rawQuery);
+
   // Retrieve a single Item with id
   router.get("/:id", Item.findOne);
 

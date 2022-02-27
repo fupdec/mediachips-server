@@ -27,6 +27,18 @@ exports.findAll = (req, res) => {
   })
 };
 
+// Retrieve all Item from the database.
+exports.rawQuery = (req, res) => {
+  db.sequelize.query(req.body.query)
+    .then(data => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving media."
+      })
+    })
+};
+
 // Find a single Item with an id
 exports.findOne = (req, res) => {
   Item.findOne({
