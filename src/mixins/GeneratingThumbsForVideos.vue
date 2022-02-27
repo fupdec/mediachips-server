@@ -34,6 +34,9 @@ export default {
     isMediaPage() {
       return Vue.prototype.$checkCurrentPage("media");
     },
+    isItemPage() {
+      return Vue.prototype.$checkCurrentPage("item");
+    },
   },
   methods: {
     async createGrids(videos) {
@@ -160,7 +163,7 @@ export default {
   },
   watch: {
     itemsOnPage(videos) {
-      if (this.isMediaPage) this.generateImages(videos);
+      if (this.isMediaPage || this.isItemPage) this.generateImages(videos);
     },
   },
 };
