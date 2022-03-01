@@ -1,22 +1,30 @@
 <template>
-  <div>
+  <div class="editing">
     <v-form v-model="valid" ref="form" @submit.prevent>
       <v-container fluid>
         <v-row>
           <v-col cols="12" lg="6">
             <v-text-field
               v-model="vals.name"
+              @click:append-outer="restore('name')"
               :rules="[nameRules]"
-              label="Name"
+              :class="{ edited: vals.name !== old.name }"
               :prepend-icon="showIcons ? 'mdi-alphabetical-variant' : ''"
+              :appendOuterIcon="vals.name === old.name ? '' : 'mdi-restore'"
+              label="Name"
             />
           </v-col>
 
           <v-col v-if="meta.metaSetting.synonyms" cols="12" lg="6">
             <v-text-field
               v-model="vals.synonyms"
+              @click:append-outer="restore('synonyms')"
               label="Synonyms"
+              :class="{ edited: vals.synonyms !== old.synonyms }"
               :prepend-icon="showIcons ? 'mdi-alphabetical' : ''"
+              :appendOuterIcon="
+                vals.synonyms === old.synonyms ? '' : 'mdi-restore'
+              "
             />
           </v-col>
 
@@ -78,17 +86,23 @@
             <MetaInputArray
               v-if="i.meta.type === 'array'"
               @input="setVal($event, i.meta.id)"
+              @restore="restore(i.childMetaId)"
               :value="vals[i.childMetaId]"
               :metaId="i.childMetaId"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
+              :appendOuterIcon="compare(i.childMetaId) ? null : 'mdi-restore'"
             />
 
             <v-text-field
               v-if="i.meta.type === 'number'"
               v-model="vals[i.childMetaId]"
+              @click:append-outer="restore(i.childMetaId)"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
+              :appendOuterIcon="
+                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
+              "
               type="number"
               persistent-hint
             />
@@ -96,19 +110,27 @@
             <v-text-field
               v-if="i.meta.type === 'string'"
               v-model="vals[i.childMetaId]"
+              @click:append-outer="restore(i.childMetaId)"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
+              :appendOuterIcon="
+                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
+              "
               persistent-hint
             />
 
             <v-text-field
               v-if="i.meta.type === 'date'"
               @click="pickDate"
+              @click:append-outer="restore(i.childMetaId)"
               :value="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
+              :appendOuterIcon="
+                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
+              "
               persistent-hint
               readonly
             />
@@ -150,13 +172,18 @@
                 {{ i.meta.hint }}
               </div>
             </div>
+            <!-- TODO Date fix, clearable, restore -->
             <!-- TODO add color, country -->
           </v-col>
 
           <v-col v-if="meta.metaSetting.bookmark" cols="12" lg="6">
             <v-textarea
               v-model="vals.bookmark"
+              @click:append-outer="restore('bookmark')"
               :prepend-icon="showIcons ? 'mdi-bookmark' : ''"
+              :appendOuterIcon="
+                vals.bookmark === old.bookmark ? '' : 'mdi-restore'
+              "
               label="Bookmark"
               hide-details
               clearable
@@ -248,13 +275,9 @@ export default {
           console.log(e);
         });
 
-      const changeVal = (metaId, val) => {
-        this.$set(this.vals, metaId, val);
-      };
-
       const assigned = this.assigned;
       // creating all meta and their values
-      for (let i of assigned) changeVal(i.childMetaId, null);
+      for (let i of assigned) this.setVal(null, i.childMetaId);
 
       // parsing values and place their value into meta values
       for (let i of values) {
@@ -266,11 +289,11 @@ export default {
             v = Number(v);
             if (isNaN(v)) v = 0;
           } else if (type === "number") {
-            v = Number(v);
-            if (isNaN(v)) v = null;
+            // v = Number(v);
+            // if (isNaN(v)) v = null;
           }
         }
-        changeVal(i.metaId, v);
+        this.setVal(v, i.metaId);
       }
 
       // parsing items. creating array and place it into meta values
@@ -279,16 +302,17 @@ export default {
         if (!pi[i.metaId]) pi[i.metaId] = [i.itemId];
         else pi[i.metaId].push(i.itemId);
       }
-      for (let i in pi) changeVal(i, pi[i]);
+      for (let i in pi) this.setVal(pi[i], i);
 
+      this.vals = Object.assign({}, this.vals, this.vals);
       this.old = _.cloneDeep(this.vals);
       // TODO after deleling assigned meta (child meta) also delete values
     },
     nameRules(string) {
       return Vue.prototype.$validateName(string);
     },
-    setVal(val, metaId) {
-      this.vals[metaId] = val;
+    setVal(val, key) {
+      this.$set(this.vals, key, val);
     },
     openDialogColor() {},
     pickDate(index) {
@@ -300,9 +324,28 @@ export default {
       this.datePicker.dialog = false;
       this.val = date;
     },
+    compare(metaId) {
+      let arr1 = _.cloneDeep(this.vals[metaId]);
+      let arr2 = _.cloneDeep(this.old[metaId]);
+      if (arr1 === undefined || arr2 === undefined) return true;
+      return _.isEqual(arr1.sort(), arr2.sort());
+    },
+    restore(key) {
+      let val = _.cloneDeep(this.old[key]);
+      this.$set(this.vals, key, val);
+    },
     save() {
       if (!this.valid) return;
-      console.log("saved");
+      for (let key in this.vals) {
+        let v = this.vals[key];
+        let t = typeof v;
+        if (t == "string") {
+          v = v.trim();
+          console.log(v.length);
+          if (v.length == 0) this.vals[key] = null;
+        }
+      }
+      console.log(this.vals);
     },
   },
 };
