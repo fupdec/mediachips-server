@@ -103,7 +103,7 @@ exports.importDatabase = async (req, res) => {
       }))
       obj.videoMetadata = Videos.videos.map((i, x) => ({
         oldId: i.id, // its needed for parsing
-        duration: i.duration,
+        duration: i.duration || 0,
         width: +i.resolution.match(/\d*/)[0] || 0,
         height: +i.resolution.match(/\x(.*)/)[1] || 0,
       }))
@@ -130,9 +130,9 @@ exports.importDatabase = async (req, res) => {
             oldId: m.id,
             type: m.dataType,
             name: m.settings.name,
-            nameSingular: m.settings.name,
+            nameSingular: m.settings.name || null,
             icon: m.settings.icon || 'shape',
-            hint: m.settings.hint || '',
+            hint: m.settings.hint || null,
             createdAt: (new Date(m.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             metaSetting: {
@@ -178,7 +178,7 @@ exports.importDatabase = async (req, res) => {
             name: m.settings.name,
             nameSingular: m.settings.nameSingular,
             icon: m.settings.icon || 'shape',
-            hint: m.settings.hint || '',
+            hint: m.settings.hint || null,
             createdAt: (new Date(m.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(m.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
           }
@@ -214,6 +214,11 @@ exports.importDatabase = async (req, res) => {
             createdAt: (new Date(i.date).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
             updatedAt: (new Date(i.edit).toISOString()).replace('T', ' ').replace('Z', ' +00:00'),
           }))
+          for (let z of cards) {
+            for (let y in z) {
+              if (typeof z[y] == 'string' && z[y].length == 0) z[y] = null
+            }
+          }
           obj.items.push({
             [m.id]: cards
           })
@@ -231,6 +236,11 @@ exports.importDatabase = async (req, res) => {
       obj.onlyMeta = Videos.videos.map(i =>
         Object.fromEntries(Object.entries(i).filter(([key]) => !videoKeys.includes(key)))
       )
+      for (let z of obj.onlyMeta) {
+        for (let y in z) {
+          if (typeof z[y] == 'string' && z[y].length == 0) z[y] = null
+        }
+      }
       resolve(obj)
     })
   }
@@ -557,8 +567,8 @@ ffmpeg.setFfprobePath(pathToFfprobe)
 
 exports.checkFileExists = async (req, res) => {
   const filePath = path.join(req.body.path)
-  if (fs.existsSync(filePath)) res.send(201).status()
-  else res.send(400).status()
+  if (fs.existsSync(filePath)) res.sendStatus(201)
+  else res.sendStatus(400)
 }
 
 const getLocalPath = (outputPath) => {
