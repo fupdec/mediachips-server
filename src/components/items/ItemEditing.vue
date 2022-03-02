@@ -60,18 +60,17 @@
                 dense
                 hover
               />
-              <v-btn
+              <v-checkbox
                 v-if="meta.metaSetting.favorite"
-                @click="vals.favorite = !vals.favorite"
-                icon
-              >
-                <v-icon v-if="vals.favorite" size="20" color="pink"
-                  >mdi-heart</v-icon
-                >
-                <v-icon v-else size="20" color="grey"
-                  >mdi-heart-outline
-                </v-icon>
-              </v-btn>
+                v-model="vals.favorite"
+                :false-value="0"
+                :true-value="1"
+                off-icon="mdi-heart-outline"
+                on-icon="mdi-heart"
+                color="pink"
+                hide-details
+                class="ma-0"
+              />
             </div>
           </v-col>
 
@@ -221,13 +220,13 @@ export default {
     MetaInputArray,
   },
   async beforeMount() {
-    this.vals.name = this.item.name || "";
+    this.vals.name = this.item.name || null;
     this.vals.color = this.item.color || "#777";
-    this.vals.synonyms = this.item.synonyms;
+    this.vals.synonyms = this.item.synonyms || null;
     this.vals.rating = this.item.rating || 0;
-    this.vals.favorite = this.item.favorite || false;
-    this.vals.country = this.item.country || "";
-    this.vals.bookmark = this.item.bookmark || "";
+    this.vals.favorite = this.item.favorite || 0;
+    this.vals.country = this.item.country || null;
+    this.vals.bookmark = this.item.bookmark || null;
     await this.getMetaValues();
   },
   data: () => ({
@@ -334,18 +333,23 @@ export default {
       let val = _.cloneDeep(this.old[key]);
       this.$set(this.vals, key, val);
     },
-    save() {
+    async save() {
       if (!this.valid) return;
       for (let key in this.vals) {
         let v = this.vals[key];
         let t = typeof v;
         if (t == "string") {
           v = v.trim();
-          console.log(v.length);
-          if (v.length == 0) this.vals[key] = null;
+          if (v.length == 0) v = null;
         }
       }
-      console.log(this.vals);
+
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/item/" + this.item.id,
+        data: this.vals,
+      });
+      this.$emit("close");
     },
   },
 };

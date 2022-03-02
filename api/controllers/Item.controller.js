@@ -68,7 +68,20 @@ exports.getAll = (req, res) => {
 };
 
 // Update a Item by the id in the request
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  console.log(req.body, req.params.id)
+  Item.update(req.body, {
+    where: {
+      id: req.params.id,
+    }
+  }).then((data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
 
 // Delete a Item with the specified id in the request
 exports.delete = (req, res) => {};

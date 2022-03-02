@@ -41,7 +41,7 @@
             </v-carousel-item>
           </v-carousel>
 
-          <ItemEditing ref="editing" :item="item" :meta="meta" />
+          <ItemEditing @close="close" ref="editing" :item="item" :meta="meta" />
         </v-card-text>
       </v-card>
     </v-dialog>
