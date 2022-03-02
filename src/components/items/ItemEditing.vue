@@ -13,7 +13,6 @@
             <v-btn
               v-if="vals.name !== old.name"
               @click="restore('name')"
-              color="primary"
               class="restore"
               x-small
               icon
@@ -32,11 +31,11 @@
               v-model="vals.synonyms"
               :prepend-icon="showIcons ? 'mdi-alphabetical' : ''"
               label="Synonyms"
+              clearable
             />
             <v-btn
               v-if="vals.synonyms !== old.synonyms"
               @click="restore('synonyms')"
-              color="primary"
               class="restore"
               x-small
               icon
@@ -93,9 +92,7 @@
 
           <v-col v-if="meta.metaSetting.color" cols="12" lg="6" class="mt-3">
             <v-icon :color="vals.color" left>mdi-circle</v-icon>
-            <v-btn @click="openDialogColor" outlined rounded>
-              Change Color
-            </v-btn>
+            <v-btn @click="pickColor" outlined rounded> Change Color </v-btn>
           </v-col>
 
           <v-col
@@ -121,6 +118,7 @@
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               type="number"
               persistent-hint
+              clearable
             />
 
             <v-text-field
@@ -130,17 +128,19 @@
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               persistent-hint
+              clearable
             />
 
             <v-text-field
               v-if="i.meta.type === 'date'"
-              @click="pickDate"
+              @click="pickDate(i.childMetaId)"
               :value="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
               persistent-hint
               readonly
+              clearable
             />
 
             <div v-if="i.meta.type === 'rating'" class="d-flex flex-column">
@@ -184,7 +184,6 @@
             <v-btn
               v-if="!equalOld(i.childMetaId, i.meta.type)"
               @click="restore(i.childMetaId)"
-              color="primary"
               class="restore"
               x-small
               icon
@@ -195,24 +194,42 @@
             <!-- TODO add color, country -->
           </v-col>
 
-          <v-col v-if="meta.metaSetting.bookmark" cols="12" lg="6">
+          <v-col
+            v-if="meta.metaSetting.bookmark"
+            cols="12"
+            lg="6"
+            class="field"
+          >
             <v-textarea
               v-model="vals.bookmark"
-              @click:append-outer="restore('bookmark')"
               :prepend-icon="showIcons ? 'mdi-bookmark' : ''"
-              :appendOuterIcon="
-                vals.bookmark === old.bookmark ? '' : 'mdi-restore'
-              "
               label="Bookmark"
               hide-details
               clearable
               auto-grow
               outlined
             />
+            <v-btn
+              v-if="vals.bookmark !== old.bookmark"
+              @click="restore('bookmark')"
+              class="restore"
+              x-small
+              icon
+            >
+              <v-icon>mdi-restore</v-icon>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
     </v-form>
+
+    <ColorPicker
+      v-if="colorPicker.dialog"
+      :dialog="colorPicker.dialog"
+      :color="colorPicker.color"
+      @close="colorPicker.dialog = false"
+      @getColor="setColor($event)"
+    />
 
     <v-dialog v-model="datePicker.dialog">
       <v-date-picker
@@ -238,6 +255,7 @@ export default {
   },
   components: {
     MetaInputArray,
+    ColorPicker: () => import("@/components/elements/ColorPicker.vue"),
   },
   async beforeMount() {
     this.vals.name = this.item.name || null;
@@ -253,9 +271,13 @@ export default {
     valid: false,
     vals: {},
     old: {},
+    colorPicker: {
+      dialog: false,
+      color: null,
+    },
     datePicker: {
       dialog: false,
-      index: -1,
+      metaId: null,
       value: null,
     },
   }),
@@ -333,15 +355,22 @@ export default {
     setVal(val, key) {
       this.$set(this.vals, key, val);
     },
-    openDialogColor() {},
-    pickDate(index) {
+    pickColor() {
+      this.colorPicker.color = this.vals.color;
+      this.colorPicker.dialog = true;
+    },
+    setColor(e) {
+      this.vals.color = e;
+      this.colorPicker.dialog = false;
+    },
+    pickDate(metaId) {
       this.datePicker.dialog = true;
-      this.datePicker.value = this.val;
-      this.datePicker.index = index;
+      this.datePicker.value = this.vals[metaId];
+      this.datePicker.metaId = metaId;
     },
     setDate(date) {
       this.datePicker.dialog = false;
-      this.val = date;
+      this.vals[this.datePicker.metaId] = date;
     },
     equalOld(metaId, metaType) {
       let val = this.vals[metaId];
@@ -425,7 +454,7 @@ export default {
       });
 
       this.$emit("close");
-      this.$root.$emit("getItemsFromDb");
+      this.$root.$emit("getItemsFromDb", [this.item.id]);
     },
   },
 };

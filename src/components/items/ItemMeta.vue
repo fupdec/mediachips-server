@@ -157,6 +157,7 @@ export default {
   props: {
     item: Object,
     meta: Object,
+    upd: Array,
   },
   components: {
     NestedItems: () => import("@/components/items/NestedItems.vue"),
@@ -236,6 +237,14 @@ export default {
         });
     },
   },
-  watch: {},
+  watch: {
+    upd(arr) {
+      if (arr.includes(this.item.id)) {
+        this.getItems();
+        this.getValues();
+        console.log('updated')
+      }
+    },
+  },
 };
 </script>

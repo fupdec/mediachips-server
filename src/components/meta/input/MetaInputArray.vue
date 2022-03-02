@@ -10,12 +10,14 @@
     :menu-props="{ contentClass: 'list-with-preview' }"
     :label="meta.name"
     :hint="meta.hint"
+    append-icon="mdi-chevron-down"
     :prepend-icon="prependIcon"
     :persistent-hint="view.persistentHint"
     :hide-details="view.hideDetails"
     :outlined="view.outlined"
     hide-selected
     multiple
+    clearable
     class="val"
   >
     <!-- TODO add rules -->

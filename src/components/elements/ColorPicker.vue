@@ -3,7 +3,7 @@
     <v-card>
       <v-toolbar>
         <v-btn @click="apply" color="success" block depressed>
-          <v-icon left>mdi-check</v-icon> apply
+          <v-icon left>mdi-check</v-icon> Apply
         </v-btn>
       </v-toolbar>
       <v-color-picker @update:color="changeColor($event)" :value="palette" />

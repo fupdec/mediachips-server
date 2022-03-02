@@ -88,7 +88,13 @@
         { 'chips-grid': page.view == '2' },
       ]"
     >
-      <ItemMeta v-for="i in itemsOnPage" :key="i.id" :item="i" :meta="meta" />
+      <ItemMeta
+        v-for="i in itemsOnPage"
+        :key="i.id"
+        :item="i"
+        :meta="meta"
+        :upd="upd"
+      />
     </v-container>
 
     <v-pagination
@@ -161,7 +167,8 @@ export default {
     await this.init();
   },
   mounted() {
-    this.$root.$on("getItemsFromDb", () => {
+    this.$root.$on("getItemsFromDb", (ids) => {
+      this.upd = ids;
       this.getItemsFromDb();
     });
     this.$root.$on("setItemsFilters", async (val) => {
@@ -228,6 +235,7 @@ export default {
       show: false,
       timeout: false,
     },
+    upd: [],
   }),
   computed: {
     isInfiniteScroll() {
