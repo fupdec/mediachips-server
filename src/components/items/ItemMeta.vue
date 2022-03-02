@@ -70,10 +70,10 @@
 
         <v-btn
           @click.stop="dialogAbout = true"
-          fab
-          small
           color="primary"
           class="btn-edit"
+          small
+          fab
         >
           <v-icon>mdi-square-edit-outline</v-icon>
         </v-btn>
@@ -102,6 +102,7 @@
         :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
+        z-index="1"
         absolute
       >
         <v-icon v-if="isSelected" size="50">
@@ -137,6 +138,7 @@
         :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
+        z-index="1"
         absolute
       >
         <v-icon v-if="isSelected"> mdi-checkbox-marked-outline </v-icon>
@@ -242,7 +244,7 @@ export default {
       if (arr.includes(this.item.id)) {
         this.getItems();
         this.getValues();
-        console.log('updated')
+        console.log("updated");
       }
     },
   },

@@ -1,3 +1,11 @@
+@media (hover: none) {
+  .meta-card {
+    .btn-edit {
+      opacity: 0.85;
+    }
+  }
+}
+
 @media (hover: hover) {
   // scrollbar
   .scrollable {
