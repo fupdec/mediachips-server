@@ -1,7 +1,6 @@
 <template>
   <v-autocomplete
     @input="setVal($event)"
-    @click:append-outer="clickAppendOuter"
     :value="val"
     :items="listItems"
     item-value="id"
@@ -12,7 +11,6 @@
     :label="meta.name"
     :hint="meta.hint"
     :prepend-icon="prependIcon"
-    :appendOuterIcon="appendOuterIcon"
     :persistent-hint="view.persistentHint"
     :hide-details="view.hideDetails"
     :outlined="view.outlined"
@@ -75,7 +73,6 @@ export default {
     cond: null,
     value: Array,
     prependIcon: null,
-    appendOuterIcon: null,
   },
   async beforeMount() {
     await axios
@@ -137,9 +134,6 @@ export default {
     setVal(val) {
       this.val = val;
       this.$emit("input", val);
-    },
-    clickAppendOuter() {
-      this.$emit("restore");
     },
     showHoverImage(event, itemId) {
       Vue.prototype.$showHoverImage(event, this.metaId, itemId);

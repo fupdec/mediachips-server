@@ -1610,6 +1610,21 @@ pre {
   gap: 20px;
   grid-template-columns: 300px auto;
 }
+.editing {
+  &.show-icons {
+    .restore {
+      left: 13px;
+    }
+  }
+  .field {
+    position: relative;
+  }
+  .restore {
+    position: absolute;
+    top: 12px;
+    left: -10px;
+  }
+}
 // item page
 .item-header {
   display: flex;

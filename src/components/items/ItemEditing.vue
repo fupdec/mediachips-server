@@ -1,31 +1,48 @@
 <template>
-  <div class="editing">
+  <div class="editing" :class="{ 'show-icons': showIcons }">
     <v-form v-model="valid" ref="form" @submit.prevent>
       <v-container fluid>
         <v-row>
-          <v-col cols="12" lg="6">
+          <v-col cols="12" lg="6" class="field">
             <v-text-field
               v-model="vals.name"
-              @click:append-outer="restore('name')"
               :rules="[nameRules]"
-              :class="{ edited: vals.name !== old.name }"
               :prepend-icon="showIcons ? 'mdi-alphabetical-variant' : ''"
-              :appendOuterIcon="vals.name === old.name ? '' : 'mdi-restore'"
               label="Name"
             />
+            <v-btn
+              v-if="vals.name !== old.name"
+              @click="restore('name')"
+              color="primary"
+              class="restore"
+              x-small
+              icon
+            >
+              <v-icon>mdi-restore</v-icon>
+            </v-btn>
           </v-col>
 
-          <v-col v-if="meta.metaSetting.synonyms" cols="12" lg="6">
+          <v-col
+            v-if="meta.metaSetting.synonyms"
+            cols="12"
+            lg="6"
+            class="field"
+          >
             <v-text-field
               v-model="vals.synonyms"
-              @click:append-outer="restore('synonyms')"
-              label="Synonyms"
-              :class="{ edited: vals.synonyms !== old.synonyms }"
               :prepend-icon="showIcons ? 'mdi-alphabetical' : ''"
-              :appendOuterIcon="
-                vals.synonyms === old.synonyms ? '' : 'mdi-restore'
-              "
+              label="Synonyms"
             />
+            <v-btn
+              v-if="vals.synonyms !== old.synonyms"
+              @click="restore('synonyms')"
+              color="primary"
+              class="restore"
+              x-small
+              icon
+            >
+              <v-icon>mdi-restore</v-icon>
+            </v-btn>
           </v-col>
 
           <v-col
@@ -81,27 +98,27 @@
             </v-btn>
           </v-col>
 
-          <v-col v-for="(i, x) in assigned" :key="x" cols="12" lg="6">
+          <v-col
+            v-for="(i, x) in assigned"
+            :key="x"
+            cols="12"
+            lg="6"
+            class="field"
+          >
             <MetaInputArray
               v-if="i.meta.type === 'array'"
               @input="setVal($event, i.meta.id)"
-              @restore="restore(i.childMetaId)"
               :value="vals[i.childMetaId]"
               :metaId="i.childMetaId"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
-              :appendOuterIcon="compare(i.childMetaId) ? null : 'mdi-restore'"
             />
 
             <v-text-field
               v-if="i.meta.type === 'number'"
               v-model="vals[i.childMetaId]"
-              @click:append-outer="restore(i.childMetaId)"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
-              :appendOuterIcon="
-                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
-              "
               type="number"
               persistent-hint
             />
@@ -109,27 +126,19 @@
             <v-text-field
               v-if="i.meta.type === 'string'"
               v-model="vals[i.childMetaId]"
-              @click:append-outer="restore(i.childMetaId)"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
-              :appendOuterIcon="
-                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
-              "
               persistent-hint
             />
 
             <v-text-field
               v-if="i.meta.type === 'date'"
               @click="pickDate"
-              @click:append-outer="restore(i.childMetaId)"
               :value="vals[i.childMetaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
-              :appendOuterIcon="
-                vals[i.childMetaId] === old[i.childMetaId] ? '' : 'mdi-restore'
-              "
               persistent-hint
               readonly
             />
@@ -171,6 +180,17 @@
                 {{ i.meta.hint }}
               </div>
             </div>
+
+            <v-btn
+              v-if="!equalOld(i.childMetaId)"
+              @click="restore(i.childMetaId)"
+              color="primary"
+              class="restore"
+              x-small
+              icon
+            >
+              <v-icon>mdi-restore</v-icon>
+            </v-btn>
             <!-- TODO Date fix, clearable, restore -->
             <!-- TODO add color, country -->
           </v-col>
@@ -323,11 +343,13 @@ export default {
       this.datePicker.dialog = false;
       this.val = date;
     },
-    compare(metaId) {
-      let arr1 = _.cloneDeep(this.vals[metaId]);
-      let arr2 = _.cloneDeep(this.old[metaId]);
-      if (arr1 === undefined || arr2 === undefined) return true;
-      return _.isEqual(arr1.sort(), arr2.sort());
+    equalOld(metaId) {
+      let val = _.cloneDeep(this.vals[metaId]);
+      let old = _.cloneDeep(this.old[metaId]);
+      if (val === undefined || old === undefined) return true;
+      let type = typeof val;
+      if (type == "object") return _.isEqual(val.sort(), old.sort());
+      else return val === old;
     },
     restore(key) {
       let val = _.cloneDeep(this.old[key]);
