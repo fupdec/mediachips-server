@@ -1,14 +1,20 @@
-const db = require("../index.js");
 const {
   Meta,
   ValuesInItem
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
-// Create and Save a new Tutorial
-exports.create = (req, res) => {};
+// Create and Save a new Value
+exports.create = (req, res) => {
+  ValuesInItem.bulkCreate(req.body).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
-// Retrieve all Tutorials from the database.
+// Retrieve all Values from the database.
 exports.findAll = (req, res) => {
   if (!req.body) return res.sendStatus(400)
 
@@ -26,14 +32,29 @@ exports.findAll = (req, res) => {
   })
 };
 
-// Find a single Tutorial with an id
+// Find a single Value with an id
 exports.findOne = (req, res) => {};
 
-// Update a Tutorial by the id in the request
+// Update a Value by the id in the request
 exports.update = (req, res) => {};
 
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {};
+// Delete a Value with the specified id in the request
+exports.delete = (req, res) => {
+  ValuesInItem
+    .destroy({
+      where: {
+        itemId: req.params.id
+      }
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
-// Delete all Tutorials from the database.
+// Delete all Values from the database.
 exports.deleteAll = (req, res) => {};

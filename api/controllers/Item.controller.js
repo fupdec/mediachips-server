@@ -69,7 +69,6 @@ exports.getAll = (req, res) => {
 
 // Update a Item by the id in the request
 exports.update = (req, res) => {
-  console.log(req.body, req.params.id)
   Item.update(req.body, {
     where: {
       id: req.params.id,

@@ -5,7 +5,15 @@ const {
 } = require("../index.js");
 
 // Create and Save a new ItemsInItem
-exports.create = (req, res) => {};
+exports.create = (req, res) => {
+  ItemsInItem.bulkCreate(req.body).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
 // Retrieve all ItemsInItems from the database.
 exports.findAll = (req, res) => {
@@ -30,14 +38,20 @@ exports.findAll = (req, res) => {
   })
 };
 
-// Find a single ItemsInItem with an id
-exports.findOne = (req, res) => {};
-
-// Update a ItemsInItem by the id in the request
-exports.update = (req, res) => {};
-
 // Delete a ItemsInItem with the specified id in the request
-exports.delete = (req, res) => {};
-
-// Delete all ItemsInItem from the database
-exports.deleteAll = (req, res) => {};
+exports.delete = (req, res) => {
+  ItemsInItem
+    .destroy({
+      where: {
+        parentItemId: req.params.id
+      }
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};

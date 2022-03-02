@@ -182,7 +182,7 @@
             </div>
 
             <v-btn
-              v-if="!equalOld(i.childMetaId)"
+              v-if="!equalOld(i.childMetaId, i.meta.type)"
               @click="restore(i.childMetaId)"
               color="primary"
               class="restore"
@@ -343,13 +343,16 @@ export default {
       this.datePicker.dialog = false;
       this.val = date;
     },
-    equalOld(metaId) {
-      let val = _.cloneDeep(this.vals[metaId]);
-      let old = _.cloneDeep(this.old[metaId]);
-      if (val === undefined || old === undefined) return true;
-      let type = typeof val;
-      if (type == "object") return _.isEqual(val.sort(), old.sort());
-      else return val === old;
+    equalOld(metaId, metaType) {
+      let val = this.vals[metaId];
+      let old = this.old[metaId];
+      if (metaType == "array") {
+        val = _.cloneDeep(val);
+        old = _.cloneDeep(old);
+        if (!val) val = [];
+        if (!old) old = [];
+        return _.isEqual(val.sort(), old.sort());
+      } else return val === old;
     },
     restore(key) {
       let val = _.cloneDeep(this.old[key]);
@@ -357,12 +360,35 @@ export default {
     },
     async save() {
       if (!this.valid) return;
+
+      let items = [];
+      let values = [];
+
       for (let key in this.vals) {
         let v = this.vals[key];
-        let t = typeof v;
-        if (t == "string") {
+        let tv = typeof v;
+        let isMeta = /\d/.test(key);
+        if (tv == "string") {
           v = v.trim();
           if (v.length == 0) v = null;
+        } else if (tv == "object") {
+          let ids = _.cloneDeep(v);
+          // collecting items of item
+          for (let id in ids) {
+            items.push({
+              parentItemId: this.item.id,
+              itemId: ids[id],
+              metaId: key,
+            });
+          }
+        }
+        // collecting values of item
+        if (isMeta && tv !== "object") {
+          values.push({
+            value: v,
+            itemId: this.item.id,
+            metaId: key,
+          });
         }
       }
 
@@ -371,7 +397,35 @@ export default {
         url: this.apiUrl + "/api/item/" + this.item.id,
         data: this.vals,
       });
+
+      // removing existed items of item
+      await axios({
+        method: "delete",
+        url: this.apiUrl + "/api/ItemsInItem/" + this.item.id,
+      });
+
+      // adding new items of item
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/ItemsInItem",
+        data: items,
+      });
+
+      // removing existed values of item
+      await axios({
+        method: "delete",
+        url: this.apiUrl + "/api/ValuesInItem/" + this.item.id,
+      });
+
+      // adding new values of item
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/ValuesInItem",
+        data: values,
+      });
+
       this.$emit("close");
+      this.$root.$emit("getItemsFromDb");
     },
   },
 };

@@ -161,6 +161,9 @@ export default {
     await this.init();
   },
   mounted() {
+    this.$root.$on("getItemsFromDb", () => {
+      this.getItemsFromDb();
+    });
     this.$root.$on("setItemsFilters", async (val) => {
       this.updatePageSetting({
         page: 1,
@@ -206,6 +209,7 @@ export default {
     this.$nextTick(async () => {});
   },
   beforeDestroy() {
+    this.$root.$off("getItemsFromDb");
     this.$root.$off("setItemsFilters");
     this.$root.$off("setItemsLimit");
     this.$root.$off("setItemsSortDir");
