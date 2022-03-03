@@ -244,7 +244,6 @@ export default {
       if (arr.includes(this.item.id)) {
         this.getItems();
         this.getValues();
-        console.log("updated");
       }
     },
   },

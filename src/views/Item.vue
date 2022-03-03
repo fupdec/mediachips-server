@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div class="item-header pa-3 pa-sm-6" :style="gradient">
+    <v-sheet
+      color="transparent"
+      class="item-header pa-3 pa-sm-6"
+      :style="gradient"
+      :dark="isTextDark"
+      :light="!isTextDark"
+    >
       <div class="main-img">
         <v-hover v-slot="{ hover }">
           <v-img
@@ -26,24 +32,31 @@
 
         <div class="item-name">{{ item.name }}</div>
 
-        <div class="d-flex my-2">
+        <div class="d-flex align-center my-2">
           <v-rating
             v-if="meta.metaSetting.rating"
             :value="item.rating"
-            dense
+            @input="setVal($event, 'rating')"
+            background-color="inherit"
+            color="inherit"
+            class="mr-4"
             half-increments
-            hover
             clearable
-            color="yellow darken-2"
-            background-color="grey"
-            empty-icon="mdi-star-outline"
-            half-icon="mdi-star-half-full"
+            dense
+            hover
           />
-
-          <div v-if="meta.metaSetting.favorite">
-            <v-icon v-if="item.favorite" right color="pink">mdi-heart</v-icon>
-            <v-icon v-else right>mdi-heart-outline</v-icon>
-          </div>
+          <v-checkbox
+            v-if="meta.metaSetting.favorite"
+            :value="item.favorite"
+            @change="setVal($event, 'favorite')"
+            :false-value="0"
+            :true-value="1"
+            off-icon="mdi-heart-outline"
+            on-icon="mdi-heart"
+            color="inherit"
+            hide-details
+            class="ma-0 pa-0"
+          />
         </div>
 
         <v-chip-group column>
@@ -68,7 +81,7 @@
           </v-chip>
         </v-chip-group>
       </div>
-    </div>
+    </v-sheet>
 
     <!-- <v-tabs
       v-model="tab"
@@ -154,6 +167,8 @@ export default {
     cropperOps: {
       aspectRatio: 1,
     },
+    bgc: "#777",
+    gradient: "linear-gradient(180deg, #777, transparent)",
   }),
   computed: {
     apiUrl() {
@@ -168,18 +183,8 @@ export default {
     itemId() {
       return +this.$route.query.itemId;
     },
-    gradient() {
-      let back = "background-image: ";
-      if (this.images.header && !this.images.header.includes("ghost")) {
-        if (this.$vuetify.theme.dark)
-          back += `linear-gradient(0deg, #121212, transparent, transparent)`;
-        else back += `linear-gradient(0deg, #fff, transparent, transparent)`;
-        back += `, url(${this.images.header})`;
-      } else {
-        let color = this.item.color || "#777";
-        back += `linear-gradient(180deg, ${color}, transparent)`;
-      }
-      return back;
+    isTextDark() {
+      return Vue.prototype.$checkColorForDarkText(this.bgc);
     },
   },
   methods: {
@@ -187,6 +192,7 @@ export default {
       await this.getMeta();
       await this.getItem();
       await this.getImages();
+      await this.getGradient();
       await this.getItems();
       await this.getValues();
       this.cropperOps.aspectRatio = this.meta.metaSetting.imageAspectRatio;
@@ -251,6 +257,30 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+    async getGradient() {
+      let bg = "background-image: ";
+      if (this.images.header && !this.images.header.includes("ghost")) {
+        bg += `linear-gradient(0deg,`;
+        if (this.$vuetify.theme.dark) this.bgc = "#121212";
+        else this.bgc = "#fff";
+        bg += `${this.bgc}, transparent, transparent), url(${this.images.header})`;
+      } else {
+        if (this.item.color) this.bgc = this.item.color;
+        else if (this.images.main && !this.images.main.includes("ghost"))
+          this.bgc = await Vue.prototype.$getAverageColor(this.images.main);
+        bg += `linear-gradient(180deg, ${this.bgc}, transparent)`;
+      }
+      this.gradient = bg;
+    },
+    async setVal(val, key) {
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/item/" + this.item.id,
+        data: {
+          [key]: val,
+        },
+      });
     },
   },
 };

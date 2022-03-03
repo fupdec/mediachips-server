@@ -202,7 +202,7 @@ const Readable = {
       );
 
       // Using the HSP value, determine whether the color is light or dark
-      return hsp < 160
+      return hsp < 150
     }
     Vue.prototype.$showHoverImage = function (event, metaId, itemId) {
       if (event.buttons !== 0) return
@@ -297,7 +297,21 @@ const Readable = {
       q += "GROUP BY id ";
       q += `ORDER BY ${sets.sortBy} ${sets.sortDir} `;
       return q
-    };
+    }
+    Vue.prototype.$getAverageColor = function (src) {
+      return new Promise((resolve) => {
+        let context = document.createElement("canvas").getContext("2d");
+        context.imageSmoothingEnabled = true;
+        let img = new Image();
+        img.src = src;
+        img.onload = () => {
+          context.drawImage(img, 0, 0, 1, 1);
+          let res = context.getImageData(0, 0, 1, 1).data.slice(0, 3)
+          let color = "rgb(" + res[0] + "," + res[1] + "," + res[2] + ")"
+          resolve(color);
+        };
+      });
+    }
   }
 }
 
