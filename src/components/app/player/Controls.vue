@@ -457,6 +457,7 @@ export default {
       this.p.marksVisible = !this.p.marksVisible;
     },
     toggleMute() {
+      this.p.player.muted = !this.p.player.muted;
       this.p.muted = !this.p.muted;
       let text = (this.p.volume * 100).toFixed() + " %";
       if (this.p.muted) text = "Muted";
