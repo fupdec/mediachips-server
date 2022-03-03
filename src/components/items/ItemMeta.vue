@@ -49,20 +49,20 @@
           hide-details
         />
 
-        <div v-if="meta.metaSetting.rating" class="rating-wrapper">
-          <v-rating
-            :value="item.rating"
-            @input="setVal($event, 'rating')"
-            color="yellow darken-2"
-            background-color="grey"
-            empty-icon="mdi-star-outline"
-            half-icon="mdi-star-half-full"
-            half-increments
-            clearable
-            dense
-            hover
-          />
-        </div>
+        <v-rating
+          v-if="meta.metaSetting.rating"
+          :value="item.rating"
+          @input="setVal($event, 'rating')"
+          color="yellow darken-2"
+          background-color="#eee"
+          class="rating"
+          empty-icon="mdi-star-outline"
+          half-icon="mdi-star-half-full"
+          half-increments
+          clearable
+          dense
+          hover
+        />
 
         <v-icon
           v-if="meta.metaSetting.bookmark && item.bookmark"

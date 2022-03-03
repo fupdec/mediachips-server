@@ -34,9 +34,9 @@
         <v-rating
           :value="video.rating"
           @input="setVal($event, 'rating')"
-          class="rating rating-wrapper"
           color="yellow darken-2"
-          background-color="grey darken-1"
+          background-color="#eee"
+          class="rating"
           empty-icon="mdi-star-outline"
           half-icon="mdi-star-half-full"
           dense
