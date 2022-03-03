@@ -75,7 +75,7 @@
 @media (max-width: 480px) {
   .card-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    &.card-size {
+    &.item-size {
       &-1 {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
       }
@@ -92,7 +92,7 @@
   }
   .card-grid.wide-image {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    &.card-size {
+    &.item-size {
       &-1 {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
       }

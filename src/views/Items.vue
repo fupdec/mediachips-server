@@ -63,7 +63,7 @@
       fluid
       class="wide-image videos-selection"
       :class="[
-        `card-size-${page.size}`,
+        `item-size-${page.size}`,
         `gap-size-${sets.gapSize}`,
         { 'card-grid': page.view == '1' },
         { 'line-grid': page.view == '2' },
@@ -82,7 +82,7 @@
       v-else-if="isMetaPage"
       fluid
       :class="[
-        `card-size-${page.size}`,
+        `item-size-${page.size}`,
         `gap-size-${sets.gapSize}`,
         { 'card-grid': page.view == '1' },
         { 'chips-grid': page.view == '2' },

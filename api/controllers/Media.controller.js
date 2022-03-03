@@ -57,8 +57,19 @@ exports.countInItem = (req, res) => {
 exports.findOne = (req, res) => {};
 
 // Update a Media by the id in the request
-exports.update = (req, res) => {};
-
+exports.update = (req, res) => {
+  Media.update(req.body, {
+    where: {
+      id: req.params.id,
+    }
+  }).then((data) => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while retrieving media."
+    })
+  })
+};
 // Delete a Media with the specified id in the request
 exports.delete = (req, res) => {};
 

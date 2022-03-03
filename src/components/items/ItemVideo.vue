@@ -33,7 +33,7 @@
 
         <v-rating
           :value="video.rating"
-          @input="changeRating($event, video.id)"
+          @input="setVal($event, 'rating')"
           class="rating rating-wrapper"
           color="yellow darken-2"
           background-color="grey darken-1"
@@ -45,10 +45,17 @@
           clearable
         />
 
-        <v-btn class="fav-btn" color="pink" absolute icon>
-          <v-icon v-if="video.favorite" color="pink"> mdi-heart </v-icon>
-          <v-icon v-else color="grey"> mdi-heart-outline </v-icon>
-        </v-btn>
+        <v-checkbox
+          v-model="video.favorite"
+          @change="setVal($event, 'favorite')"
+          :false-value="0"
+          :true-value="1"
+          off-icon="mdi-heart-outline"
+          on-icon="mdi-heart"
+          color="pink"
+          class="ma-0 pa-0 fav-btn"
+          hide-details
+        />
 
         <div class="duration" v-html="duration" />
 
@@ -429,6 +436,16 @@ export default {
     async checkFileExists() {
       let res = await Vue.prototype.$checkFileExists(this.video.path);
       this.isFileExists = res.status == 201;
+    },
+    async setVal(val, key) {
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/media/" + this.video.id,
+        data: {
+          [key]: val,
+        },
+      });
+      this.$root.$emit("getItemsFromDb", []);
     },
   },
   watch: {

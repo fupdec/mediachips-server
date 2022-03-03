@@ -1,27 +1,27 @@
 <template>
-  <div>
+  <div class="nested-items">
     <!-- Video meta -->
     <v-chip v-if="type == 'video'" label outlined>
-      <v-icon left>mdi-monitor-screenshot</v-icon>
+      <v-icon>mdi-monitor-screenshot</v-icon>
       {{ metadata.resolution }}
     </v-chip>
 
     <v-chip v-if="type == 'video'" label outlined>
-      <v-icon left>mdi-harddisk</v-icon>
+      <v-icon>mdi-harddisk</v-icon>
       {{ metadata.filesize }}
     </v-chip>
 
     <v-chip v-if="type == 'video'" label outlined>
-      <v-icon left>mdi-file-video-outline</v-icon>
+      <v-icon>mdi-file-video-outline</v-icon>
       {{ metadata.fileExtension }}
     </v-chip>
 
     <v-chip v-if="type == 'meta'" label outlined title="Number of videos">
-      <v-icon class="mr-1">mdi-video-outline</v-icon> {{ numberOfMedia }}
+      <v-icon>mdi-video-outline</v-icon> {{ numberOfMedia }}
     </v-chip>
 
     <v-chip label outlined title="Number of views">
-      <v-icon class="mr-1">mdi-eye-outline</v-icon> {{ item.views }}
+      <v-icon>mdi-eye-outline</v-icon> {{ item.views }}
     </v-chip>
 
     <v-chip
@@ -33,7 +33,7 @@
       :text-color="getTextColor(i.item.color)"
       v-show="checkShow(i.item.metaId)"
     >
-      <v-icon class="mr-1">mdi-{{ i.item.meta.icon }}</v-icon>
+      <v-icon>mdi-{{ i.item.meta.icon }}</v-icon>
       {{ i.item.name }}
     </v-chip>
 
@@ -45,7 +45,7 @@
       :title="i.meta.name"
       v-show="checkShow(i.metaId)"
     >
-      <v-icon class="mr-1">mdi-{{ i.meta.icon }}</v-icon>
+      <v-icon>mdi-{{ i.meta.icon }}</v-icon>
       {{ i.value }}
     </v-chip>
   </div>

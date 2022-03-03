@@ -35,28 +35,32 @@
         <div v-if="images.custom2" class="custom2-img-button">2</div>
         <v-img :src="images.custom2" class="custom2-img" />
 
-        <v-btn
+        <v-checkbox
           v-if="meta.metaSetting.favorite"
-          class="fav-btn"
+          v-model="item.favorite"
+          @click.stop=""
+          @change="setVal($event, 'favorite')"
+          :false-value="0"
+          :true-value="1"
+          off-icon="mdi-heart-outline"
+          on-icon="mdi-heart"
           color="pink"
-          absolute
-          icon
-        >
-          <v-icon v-if="item.favorite" color="pink"> mdi-heart </v-icon>
-          <v-icon v-else color="grey"> mdi-heart-outline </v-icon>
-        </v-btn>
+          class="ma-0 pa-0 fav-btn"
+          hide-details
+        />
 
         <div v-if="meta.metaSetting.rating" class="rating-wrapper">
           <v-rating
             :value="item.rating"
-            dense
-            half-increments
-            hover
-            clearable
+            @input="setVal($event, 'rating')"
             color="yellow darken-2"
             background-color="grey"
             empty-icon="mdi-star-outline"
             half-icon="mdi-star-half-full"
+            half-increments
+            clearable
+            dense
+            hover
           />
         </div>
 
@@ -237,6 +241,16 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+    async setVal(val, key) {
+      await axios({
+        method: "put",
+        url: this.apiUrl + "/api/item/" + this.item.id,
+        data: {
+          [key]: val,
+        },
+      });
+      this.$root.$emit("getItemsFromDb", []);
     },
   },
   watch: {
