@@ -216,7 +216,8 @@ exports.importDatabase = async (req, res) => {
           }))
           for (let z of cards) {
             for (let y in z) {
-              if (typeof z[y] == 'string' && z[y].length == 0) z[y] = null
+              if (typeof z[y] == 'string' && z[y].length == 0) delete z[y]
+              else if (z[y] === null) delete z[y]
             }
           }
           obj.items.push({
@@ -238,7 +239,8 @@ exports.importDatabase = async (req, res) => {
       )
       for (let z of obj.onlyMeta) {
         for (let y in z) {
-          if (typeof z[y] == 'string' && z[y].length == 0) z[y] = null
+          if (typeof z[y] == 'string' && z[y].length == 0) delete z[y]
+          else if (z[y] === null) delete z[y]
         }
       }
       resolve(obj)
@@ -412,6 +414,7 @@ exports.importDatabase = async (req, res) => {
               }
             }
           } else {
+            if (val !== null && val !== '')
             valuesInMedia.push({
               value: val,
               metaId: m.id,
@@ -468,7 +471,7 @@ exports.importDatabase = async (req, res) => {
               }
             }
           } else {
-            if (val !== 0 && val !== '')
+            if (val !== null && val !== '')
               valuesInItem.push({
                 value: val,
                 metaId: metaOfItem.id,
