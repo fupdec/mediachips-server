@@ -65,7 +65,7 @@ import DialogHeader from "@/components/elements/DialogHeader.vue";
 const path = require("path");
 
 export default {
-  name: "DialogItemAbout",
+  name: "DialogItemEditing",
   props: {
     dialog: Boolean,
     item: Object,

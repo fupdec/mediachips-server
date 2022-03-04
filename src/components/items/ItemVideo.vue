@@ -94,6 +94,16 @@
             />
           </div>
         </div>
+
+        <v-btn
+          @click.stop="dialogEditing = true"
+          color="primary"
+          class="btn-edit"
+          small
+          fab
+        >
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
       </v-responsive>
 
       <div class="description">
@@ -126,6 +136,13 @@
           mdi-checkbox-marked-outline
         </v-icon>
       </v-overlay>
+
+      <DialogMediaEditing
+        v-if="dialogEditing"
+        @close="dialogEditing = false"
+        :dialog="dialogEditing"
+        :media="video"
+      />
     </v-card>
 
     <v-card
@@ -213,7 +230,7 @@
 import Vue from "vue";
 import axios from "axios";
 import ComputedForItem from "@/mixins/ComputedForItem";
-import NestedItems from "./NestedItems.vue";
+import NestedItems from "@/components/items/NestedItems.vue";
 const path = require("path");
 
 export default {
@@ -223,7 +240,11 @@ export default {
     reg: Boolean,
     x: Number,
   },
-  components: { NestedItems },
+  components: {
+    NestedItems,
+    DialogMediaEditing: () =>
+      import("@/components/dialogs/DialogMediaEditing.vue"),
+  },
   mixins: [ComputedForItem],
   async beforeMount() {
     await this.getMetadata();
@@ -257,6 +278,7 @@ export default {
     timelines: [5, 15, 25, 35, 45, 55, 65, 75, 85, 95],
     timeouts: {},
     isFileExists: true,
+    dialogEditing: false,
   }),
   computed: {
     apiUrl() {

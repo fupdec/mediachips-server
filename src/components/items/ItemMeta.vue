@@ -74,13 +74,13 @@
         />
 
         <v-btn
-          @click.stop="dialogAbout = true"
+          @click.stop="dialogEditing = true"
           color="primary"
           class="btn-edit"
           small
           fab
         >
-          <v-icon>mdi-square-edit-outline</v-icon>
+          <v-icon>mdi-pencil</v-icon>
         </v-btn>
       </div>
 
@@ -115,10 +115,10 @@
         </v-icon>
       </v-overlay>
 
-      <DialogItemAbout
-        v-if="dialogAbout"
-        @close="dialogAbout = false"
-        :dialog="dialogAbout"
+      <DialogItemEditing
+        v-if="dialogEditing"
+        @close="dialogEditing = false"
+        :dialog="dialogEditing"
         :item="item"
         :meta="meta"
       />
@@ -156,6 +156,7 @@
 import Vue from "vue";
 import axios from "axios";
 import ComputedForItem from "@/mixins/ComputedForItem";
+import NestedItems from "@/components/items/NestedItems.vue";
 
 const path = require("path");
 
@@ -167,8 +168,9 @@ export default {
     upd: Array,
   },
   components: {
-    NestedItems: () => import("@/components/items/NestedItems.vue"),
-    DialogItemAbout: () => import("@/components/dialogs/DialogItemAbout.vue"),
+    NestedItems,
+    DialogItemEditing: () =>
+      import("@/components/dialogs/DialogItemEditing.vue"),
   },
   mixins: [ComputedForItem],
   mounted() {
@@ -185,7 +187,7 @@ export default {
     },
     items: [],
     values: [],
-    dialogAbout: false,
+    dialogEditing: false,
   }),
   computed: {
     apiUrl() {
