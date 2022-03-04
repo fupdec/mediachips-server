@@ -10,7 +10,7 @@
       <div class="main-img">
         <v-hover v-slot="{ hover }">
           <v-img
-            @click="dialogEditImage = true"
+            @click="dialogImageEditing = true"
             :src="images.main"
             :aspect-ratio="meta.metaSetting.imageAspectRatio"
             style="cursor: pointer"
@@ -104,11 +104,11 @@
       </v-tab-item>
     </v-tabs-items> -->
     <Items />
-    <DialogEditImage
-      v-if="dialogEditImage"
+    <DialogImageEditing
+      v-if="dialogImageEditing"
       @edited="getImages"
-      @close="dialogEditImage = false"
-      :dialog="dialogEditImage"
+      @close="dialogImageEditing = false"
+      :dialog="dialogImageEditing"
       :image="images.main"
       :options="cropperOps"
       :imagePath="imgPath"
@@ -126,7 +126,7 @@ export default {
   name: "Item",
   components: {
     Items: () => import("@/views/Items.vue"),
-    DialogEditImage: () => import("@/components/dialogs/DialogEditImage.vue"),
+    DialogImageEditing: () => import("@/components/dialogs/DialogImageEditing.vue"),
   },
   async beforeMount() {
     const filter = await Vue.prototype.$createDbEntry(
@@ -162,7 +162,7 @@ export default {
     items: [],
     values: [],
     // editing image
-    dialogEditImage: false,
+    dialogImageEditing: false,
     imgPath: "",
     cropperOps: {
       aspectRatio: 1,

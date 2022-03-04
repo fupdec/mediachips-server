@@ -46,11 +46,11 @@
       </v-card>
     </v-dialog>
 
-    <DialogEditImage
-      v-if="dialogEditImage"
+    <DialogImageEditing
+      v-if="dialogImageEditing"
       @edited="getImages"
-      @close="dialogEditImage = false"
-      :dialog="dialogEditImage"
+      @close="dialogImageEditing = false"
+      :dialog="dialogImageEditing"
       :image="selectedImage"
       :options="cropperOps"
       :imagePath="imgPath"
@@ -73,7 +73,7 @@ export default {
   },
   components: {
     DialogHeader,
-    DialogEditImage: () => import("@/components/dialogs/DialogEditImage.vue"),
+    DialogImageEditing: () => import("@/components/dialogs/DialogImageEditing.vue"),
     ItemEditing: () => import("@/components/items/ItemEditing.vue"),
   },
   mounted() {
@@ -82,7 +82,7 @@ export default {
   },
   data: () => ({
     images: [],
-    dialogEditImage: false,
+    dialogImageEditing: false,
     selectedImage: null,
     imgPath: "",
     cropperOps: {
@@ -151,7 +151,7 @@ export default {
       }, 100);
     },
     edit(i) {
-      this.dialogEditImage = true;
+      this.dialogImageEditing = true;
       this.selectedImage = i.src;
       this.imgPath = i.path;
       this.cropperOps.aspectRatio = i.ar;

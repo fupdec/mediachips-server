@@ -50,10 +50,10 @@
     </v-dialog>
 
     <DialogDeleteConfirm
-      v-if="dialogDeleteImage"
-      @close="dialogDeleteImage = false"
+      v-if="dialogImageDeleting"
+      @close="dialogImageDeleting = false"
       @delete="deleteImage"
-      :dialog="dialogDeleteImage"
+      :dialog="dialogImageDeleting"
       :text="textDialogDelete"
     />
   </div>
@@ -77,7 +77,7 @@ const FilePond = vueFilePond(
 );
 
 export default {
-  name: "DialogEditImage",
+  name: "DialogImageEditing",
   props: {
     dialog: Boolean,
     image: String,
@@ -98,7 +98,7 @@ export default {
     });
   },
   data: () => ({
-    dialogDeleteImage: false,
+    dialogImageDeleting: false,
     // cropper
     src: null,
     width: null,
@@ -121,7 +121,7 @@ export default {
         color: "error",
         outlined: false,
         function: () => {
-          this.dialogDeleteImage = true;
+          this.dialogImageDeleting = true;
         },
       });
       this.buttons.push({
@@ -147,7 +147,7 @@ export default {
     },
     async deleteImage() {
       this.src = "";
-      this.dialogDeleteImage = false;
+      this.dialogImageDeleting = false;
       await Vue.prototype.$deleteLocalImage(this.imagePath);
       this.close();
       this.$emit("edited");
