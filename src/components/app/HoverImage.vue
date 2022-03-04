@@ -1,9 +1,9 @@
 <template>
   <div
-    v-show="$store.state.hover.show"
+    v-show="hover.show"
     class="hover-image"
-    :style="`top:${$store.state.hover.y + 30}px; 
-        left:${$store.state.hover.x + 30}px;`"
+    :style="`top:${hover.y + 30}px; 
+        left:${hover.x + 30}px;`"
   >
     <img :src="src" />
   </div>
@@ -19,8 +19,8 @@ export default {
     src: null,
   }),
   computed: {
-    itemId() {
-      return this.$store.state.hover.itemId;
+    hover() {
+      return this.$store.state.hover;
     },
   },
   methods: {
@@ -28,14 +28,14 @@ export default {
       let imgPath = path.join(
         __dirname,
         "/userfiles/media/meta/",
-        `${this.$store.state.hover.metaId}`,
-        `${this.$store.state.hover.itemId}_main.jpg`
+        `${this.hover.metaId}`,
+        `${this.hover.itemId}_main.jpg`
       );
       this.src = await Vue.prototype.$getLocalImage(imgPath);
     },
   },
   watch: {
-    async itemId() {
+    async "hover.itemId"() {
       this.src = null;
       await this.getHoveredImage();
     },

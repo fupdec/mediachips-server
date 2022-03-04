@@ -47,6 +47,7 @@
           color="pink"
           class="ma-0 pa-0 fav-btn"
           hide-details
+          dark
         />
 
         <v-rating
@@ -131,7 +132,7 @@
       :label="meta.metaSetting.chipLabel"
       :outlined="meta.metaSetting.chipOutlined"
       @mouseover.stop="hoverImage($event, item.metaId, item.id)"
-      @mouseleave.stop="$store.state.hover.show = false"
+      @mouseleave.stop="hideHoverImage"
     >
       <v-avatar>
         <v-img :src="images.main" position="top" />

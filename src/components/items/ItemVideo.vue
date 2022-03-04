@@ -55,6 +55,7 @@
           color="pink"
           class="ma-0 pa-0 fav-btn"
           hide-details
+          dark
         />
 
         <div class="duration" v-html="duration" />

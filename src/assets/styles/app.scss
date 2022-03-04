@@ -199,7 +199,7 @@ pre {
   display: flex;
   flex-direction: column;
   opacity: 0;
-  animation: appearing 0.2s 0.5s forwards;
+  animation: appearing 0.2s forwards;
   transition: all 0.3s ease;
 }
 .group-buttons {

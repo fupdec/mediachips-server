@@ -220,10 +220,10 @@ const Readable = {
       options.store.state.hover.itemId = itemId
       options.store.state.hover.metaId = metaId
 
-      options.store.state.hover.time = new Date().getTime()
+      options.store.state.hover.delay = new Date().getTime()
       setTimeout(() => {
         let currentTime = new Date().getTime()
-        if (currentTime - options.store.state.hover.time > 4500)
+        if (currentTime - options.store.state.hover.delay > 4500)
           options.store.state.hover.show = false
       }, 5000)
     }

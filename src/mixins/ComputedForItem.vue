@@ -28,7 +28,14 @@ export default {
       event.stopPropagation();
     },
     hoverImage(event, metaId, itemId) {
-      Vue.prototype.$showHoverImage(event, metaId, itemId);
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.timeout = setTimeout(() => {
+        Vue.prototype.$showHoverImage(event, metaId, itemId);
+      }, 500);
+    },
+    hideHoverImage() {
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.show = false
     },
     toggleSelect() {
       const id = this.id;

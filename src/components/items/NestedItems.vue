@@ -28,7 +28,7 @@
       v-for="(i, x) in items"
       :key="i.item.name + x"
       @mouseover.stop="hoverImage($event, i.item.metaId, i.itemId)"
-      @mouseleave.stop="$store.state.hover.show = false"
+      @mouseleave.stop="hideHoverImage"
       :color="i.item.color"
       :text-color="getTextColor(i.item.color)"
       v-show="checkShow(i.item.metaId)"
@@ -96,7 +96,14 @@ export default {
       else return "black";
     },
     hoverImage(event, metaId, itemId) {
-      Vue.prototype.$showHoverImage(event, metaId, itemId);
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.timeout = setTimeout(() => {
+        Vue.prototype.$showHoverImage(event, metaId, itemId);
+      }, 500);
+    },
+    hideHoverImage() {
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.show = false
     },
     checkShow(metaId) {
       let assigned = this.assigned;

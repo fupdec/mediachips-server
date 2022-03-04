@@ -25,8 +25,8 @@
       <v-chip
         v-bind="data.attrs"
         @click="removeItem(data.item.id)"
-        @mouseover.stop="showHoverImage($event, data.item.id)"
-        @mouseleave.stop="$store.state.hover.show = false"
+        @mouseover.stop="hoverImage($event, data.item.id)"
+        @mouseleave.stop="hideHoverImage"
         :input-value="data.selected"
         :color="data.item.color"
         :label="meta.metaSetting.chipLabel"
@@ -37,8 +37,8 @@
     </template>
     <template v-slot:item="data">
       <div
-        @mouseover.stop="showHoverImage($event, data.item.id)"
-        @mouseleave.stop="$store.state.hover.show = false"
+        @mouseover.stop="hoverImage($event, data.item.id)"
+        @mouseleave.stop="hideHoverImage"
         class="list-item"
       >
         <span v-if="meta.metaSetting.favorite">
@@ -137,8 +137,15 @@ export default {
       this.val = val;
       this.$emit("input", val);
     },
-    showHoverImage(event, itemId) {
-      Vue.prototype.$showHoverImage(event, this.metaId, itemId);
+    hoverImage(event, itemId) {
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.timeout = setTimeout(() => {
+        Vue.prototype.$showHoverImage(event, this.metaId, itemId);
+      }, 500);
+    },
+    hideHoverImage() {
+      clearTimeout(this.$store.state.hover.timeout);
+      this.$store.state.hover.show = false
     },
     removeItem(item) {
       const index = this.val.indexOf(item);
