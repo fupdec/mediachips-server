@@ -16,13 +16,11 @@
           closable
         />
 
-        <v-card-text class="pa-2 pa-sm-4">
+        <v-card-text class="item-about pa-2 pa-sm-4">
           <v-hover v-slot="{ hover }">
             <v-img
               @click="dialogImageEditing = true"
               :src="img"
-              :aspect-ratio="16 / 9"
-              max-width="500"
             >
               <v-fade-transition>
                 <v-overlay v-if="hover" absolute>

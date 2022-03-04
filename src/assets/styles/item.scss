@@ -801,6 +801,7 @@
   display: grid;
   gap: 20px;
   grid-template-columns: 300px auto;
+  align-items: start;
 }
 .editing {
   &.show-icons {

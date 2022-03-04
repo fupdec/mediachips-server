@@ -68,7 +68,7 @@
 
             <v-text-field
               v-if="i.meta.type === 'number'"
-              v-model="vals[i.childMetaId]"
+              v-model="vals[i.metaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
@@ -79,7 +79,7 @@
 
             <v-text-field
               v-if="i.meta.type === 'string'"
-              v-model="vals[i.childMetaId]"
+              v-model="vals[i.metaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
@@ -89,8 +89,8 @@
 
             <v-text-field
               v-if="i.meta.type === 'date'"
-              @click="pickDate(i.childMetaId)"
-              :value="vals[i.childMetaId]"
+              @click="pickDate(i.metaId)"
+              :value="vals[i.metaId]"
               :label="i.meta.name"
               :hint="i.meta.hint"
               :prependIcon="showIcons ? `mdi-${i.meta.icon}` : ''"
@@ -109,8 +109,8 @@
               <div class="d-flex">
                 <v-icon v-html="showIcons ? `mdi-${i.meta.icon}` : ''" left />
                 <v-rating
-                  :value="vals[i.childMetaId]"
-                  @input="setVal($event, i.childMetaId)"
+                  :value="vals[i.metaId]"
+                  @input="setVal($event, i.metaId)"
                   :length="i.meta.metaSetting.ratingMax"
                   :full-icon="`mdi-${i.meta.metaSetting.ratingIcon}`"
                   :empty-icon="`mdi-${
@@ -138,8 +138,8 @@
             </div>
 
             <v-btn
-              v-if="!equalOld(i.childMetaId, i.meta.type)"
-              @click="restore(i.childMetaId)"
+              v-if="!equalOld(i.metaId, i.meta.type)"
+              @click="restore(i.metaId)"
               class="restore"
               x-small
               icon
@@ -258,12 +258,12 @@ export default {
 
       const assigned = this.assigned;
       // creating all meta and their values
-      for (let i of assigned) this.setVal(null, i.childMetaId);
+      for (let i of assigned) this.setVal(null, i.metaId);
 
       // parsing values and place their value into meta values
       for (let i of values) {
         let v = i.value;
-        let x = assigned.findIndex((j) => j.childMetaId == i.metaId);
+        let x = assigned.findIndex((j) => j.metaId == i.metaId);
         if (x > -1) {
           let type = assigned[x].meta.type;
           if (type === "rating") {
@@ -334,7 +334,7 @@ export default {
           // collecting items of media
           for (let id in ids) {
             items.push({
-              parentItemId: this.media.id,
+              mediaId: this.media.id,
               itemId: ids[id],
               metaId: key,
             });
@@ -344,7 +344,7 @@ export default {
         if (isMeta && tv !== "object") {
           values.push({
             value: v,
-            itemId: this.media.id,
+            mediaId: this.media.id,
             metaId: key,
           });
         }

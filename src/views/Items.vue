@@ -74,6 +74,7 @@
         :key="i.id"
         :video="i"
         :reg="reg"
+        :upd="upd"
         :x="x"
       />
     </v-container>

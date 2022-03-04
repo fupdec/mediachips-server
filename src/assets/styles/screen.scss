@@ -68,7 +68,8 @@
 
 @media (max-width: 640px) {
   .item-about {
-    grid-template: "a";
+    display: flex;
+    flex-direction: column;
   }
 }
 

@@ -238,6 +238,7 @@ export default {
   props: {
     video: Object,
     reg: Boolean,
+    upd: Array,
     x: Number,
   },
   components: {
@@ -248,7 +249,7 @@ export default {
   mixins: [ComputedForItem],
   async beforeMount() {
     await this.getMetadata();
-    await this.getMeta();
+    await this.getItems();
     await this.getValues();
     await this.getImg();
     if (this.page.view == "2") await this.initFrames();
@@ -358,7 +359,7 @@ export default {
           console.log(e);
         });
     },
-    getMeta() {
+    getItems() {
       let url = `/api/ItemsInMedia?mediaId=${this.video.id}`;
       axios
         .get(this.apiUrl + url)
@@ -474,6 +475,12 @@ export default {
   watch: {
     "page.view"(view) {
       if (view == "2") this.initFrames();
+    },
+    upd(arr) {
+      if (arr.includes(this.video.id)) {
+        this.getItems();
+        this.getValues();
+      }
     },
   },
 };
