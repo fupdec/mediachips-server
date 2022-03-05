@@ -59,6 +59,7 @@ export default {
     await this.getItems();
     await this.getMeta();
     this.checkLogin();
+    this.checkElectronRunning();
     await this.getMachineId();
     this.$root.$on("getMeta", () => {
       this.getMeta();
@@ -161,6 +162,10 @@ export default {
         .catch((e) => {
           // console.log(e);
         });
+    },
+    checkElectronRunning() {
+      const ua = navigator.userAgent.toLowerCase();
+      this.$store.state.isElectron = ua.indexOf(" electron/") > -1;
     },
   },
   watch: {
