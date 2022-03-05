@@ -1,6 +1,7 @@
 <template>
   <div class="d-flex">
     <ItemsAdd v-if="!isMediaPage" />
+    <MediaAdd v-if="isMediaPage" />
     <ItemsFilter />
     <ItemsSearch />
     <ItemsFavorite />
@@ -18,6 +19,7 @@ export default {
   name: "ItemsAppbar",
   components: {
     ItemsAdd: () => import("@/components/app/appbar/elements/ItemsAdd.vue"),
+    MediaAdd: () => import("@/components/app/appbar/elements/MediaAdd.vue"),
     ItemsFilter: () =>
       import("@/components/app/appbar/elements/ItemsFilter.vue"),
     ItemsSearch: () =>
