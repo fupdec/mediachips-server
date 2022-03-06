@@ -66,7 +66,6 @@ export default {
     valid: false,
     paths: "",
     buttons: [],
-    dialogMediaScanning: false,
     dialogParserSettings: false,
   }),
   computed: {
@@ -104,20 +103,65 @@ export default {
     async run() {
       await this.$refs.form.validate();
       if (!this.valid) return;
-
-      await axios({
-        method: "post",
-        url: this.apiUrl + "/api/Task/addMediaVideo",
-        data: {
-          path: this.paths,
-        },
-      })
-        .then((res) => {
-          console.log(res.data);
+      let exts = [
+        "3gp",
+        "avi",
+        "f4v",
+        "flv",
+        "m4v",
+        "mkv",
+        "mod",
+        "mov",
+        "mp4",
+        "mpeg",
+        "mpg",
+        "mts",
+        "rm",
+        "rmvb",
+        "swf",
+        "ts",
+        "vob",
+        "webm",
+        "wmv",
+        "yuv",
+      ];
+      const regex = "." + exts.join("$|.") + "$";
+      const regexString = JSON.stringify(regex);
+      const paths = this.paths.trim().split("\n");
+      let files = [];
+      for (const entryPath of paths) {
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/Task/getFileList",
+          data: {
+            path: entryPath,
+            filter: regexString,
+          },
         })
-        .catch((e) => {
-          console.log(e);
-        });
+          .then((res) => {
+            files = files.concat(res.data);
+          })
+          .catch((e) => {
+            // console.log(e);
+          });
+      }
+
+      for (const filePath of files) {
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/Task/addMediaVideo",
+          data: {
+            path: filePath,
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+      this.$root.$emit("getItemsFromDb", []);
     },
     close() {
       this.$emit("close");

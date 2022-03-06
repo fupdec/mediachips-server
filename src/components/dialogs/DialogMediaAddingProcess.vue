@@ -10,7 +10,7 @@
     <v-card>
       <DialogHeader
         @close="close"
-        :header="`Settings`"
+        :header="`Media Adding Process`"
         :buttons="buttons"
         closable
       />
@@ -27,7 +27,7 @@ import axios from "axios";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
-  name: "DialogParsingSettings",
+  name: "DialogMediaAddingProcess",
   props: {
     dialog: Boolean,
   },

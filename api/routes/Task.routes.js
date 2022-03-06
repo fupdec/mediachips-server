@@ -15,6 +15,9 @@ module.exports = app => {
   // deleting image from userfiles directory
   router.post("/deleteImage", Task.deleteImage);
 
+  // getting file list with specific extension in directory
+  router.post("/getFileList", Task.getFileList);
+
   // adding video with metadata to database
   router.post("/addMediaVideo", Task.addMediaVideo);
 

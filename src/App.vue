@@ -24,6 +24,11 @@
     <DialogLogin :login="login" @close="closeApp" @success="login = false" />
 
     <DialogError v-if="$store.state.dialogError" />
+    <DialogMediaAddingProcess
+      v-if="$store.state.Tasks.dialogMediaAddingProcess"
+      @close="$store.state.Tasks.dialogMediaAddingProcess = false"
+      :dialog="$store.state.Tasks.dialogMediaAddingProcess"
+    />
   </v-app>
 </template>
 
@@ -48,6 +53,8 @@ export default {
     HoverImage: () => import("@/components/app/HoverImage.vue"),
     Snackbars: () => import("@/components/app/Snackbars.vue"),
     DialogError: () => import("@/components/dialogs/DialogError.vue"),
+    DialogMediaAddingProcess: () =>
+      import("@/components/dialogs/DialogMediaAddingProcess.vue"),
   },
   async beforeMount() {},
   async mounted() {

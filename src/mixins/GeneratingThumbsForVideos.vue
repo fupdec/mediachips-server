@@ -22,13 +22,10 @@ export default {
     },
     tasks: {
       get() {
-        return this.$store.state.tasks;
+        return this.$store.state.Tasks.list;
       },
       set(val) {
-        this.$store.commit("updateState", {
-          key: "tasks",
-          value: val,
-        });
+        this.$store.state.Tasks.list = val;
       },
     },
     isMediaPage() {

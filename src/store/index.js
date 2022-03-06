@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import Page from './modules/page.js'
 import Player from './modules/player.js'
 import Reg from './modules/reg.js'
+import Tasks from './modules/tasks.js'
 const Settings = require('./../../default-settings.js')
 
 Vue.use(Vuex)
@@ -39,7 +40,6 @@ export default new Vuex.Store({
     navDrawer: true,
     clipboardMeta: {},
     updateFoldersData: 0,
-    tasks: [],
     dialogError: false,
     dialogErrorText: null,
     settings: Settings,
@@ -89,5 +89,6 @@ export default new Vuex.Store({
     Page,
     Player,
     Reg,
+    Tasks,
   }
 })

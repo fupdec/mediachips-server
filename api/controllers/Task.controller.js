@@ -582,6 +582,76 @@ const getLocalPath = (outputPath) => {
   )
 }
 
+exports.getFileList = async (req, res) => {
+  function findInDir(dir, regex, fileList = []) {
+    let files
+    try {
+      files = fs.readdirSync(dir)
+    } catch (err) {
+      res.status(400).send({
+        message: err
+      })
+      files = []
+      return
+    }
+
+    for (let file of files) {
+      const filePath = path.join(dir, file)
+      let fileStat
+      try {
+        fileStat = fs.lstatSync(filePath)
+      } catch (error) {
+        res.status(400).send({
+          message: err
+        })
+        return
+      }
+
+      if (fileStat.isDirectory()) findInDir(filePath, regex, fileList)
+      else if (regex.test(filePath.toLowerCase())) fileList.push(filePath)
+    }
+
+    return fileList
+  }
+
+  const entryPath = req.body.path;
+  const regexObj = JSON.parse(req.body.filter);
+  const regex = new RegExp(regexObj);
+
+  // getting stat by path
+  let fileStat
+  try {
+    fileStat = fs.lstatSync(entryPath)
+  } catch (error) {
+    res.status(400).send({
+      message: err
+    })
+    return
+  }
+
+  // check if file or directory exists
+  if (fileStat.isFile() && regex.test(entryPath.toLowerCase())) {
+    res.status(201).send([entryPath])
+    return
+  } else if (!fileStat.isDirectory()) {
+    res.status(400).send({
+      message: "not directory"
+    })
+    return
+  }
+
+  let fileList
+  try {
+    fileList = findInDir(entryPath, regex)
+  } catch (error) {
+    res.status(400).send({
+      message: error
+    })
+    return
+  }
+  res.status(201).send(fileList)
+}
+
 exports.addMediaVideo = async (req, res) => {
   function getVideoMetadata(pathToFile) {
     return new Promise((resolve, reject) => {
@@ -637,7 +707,7 @@ exports.addMediaVideo = async (req, res) => {
     }
 
     return {
-      size: info.format.size,
+      filesize: info.format.size,
       duration: duration,
       bitrate: info.format.bit_rate,
       width,
@@ -648,7 +718,7 @@ exports.addMediaVideo = async (req, res) => {
   }
 
   const {
-    size,
+    filesize,
     duration,
     bitrate,
     width,
@@ -662,7 +732,7 @@ exports.addMediaVideo = async (req, res) => {
       path: pathToFile,
     },
     defaults: {
-      size,
+      filesize,
       typeId: 1,
     },
   })
