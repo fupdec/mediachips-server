@@ -15,6 +15,9 @@ module.exports = app => {
   // deleting image from userfiles directory
   router.post("/deleteImage", Task.deleteImage);
 
+  // adding video with metadata to database
+  router.post("/addMediaVideo", Task.addMediaVideo);
+
   // creating thumbnail for video
   router.post("/createThumb", Task.createThumb);
 

@@ -415,11 +415,11 @@ exports.importDatabase = async (req, res) => {
             }
           } else {
             if (val !== null && val !== '')
-            valuesInMedia.push({
-              value: val,
-              metaId: m.id,
-              mediaId: mVideo.id,
-            })
+              valuesInMedia.push({
+                value: val,
+                metaId: m.id,
+                mediaId: mVideo.id,
+              })
           }
         }
       }
@@ -581,6 +581,119 @@ const getLocalPath = (outputPath) => {
     outputPath
   )
 }
+
+exports.addMediaVideo = async (req, res) => {
+  function getVideoMetadata(pathToFile) {
+    return new Promise((resolve, reject) => {
+      return ffmpeg.ffprobe(pathToFile, (error, info) => {
+        if (error) reject(error)
+        else if (info.format.duration < 1) reject('duration less than 1 sec.')
+        else resolve(info)
+      })
+    })
+  }
+
+  function createThumb(pathToFile, id) {
+    return new Promise((resolve, reject) => {
+      let outputPathThumbs = getLocalPath("/userfiles/media/thumbs/")
+      ffmpeg()
+        .input(pathToFile)
+        .screenshots({
+          count: 1,
+          filename: `${id}.jpg`,
+          folder: outputPathThumbs,
+          size: '?x320'
+        })
+        .on('end', () => {
+          resolve('success')
+        })
+        .on('error', (err) => {
+          reject(err.message)
+        })
+    })
+  }
+
+  let pathToFile = req.body.path
+  let videoInfo = {}
+  try {
+    videoInfo = await getVideoMetadata(pathToFile)
+  } catch (error) {
+    res.status(400).send({
+      message: error
+    })
+  }
+
+  function getVideoInfo(info) {
+    let duration = Math.floor(info.format.duration)
+
+    let width, height, codec, fps
+    for (let stream of info.streams) {
+      if (stream.codec_type !== 'video') continue
+      width = stream.width
+      height = stream.height
+      codec = stream.codec_name
+      fps = Math.ceil(stream.nb_frames / info.format.duration)
+      break
+    }
+
+    return {
+      size: info.format.size,
+      duration: duration,
+      bitrate: info.format.bit_rate,
+      width,
+      height,
+      codec,
+      fps,
+    }
+  }
+
+  const {
+    size,
+    duration,
+    bitrate,
+    width,
+    height,
+    codec,
+    fps,
+  } = getVideoInfo(videoInfo)
+
+  const [media, isCreated] = await Media.findOrCreate({
+    where: {
+      path: pathToFile,
+    },
+    defaults: {
+      size,
+      typeId: 1,
+    },
+  })
+
+  if (isCreated) {
+    await VideoMetadata.create({
+      mediaId: media.id,
+      duration,
+      bitrate,
+      width,
+      height,
+      codec,
+      fps,
+    })
+
+    try {
+      await createThumb(pathToFile, media.id)
+    } catch (error) {
+      res.status(400).send({
+        message: error
+      })
+    }
+
+    // TODO parse Path For Meta items 
+    res.status(201).send('success')
+  } else {
+    res.status(400).send({
+      message: "Media already added."
+    })
+  }
+};
 
 exports.createThumb = async (req, res) => {
   /** 

@@ -5,7 +5,6 @@
     @input="close"
     :fullscreen="$vuetify.breakpoint.xs"
     scrollable
-    persistent
     width="980"
   >
     <v-card>
@@ -16,47 +15,40 @@
         closable
       />
 
-      <v-stepper v-model="step">
-        <v-stepper-header style="height: 50px">
-          <v-stepper-step :complete="step > 1" step="1" class="py-0">
-            Folders
-          </v-stepper-step>
-          <v-divider></v-divider>
-          <v-stepper-step :complete="step > 2" step="2" class="py-0">
-            Settings
-          </v-stepper-step>
-          <v-divider></v-divider>
-          <v-stepper-step step="3" class="py-0"> Scanning </v-stepper-step>
-        </v-stepper-header>
+      <v-card-text class="text-center pa-2 pa-sm-4">
+        <v-btn v-if="isElectron" @click="chooseMultipleDir" outlined>
+          <v-icon left>mdi-folder-open</v-icon> Choose Folders
+        </v-btn>
+        <v-btn v-else @click="chooseFiles" outlined>
+          <v-icon left>mdi-file</v-icon> Choose Files
+        </v-btn>
 
-        <v-stepper-items>
-          <v-card>
-            <v-card-text class="text-center">
-              <v-textarea
-                v-model="folders"
-                outlined
-                no-resize
-                label="Paths to files or folders"
-                hint="Each path starts on a new line"
-              />
-
-              <v-btn v-if="isElectron" @click="chooseMultipleDir" outlined>
-                <v-icon left>mdi-folder-open</v-icon> Choose Folders
-              </v-btn>
-              <v-btn v-else @click="chooseFiles" outlined>
-                <v-icon left>mdi-file</v-icon> Choose Files
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-stepper-items>
-      </v-stepper>
+        <v-form ref="form" v-model="valid" class="mt-4">
+          <v-textarea
+            v-model="paths"
+            :rules="[(v) => !!v || 'Path is required']"
+            label="Paths to files or folders"
+            hint="Each path starts on a new line"
+            outlined
+            no-resize
+          />
+        </v-form>
+      </v-card-text>
     </v-card>
+
+    <DialogParsingSettings
+      v-if="dialogParserSettings"
+      @close="dialogParserSettings = false"
+      :dialog="dialogParserSettings"
+    />
   </v-dialog>
 </template>
 
 
 <script>
+import axios from "axios";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
+import DialogParsingSettings from "@/components/dialogs/DialogParsingSettings.vue";
 
 export default {
   name: "DialogMediaAdding",
@@ -65,34 +57,68 @@ export default {
   },
   components: {
     DialogHeader,
+    DialogParsingSettings,
   },
   mounted() {
     this.initButtons();
   },
   data: () => ({
-    step: 1,
-    folders: [],
+    valid: false,
+    paths: "",
     buttons: [],
+    dialogMediaScanning: false,
+    dialogParserSettings: false,
   }),
   computed: {
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
     isElectron() {
       return this.$store.state.isElectron;
     },
   },
   methods: {
     initButtons() {
-      this.buttons.push({
-        icon: "check",
-        text: "Continue",
-        color: "success",
-        outlined: false,
-        function: () => {
-          ++this.step;
+      this.buttons.push(
+        {
+          icon: "cog",
+          text: "Settings",
+          outlined: true,
+          function: () => {
+            this.dialogParserSettings = true;
+          },
         },
-      });
+        {
+          icon: "plus",
+          text: "Add",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.run();
+          },
+        }
+      );
     },
     chooseMultipleDir() {},
     chooseFiles() {},
+    async run() {
+      await this.$refs.form.validate();
+      if (!this.valid) return;
+
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/Task/addMediaVideo",
+        data: {
+          path: this.paths,
+        },
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     close() {
       this.$emit("close");
     },
