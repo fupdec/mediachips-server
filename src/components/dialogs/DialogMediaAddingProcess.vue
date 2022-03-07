@@ -30,8 +30,12 @@
           </template>
         </v-progress-linear>
       </v-card-actions>
+      <div class="d-flex justify-space-between px-4">
+        <div>{{ task.status }}</div>
+      </div>
 
       <v-card-text class="text-center pa-2 pa-sm-4">
+        <div>{{ task.processed }}</div>
         <div>Added: {{ task.added.length }}</div>
         <div>Error: {{ task.errors.length }}</div>
       </v-card-text>

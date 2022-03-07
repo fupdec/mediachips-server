@@ -16,12 +16,12 @@
       />
 
       <v-card-text class="text-center pa-2 pa-sm-4">
-        <v-btn v-if="isElectron" @click="chooseMultipleDir" outlined>
+        <!-- <v-btn v-if="isElectron" @click="chooseMultipleDir" outlined>
           <v-icon left>mdi-folder-open</v-icon> Choose Folders
         </v-btn>
         <v-btn v-else @click="chooseFiles" outlined>
           <v-icon left>mdi-file</v-icon> Choose Files
-        </v-btn>
+        </v-btn> -->
 
         <v-form ref="form" v-model="valid" class="mt-4">
           <v-textarea
@@ -84,14 +84,14 @@ export default {
   methods: {
     initButtons() {
       this.buttons.push(
-        {
-          icon: "cog",
-          text: "Settings",
-          outlined: true,
-          function: () => {
-            this.dialogParserSettings = true;
-          },
-        },
+        // {
+        //   icon: "cog",
+        //   text: "Settings",
+        //   outlined: true,
+        //   function: () => {
+        //     this.dialogParserSettings = true;
+        //   },
+        // },
         {
           icon: "plus",
           text: "Add",

@@ -27,7 +27,8 @@ export default {
   methods: {
     async addMedia() {
       this.task.active = true;
-      this.task.status = "Media scanning in progress...";
+      this.task.status = "Scanning files...";
+      this.task.processed = "";
       this.task.progress = 0;
       this.task.stopped = false;
       this.task.finished = false;
@@ -91,6 +92,7 @@ export default {
           });
       }
 
+      this.task.status = `Gathering metadata and adding media to the database...`;
       this.task.total = files.length;
       let percentage = 100 / files.length;
       const sleep = (ms) => {
@@ -117,6 +119,7 @@ export default {
           });
 
         ++this.task.current;
+        this.task.processed = `Processed: ${this.task.current} / ${this.task.total}`;
         this.task.progress += percentage;
         if (this.task.progress > 100) this.task.progress = 100;
         await sleep(10);
@@ -143,6 +146,7 @@ export default {
       }
       this.task.finished = true;
       this.task.active = false;
+      this.task.status = "Adding media is complete!";
       this.$store.dispatch("removeTask", taskId);
       this.$root.$emit("getItemsFromDb", []);
     },

@@ -9,6 +9,8 @@ const Tasks = {
       active: false,
       stopped: false,
       finished: false,
+      status: "",
+      processed: "",
       progress: 0,
       current: 0,
       total: 0,
