@@ -4,17 +4,22 @@ import Vue from "vue";
 
 export default {
   beforeDestroy() {
-    this.isGenBreak = true;
+    this.grid.stopped = true;
+    this.timeline.stopped = true;
   },
   mounted() {
     this.$nextTick(() => {});
   },
   data: () => ({
-    isGenGridsRun: false,
-    isGenTimelinesRun: false,
-    isGenBreak: false,
-    numberOfCreatedGrid: 0,
-    genTimeout: null,
+    grid: {
+      active: false,
+      stopped: false,
+    },
+    timeline: {
+      active: false,
+      stopped: false,
+    },
+    timeout: null,
   }),
   computed: {
     apiUrl() {
@@ -37,22 +42,26 @@ export default {
   },
   methods: {
     async createGrids(videos) {
-      this.isGenGridsRun = true;
-      const taskId = Vue.prototype.$getRandomId();
-      this.tasks.push({
-        id: taskId,
+      this.grid.active = true;
+      const id = await this.$store.dispatch("setTask", {
         text: "Generating grids images",
         icon: "apps",
+        action: () => {
+          this.grid.stopped = true;
+        },
       });
 
-      const x = this.tasks.findIndex((i) => i.id === taskId);
-      for (let i = 0; i < videos.length; i++) {
-        if (this.isGenBreak) break;
-        if (x > -1)
-          this.tasks[x].text = `Generating grids images ${i + 1} of ${
-            videos.length
-          }`;
-        const video = videos[i];
+      let x = 0;
+      for (const video of videos) {
+        ++x;
+        if (this.grid.stopped) break;
+        this.$store.dispatch("updateTask", {
+          id,
+          data: {
+            subtitle: `${x} of ${videos.length}`,
+            progress: 100 / videos.length * x,
+          },
+        });
         try {
           await this.createVideoGrid(video.path, `${video.id}.jpg`);
         } catch (error) {
@@ -61,10 +70,8 @@ export default {
       }
 
       // TODO rerender items if grid is created
-      //   if (this.numberOfCreatedGrid) this.$store.commit("updateVideos");
-      this.numberOfCreatedGrid = 0;
-      this.isGenGridsRun = false;
-      this.tasks.splice(x, 1);
+      this.grid.active = false;
+      this.$store.dispatch("removeTask", id);
     },
     /**
      * Creating an image by taking a frame from a video.
@@ -85,7 +92,6 @@ export default {
           },
         })
           .then((res) => {
-            ++this.numberOfCreatedGrid;
             resolve(res);
           })
           .catch((e) => {
@@ -95,22 +101,26 @@ export default {
       });
     },
     async createTimelines(videos) {
-      this.isGenTimelinesRun = true;
-      const taskId = Vue.prototype.$getRandomId();
-      this.tasks.push({
-        id: taskId,
-        text: "Generating timelines images",
-        icon: "view-carousel",
+      this.timeline.active = true;
+      const id = await this.$store.dispatch("setTask", {
+        text: "Generating timeline images",
+        icon: "view-column",
+        action: () => {
+          this.timeline.stopped = true;
+        },
       });
 
-      const x = this.tasks.findIndex((i) => i.id === taskId);
-      for (let i = 0; i < videos.length; i++) {
-        if (this.isGenBreak) break;
-        if (x > -1)
-          this.tasks[x].text = `Generating timelines images ${i + 1} of ${
-            videos.length
-          }`;
-        const video = videos[i];
+      let x = 0;
+      for (const video of videos) {
+        ++x;
+        if (this.timeline.stopped) break;
+        await this.$store.dispatch("updateTask", {
+          id,
+          data: {
+            subtitle: `${x} of ${videos.length}`,
+            progress: 100 / videos.length * x,
+          },
+        });
         // const frame = path.join(`/userfiles/media/timelines/${video.id}_5.jpg`);
         try {
           await this.createVideoTimeline(video);
@@ -119,8 +129,8 @@ export default {
         }
       }
 
-      this.isGenTimelinesRun = false;
-      this.tasks = this.tasks.slice(x, 0);
+      this.timeline.active = false;
+      this.$store.dispatch("removeTask", id);
     },
     createVideoTimeline(video) {
       return new Promise((resolve, reject) => {
@@ -140,15 +150,15 @@ export default {
       });
     },
     generateImages(videos) {
-      clearInterval(this.genTimeout);
-      this.isGenBreak = true;
-      this.genTimeout = setTimeout(() => {
-        this.isGenBreak = false;
-        if (!this.isGenGridsRun) {
+      clearInterval(this.timeout);
+      this.grid.stopped = false;
+      this.timeline.stopped = false;
+      this.timeout = setTimeout(() => {
+        if (!this.grid.active) {
           if (this.$store.state.settings.videoPreviewStatic == "grid")
             this.createGrids(videos);
         }
-        if (!this.isGenTimelinesRun) {
+        if (!this.timeline.active) {
           if (
             this.$store.state.settings.videoPreviewHover == "timeline" ||
             this.$store.state.settings.videoView == "0"

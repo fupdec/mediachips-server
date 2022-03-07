@@ -26,7 +26,7 @@
           rounded
         >
           <template v-slot="{ value }">
-            <strong class="process-percents">{{ Math.ceil(value) }}%</strong>
+            <strong class="process-percents">{{ Math.ceil(value) }} %</strong>
           </template>
         </v-progress-linear>
       </v-card-actions>

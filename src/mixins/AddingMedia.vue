@@ -37,6 +37,17 @@ export default {
       this.task.duplicates = [];
       this.task.added = [];
 
+      const taskId = await this.$store.dispatch("setTask", {
+        text: "Adding media",
+        icon: "file-plus",
+        click: () => {
+          this.task.dialogProcess = true;
+        },
+        action: () => {
+          this.task.stopped = true;
+        },
+      });
+
       let exts = [
         "3gp",
         "avi",
@@ -109,9 +120,30 @@ export default {
         this.task.progress += percentage;
         if (this.task.progress > 100) this.task.progress = 100;
         await sleep(10);
+        await this.$store.dispatch("updateTask", {
+          id: taskId,
+          data: {
+            subtitle: `${this.task.current} of ${this.task.total}`,
+            progress: this.task.progress,
+          },
+        });
+      }
+
+      if (!this.task.dialogProcess) {
+        if (this.task.added.length > 0)
+          this.$store.commit("setNotification", {
+            type: "success",
+            text: `Added ${this.task.added.length} media`,
+          });
+        else
+          this.$store.commit("setNotification", {
+            type: "info",
+            text: `No new media found`,
+          });
       }
       this.task.finished = true;
       this.task.active = false;
+      this.$store.dispatch("removeTask", taskId);
       this.$root.$emit("getItemsFromDb", []);
     },
     close() {

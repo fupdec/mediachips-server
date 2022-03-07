@@ -15,7 +15,7 @@
 
     <v-card width="450">
       <v-card-actions>
-        <div class="caption">Notifications</div>
+        <div>Notifications</div>
         <v-spacer></v-spacer>
         <v-btn v-if="notifications.length > 0" @click="clearAll" icon x-small>
           <v-icon>mdi-notification-clear-all</v-icon>
