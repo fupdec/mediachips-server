@@ -588,23 +588,17 @@ exports.getFileList = async (req, res) => {
     try {
       files = fs.readdirSync(dir)
     } catch (err) {
-      res.status(400).send({
-        message: err
-      })
       files = []
-      return
     }
 
-    for (let file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       const filePath = path.join(dir, file)
       let fileStat
       try {
         fileStat = fs.lstatSync(filePath)
-      } catch (error) {
-        res.status(400).send({
-          message: err
-        })
-        return
+      } catch (err) {
+        continue
       }
 
       if (fileStat.isDirectory()) findInDir(filePath, regex, fileList)
@@ -614,7 +608,7 @@ exports.getFileList = async (req, res) => {
     return fileList
   }
 
-  const entryPath = req.body.path;
+  const entryPath = path.join(req.body.path);
   const regexObj = JSON.parse(req.body.filter);
   const regex = new RegExp(regexObj);
 
@@ -640,15 +634,7 @@ exports.getFileList = async (req, res) => {
     return
   }
 
-  let fileList
-  try {
-    fileList = findInDir(entryPath, regex)
-  } catch (error) {
-    res.status(400).send({
-      message: error
-    })
-    return
-  }
+  let fileList = findInDir(entryPath, regex)
   res.status(201).send(fileList)
 }
 
