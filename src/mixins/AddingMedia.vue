@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import Vue from "vue";
 
 export default {
   beforeDestroy() {
@@ -73,7 +74,7 @@ export default {
       ];
       const regex = "." + exts.join("$|.") + "$";
       const regexString = JSON.stringify(regex);
-      const paths = this.task.paths.trim().split("\n");
+      const paths = Vue.prototype.$transformTextToArray(this.task.paths);
       let files = [];
       for (const entryPath of paths) {
         await axios({

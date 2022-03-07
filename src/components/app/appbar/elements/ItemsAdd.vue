@@ -5,60 +5,31 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
 
-      <div>
-        <v-dialog v-model="dialogNames" scrollable width="600">
-          <v-card>
-            <DialogHeader
-              @close="dialogNames = false"
-              :header="`Adding ${page.name}`"
-              :buttons="buttons"
-              closable
-            />
+      <v-dialog v-model="dialogNames" scrollable width="600">
+        <v-card>
+          <DialogHeader
+            @close="dialogNames = false"
+            :header="`Adding ${page.name}`"
+            :buttons="buttons"
+            closable
+          />
 
-            <v-card-text class="pa-sm-4 pa-2">
-              <v-alert type="info" text dense dismissible class="body-2">
-                {{
-                  `Write a name on a new line to add several ${page.name.toLowerCase()} at once`
-                }}
-              </v-alert>
-              <v-form ref="form" v-model="valid">
-                <v-textarea
-                  v-model="names"
-                  :rules="[nameRules]"
-                  label="Names"
-                  outlined
-                  required
-                  autofocus
-                  no-resize
-                />
-                <v-alert
-                  v-if="dups.length"
-                  border="left"
-                  dense
-                  text
-                  class="body-2"
-                  type="warning"
-                >
-                  These {{ page.name }} already exist: {{ dups.join(", ") }}
-                </v-alert>
-                <v-alert
-                  v-if="added.length"
-                  border="left"
-                  dense
-                  text
-                  icon="mdi-plus-circle"
-                  close-text="Close"
-                  type="success"
-                  dismissible
-                  class="mt-4 mb-0"
-                >
-                  Added: {{ added.join(", ") }}
-                </v-alert>
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
-      </div>
+          <v-card-text class="pa-sm-4 pa-2">
+            <v-form ref="form" v-model="valid">
+              <v-textarea
+                v-model="names"
+                :rules="[(v) => !!v || 'Name is required', nameRules]"
+                hint="Write a name on a new line to add several"
+                label="Names"
+                outlined
+                required
+                autofocus
+                no-resize
+              />
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </template>
     <span> Add {{ page.nameSingular }} </span>
   </v-tooltip>
@@ -66,6 +37,7 @@
 
 
 <script>
+import axios from "axios";
 import Vue from "vue";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
 
@@ -86,13 +58,11 @@ export default {
     buttons: [],
   }),
   computed: {
+    apiUrl() {
+      return this.$store.state.localhost;
+    },
     page() {
       return this.$store.state.Page;
-    },
-    content() {
-      if (typeof this.searchString == "string")
-        return this.searchString.substring(0, 2);
-      else return "";
     },
   },
   methods: {
@@ -110,23 +80,54 @@ export default {
     async add() {
       await this.$refs.form.validate();
       if (!this.valid) return;
-      let arr = Vue.prototype.$transformTextToArray(this.names);
-      const allItems = ["allItems"];
+      let names = Vue.prototype.$transformTextToArray(this.names);
+      const items = this.page.items;
       this.dups = [];
       this.added = [];
 
-      // TODO check "arr" for dups in themself and in allItems
-
-      for (const n of arr) {
-        let duplicate = allItems.find(
-          (i) => i.toLowerCase() === n.toLowerCase()
+      for (const n of names) {
+        // checking for duplicates
+        let duplicate = items.findIndex(
+          (i) => i.name.toLowerCase() === n.toLowerCase()
         );
-        if (duplicate) {
+        if (duplicate > -1) {
           this.dups.push(n);
           continue;
         }
         this.added.push(n);
       }
+
+      if (this.dups.length > 0)
+        this.$store.commit("setNotification", {
+          type: "warning",
+          text: `Duplicates: ${this.dups.join(", ")}`,
+        });
+
+      if (this.added.length > 0)
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/item",
+          data: this.added.map((i) => {
+            return {
+              name: i,
+              metaId: +this.$route.query.metaId,
+            };
+          }),
+        })
+          .then((res) => {
+            this.$store.commit("setNotification", {
+              type: "success",
+              text: `Added items: ${this.added.join(", ")}`,
+            });
+            this.$root.$emit("getItemsFromDb", []);
+            this.$root.$emit("getItems");
+          })
+          .catch((e) => {
+            // console.log(e);
+          });
+
+      this.dialogNames = false;
+      this.names = "";
     },
     nameRules(string) {
       let arr = Vue.prototype.$transformTextToArray(string);

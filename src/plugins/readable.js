@@ -170,7 +170,7 @@ const Readable = {
       arr = arr.split(/\r?\n/);
       arr = arr.filter((el) => el != "");
       arr = arr.map((s) => s.trim());
-      return arr
+      return [...new Set(arr)] // removing duplicates
     }
     Vue.prototype.$checkColorForDarkText = function (color) {
       // Variables for red, green, blue values

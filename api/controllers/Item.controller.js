@@ -2,7 +2,15 @@ const db = require("../index.js");
 const Item = db.Item;
 
 // Create and Save a new Item
-exports.create = (req, res) => {};
+exports.create = (req, res) => {
+  Item.bulkCreate(req.body).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
 // Retrieve all Item from the database.
 exports.findAll = (req, res) => {

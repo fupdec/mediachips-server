@@ -25,7 +25,7 @@
       <v-divider></v-divider>
 
       <v-card-text class="py-2 px-1">
-        <div class="px-1 notifications-wrap">
+        <div v-if="notifications.length > 0" class="px-1 notifications-wrap">
           <v-alert
             v-for="(i, x) in notifications"
             :key="i.id"
@@ -43,7 +43,7 @@
           </v-alert>
         </div>
 
-        <div v-if="notifications.length == 0" class="text-center py-3">
+        <div v-else class="text-center py-2">
           <v-icon class="mb-2">mdi-ghost-outline</v-icon>
           <div class="caption">No new notifications</div>
         </div>

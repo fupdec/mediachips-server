@@ -69,11 +69,15 @@ export default {
     this.checkLogin();
     this.checkElectronRunning();
     await this.getMachineId();
+    this.$root.$on("getItems", () => {
+      this.getItems();
+    });
     this.$root.$on("getMeta", () => {
       this.getMeta();
     });
   },
   beforeDestroy() {
+    this.$root.$off("getItems");
     this.$root.$off("getMeta");
   },
   data: () => ({
