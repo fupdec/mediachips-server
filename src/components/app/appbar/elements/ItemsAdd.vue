@@ -10,7 +10,7 @@
           <v-card>
             <DialogHeader
               @close="dialogNames = false"
-              :header="`Adding New ${page.name}`"
+              :header="`Adding ${page.name}`"
               :buttons="buttons"
               closable
             />
@@ -60,7 +60,7 @@
         </v-dialog>
       </div>
     </template>
-    <span> Add New {{ page.nameSingular }} </span>
+    <span> Add {{ page.nameSingular }} </span>
   </v-tooltip>
 </template>
 

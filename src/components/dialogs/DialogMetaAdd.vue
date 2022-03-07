@@ -10,7 +10,7 @@
       <v-card>
         <DialogHeader
           @close="close"
-          :header="`Adding new meta`"
+          :header="`Adding meta`"
           :buttons="buttons"
           closable
         />

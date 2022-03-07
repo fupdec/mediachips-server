@@ -12,7 +12,7 @@
       />
     </template>
 
-    <span> Add New {{ page.name }} </span>
+    <span> Add {{ page.name }} </span>
   </v-tooltip>
 </template>
 

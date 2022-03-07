@@ -10,7 +10,7 @@
     <v-card>
       <DialogHeader
         @close="close"
-        :header="`Adding New Media`"
+        :header="`Adding media`"
         :buttons="buttons"
         closable
       />

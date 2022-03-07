@@ -10,7 +10,7 @@
     <v-card>
       <DialogHeader
         @close="close"
-        :header="`Media Adding Process`"
+        :header="`Adding media`"
         :buttons="buttons"
         closable
       />
@@ -94,6 +94,7 @@ export default {
   watch: {
     "task.finished"() {
       this.buttons = [];
+      this.task.progress = 100;
     },
   },
 };
