@@ -25,9 +25,9 @@
 
     <DialogError v-if="$store.state.dialogError" />
     <DialogMediaAddingProcess
-      v-if="$store.state.Tasks.dialogMediaAddingProcess"
-      @close="$store.state.Tasks.dialogMediaAddingProcess = false"
-      :dialog="$store.state.Tasks.dialogMediaAddingProcess"
+      v-if="$store.state.Tasks.mediaAdding.dialogProcess"
+      @close="$store.state.Tasks.mediaAdding.dialogProcess = false"
+      :dialog="$store.state.Tasks.mediaAdding.dialogProcess"
     />
   </v-app>
 </template>
@@ -36,6 +36,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import AddingMedia from "@/mixins/AddingMedia.vue";
 /* TODO
  * countries array
  * playlists: remake as meta
@@ -56,7 +57,7 @@ export default {
     DialogMediaAddingProcess: () =>
       import("@/components/dialogs/DialogMediaAddingProcess.vue"),
   },
-  async beforeMount() {},
+  mixins: [AddingMedia],
   async mounted() {
     await Vue.prototype.$getLocalhost();
     this.isApiReady = true;
@@ -71,6 +72,9 @@ export default {
     this.$root.$on("getMeta", () => {
       this.getMeta();
     });
+  },
+  beforeDestroy() {
+    this.$root.$off("getMeta");
   },
   data: () => ({
     isServerError: false,

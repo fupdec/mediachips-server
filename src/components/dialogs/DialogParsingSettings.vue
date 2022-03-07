@@ -5,7 +5,7 @@
     @input="close"
     :fullscreen="$vuetify.breakpoint.xs"
     scrollable
-    width="800"
+    width="600"
   >
     <v-card>
       <DialogHeader
@@ -52,22 +52,7 @@ export default {
         },
       });
     },
-    chooseMultipleDir() {},
-    chooseFiles() {},
-    async save() {
-      await axios({
-        method: "post",
-        url: this.apiUrl + "/api/Task/addMediaVideo",
-        data: {
-          path: this.paths,
-        },
-      })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    save() {
       this.close();
     },
     close() {

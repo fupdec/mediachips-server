@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
-      <v-btn @click="dialogAdd = true" v-on="on" icon>
+      <v-btn @click="openDialog" v-on="on" icon>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
 
@@ -21,7 +21,8 @@
 export default {
   name: "ItemsAdd",
   components: {
-    DialogMediaAdding: () => import("@/components/dialogs/DialogMediaAdding.vue"),
+    DialogMediaAdding: () =>
+      import("@/components/dialogs/DialogMediaAdding.vue"),
   },
   mounted() {},
   data: () => ({
@@ -31,7 +32,20 @@ export default {
     page() {
       return this.$store.state.Page;
     },
+    task: {
+      get() {
+        return this.$store.state.Tasks.mediaAdding;
+      },
+      set(value) {
+        this.$store.state.Tasks.mediaAdding = value;
+      },
+    },
   },
-  methods: {},
+  methods: {
+    openDialog() {
+      if (this.task.active) this.task.dialogProcess = true;
+      else this.dialogAdd = true;
+    },
+  },
 };
 </script>
