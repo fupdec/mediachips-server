@@ -1,24 +1,27 @@
 <template>
-  <v-card outlined class="mt-6 px-4 pb-6 mx-2">
-    <div class="headline text-center pt-4 pb-6">Login</div>
+  <div class="mx-4">
+    <v-divider class="mt-8 mb-2" />
+    <div class="subtitle-2 text-right mb-4">Login</div>
 
-    <v-row>
-      <v-col cols="12">
-        <div class="d-flex">
-          <v-radio-group
-            :value="sets.passwordProtection"
-            @change="setOption($event, 'passwordProtection')"
-            class="mt-0 pt-0"
-            mandatory
-            row
-            hide-details
-          >
-            <v-radio label="Password" value="1"></v-radio>
-            <v-radio label="Free" value="0"></v-radio>
-          </v-radio-group>
+    <v-checkbox
+      v-model="sets.passwordProtection"
+      @change="setOption($event, 'passwordProtection')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Password protection</div>
+          <div class="subtitle-2 mt-1">
+            Require a password when entering the application
+          </div>
         </div>
-      </v-col>
-      <v-col v-if="sets.passwordProtection == '1'" cols="12" sm="6">
+      </template>
+    </v-checkbox>
+
+    <v-row v-if="sets.passwordProtection == '1'">
+      <v-col cols="12" sm="6">
         <v-text-field
           :value="password"
           @change="setOption(password, 'passwordHint')"
@@ -32,7 +35,7 @@
           hide-details
         />
       </v-col>
-      <v-col v-if="sets.passwordProtection == '1'" cols="12" sm="6">
+      <v-col cols="12" sm="6">
         <v-text-field
           :value="hint"
           @change="setOption(hint, 'passwordHint')"
@@ -44,7 +47,7 @@
         />
       </v-col>
     </v-row>
-  </v-card>
+  </div>
 </template>
 
 
