@@ -618,7 +618,7 @@ exports.getFileList = async (req, res) => {
     fileStat = fs.lstatSync(entryPath)
   } catch (error) {
     res.status(400).send({
-      message: err
+      message: error
     })
     return
   }

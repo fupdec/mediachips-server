@@ -4,10 +4,12 @@
     :value="val"
     :items="listItems"
     item-value="id"
+    ref="field"
+    :search-input.sync="search"
     :rules="[rules]"
     :disabled="disabled"
     :filter="filterItems"
-    :menu-props="{ contentClass: 'list-with-preview' }"
+    :menu-props="{ contentClass: 'custom-list' }"
     :label="meta.name"
     :hint="meta.hint"
     append-icon="mdi-chevron-down"
@@ -15,11 +17,19 @@
     :persistent-hint="view.persistentHint"
     :hide-details="view.hideDetails"
     :outlined="view.outlined"
+    :hide-no-data="!search"
     hide-selected
     multiple
     clearable
-    class="val"
+    class="val custom-chips-size"
   >
+    <template v-slot:no-data>
+      <div v-if="dialog == 'filtering'" class="pa-3">No data available</div>
+      <v-list-item v-else @click="create" class="pa-3">
+        <span class="mr-2">Create</span>
+        <v-chip small v-html="search" />
+      </v-list-item>
+    </template>
     <!-- TODO add rules -->
     <template v-slot:selection="data">
       <v-chip
@@ -37,6 +47,7 @@
     </template>
     <template v-slot:item="data">
       <div
+        @click="hideHoverImage"
         @mouseover.stop="hoverImage($event, data.item.id)"
         @mouseleave.stop="hideHoverImage"
         class="list-item"
@@ -103,6 +114,7 @@ export default {
       hideDetails: false,
       outlined: false,
     },
+    search: null,
   }),
   computed: {
     apiUrl() {
@@ -133,7 +145,39 @@ export default {
           console.log(e);
         });
     },
+    create() {
+      if (!this.search) return;
+      let isExists =
+        this.listItems.findIndex(
+          (i) => i.name.toLowerCase() === this.search.trim().toLowerCase()
+        ) > -1;
+      if (isExists) return;
+      axios({
+        method: "post",
+        url: this.apiUrl + "/api/item",
+        data: [
+          {
+            name: this.search,
+            metaId: this.metaId,
+          },
+        ],
+      })
+        .then((res) => {
+          this.search = null;
+          let val = [res.data[0].id];
+          if (typeof this.val == "object") val = [...this.val, ...val];
+          this.setVal(val);
+          this.getItems();
+          this.$root.$emit("getItems");
+          if (+this.$route.query.metaId === this.metaId)
+            this.$root.$emit("getItemsFromDb", []);
+        })
+        .catch((e) => {
+          // console.log(e);
+        });
+    },
     setVal(val) {
+      this.$refs.field.lazySearch = null;
       this.val = val;
       this.$emit("input", val);
     },
@@ -145,12 +189,12 @@ export default {
     },
     hideHoverImage() {
       clearTimeout(this.$store.state.hover.timeout);
-      this.$store.state.hover.show = false
+      this.$store.state.hover.show = false;
     },
     removeItem(item) {
       const index = this.val.indexOf(item);
       if (index > -1) this.val.splice(index, 1);
-      this.$store.state.hover.show = false;
+      this.hideHoverImage();
     },
     filterItems(itemObj, queryText, itemText) {
       let item = _.cloneDeep(itemObj);

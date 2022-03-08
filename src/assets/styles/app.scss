@@ -99,9 +99,9 @@ pre {
   background: none;
 }
 // .v-dialog {
-  // &--fullscreen {
-  //   padding-top: 28px;
-  // }
+// &--fullscreen {
+//   padding-top: 28px;
+// }
 // }
 .v-avatar.v-list-item__avatar {
   align-items: start;
@@ -151,10 +151,11 @@ pre {
     }
   }
 }
-.list-with-preview {
+.custom-list {
   .v-list-item {
     min-height: 0 !important;
     padding: 0;
+    font-size: 0.95em;
     b {
       font-weight: normal;
       text-decoration: underline;
@@ -738,6 +739,13 @@ pre {
   }
   .v-input__icon--append {
     display: none;
+  }
+}
+.custom-chips-size {
+  .v-chip {
+    margin: 2px 3px;
+    padding: 3px 8px;
+    height: auto !important;
   }
 }
 .color-scroll {
