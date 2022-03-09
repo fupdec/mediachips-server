@@ -14,6 +14,8 @@
 
     <Snackbars />
 
+    <ContextMenu v-if="$store.state.contextMenu.show" />
+
     <v-dialog v-model="isServerError" persistent overlay-opacity="1">
       <v-alert type="error" text outlined class="mb-0">
         Failed to start the server. The settings may be incorrect. After
@@ -49,6 +51,7 @@ export default {
     AppBar: () => import("@/components/app/AppBar.vue"),
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
+    ContextMenu: () => import("@/components/app/ContextMenu.vue"),
     Player: () => import("@/components/app/Player.vue"),
     DialogLogin: () => import("@/components/dialogs/DialogLogin.vue"),
     HoverImage: () => import("@/components/app/HoverImage.vue"),

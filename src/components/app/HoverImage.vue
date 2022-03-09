@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="hover.show"
+    v-show="hover.show && !$store.state.contextMenu.show"
     class="hover-image"
     :style="`top:${hover.y + 30}px; 
         left:${hover.x + 30}px;`"

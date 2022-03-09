@@ -510,6 +510,12 @@ pre {
     }
   }
 }
+.bottom-menu-mobile {
+  padding: 0 15px 15px;
+  .menu {
+    overflow-y: auto;
+  }
+}
 // console status bar
 .console {
   user-select: text;
