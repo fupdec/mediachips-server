@@ -21,7 +21,7 @@
               </v-list-item-icon>
 
               <v-list-item-content>
-                <v-list-item-title v-html="item.name" />
+                <v-list-item-title v-html="item.name" class="subtitle-1" />
               </v-list-item-content>
             </v-list-item>
 
@@ -52,7 +52,7 @@
           <div v-for="(item, i) in menu.content" :key="i">
             <v-list-item
               v-if="item.type == 'item'"
-              @mouseover="hideChildMenu"
+              @mouseover="hideNested"
               @mouseup="activate(item.action)"
               :disabled="item.disabled"
               class="pr-1"
@@ -71,7 +71,6 @@
 
             <ContextMenuNested
               v-else-if="item.type == 'menu'"
-              @hide="hideChildMenu"
               :ref="'child' + i"
               :item="item"
             />
@@ -103,10 +102,8 @@ export default {
       originalFunction();
       this.menu.show = false;
     },
-    hideChildMenu() {
-      return
-      for (let ref in this.$refs) this.$refs[ref][0].hide();
-      this.menu.child = false;
+    hideNested() {
+      for (let ref in this.$refs) this.$refs[ref][0].hideNested();
     },
   },
 };

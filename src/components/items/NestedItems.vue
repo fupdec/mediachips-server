@@ -103,7 +103,7 @@ export default {
     },
     hideHoverImage() {
       clearTimeout(this.$store.state.hover.timeout);
-      this.$store.state.hover.show = false
+      this.$store.state.hover.show = false;
     },
     checkShow(metaId) {
       let assigned = this.assigned;

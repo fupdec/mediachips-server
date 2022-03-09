@@ -33,7 +33,6 @@ export default new Vuex.Store({
     contextMenu: {
       show: false,
       content: null,
-      child: false,
       x: 0,
       y: 0,
     },
@@ -88,7 +87,28 @@ export default new Vuex.Store({
       }, 5000);
     },
   },
-  actions: {},
+  actions: {
+    showContextMenu({
+      state
+    }, {
+      x,
+      y,
+      content,
+    }) {
+      const parseMenu = (entry) => {
+        for (let i of entry) {
+          i.id = Vue.prototype.$getRandomId()
+          i.show = false
+          if (i.type == "menu") parseMenu(i.menu);
+        }
+      };
+      parseMenu(content)
+      state.contextMenu.x = x
+      state.contextMenu.y = y
+      state.contextMenu.content = content
+      state.contextMenu.show = true
+    },
+  },
   getters: {},
   modules: {
     Page,

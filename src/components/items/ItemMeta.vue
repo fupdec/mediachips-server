@@ -2,6 +2,8 @@
   <v-lazy>
     <v-card
       v-if="page.view == '1'"
+      @contextmenu.stop="showMenu"
+      v-ripple="{ class: 'primary--text' }"
       :class="{ favorite: item.favorite }"
       class="meta-card"
       outlined
@@ -188,6 +190,7 @@ export default {
     items: [],
     values: [],
     dialogEditing: false,
+    dialogDeleting: false,
   }),
   computed: {
     apiUrl() {
@@ -254,6 +257,34 @@ export default {
         },
       });
       this.$root.$emit("getItemsFromDb", []);
+    },
+    showMenu(e) {
+      e.preventDefault();
+      let contextMenu = [
+        {
+          name: `Edit ${this.meta.nameSingular}`,
+          type: "item",
+          icon: "pencil",
+          action: () => {
+            this.dialogEditing = true;
+          },
+        },
+      ];
+      contextMenu.push({ type: "divider" });
+      contextMenu.push({
+        name: `Delete ${this.meta.nameSingular}`,
+        type: "item",
+        icon: "delete",
+        color: "red",
+        action: () => {
+          this.dialogDeleting = true;
+        },
+      });
+      this.$store.dispatch("showContextMenu", {
+        x: e.clientX,
+        y: e.clientY,
+        content: contextMenu,
+      });
     },
   },
   watch: {

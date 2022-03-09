@@ -20,24 +20,12 @@
             <v-list-item-title v-text="sub.name"></v-list-item-title>
           </v-list-item>
 
-          <ContextMenuNested
-            v-else-if="sub.type == 'menu'"
-            :item="sub"
-            :depth="Number(depth) + 1"
-          />
+          <ContextMenuNested v-else-if="sub.type == 'menu'" :item="sub" />
         </div>
       </v-list-group>
     </v-list>
 
-    <v-menu
-      v-else
-      v-model="show"
-      :open-on-click="false"
-      :close-on-content-click="false"
-      min-width="150"
-      nudge-top="3"
-      offset-x
-    >
+    <v-menu v-else :value="item.show" min-width="150" nudge-top="3" offset-x>
       <template v-slot:activator="{ on, attrs }">
         <v-list-item
           v-on="on"
@@ -48,10 +36,13 @@
           link
         >
           <v-list-item-title>
-            <v-icon left size="18" :color="item.color">
-              mdi-{{ item.icon }}
-            </v-icon>
-            {{ item.name }}
+            <v-icon
+              left
+              size="18"
+              :color="item.color"
+              v-html="`mdi-${item.icon}`"
+            />
+            <span v-html="item.name" />
           </v-list-item-title>
           <v-icon size="22">mdi-menu-right</v-icon>
         </v-list-item>
@@ -62,25 +53,27 @@
           <div v-for="(sub, i) in item.menu" :key="i">
             <v-list-item
               v-if="sub.type == 'item'"
-              @mouseover="hideChildMenu(i)"
+              @mouseover="open"
               @mouseup="activate(sub.action)"
               class="pr-1"
               link
             >
-              <v-list-item-title>
-                <v-icon left size="18" :color="sub.color">
-                  mdi-{{ sub.icon }}
-                </v-icon>
-                {{ sub.name }}
+              <v-list-item-title class="pr-6">
+                <v-icon
+                  left
+                  size="18"
+                  :color="sub.color"
+                  v-html="`mdi-${sub.icon}`"
+                />
+                <span v-html="sub.name" />
               </v-list-item-title>
-              <div class="px-3" />
             </v-list-item>
 
             <v-divider v-else-if="sub.type == 'divider'" class="ma-1" />
 
             <ContextMenuNested
               v-else-if="sub.type == 'menu'"
-              :ref="'child' + i"
+              @showParent="showCurrent"
               :item="sub"
             />
           </div>
@@ -91,6 +84,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import ContextMenuNested from "@/components/elements/ContextMenuNested.vue";
 
 export default {
@@ -99,10 +93,6 @@ export default {
     item: Object,
   },
   components: { ContextMenuNested },
-  data: () => ({
-    show: false,
-    timeout: null,
-  }),
   computed: {
     menu: {
       get() {
@@ -119,23 +109,21 @@ export default {
       this.menu.show = false;
     },
     open() {
-      // if (this.menu.child) this.$emit("hide");
-      // else {
-        clearTimeout(this.timeout);
-        this.show = true;
-        this.menu.child = true;
-      // }
+      this.hideNested();
+      this.showCurrent();
+      this.$emit("showParent");
     },
-    hide() {
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
-        this.show = false;
-      }, 10);
+    showCurrent() {
+      Vue.set(this.item, "show", true);
     },
-    hideChildMenu(i) {
-      return;
-      for (let ref in this.$refs)
-        if (ref == "child" + i) this.$refs[ref][0].hide();
+    hideNested() {
+      const hideMenu = (entry) => {
+        for (let i of entry) {
+          Vue.set(i, "show", false);
+          if (i.type == "menu") hideMenu(i.menu);
+        }
+      };
+      hideMenu(this.menu.content);
     },
   },
 };
