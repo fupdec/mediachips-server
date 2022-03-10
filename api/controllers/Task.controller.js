@@ -192,10 +192,7 @@ exports.importDatabase = async (req, res) => {
           }
           delete metaSettings.metaInCard
           metaSettings.oldId = m.id
-          if (metaSettings.imageTypes) {
-            if (metaSettings.imageTypes.length == 0) metaSettings.imageTypes = "main"
-            else metaSettings.imageTypes = metaSettings.imageTypes.join()
-          }
+          metaSettings.marks = metaSettings.markers
           cm.metaSetting = metaSettings
           cm.pageSetting = {
             page: 1
@@ -217,6 +214,7 @@ exports.importDatabase = async (req, res) => {
           for (let z of cards) {
             for (let y in z) {
               if (typeof z[y] == 'string' && z[y].length == 0) delete z[y]
+              else if (z[y] === 0 || z[y] === '0') delete z[y]
               else if (z[y] === null) delete z[y]
             }
           }
@@ -240,6 +238,7 @@ exports.importDatabase = async (req, res) => {
       for (let z of obj.onlyMeta) {
         for (let y in z) {
           if (typeof z[y] == 'string' && z[y].length == 0) delete z[y]
+          else if (z[y] === 0 || z[y] === '0') delete z[y]
           else if (z[y] === null) delete z[y]
         }
       }

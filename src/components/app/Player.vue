@@ -64,10 +64,17 @@
           @play="playVideoObject($event)"
           @changeVolume="changeVolume($event)"
           @showControls="showControls"
+          @showDialogMarkAddingMeta="showDialogMarkAddingMeta($event)"
         />
       </div>
       <Playlist @play="playVideoObject($event)" />
       <Marks />
+      <DialogMarkAddingMeta
+        v-if="dialogMarkAddingMeta"
+        @close="dialogMarkAddingMeta = false"
+        :dialog="dialogMarkAddingMeta"
+        :meta="addingMarkMeta"
+      />
     </div>
   </v-dialog>
 </template>
@@ -76,9 +83,9 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import Controls from "./player/Controls.vue";
-import Playlist from "./player/Playlist.vue";
-import Marks from "./player/Marks.vue";
+import Controls from "@/components/app/player/Controls.vue";
+import Playlist from "@/components/app/player/Playlist.vue";
+import Marks from "@/components/app/player/Marks.vue";
 const path = require("path");
 
 export default {
@@ -87,6 +94,8 @@ export default {
     Controls,
     Playlist,
     Marks,
+    DialogMarkAddingMeta: () =>
+      import("@/components/dialogs/DialogMarkAddingMeta.vue"),
   },
   mounted() {
     this.p.player = this.$refs.videoPlayer;
@@ -104,6 +113,8 @@ export default {
   data: () => ({
     timeoutControls: -1,
     isControlsVisible: true,
+    dialogMarkAddingMeta: false,
+    addingMarkMeta: null,
   }),
   computed: {
     apiUrl() {
@@ -321,6 +332,10 @@ export default {
     showControls() {
       this.isControlsVisible = true;
       clearTimeout(this.timeoutControls);
+    },
+    showDialogMarkAddingMeta(meta) {
+      this.dialogMarkAddingMeta = true;
+      this.addingMarkMeta = meta;
     },
   },
   watch: {

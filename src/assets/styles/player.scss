@@ -214,6 +214,12 @@
           transform: scale(1);
         }
       }
+      &:focus {
+        .tip {
+          opacity: 0;
+          transform: scale(0);
+        }
+      }
     }
     .tip {
       pointer-events: none;
@@ -279,20 +285,10 @@
   }
 }
 .theme--dark {
-  .marks-wrapper {
-    .mark {
-      .name,
-      .time {
-        background-color: rgba(0, 0, 0, 0.6);
-      }
-    }
-  }
-  .playlist-wrapper {
-    .video-name {
-      b,
-      .path {
-        background-color: rgba(0, 0, 0, 0.6);
-      }
+  .player-window {
+    .name,
+    .time {
+      background-color: rgba(0, 0, 0, 0.8);
     }
   }
 }
@@ -304,138 +300,24 @@
   display: flex;
   align-items: center;
 }
-
-.marks-wrapper {
-  position: fixed;
-  top: 10px;
+.marks-window {
   left: 10px;
-  min-width: 18vw;
-  height: calc(100vh - 20px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  .v-card__title {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-  }
-  .items {
-    overflow-y: auto;
-    height: 100%;
-  }
   .mark {
-    cursor: pointer;
-    &-wrapper {
-      position: relative;
-      &:hover {
-        .delete {
-          opacity: 1;
-        }
+    &:hover {
+      .delete {
+        opacity: 1;
       }
-    }
-    .thumb {
-      width: 100%;
-      background-color: rgb(38, 50, 61);
-    }
-    .name {
-      position: absolute;
-      font-size: 1vw;
-      display: flex;
-      align-items: center;
-      left: 0px;
-      top: 0px;
-      padding: 0 5px;
-      border-radius: 0 0 3px 0;
-      background-color: rgba(255, 255, 255, 0.7);
-    }
-    .time {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      line-height: 1;
-      padding: 2px;
-      border-radius: 3px 0 0 0;
-      font-size: 1vw;
-      background-color: rgba(255, 255, 255, 0.7);
-    }
-  }
-  .toggle {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    .v-btn {
-      min-width: 30px;
-      padding: 0;
     }
   }
   .delete {
-    opacity: 0;
-    transition: 0.3s 0.2s;
     position: absolute;
-    left: 0;
-    bottom: 0;
-    padding: 1.5vw;
-    border-radius: 0 5px 0 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    left: 3px;
+    bottom: 3px;
+    opacity: 0;
   }
 }
-
-.playlist-wrapper {
-  position: fixed;
-  top: 10px;
+.playlist-window {
   right: 10px;
-  min-width: 18vw;
-  height: calc(100vh - 20px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  .v-card__title {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-  }
-  .items {
-    overflow-y: auto;
-    height: 100%;
-  }
-  .video-item {
-    position: relative;
-    overflow: hidden;
-    height: 10vw;
-  }
-  .video-name {
-    font-size: 1vw;
-    line-height: 1.2;
-    word-break: keep-all;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    overflow: hidden;
-    b,
-    .path {
-      background-color: rgba(255, 255, 255, 0.7);
-    }
-    b {
-      padding-left: 3px;
-    }
-    .path {
-      padding-left: 3px;
-      padding-right: 3px;
-      border-radius: 0 0 3px 0;
-      position: absolute;
-    }
-  }
-  .time {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    font-size: 1vw;
-    line-height: 1.2;
-    word-break: keep-all;
-    padding-left: 3px;
-    padding-right: 3px;
-    border-radius: 3px 0 0 0;
-    background-color: rgba(255, 255, 255, 0.7);
-  }
   .play-state {
     display: flex;
     justify-content: center;
@@ -460,15 +342,6 @@
       font-size: 1vw;
     }
   }
-  .thumb {
-    position: absolute;
-    min-height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-  }
   .toggle {
     width: 100%;
     .v-btn {
@@ -476,6 +349,53 @@
       width: 33.33%;
       padding: 0;
     }
+  }
+}
+.player-window {
+  position: fixed;
+  top: 10px;
+  min-width: 18vw;
+  max-width: 320px;
+  height: calc(100vh - 20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  .items {
+    overflow-y: auto;
+    height: 100%;
+  }
+  .thumb {
+    width: 100%;
+    background-color: rgb(38, 50, 61);
+    margin-bottom: 1px;
+    cursor: pointer;
+  }
+  .name {
+    position: absolute;
+    font-size: 1vw;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    max-width: calc(100% - 4px);
+    left: 2px;
+    top: 2px;
+    padding: 0 4px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  .time {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    line-height: 1;
+    padding: 2px;
+    border-radius: 5px;
+    font-size: 1vw;
+    background-color: rgba(255, 255, 255, 0.7);
   }
 }
 @media (max-width: 920px) {

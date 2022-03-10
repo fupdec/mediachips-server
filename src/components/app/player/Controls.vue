@@ -41,8 +41,8 @@
       <v-chip outlined dark class="px-0 ml-3">
         <v-btn @click="prev" :disabled="isPrevDisabled" icon dark>
           <v-icon>mdi-skip-previous</v-icon>
-          <div class="tip" style="left: 0">
-            <div v-if="!isPrevDisabled" class="video-thumb">
+          <div v-if="!isPrevDisabled" class="tip" style="left: 0">
+            <div class="video-thumb">
               <div>
                 <span class="overline mr-2">Previous Video:</span>
                 <b class="kbd" v-html="'z'" />
@@ -68,8 +68,8 @@
 
         <v-btn @click="next" :disabled="isNextDisabled" icon dark>
           <v-icon>mdi-skip-next</v-icon>
-          <div class="tip" style="left: 0">
-            <div v-if="!isNextDisabled" class="video-thumb">
+          <div v-if="!isNextDisabled" class="tip" style="left: 0">
+            <div class="video-thumb">
               <div>
                 <span class="overline mr-2">Next Video:</span>
                 <b class="kbd" v-html="'c'" />
@@ -118,7 +118,13 @@
           </div>
         </v-btn>
 
-        <v-menu offset-y nudge-top="40" nudge-right="400" attach=".controls">
+        <v-menu
+          attach=".mark-buttons"
+          nudge-top="45"
+          nudge-left="10"
+          min-width="150"
+          top
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn v-bind="attrs" v-on="on" icon dark>
               <v-icon>mdi-plus</v-icon>
@@ -126,17 +132,32 @@
             </v-btn>
           </template>
 
-          <!-- <div class="remove-active">
-                  <v-btn @click="addMark('favorite')" title="Favorite">
-                    <v-icon size="20">mdi-heart</v-icon> 
-                  </v-btn>
-                  <v-btn @click="openDialogMarkBookmark" title="Bookmark">
-                    <v-icon size="20">mdi-bookmark</v-icon> 
-                  </v-btn>
-                  <v-btn v-for="m in metaMarks" :key="m.id" :value="m.id" @click="openDialogMarkMeta(m.id)" :title="m.settings.name">
-                    <v-icon size="20">mdi-{{m.settings.icon}}</v-icon>
-                  </v-btn>
-                </div> -->
+          <v-list dense class="py-1">
+            <v-list-item @click="addMarkFavorite">
+              <v-list-item-title>
+                <v-icon class="mr-4" v-text="`mdi-heart`" />
+                <span v-text="`Favorite`" />
+              </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item @click="openDialogMarkBookmark">
+              <v-list-item-title>
+                <v-icon class="mr-4" v-text="`mdi-bookmark`" />
+                <span v-text="`Bookmark`" />
+              </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+              v-for="i in assigned"
+              :key="i.meta.id"
+              @click="openDialogMarkMeta(i.meta)"
+            >
+              <v-list-item-title>
+                <v-icon class="mr-4" v-text="`mdi-${i.meta.icon}`" />
+                <span v-text="i.meta.name" />
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
         </v-menu>
 
         <v-btn
@@ -185,29 +206,6 @@
           <div class="tip" v-html="'Set Frame as Thumb'" />
         </v-btn>
       </v-chip>
-
-      <!-- FAST SEEK -->
-      <!-- <v-chip outlined dark class="seek-buttons px-0">
-        <v-btn @click="jumpToSeconds(-5)" icon dark>
-          <v-icon size="20">mdi-chevron-triple-left</v-icon>
-          <div class="tip" v-html="'- 5 seconds'" />
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(-2)" icon dark>
-          <v-icon size="20">mdi-chevron-double-left</v-icon>
-          <div class="tip" v-html="'- 2 seconds'" />
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(2)" icon dark>
-          <v-icon size="20">mdi-chevron-double-right</v-icon>
-          <div class="tip" v-html="'+ 2 seconds'" />
-        </v-btn>
-
-        <v-btn @click="jumpToSeconds(5)" icon dark>
-          <v-icon size="20">mdi-chevron-triple-right</v-icon>
-          <div class="tip" v-html="'+ 5 seconds'" />
-        </v-btn>
-      </v-chip> -->
 
       <v-spacer></v-spacer>
 
@@ -272,6 +270,10 @@ export default {
     Mark,
   },
   computed: {
+    assigned() {
+      let list = this.$store.state.Page.assigned;
+      return list.filter((i) => i.meta.metaSetting.marks);
+    },
     p: {
       get() {
         return this.$store.state.Player;
@@ -468,6 +470,11 @@ export default {
     },
     changeVolume(e) {
       this.$emit("changeVolume", e);
+    },
+    addMarkFavorite() {},
+    openDialogMarkBookmark() {},
+    openDialogMarkMeta(meta) {
+      this.$emit('showDialogMarkAddingMeta', meta)
     },
     async setAsThumb() {
       let video = this.p.playlist[this.p.nowPlaying];

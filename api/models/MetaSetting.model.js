@@ -57,10 +57,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      imageTypes: {
-        type: Sequelize.TEXT,
-        defaultValue: 'main',
-      },
       imageAspectRatio: {
         type: Sequelize.FLOAT,
         defaultValue: 1,

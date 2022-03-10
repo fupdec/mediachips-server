@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-show="p.playlistVisible"
-    class="playlist-wrapper"
+    class="playlist-window player-window"
     elevation="20"
     outlined
   >
@@ -14,75 +14,62 @@
       </v-btn>
     </v-card-actions>
 
-    <v-card-actions class="pa-0">
-      <v-btn-toggle
-        v-model="p.playlistMode"
-        tile
-        dense
-        multiple
-        color="primary"
-        class="toggle"
-      >
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn value="loop" v-on="on">
-              <v-icon>mdi-sync</v-icon>
-            </v-btn>
-          </template>
-          <span>Loop</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn value="autoplay" v-on="on">
-              <v-icon>mdi-play-pause</v-icon>
-            </v-btn>
-          </template>
-          <span>Autoplay</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn value="shuffle" v-on="on">
-              <v-icon>mdi-shuffle-variant</v-icon>
-            </v-btn>
-          </template>
-          <span>Shuffle</span>
-        </v-tooltip>
-      </v-btn-toggle>
-    </v-card-actions>
+    <v-btn-toggle
+      v-model="p.playlistMode"
+      color="primary"
+      class="toggle"
+      multiple
+      dense
+      tile
+    >
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn value="loop" v-on="on">
+            <v-icon>mdi-sync</v-icon>
+          </v-btn>
+        </template>
+        <span>Loop</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn value="autoplay" v-on="on">
+            <v-icon>mdi-play-pause</v-icon>
+          </v-btn>
+        </template>
+        <span>Autoplay</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn value="shuffle" v-on="on">
+            <v-icon>mdi-shuffle-variant</v-icon>
+          </v-btn>
+        </template>
+        <span>Shuffle</span>
+      </v-tooltip>
+    </v-btn-toggle>
 
     <div class="items">
-      <v-card-text class="pa-0">
-        <v-list dense class="pa-0">
-          <v-list-item-group v-model="p.nowPlaying" mandatory color="primary">
-            <v-list-item
-              v-for="(video, i) in p.playlist"
-              :key="video.id"
-              :ref="`videoItem${i}`"
-              @click="play(i)"
-              class="video-item"
-            >
-              <img :src="video.thumb" class="thumb" />
-              <span class="video-name">
-                <b>{{ i + 1 }}.</b>
-                <span class="path" v-html="getFileName(video.path)" />
-              </span>
-              <div v-if="!reg && i > 9" class="reg-playlist">
-                App not registered
-              </div>
-              <!-- <span class="time">
+      <div v-for="(video, i) in p.playlist" :key="video.id" @click="play(i)">
+        <v-img :src="video.thumb" :aspect-ratio="16 / 9" class="thumb">
+          <span class="name">
+            <b class="pr-1">{{ i + 1 }}.</b>
+            <span v-text="getFileName(video.path)" />
+          </span>
+          <div
+            v-if="!reg && i > 9"
+            class="reg-playlist"
+            v-text="`App not registered`"
+          />
+          <!-- <span class="time">
                 {{ getDuration(video['videoMetadata'].duration) }}
               </span> -->
-              <span
-                v-if="p.nowPlaying === i"
-                class="play-state overline text--primary"
-              >
-                <v-icon class="pl-2 pr-1">mdi-play</v-icon>
-                <span class="pr-4 text">Now playing</span>
-              </span>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-card-text>
+          <!-- TODO get duration -->
+          <span v-if="p.nowPlaying === i" class="play-state">
+            <v-icon class="pl-1 pr-1">mdi-play</v-icon>
+            <span class="pr-3 text">Now playing</span>
+          </span>
+        </v-img>
+      </div>
     </div>
   </v-card>
 </template>

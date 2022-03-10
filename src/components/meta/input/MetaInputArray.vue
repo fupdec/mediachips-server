@@ -17,9 +17,9 @@
     :persistent-hint="view.persistentHint"
     :hide-details="view.hideDetails"
     :outlined="view.outlined"
+    :multiple="multiple"
     :hide-no-data="!search"
     hide-selected
-    multiple
     clearable
     class="val custom-chips-size"
   >
@@ -81,11 +81,24 @@ export default {
   name: "MetaInputArray",
   props: {
     metaId: Number,
-    disabled: Boolean || false,
     dialog: String,
-    cond: null,
-    value: Array,
-    prependIcon: null,
+    value: [Array, Number],
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    cond: {
+      type: String,
+      default: null,
+    },
+    prependIcon: {
+      type: String,
+      default: null,
+    },
+    multiple: {
+      type: Boolean,
+      default: true,
+    },
   },
   async beforeMount() {
     await axios
