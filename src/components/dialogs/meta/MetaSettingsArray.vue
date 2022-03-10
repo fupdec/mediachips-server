@@ -200,7 +200,6 @@ export default {
       hidden: false,
       parser: false,
       imageAspectRatio: 1,
-      imageTypes: "main",
       chipLabel: false,
       chipOutlined: false,
       color: false,

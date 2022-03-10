@@ -39,6 +39,7 @@
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <!-- <WatchedFolders /> -->
           <Login />
+          <General />
         </v-card>
       </v-tab-item>
       <v-tab-item value="appearance">
@@ -84,6 +85,7 @@ export default {
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
     Login: () => import("@/components/settings/Login.vue"),
+    General: () => import("@/components/settings/General.vue"),
     Registration: () => import("@/components/settings/Registration.vue"),
     About: () => import("@/components/app/About.vue"),
   },

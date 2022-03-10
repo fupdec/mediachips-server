@@ -228,7 +228,7 @@ export default {
 
       let filtersDefault = this.$store.state.settings.typingFiltersDefault;
 
-      if (filtersDefault) {
+      if (filtersDefault == "1") {
         let x = item.name.toLowerCase().indexOf(query);
         if (x > -1) return true;
         else {

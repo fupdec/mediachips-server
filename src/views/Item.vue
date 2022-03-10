@@ -224,9 +224,7 @@ export default {
     },
     async getImages() {
       const imageTypes = ["main", "header"];
-      const settings = this.meta.metaSetting.imageTypes;
       for (let i of imageTypes) {
-        if (!settings.includes(i)) continue;
         let imgPath = path.join(
           __dirname,
           "/userfiles/media/meta/",
