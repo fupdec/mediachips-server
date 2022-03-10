@@ -6,11 +6,11 @@
         <pre class="error--text" v-html="text" />
       </v-card-text>
       <v-card-actions class="pb-4">
-        <v-btn @click="close" plain>
+        <v-btn @click="close" class="pr-4" text>
           <v-icon left>mdi-close</v-icon> Cancel
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn @click="del" color="error" plain>
+        <v-btn @click="del" color="error" class="pr-4" depressed>
           <v-icon left>mdi-check</v-icon> Delete
         </v-btn>
       </v-card-actions>

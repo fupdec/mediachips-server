@@ -126,7 +126,7 @@
                 </v-alert>
               </v-card-text>
               <v-card-actions>
-                <v-btn @click="dialog = false" class="ma-2" plain>
+                <v-btn @click="dialog = false" class="ma-2 pr-4" text rounded>
                   <v-icon left>mdi-close</v-icon> Cancel
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -171,13 +171,13 @@
                 </div>
               </v-card-text>
               <v-card-actions>
-                <v-btn @click="closeDialog" class="ma-2" plain>
+                <v-btn @click="closeDialog" class="ma-2 pr-4" text rounded>
                   <v-icon left>mdi-close</v-icon> Cancel
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn @click="step = 1" class="ma-2" plain>
-                  <v-icon large left>mdi-chevron-left</v-icon> Back to entering
-                  key
+                <v-btn @click="step = 1" class="ma-2 pr-4" text rounded>
+                  <v-icon large left>mdi-chevron-left</v-icon> 
+                  <span v-html="`Back to entering key`"/>
                 </v-btn>
                 <v-btn
                   @click="register"

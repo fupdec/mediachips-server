@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Dialogs from './modules/dialogs.js'
 import Page from './modules/page.js'
 import Player from './modules/player.js'
 import Reg from './modules/reg.js'
@@ -37,15 +38,10 @@ export default new Vuex.Store({
       y: 0,
     },
     pathToUserData: '',
-    videoPlayerVideoId: null,
-    videoPlayerPlaylist: null,
     foldersData: [],
     dialogFolder: false,
     navDrawer: true,
-    clipboardMeta: {},
     updateFoldersData: 0,
-    dialogError: false,
-    dialogErrorText: null,
     settings: Settings,
   }),
   mutations: {
@@ -111,6 +107,7 @@ export default new Vuex.Store({
   },
   getters: {},
   modules: {
+    Dialogs,
     Page,
     Player,
     Reg,

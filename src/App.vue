@@ -25,11 +25,24 @@
 
     <DialogLogin :login="login" @close="closeApp" @success="login = false" />
 
-    <DialogError v-if="$store.state.dialogError" />
+    <DialogError v-if="$store.state.Dialogs.error.show" />
     <DialogMediaAddingProcess
       v-if="$store.state.Tasks.mediaAdding.dialogProcess"
       @close="$store.state.Tasks.mediaAdding.dialogProcess = false"
       :dialog="$store.state.Tasks.mediaAdding.dialogProcess"
+    />
+    <DialogMediaEditing
+      v-if="$store.state.Dialogs.mediaEditing.show"
+      @close="$store.state.Dialogs.mediaEditing.show = false"
+      :dialog="$store.state.Dialogs.mediaEditing.show"
+      :media="$store.state.Dialogs.mediaEditing.media"
+    />
+    <DialogItemEditing
+      v-if="$store.state.Dialogs.itemEditing.show"
+      @close="$store.state.Dialogs.itemEditing.show = false"
+      :dialog="$store.state.Dialogs.itemEditing.show"
+      :item="$store.state.Dialogs.itemEditing.item"
+      :meta="$store.state.Dialogs.itemEditing.meta"
     />
   </v-app>
 </template>
@@ -59,6 +72,10 @@ export default {
     DialogError: () => import("@/components/dialogs/DialogError.vue"),
     DialogMediaAddingProcess: () =>
       import("@/components/dialogs/DialogMediaAddingProcess.vue"),
+    DialogMediaEditing: () =>
+      import("@/components/dialogs/DialogMediaEditing.vue"),
+    DialogItemEditing: () =>
+      import("@/components/dialogs/DialogItemEditing.vue"),
   },
   mixins: [AddingMedia],
   async mounted() {

@@ -76,7 +76,7 @@
         />
 
         <v-btn
-          @click.stop="dialogEditing = true"
+          @click.stop="edit"
           color="primary"
           class="btn-edit"
           small
@@ -116,18 +116,11 @@
           mdi-checkbox-marked-outline
         </v-icon>
       </v-overlay>
-
-      <DialogItemEditing
-        v-if="dialogEditing"
-        @close="dialogEditing = false"
-        :dialog="dialogEditing"
-        :item="item"
-        :meta="meta"
-      />
     </v-card>
 
     <v-chip
       v-else-if="page.view == '2'"
+      @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       class="meta-chip"
       :color="item.color || '#777777'"
@@ -171,8 +164,6 @@ export default {
   },
   components: {
     NestedItems,
-    DialogItemEditing: () =>
-      import("@/components/dialogs/DialogItemEditing.vue"),
   },
   mixins: [ComputedForItem],
   mounted() {
@@ -189,7 +180,6 @@ export default {
     },
     items: [],
     values: [],
-    dialogEditing: false,
     dialogDeleting: false,
   }),
   computed: {
@@ -201,6 +191,11 @@ export default {
     },
   },
   methods: {
+    edit() {
+      this.$store.state.Dialogs.itemEditing.show = true;
+      this.$store.state.Dialogs.itemEditing.item = this.item;
+      this.$store.state.Dialogs.itemEditing.meta = this.meta;
+    },
     openItemPage() {
       let url =
         "/item?metaId=" +
@@ -260,19 +255,18 @@ export default {
     },
     showMenu(e) {
       e.preventDefault();
-      let contextMenu = [
-        {
-          name: `Edit ${this.meta.nameSingular}`,
-          type: "item",
-          icon: "pencil",
-          action: () => {
-            this.dialogEditing = true;
-          },
+      let contextMenu = [];
+      contextMenu.push({
+        name: `Edit`,
+        type: "item",
+        icon: "pencil",
+        action: () => {
+          this.edit();
         },
-      ];
+      });
       contextMenu.push({ type: "divider" });
       contextMenu.push({
-        name: `Delete ${this.meta.nameSingular}`,
+        name: `Delete`,
         type: "item",
         icon: "delete",
         color: "red",

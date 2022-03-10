@@ -3,7 +3,9 @@
     <v-card
       v-if="page.view == '1'"
       :disabled="!reg && x > 9"
+      @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
+      v-ripple="{ class: 'primary--text' }"
       :class="{ favorite: video.favorite }"
       class="video-card meta-card"
       outlined
@@ -95,13 +97,7 @@
           </div>
         </div>
 
-        <v-btn
-          @click.stop="dialogEditing = true"
-          color="primary"
-          class="btn-edit"
-          small
-          fab
-        >
+        <v-btn @click.stop="edit" color="primary" class="btn-edit" small fab>
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
       </v-responsive>
@@ -130,27 +126,22 @@
         :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
+        z-index="1"
         absolute
       >
         <v-icon v-if="isSelected" size="50">
           mdi-checkbox-marked-outline
         </v-icon>
       </v-overlay>
-
-      <DialogMediaEditing
-        v-if="dialogEditing"
-        @close="dialogEditing = false"
-        :dialog="dialogEditing"
-        :media="video"
-      />
     </v-card>
 
     <v-card
       v-else-if="page.view == '2'"
-      :disabled="!reg && x > 9"
+      @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
       :class="{ favorite: video.favorite }"
+      :disabled="!reg && x > 9"
       outlined
       hover
       class="video-card meta-card"
@@ -216,6 +207,7 @@
         :value="page.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
+        z-index="1"
         absolute
       >
         <v-icon v-if="isSelected" size="50">
@@ -243,8 +235,6 @@ export default {
   },
   components: {
     NestedItems,
-    DialogMediaEditing: () =>
-      import("@/components/dialogs/DialogMediaEditing.vue"),
   },
   mixins: [ComputedForItem],
   async beforeMount() {
@@ -279,7 +269,6 @@ export default {
     timelines: [5, 15, 25, 35, 45, 55, 65, 75, 85, 95],
     timeouts: {},
     isFileExists: true,
-    dialogEditing: false,
   }),
   computed: {
     apiUrl() {
@@ -381,11 +370,15 @@ export default {
           console.log(e);
         });
     },
+    edit() {
+      this.$store.state.Dialogs.mediaEditing.show = true;
+      this.$store.state.Dialogs.mediaEditing.media = this.video;
+    },
     openPlayer() {
       if (!this.isFileExists) {
-        this.$store.state.dialogError = true;
+        this.$store.state.Dialogs.error.show = true;
         let text = `File not found on path: \n"${this.video.path}"`;
-        this.$store.state.dialogErrorText = text;
+        this.$store.state.Dialogs.error.text = text;
         return;
       }
       this.$store.state.Player.active = true;
@@ -470,6 +463,88 @@ export default {
         },
       });
       this.$root.$emit("getItemsFromDb", []);
+    },
+    showMenu(e) {
+      e.preventDefault();
+      let contextMenu = [];
+      contextMenu.push(
+        {
+          name: `Edit`,
+          type: "item",
+          icon: "pencil",
+          action: () => {
+            this.edit();
+          },
+        },
+        {
+          name: `Clear Meta`,
+          type: "item",
+          icon: "close-circle-outline",
+          color: "error",
+          action: () => {
+            this.dialogEditing = true;
+          },
+        }
+      );
+      contextMenu.push({ type: "divider" });
+      contextMenu.push({
+        name: `Parse Metadata`,
+        type: "item",
+        icon: "text-box-search",
+        action: () => {
+          this.dialogEditing = true;
+        },
+      });
+      contextMenu.push({
+        name: `Update File Information`,
+        type: "item",
+        icon: "information-variant",
+        action: () => {
+          this.dialogEditing = true;
+        },
+      });
+      contextMenu.push({ type: "divider" });
+      if (!this.page.isSelect)
+        contextMenu.push({
+          name: `Open in System Player`,
+          type: "item",
+          icon: "play",
+          action: () => {
+            this.dialogEditing = true;
+          },
+        });
+      if (!this.page.isSelect)
+        contextMenu.push({
+          name: `Reveal in File Explorer`,
+          type: "item",
+          icon: "folder-open",
+          action: () => {
+            this.dialogEditing = true;
+          },
+        });
+      contextMenu.push({
+        name: `Move File to...`,
+        type: "item",
+        icon: "file-move",
+        action: () => {
+          this.dialogEditing = true;
+        },
+      });
+      contextMenu.push({ type: "divider" });
+      contextMenu.push({
+        name: `Delete`,
+        type: "item",
+        icon: "delete",
+        color: "red",
+        action: () => {
+          this.dialogDeleting = true;
+        },
+      });
+      this.$store.dispatch("showContextMenu", {
+        x: e.clientX,
+        y: e.clientY,
+        content: contextMenu,
+      });
     },
   },
   watch: {
