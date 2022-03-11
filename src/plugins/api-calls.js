@@ -17,7 +17,7 @@ const ApiCalls = {
           })
       })
     }
-    Vue.prototype.$checkFileExists = async function (filePath) {
+    Vue.prototype.$checkFileExists = async function (filePath, isMedia) {
       let res = null
       try {
         res = await axios({
@@ -25,6 +25,7 @@ const ApiCalls = {
           url: options.store.state.localhost + '/api/Task/checkFileExists',
           data: {
             path: filePath,
+            isMedia: isMedia,
           }
         })
       } catch (error) {

@@ -42,10 +42,15 @@ export default {
     position: String,
   },
   mounted() {
-    this.getImg();
     this.$root.$on("updateMarkImage", (id) => {
       if (this.mark.id === id) this.getImg();
     });
+    this.$nextTick(() => {
+      this.getImg();
+    });
+  },
+  beforeDestroy() {
+    this.$root.$off("updateMarkImage");
   },
   data: () => ({
     thumb: null,

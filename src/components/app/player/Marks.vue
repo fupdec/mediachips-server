@@ -77,6 +77,9 @@ export default {
       if (this.p.marks.some((i) => i.id === id)) this.getThumbs();
     });
   },
+  beforeDestroy() {
+    this.$root.$off("updateMarkImage");
+  },
   data: () => ({
     marksType: ["favorite", "bookmark"],
   }),

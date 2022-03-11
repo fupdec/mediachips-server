@@ -108,6 +108,9 @@ export default {
       this.loadSrc(video);
     });
   },
+  beforeDestroy() {
+    this.$root.$off("playVideo");
+  },
   data: () => ({
     timeoutControls: -1,
     isControlsVisible: true,
@@ -191,6 +194,11 @@ export default {
       for (let mark of this.p.marks) {
         let time = new Date(1000 * mark.time).toISOString().substr(11, 12);
         let imgPath = "/userfiles/media/marks/" + mark.id + ".jpg";
+        let res = await Vue.prototype.$checkFileExists(imgPath, true);
+        if (res.status == 201) {
+          this.$root.$emit("updateMarkImage", mark.id);
+          continue;
+        }
         await Vue.prototype
           .$createThumb(time, video.path, imgPath, 180)
           .then(() => {

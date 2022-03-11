@@ -568,18 +568,19 @@ const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.as
 ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
-exports.checkFileExists = async (req, res) => {
-  const filePath = path.join(req.body.path)
-  if (fs.existsSync(filePath)) res.sendStatus(201)
-  else res.sendStatus(400)
-}
-
-const getLocalPath = (outputPath) => {
+const getMediaPath = (outputPath) => {
   return path.join(
     __dirname,
     '../../',
     outputPath
   )
+}
+
+exports.checkFileExists = async (req, res) => {
+  let filePath = path.join(req.body.path)
+  if (req.body.isMedia) filePath = getMediaPath(filePath)
+  if (fs.existsSync(filePath)) res.sendStatus(201)
+  else res.sendStatus(400)
 }
 
 exports.getFileList = async (req, res) => {
@@ -651,7 +652,7 @@ exports.addMediaVideo = async (req, res) => {
 
   function createThumb(pathToFile, id) {
     return new Promise((resolve, reject) => {
-      let outputPathThumbs = getLocalPath("/userfiles/media/thumbs/")
+      let outputPathThumbs = getMediaPath("/userfiles/media/thumbs/")
       ffmpeg()
         .input(pathToFile)
         .screenshots({
@@ -790,7 +791,7 @@ exports.createThumb = async (req, res) => {
     return
   }
 
-  let outputPath = getLocalPath(req.body.outputPath)
+  let outputPath = getMediaPath(req.body.outputPath)
   createThumb(req.body.timestamp, req.body.inputPath, outputPath, req.body.width)
     .then(thumbResult => {
       res.status(201).send(thumbResult)
@@ -1036,7 +1037,7 @@ exports.getMachineId = async (req, res) => {
 const Jimp = require('jimp');
 
 exports.createImage = (req, res) => {
-  const outputPath = getLocalPath(req.body.outputPath)
+  const outputPath = getMediaPath(req.body.outputPath)
   const buf = Buffer.from(req.body.image, 'base64');
 
   Jimp.read(buf)
@@ -1055,7 +1056,7 @@ exports.createImage = (req, res) => {
 };
 
 exports.deleteImage = (req, res) => {
-  const filePath = getLocalPath(req.body.path)
+  const filePath = getMediaPath(req.body.path)
 
   fs.unlink(filePath, (err) => {
     if (err) {
