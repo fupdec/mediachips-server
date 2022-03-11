@@ -30,6 +30,11 @@ const Player = {
     playlistMode: ['autoplay'],
     // Marks
     marks: [],
+    markDel: {
+      show: false,
+      mark: null, 
+      text: "The mark will be removed.\r Are you sure?",
+    },
   }),
   mutations: {
     trackCurrentTime(state) {

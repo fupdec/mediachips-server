@@ -57,7 +57,22 @@ exports.findOne = (req, res) => {};
 exports.update = (req, res) => {};
 
 // Delete a Mark with the specified id in the request
-exports.delete = (req, res) => {};
+exports.delete = (req, res) => {
+  Mark
+    .destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Delete all Mark from the database.
 exports.deleteAll = (req, res) => {};

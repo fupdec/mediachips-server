@@ -74,6 +74,13 @@
         @togglePause="togglePause"
         @addMark="addMark($event)"
       />
+      <DialogDeleteConfirm
+        v-if="p.markDel.show"
+        @close="p.markDel.show = false"
+        @delete="deleteMark"
+        :dialog="p.markDel.show"
+        :text="p.markDel.text"
+      />
     </div>
   </v-dialog>
 </template>
@@ -94,6 +101,8 @@ export default {
     Playlist,
     Marks,
     DialogMarkAdding: () => import("@/components/dialogs/DialogMarkAdding.vue"),
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
   },
   mounted() {
     this.p.player = this.$refs.videoPlayer;
@@ -386,6 +395,19 @@ export default {
         .catch((e) => {
           // console.log(e);
         });
+    },
+    async deleteMark() {
+      this.p.markDel.show = false;
+      let id = this.p.markDel.mark.id;
+      let imgPath = path.join(
+        __dirname,
+        "/userfiles/media/marks/",
+        `${id}.jpg`
+      );
+      await axios.delete(this.apiUrl + "/api/mark/" + id);
+      await Vue.prototype.$deleteLocalImage(imgPath);
+      let video = this.p.playlist[this.p.nowPlaying];
+      await this.getMarks(video);
     },
   },
   watch: {

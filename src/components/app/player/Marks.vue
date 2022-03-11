@@ -52,7 +52,13 @@
             <span v-if="mark.type == 'meta'" v-html="mark['item.name']" />
             <span v-else v-html="mark.name" />
           </div>
-          <v-btn class="delete" color="error" small fab>
+          <v-btn
+            @click.stop="del(mark)"
+            class="delete"
+            color="error"
+            x-small
+            fab
+          >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </v-img>
@@ -96,9 +102,6 @@ export default {
         this.$store.state.Player = value;
       },
     },
-    metaMarks() {
-      return [];
-    },
   },
   methods: {
     async getThumbs() {
@@ -128,10 +131,13 @@ export default {
       this.$store.dispatch("playerJumpTo", { time });
     },
     checkMarkVisibility(mark) {
-      return (
-        this.marksType.includes(mark.type) ||
-        this.marksType.includes(mark.meta.id)
-      );
+      let type = mark.type;
+      if (type == "meta") type = mark.meta.id;
+      return this.marksType.includes(type);
+    },
+    del(mark) {
+      this.p.markDel.show = true;
+      this.p.markDel.mark = mark;
     },
   },
   watch: {

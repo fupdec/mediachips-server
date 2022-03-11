@@ -16,6 +16,9 @@
 
     <v-sheet class="tooltip text-center" :color="color" outlined rounded>
       <v-img :src="thumb" :aspect-ratio="16 / 9" class="thumb">
+        <v-btn @click.stop="del(mark)" class="delete" color="error" x-small fab>
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
         <v-sheet class="time" v-html="time" />
       </v-img>
 
@@ -56,6 +59,14 @@ export default {
     thumb: null,
   }),
   computed: {
+    p: {
+      get() {
+        return this.$store.state.Player;
+      },
+      set(value) {
+        this.$store.state.Player = value;
+      },
+    },
     icon() {
       let icon = "tooltip";
       if (this.mark.type == "favorite") icon = "heart";
@@ -88,6 +99,10 @@ export default {
     },
     jumpTo() {
       this.$store.dispatch("playerJumpTo", { time: this.mark.time });
+    },
+    del(mark) {
+      this.p.markDel.show = true;
+      this.p.markDel.mark = mark;
     },
   },
 };

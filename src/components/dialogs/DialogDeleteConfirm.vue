@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-if="dialog" :value="dialog" @input="close">
-    <v-card>
+    <v-card min-width="300">
       <v-card-text class="text-center">
         <v-icon large color="error" class="py-6"> mdi-alert-outline </v-icon>
         <pre class="error--text" v-html="text" />
