@@ -12,6 +12,9 @@
     .playlist-wrapper {
       height: calc(100vh - 100px);
     }
+    .dialog-overflow-visible {
+      overflow: visible;
+    }
   }
   .player-wrapper {
     position: relative;
@@ -115,6 +118,7 @@
       .v-slider__thumb {
         height: 16px;
         width: 16px;
+        pointer-events: none;
       }
     }
     .v-slider {

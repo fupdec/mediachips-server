@@ -24,7 +24,7 @@
           mdi-{{ mark.meta.icon }}
         </v-icon>
         <span v-if="mark.type == 'meta'" v-html="mark['item.name']" />
-        <span v-else v-html="mark.name" />
+        <span v-else v-html="mark.text" />
       </v-sheet>
     </v-sheet>
   </div>

@@ -9,7 +9,13 @@
       <span> Global Search </span>
     </v-tooltip>
 
-    <v-dialog v-model="dialog" @input="close" scrollable width="680">
+    <v-dialog
+      :value="dialog"
+      @input="close"
+      content-class=" dialog-position-start"
+      scrollable
+      width="680"
+    >
       <v-card>
         <v-card-actions>
           <v-text-field
@@ -26,12 +32,7 @@
         </v-card-actions>
 
         <v-card-text class="pa-4">
-          <v-card
-            v-for="(group, x) in items"
-            :key="x"
-            class="mb-4"
-            outlined
-          >
+          <v-card v-for="(group, x) in items" :key="x" class="mb-4" outlined>
             <v-btn
               @click="openMeta(group[0].metaId)"
               block

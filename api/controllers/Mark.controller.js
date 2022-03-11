@@ -1,14 +1,20 @@
-const db = require("../index.js");
 const {
   Item,
   Mark,
   Meta,
   MetaSetting
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
 // Create and Save a new Mark
-exports.create = (req, res) => {};
+exports.create = (req, res) => {
+  Mark.create(req.body).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
 
 // Retrieve all Mark for video from the database.
 exports.findAll = (req, res) => {};

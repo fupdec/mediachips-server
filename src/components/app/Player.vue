@@ -64,16 +64,15 @@
           @play="playVideoObject($event)"
           @changeVolume="changeVolume($event)"
           @showControls="showControls"
-          @showDialogMarkAddingMeta="showDialogMarkAddingMeta($event)"
+          @addMark="openAddingMark($event)"
         />
       </div>
       <Playlist @play="playVideoObject($event)" />
       <Marks />
-      <DialogMarkAddingMeta
-        v-if="dialogMarkAddingMeta"
-        @close="dialogMarkAddingMeta = false"
-        :dialog="dialogMarkAddingMeta"
-        :meta="addingMarkMeta"
+      <DialogMarkAdding
+        v-if="$store.state.Dialogs.markAdding.show"
+        @togglePause="togglePause"
+        @addMark="addMark($event)"
       />
     </div>
   </v-dialog>
@@ -94,8 +93,7 @@ export default {
     Controls,
     Playlist,
     Marks,
-    DialogMarkAddingMeta: () =>
-      import("@/components/dialogs/DialogMarkAddingMeta.vue"),
+    DialogMarkAdding: () => import("@/components/dialogs/DialogMarkAdding.vue"),
   },
   mounted() {
     this.p.player = this.$refs.videoPlayer;
@@ -113,8 +111,6 @@ export default {
   data: () => ({
     timeoutControls: -1,
     isControlsVisible: true,
-    dialogMarkAddingMeta: false,
-    addingMarkMeta: null,
   }),
   computed: {
     apiUrl() {
@@ -130,6 +126,14 @@ export default {
     },
     page() {
       return this.$store.state.Page;
+    },
+    markAdding: {
+      get() {
+        return this.$store.state.Dialogs.markAdding;
+      },
+      set(value) {
+        this.$store.state.Dialogs.markAdding = value;
+      },
     },
     reg() {
       return this.$store.getters.reg;
@@ -164,11 +168,12 @@ export default {
       this.p.nowPlaying = _.findIndex(this.p.playlist, (i) => i.id == video.id);
       this.$store.dispatch("changePlayerStatusText", {
         text: `${this.p.nowPlaying + 1}. ${fileName}`,
-        icon: "format-list-bulleted",
+        icon: "playlist-play",
       });
       document.title = `Playing: ${fileName}` + " - mediaChips";
       this.p.playbackError = false;
       if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
+      this.markAdding.show = false;
     },
     getFileNameFromPath(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
@@ -184,7 +189,7 @@ export default {
         });
       // creating mark thumb
       for (let mark of this.p.marks) {
-        let time = new Date(1000 * mark.time).toISOString().substr(11, 8);
+        let time = new Date(1000 * mark.time).toISOString().substr(11, 12);
         let imgPath = "/userfiles/media/marks/" + mark.id + ".jpg";
         await Vue.prototype
           .$createThumb(time, video.path, imgPath, 180)
@@ -293,10 +298,10 @@ export default {
           this.$refs.controls.stop();
           break;
         case e.key === "1":
-          this.addMark("favorite"); // TODO make it
+          this.addMark("favorite");
           break;
         case e.key === "2":
-          this.openDialogMarkBookmark(); // TODO make it
+          this.openAddingMark("bookmark");
           break;
         case e.key === "Escape":
           if (this.p.fullscreen) this.toggleFullscreen(); // TODO fix it
@@ -333,9 +338,46 @@ export default {
       this.isControlsVisible = true;
       clearTimeout(this.timeoutControls);
     },
-    showDialogMarkAddingMeta(meta) {
-      this.dialogMarkAddingMeta = true;
-      this.addingMarkMeta = meta;
+    openAddingMark(type) {
+      this.markAdding.time = this.p.currentTime;
+      if (type === "favorite") {
+        this.markAdding.type = "favorite";
+        this.addMark("favorite");
+      } else if (type === "bookmark") {
+        this.markAdding.type = "bookmark";
+        this.markAdding.show = true;
+      } else {
+        this.markAdding.type = "meta";
+        this.markAdding.meta = type;
+        this.markAdding.show = true;
+      }
+    },
+    addMark(data) {
+      let video = this.p.playlist[this.p.nowPlaying];
+      let mark = {
+        type: this.markAdding.type,
+        time: this.markAdding.time,
+        mediaId: video.id,
+      };
+      if (data === "favorite") {
+        mark.time = this.p.currentTime;
+        mark.type = data;
+      } else mark = { ...mark, ...data };
+      axios({
+        method: "post",
+        url: this.apiUrl + "/api/mark",
+        data: mark,
+      })
+        .then((res) => {
+          this.$store.dispatch("changePlayerStatusText", {
+            text: `Mark added`,
+            icon: "tooltip-plus",
+          });
+          this.getMarks(video);
+        })
+        .catch((e) => {
+          // console.log(e);
+        });
     },
   },
   watch: {

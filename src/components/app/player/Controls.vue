@@ -133,14 +133,14 @@
           </template>
 
           <v-list dense class="py-1">
-            <v-list-item @click="addMarkFavorite">
+            <v-list-item @click="addMark('favorite')">
               <v-list-item-title>
                 <v-icon class="mr-4" v-text="`mdi-heart`" />
                 <span v-text="`Favorite`" />
               </v-list-item-title>
             </v-list-item>
 
-            <v-list-item @click="openDialogMarkBookmark">
+            <v-list-item @click="addMark('bookmark')">
               <v-list-item-title>
                 <v-icon class="mr-4" v-text="`mdi-bookmark`" />
                 <span v-text="`Bookmark`" />
@@ -150,7 +150,7 @@
             <v-list-item
               v-for="i in assigned"
               :key="i.meta.id"
-              @click="openDialogMarkMeta(i.meta)"
+              @click="addMark(i.meta)"
             >
               <v-list-item-title>
                 <v-icon class="mr-4" v-text="`mdi-${i.meta.icon}`" />
@@ -192,7 +192,7 @@
       <!-- PLAYLIST -->
       <v-chip outlined dark class="playlist-buttons px-0 mx-2">
         <v-btn @click="togglePlaylist" icon dark>
-          <v-icon>mdi-format-list-bulleted</v-icon>
+          <v-icon>mdi-playlist-play</v-icon>
           <div class="tip">
             <span class="mr-2">Playlist</span>
             <b class="kbd" v-html="'p'" />
@@ -471,10 +471,8 @@ export default {
     changeVolume(e) {
       this.$emit("changeVolume", e);
     },
-    addMarkFavorite() {},
-    openDialogMarkBookmark() {},
-    openDialogMarkMeta(meta) {
-      this.$emit('showDialogMarkAddingMeta', meta)
+    addMark(type) {
+      this.$emit('addMark', type)
     },
     async setAsThumb() {
       let video = this.p.playlist[this.p.nowPlaying];

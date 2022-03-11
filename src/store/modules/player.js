@@ -30,17 +30,6 @@ const Player = {
     playlistMode: ['autoplay'],
     // Marks
     marks: [],
-    markBookmarkText: '',
-    metaForMark: '',
-    markMetaId: null,
-    nameForNewMetaCard: '',
-    dialogMarkMeta: false,
-    dialogAddNewMetaCard: false,
-    dialogListView: false,
-    dialogMarkBookmark: false,
-    dialogRemoveMark: false,
-    markForRemove: {},
-    marksType: ['favorite', 'bookmark'],
   }),
   mutations: {
     trackCurrentTime(state) {

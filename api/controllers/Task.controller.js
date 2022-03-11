@@ -379,7 +379,8 @@ exports.importDatabase = async (req, res) => {
       let found = mediaIds.find(x => x.oldId === mark.videoId)
       if (!found) continue
       mark.mediaId = found.id
-      if (mark.type === 'meta') {
+      if (mark.type === 'favorite' && mark.text === '') mark.text = null
+      else if (mark.type === 'meta') {
         let foundItem = itemsIds.find(x => x.oldId === mark.oldItemId)
         if (!foundItem) continue
         else mark.itemId = foundItem.id

@@ -9,6 +9,13 @@ const Dialogs = {
       item: null,
       meta: null,
     },
+    markAdding: {
+      show: false,
+      type: null,
+      meta: null,
+      time: null,
+      end: null,
+    },
     error: {
       show: false,
       text: null,

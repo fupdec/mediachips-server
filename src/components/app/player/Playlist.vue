@@ -6,7 +6,7 @@
     outlined
   >
     <v-card-actions class="pa-1">
-      <v-icon left>mdi-format-list-bulleted</v-icon>
+      <v-icon left>mdi-playlist-play</v-icon>
       <span>Playlist</span>
       <v-spacer></v-spacer>
       <v-btn @click="p.playlistVisible = false" icon>

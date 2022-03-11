@@ -9,7 +9,7 @@
     :rules="[rules]"
     :disabled="disabled"
     :filter="filterItems"
-    :menu-props="{ contentClass: 'custom-list' }"
+    :menu-props="menuProps"
     :label="meta.name"
     :hint="meta.hint"
     append-icon="mdi-chevron-down"
@@ -19,6 +19,8 @@
     :outlined="view.outlined"
     :multiple="multiple"
     :hide-no-data="!search"
+    :attach="attach"
+    :autofocus="autofocus"
     hide-selected
     clearable
     class="val custom-chips-size"
@@ -98,6 +100,20 @@ export default {
     multiple: {
       type: Boolean,
       default: true,
+    },
+    attach: {
+      type: [Boolean, String],
+      default: false,
+    },
+    autofocus: {
+      type: Boolean,
+      default: false,
+    },
+    menuProps: {
+      type: Object,
+      default: () => ({
+        contentClass: "custom-list",
+      }),
     },
   },
   async beforeMount() {
