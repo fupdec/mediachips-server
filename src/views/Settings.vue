@@ -12,11 +12,11 @@
       icons-and-text
       class="fullwidth-tabs transparent-tabs"
     >
-      <v-tab href="#app" draggable="false">
-        App <v-icon>mdi-application-cog-outline</v-icon>
-      </v-tab>
       <v-tab href="#appearance" draggable="false">
         Appearance <v-icon>mdi-brush-variant</v-icon>
+      </v-tab>
+      <v-tab href="#app" draggable="false">
+        Application <v-icon>mdi-application-cog-outline</v-icon>
       </v-tab>
       <v-tab href="#meta" draggable="false">
         Meta <v-icon>mdi-shape-outline</v-icon>
@@ -35,16 +35,16 @@
     <v-divider></v-divider>
 
     <v-tabs-items v-model="tab" class="fullwidth-tabs transparent-tabs">
-      <v-tab-item value="app">
-        <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <!-- <WatchedFolders /> -->
-          <Login />
-          <General />
-        </v-card>
-      </v-tab-item>
       <v-tab-item value="appearance">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <Appearance />
+        </v-card>
+      </v-tab-item>
+      <v-tab-item value="app">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
+          <!-- <WatchedFolders /> -->
+          <General />
+          <Login />
         </v-card>
       </v-tab-item>
       <v-tab-item value="meta">
@@ -95,7 +95,7 @@ export default {
     });
   },
   data: () => ({
-    tab: "app",
+    tab: "appearance",
   }),
   computed: {
     appSets: {

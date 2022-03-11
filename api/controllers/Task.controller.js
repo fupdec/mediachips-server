@@ -413,13 +413,12 @@ exports.importDatabase = async (req, res) => {
                 })
               }
             }
-          } else {
-            if (val !== null && val !== '')
-              valuesInMedia.push({
-                value: val,
-                metaId: m.id,
-                mediaId: mVideo.id,
-              })
+          } else if (val !== null && val !== '' && val !== 0 && val !== '0') {
+            valuesInMedia.push({
+              value: val,
+              metaId: m.id,
+              mediaId: mVideo.id,
+            })
           }
         }
       }
@@ -470,13 +469,12 @@ exports.importDatabase = async (req, res) => {
                 })
               }
             }
-          } else {
-            if (val !== null && val !== '')
-              valuesInItem.push({
-                value: val,
-                metaId: metaOfItem.id,
-                itemId: metaItem.id
-              })
+          } else if (val !== null && val !== '' && val !== 0 && val !== '0') {
+            valuesInItem.push({
+              value: val,
+              metaId: metaOfItem.id,
+              itemId: metaItem.id
+            })
           }
         }
       }

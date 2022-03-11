@@ -1,8 +1,5 @@
 <template>
   <div class="mx-4">
-    <v-divider class="mt-8 mb-2" />
-    <div class="subtitle-2 text-right mb-4">General</div>
-
     <v-checkbox
       v-model="sets.isPlayVideoInSystemPlayer"
       @change="setOption($event, 'isPlayVideoInSystemPlayer')"
@@ -33,11 +30,10 @@
           <div class="text--primary">Use exact filtering when typing</div>
           <div class="subtitle-2 filtering-sample mt-1">
             <span v-if="sets.typingFiltersDefault == '1'">
-              Typing: <b>favo</b> Result: my <b>favo</b>rite video
+              Typing: <b>favo</b> / Result: <b>favo</b>rite video
             </span>
             <span v-else>
-              Typing: <b>yrid</b> / Result: m<b>y</b> favo<b>ri</b>te
-              vi<b>d</b>eo
+              Typing: <b>fade</b> / Result: <b>fa</b>vorite vi<b>de</b>o
             </span>
           </div>
         </div>

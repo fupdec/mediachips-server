@@ -1,6 +1,6 @@
 <template>
   <div class="mx-4">
-    <v-divider class="mt-8 mb-2" />
+    <v-divider class="mt-4 mb-2" />
     <div class="subtitle-2 text-right mb-4">Login</div>
 
     <v-checkbox
