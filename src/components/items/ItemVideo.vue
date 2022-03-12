@@ -24,7 +24,7 @@
         <v-img :src="thumb" :aspect-ratio="16 / 9" />
 
         <v-btn
-          @click="openPlayer"
+          @click="play"
           :color="isFileExists ? 'white' : 'error'"
           class="btn-play"
           icon
@@ -147,7 +147,7 @@
       class="video-card meta-card"
     >
       <div
-        @click="openPlayer"
+        @click="play"
         @mousemove.capture="scrollStory($event)"
         @mouseleave="stopScrollStory"
         ref="story"
@@ -374,11 +374,15 @@ export default {
       this.$store.state.Dialogs.mediaEditing.show = true;
       this.$store.state.Dialogs.mediaEditing.media = this.video;
     },
-    openPlayer() {
+    play(inApp) {
       if (!this.isFileExists) {
         this.$store.state.Dialogs.error.show = true;
         let text = `File not found on path: \n"${this.video.path}"`;
         this.$store.state.Dialogs.error.text = text;
+        return;
+      }
+      if (this.sets.isPlayVideoInSystemPlayer == "1" && !inApp) {
+        this.openPath(this.video.path, false);
         return;
       }
       this.$store.state.Player.active = true;
@@ -467,26 +471,14 @@ export default {
     showMenu(e) {
       e.preventDefault();
       let contextMenu = [];
-      contextMenu.push(
-        {
-          name: `Edit`,
-          type: "item",
-          icon: "pencil",
-          action: () => {
-            this.edit();
-          },
+      contextMenu.push({
+        name: `Edit`,
+        type: "item",
+        icon: "pencil",
+        action: () => {
+          this.edit();
         },
-        {
-          name: `Clear Meta`,
-          type: "item",
-          icon: "close-circle-outline",
-          color: "error",
-          action: () => {
-            this.dialogEditing = true;
-          },
-        }
-      );
-      contextMenu.push({ type: "divider" });
+      });
       contextMenu.push({
         name: `Parse Metadata`,
         type: "item",
@@ -495,29 +487,37 @@ export default {
           this.parseMetadata();
         },
       });
-      contextMenu.push({
-        name: `Update File Information`,
-        type: "item",
-        icon: "information-variant",
-        disabled: !this.isFileExists,
-        action: () => {
-          this.dialogEditing = true;
-        },
-      });
       contextMenu.push({ type: "divider" });
       if (!this.page.isSelect)
         contextMenu.push({
-          name: `Open in System`,
-          type: "item",
-          icon: "play",
+          name: `Open video in`,
+          type: "menu",
+          icon: "play-circle",
           disabled: !this.isFileExists,
-          action: () => {
-            this.openPath(this.video.path);
-          },
+          menu: [
+            {
+              name: `Application`,
+              type: "item",
+              icon: "movie-open-play",
+              disabled: !this.isFileExists,
+              action: () => {
+                this.play(true);
+              },
+            },
+            {
+              name: `External Player`,
+              type: "item",
+              icon: "cog-play",
+              disabled: !this.isFileExists,
+              action: () => {
+                this.openPath(this.video.path);
+              },
+            },
+          ],
         });
       if (!this.page.isSelect)
         contextMenu.push({
-          name: `Reveal in File Explorer`,
+          name: `Open file folder`,
           type: "item",
           icon: "folder-open",
           disabled: !this.isFileExists,
@@ -525,15 +525,6 @@ export default {
             this.openPath(this.video.path, true);
           },
         });
-      contextMenu.push({
-        name: `Move File to...`,
-        type: "item",
-        icon: "file-move",
-        disabled: !this.isFileExists,
-        action: () => {
-          this.dialogEditing = true;
-        },
-      });
       contextMenu.push({ type: "divider" });
       contextMenu.push({
         name: `Delete`,
