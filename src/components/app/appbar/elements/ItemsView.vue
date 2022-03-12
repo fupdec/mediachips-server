@@ -22,10 +22,8 @@ import Vue from "vue";
 
 export default {
   name: "ItemsView",
-  mounted() {
-    this.$nextTick(async () => {
-      this.init();
-    });
+  beforeMount() {
+    this.init();
   },
   data: () => ({
     list: [
