@@ -581,6 +581,13 @@ exports.checkFileExists = async (req, res) => {
   else res.sendStatus(400)
 }
 
+exports.openPath = async (req, res) => {
+  let entryPath = path.join(req.body.path)
+  if (req.body.isDir) entryPath = path.dirname(entryPath)
+  require('child_process').exec(`start "" "${entryPath}"`)
+  res.sendStatus(201)
+}
+
 exports.getFileList = async (req, res) => {
   function findInDir(dir, regex, fileList = []) {
     let files
@@ -746,7 +753,7 @@ exports.addMediaVideo = async (req, res) => {
     // TODO parse Path For Meta items 
     res.status(201).send(media)
   } else {
-    res.status(400).send({ 
+    res.status(400).send({
       message: "Media already added."
     })
   }

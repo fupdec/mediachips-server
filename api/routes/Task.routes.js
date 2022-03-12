@@ -18,6 +18,9 @@ module.exports = app => {
   // getting file list with specific extension in directory
   router.post("/getFileList", Task.getFileList);
 
+  // open folder in file explorer
+  router.post("/openPath", Task.openPath);
+
   // adding video with metadata to database
   router.post("/addMediaVideo", Task.addMediaVideo);
 

@@ -24,8 +24,8 @@
           <div v-if="p.playbackError && reg" class="video-error">
             <v-icon size="60" color="red">mdi-alert</v-icon>
             <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
-            <div class="mb-4">Video format not supported.</div>
-            <v-btn @click="playVideoInSystemPlayer" color="primary" small>
+            <div>Video format not supported or file is missing</div>
+            <v-btn @click.stop="openPath" class="mt-4" color="primary" small>
               <v-icon left>mdi-television-play</v-icon>
               <span>Play in the system player</span>
             </v-btn>
@@ -37,12 +37,6 @@
               In the unregistered version, you can only play the first 5 videos
               of the playlist.
             </div>
-          </div>
-
-          <div v-if="p.playbackError" class="video-error">
-            <v-icon size="60" color="red">mdi-alert</v-icon>
-            <div>{{ getFileNameFromPath(p.playlist[p.nowPlaying].path) }}</div>
-            <div class="mb-4">The video file is missing.</div>
           </div>
 
           <v-chip
@@ -216,9 +210,9 @@ export default {
           .catch((e) => console.log(e));
       }
     },
-    playVideoInSystemPlayer() {
-      // TODO remake this
-      shell.openPath(this.p.playlist[this.p.nowPlaying].path);
+    openPath() {
+      let filePath = this.p.playlist[this.p.nowPlaying].path;
+      Vue.prototype.$openPath(filePath, false);
     },
     stopSmoothScroll(event) {
       if (event.button != 1) return;

@@ -499,6 +499,7 @@ export default {
         name: `Update File Information`,
         type: "item",
         icon: "information-variant",
+        disabled: !this.isFileExists,
         action: () => {
           this.dialogEditing = true;
         },
@@ -506,11 +507,12 @@ export default {
       contextMenu.push({ type: "divider" });
       if (!this.page.isSelect)
         contextMenu.push({
-          name: `Open in System Player`,
+          name: `Open in System`,
           type: "item",
           icon: "play",
+          disabled: !this.isFileExists,
           action: () => {
-            this.dialogEditing = true;
+            this.openPath(this.video.path);
           },
         });
       if (!this.page.isSelect)
@@ -518,14 +520,16 @@ export default {
           name: `Reveal in File Explorer`,
           type: "item",
           icon: "folder-open",
+          disabled: !this.isFileExists,
           action: () => {
-            this.dialogEditing = true;
+            this.openPath(this.video.path, true);
           },
         });
       contextMenu.push({
         name: `Move File to...`,
         type: "item",
         icon: "file-move",
+        disabled: !this.isFileExists,
         action: () => {
           this.dialogEditing = true;
         },
@@ -584,6 +588,10 @@ export default {
         text: `Parsing completed. Items added: ${added.length}`,
       });
       if (added.length > 0) this.$root.$emit("getItemsFromDb", updated);
+    },
+    openPath(entryPath, isDir) {
+      if (!this.isFileExists) return;
+      Vue.prototype.$openPath(entryPath, isDir);
     },
   },
   watch: {

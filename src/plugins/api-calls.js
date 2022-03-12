@@ -109,6 +109,16 @@ const ApiCalls = {
       })
       return res
     }
+    Vue.prototype.$openPath = async function (entryPath, isDirectory) {
+      axios({
+        method: "post",
+        url: options.store.state.localhost + "/api/Task/openPath",
+        data: {
+          path: entryPath,
+          isDir: isDirectory,
+        },
+      });
+    }
   }
 }
 
