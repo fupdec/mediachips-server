@@ -246,8 +246,9 @@ export default {
         document.exitFullscreen();
         this.p.fullscreen = false;
       }
-      if (this.p.player !== document.pictureInPictureElement)
-        await this.p.player.requestPictureInPicture();
+      if (document.pictureInPictureElement) document.exitPictureInPicture();
+      else if (document.pictureInPictureEnabled)
+        this.p.player.requestPictureInPicture();
     },
     changeVolume(e) {
       let volume = (this.p.player.volume - e.deltaY / 1000 / 2).toFixed(2);
