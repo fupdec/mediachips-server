@@ -41,7 +41,7 @@
       <v-chip outlined dark class="px-0 ml-3">
         <v-btn @click="prev" :disabled="isPrevDisabled" icon dark>
           <v-icon>mdi-skip-previous</v-icon>
-          <div v-if="!isPrevDisabled" class="tip" style="left: 0">
+          <div v-if="!isPrevDisabled && prevVideo" class="tip" style="left: 0">
             <div class="video-thumb">
               <div>
                 <span class="overline mr-2">Previous Video:</span>
@@ -68,7 +68,7 @@
 
         <v-btn @click="next" :disabled="isNextDisabled" icon dark>
           <v-icon>mdi-skip-next</v-icon>
-          <div v-if="!isNextDisabled" class="tip" style="left: 0">
+          <div v-if="!isNextDisabled && nextVideo" class="tip" style="left: 0">
             <div class="video-thumb">
               <div>
                 <span class="overline mr-2">Next Video:</span>
@@ -472,7 +472,7 @@ export default {
       this.$emit("changeVolume", e);
     },
     addMark(type) {
-      this.$emit('addMark', type)
+      this.$emit("addMark", type);
     },
     async setAsThumb() {
       let video = this.p.playlist[this.p.nowPlaying];

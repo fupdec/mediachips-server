@@ -4,9 +4,22 @@ const {
   Meta
 } = require("../index.js");
 
+// Create many items in media
+exports.bulkCreate = (req, res) => {
+  ItemsInMedia.bulkCreate(req.body).then(data => {
+    res.status(201).send(data)
+  }).catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occurred while performing query."
+    })
+  })
+};
+
 // Create and Save a new ItemsInMedia
 exports.create = (req, res) => {
-  ItemsInMedia.bulkCreate(req.body).then(data => {
+  ItemsInMedia.findOrCreate({
+    where: req.body
+  }).then(data => {
     res.status(201).send(data)
   }).catch(err => {
     res.status(500).send({

@@ -3,8 +3,11 @@ module.exports = app => {
 
   const router = require("express").Router();
 
-  // Create a new ItemsInMedia
-  router.post("/", ItemsInMedia.create);
+  // Create many ItemsInMedia
+  router.post("/", ItemsInMedia.bulkCreate);
+  
+  // find or create a new ItemsInMedia
+  router.post("/createOne", ItemsInMedia.create);
 
   // Retrieve all ItemsInMedia
   router.get("/", ItemsInMedia.findAll);

@@ -492,7 +492,7 @@ export default {
         type: "item",
         icon: "text-box-search",
         action: () => {
-          this.dialogEditing = true;
+          this.parseMetadata();
         },
       });
       contextMenu.push({
@@ -545,6 +545,45 @@ export default {
         y: e.clientY,
         content: contextMenu,
       });
+    },
+    async parseMetadata() {
+      let videos = [];
+      if (this.page.isSelect) {
+        let ids = this.page.selection;
+        let items = this.$store.state.Page.items;
+        for (let id of ids) {
+          const x = items.findIndex((i) => i.id === id);
+          if (x > -1) videos.push(items[x]);
+        }
+      } else videos.push(this.video);
+
+      let vals = [];
+      let updated = [];
+      for (let i of videos) {
+        const v = Vue.prototype.$parseFilePath(i.path, i.id);
+        if (v.length > 0) updated.push(i.id);
+        vals = [...vals, ...v];
+      }
+
+      let added = [];
+      for (let i of vals) {
+        await axios({
+          method: "post",
+          url: this.apiUrl + "/api/ItemsInMedia/createOne",
+          data: i,
+        })
+          .then((res) => {
+            if (res.data[1]) added.push(1);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+      this.$store.commit("setNotification", {
+        type: added.length > 0 ? "success" : "info",
+        text: `Parsing completed. Items added: ${added.length}`,
+      });
+      if (added.length > 0) this.$root.$emit("getItemsFromDb", updated);
     },
   },
   watch: {

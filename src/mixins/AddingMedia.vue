@@ -100,6 +100,7 @@ export default {
         return new Promise((resolve) => setTimeout(resolve, ms));
       };
 
+      let itemsInMedia = [];
       for (const filePath of files) {
         if (this.task.stopped) break; // stop process
 
@@ -112,11 +113,12 @@ export default {
         })
           .then((res) => {
             this.task.added.push(filePath);
-            console.log(res.data);
+            const vals = Vue.prototype.$parseFilePath(filePath, res.data.id);
+            itemsInMedia = [...itemsInMedia, ...vals];
           })
           .catch((e) => {
             this.task.errors.push(filePath);
-            console.log(e);
+            // console.log(e);
           });
 
         ++this.task.current;
@@ -132,6 +134,14 @@ export default {
           },
         });
       }
+
+      // adding parsed items of media
+      this.task.status = `Adding metadata to media...`;
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/ItemsInMedia",
+        data: itemsInMedia,
+      });
 
       if (!this.task.dialogProcess) {
         if (this.task.added.length > 0)

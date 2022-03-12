@@ -742,7 +742,7 @@ exports.addMediaVideo = async (req, res) => {
     }
 
     // TODO parse Path For Meta items 
-    res.status(201).send('success')
+    res.status(201).send(media)
   } else {
     res.status(400).send({
       message: "Media already added."
@@ -795,7 +795,6 @@ exports.createThumb = async (req, res) => {
       res.status(201).send(thumbResult)
     })
     .catch(e => {
-      console.log(e)
       res.status(400).send(e)
     })
 };

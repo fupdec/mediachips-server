@@ -298,6 +298,45 @@ const Readable = {
       q += `ORDER BY ${sets.sortBy} ${sets.sortDir} `;
       return q
     }
+    Vue.prototype.$parseFilePath = function (filePath, mediaId) {
+      // Parsing file path for matching with item's name or synonyms
+      const fltr = (string) => {
+        return string.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, "").toLowerCase();
+      };
+      const string = fltr(filePath);
+      const items = options.store.state.items;
+      let parsed = options.store.state.Page.assigned;
+      parsed = parsed.filter((i) => i.meta.metaSetting.parser);
+
+      let vals = [];
+      for (let meta of parsed) {
+        const metaId = meta.metaId;
+        let found = items
+          .filter((i) => {
+            if (i.metaId !== metaId) return false;
+            let foundName = string.includes(fltr(i.name));
+            let foundSynonyms = false;
+            if (i.synonyms && i.synonyms.length) {
+              let synonyms = i.synonyms.split(",");
+              for (let s of synonyms) {
+                if (string.includes(fltr(s))) foundSynonyms = true;
+              }
+            }
+            return foundName || foundSynonyms;
+          })
+          .map((i) => i.id);
+        found = [...new Set(found)]; // remove duplicates
+
+        for (let i of found) {
+          vals.push({
+            itemId: i,
+            metaId: metaId,
+            mediaId: mediaId,
+          });
+        }
+      }
+      return vals;
+    }
     Vue.prototype.$getAverageColor = function (src) {
       return new Promise((resolve) => {
         let context = document.createElement("canvas").getContext("2d");
