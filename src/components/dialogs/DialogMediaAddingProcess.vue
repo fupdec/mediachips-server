@@ -32,12 +32,38 @@
       </v-card-actions>
       <div class="d-flex justify-space-between px-4">
         <div>{{ task.status }}</div>
+        <div class="text--secondary caption">{{ task.processed }}</div>
       </div>
 
-      <v-card-text class="text-center pa-2 pa-sm-4">
-        <div>{{ task.processed }}</div>
-        <div>Added: {{ task.added.length }}</div>
-        <div>Error: {{ task.errors.length }}</div>
+      <v-card-text class="pa-2 pa-sm-4">
+        <div>
+          <div class="green--text">Added: {{ task.added.length }}</div>
+          <v-virtual-scroll
+            v-if="task.added.length > 0"
+            :items="task.added"
+            class="virtual-scroller"
+            item-height="20"
+            height="100"
+          >
+            <template v-slot:default="{ item }">
+              <div>{{ item }}</div>
+            </template>
+          </v-virtual-scroll>
+        </div>
+        <div>
+          <div class="error--text">Error: {{ task.errors.length }}</div>
+          <v-virtual-scroll
+            v-if="task.errors.length > 0"
+            :items="task.errors"
+            class="virtual-scroller"
+            item-height="20"
+            height="100"
+          >
+            <template v-slot:default="{ item }">
+              <div>{{ item }}</div>
+            </template>
+          </v-virtual-scroll>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -159,6 +185,10 @@ export default {
   padding: 1px 4px 1px;
   border-radius: 10px;
   line-height: 1;
+}
+.virtual-scroller {
+  white-space: nowrap;
+  overflow-x: hidden;
 }
 
 @keyframes cssProgressActive {

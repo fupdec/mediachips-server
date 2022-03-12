@@ -676,6 +676,7 @@ exports.addMediaVideo = async (req, res) => {
     res.status(400).send({
       message: error
     })
+    return
   }
 
   function getVideoInfo(info) {
@@ -739,12 +740,13 @@ exports.addMediaVideo = async (req, res) => {
       res.status(400).send({
         message: error
       })
+      return
     }
 
     // TODO parse Path For Meta items 
     res.status(201).send(media)
   } else {
-    res.status(400).send({
+    res.status(400).send({ 
       message: "Media already added."
     })
   }
@@ -1004,7 +1006,16 @@ exports.createTimeline = async (req, res) => {
   const firstFrame = path.join(timelinesPath, req.body.id + "_5.jpg");
   if (!fs.existsSync(firstFrame)) {
     const timeline = new Timeline(req.body)
-    const result = await timeline.generate()
+    let result
+    try {
+      result = await timeline.generate()
+    } catch (error) {
+      res.status(400).send({
+        message: error
+      });
+      return
+    }
+
     if (result) {
       res.status(201).send(result)
     } else {
