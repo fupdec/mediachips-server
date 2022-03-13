@@ -120,14 +120,6 @@ export default {
         (i) => i.type == "array" && i.metaSetting.hidden
       );
     },
-    nav: {
-      get() {
-        return this.$store.state.navDrawer;
-      },
-      set(value) {
-        this.$store.state.navDrawer = value;
-      },
-    },
   },
 };
 </script>

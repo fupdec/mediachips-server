@@ -12,16 +12,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: () => ({
     localhost: 'http://localhost:5555',
+    pathToUserData: '',
     isElectron: null,
-    scan: {
-      folders: [],
-      files: [],
-      stage: 0,
-    },
-    mediaTypes: [],
-    items: [],
-    meta: [],
-    notifications: [],
     hover: {
       show: false,
       itemId: null,
@@ -37,11 +29,10 @@ export default new Vuex.Store({
       x: 0,
       y: 0,
     },
-    pathToUserData: '',
-    foldersData: [],
-    dialogFolder: false,
-    navDrawer: true,
-    updateFoldersData: 0,
+    mediaTypes: [],
+    items: [],
+    meta: [],
+    notifications: [],
     settings: Settings,
   }),
   mutations: {
