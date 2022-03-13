@@ -42,8 +42,8 @@
       </v-tab-item>
       <v-tab-item value="app">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <!-- <WatchedFolders /> -->
           <General />
+          <WatchedFolders />
           <Login />
         </v-card>
       </v-tab-item>

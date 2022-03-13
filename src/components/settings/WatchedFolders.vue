@@ -1,79 +1,157 @@
 <template>
-  <v-card outlined class="px-4 mx-2">
-    <div class="headline text-center my-4">
-      Folders
-      <v-tooltip right>
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on" right>
-            mdi-help-circle-outline
-          </v-icon>
-        </template>
-        <span>
-          Add folders with your videos so that app can watch <br />
-          new videos and check deleted ones
-        </span>
-      </v-tooltip>
-    </div>
-    <v-list dense v-if="folders.length" shaped class="pb-0 pl-2">
-      <WatchedFolder
-        v-for="(f, i) in folders"
-        :key="i"
-        :folder="f"
-        @open="open(i)"
-        @rename="rename(i)"
-        @remove="remove(i)"
-        @toggle="toggle(i)"
-      />
-    </v-list>
-    <div v-else class="text-center overline pt-2">
-      <v-icon size="40">mdi-folder-outline</v-icon>
-      <div>There are no watched folders yet</div>
-    </div>
-    <v-card-actions>
-      <v-btn @click="addFolder" rounded depressed color="success" class="pr-4">
-        <v-icon left>mdi-plus</v-icon> Add
+  <div class="mx-4">
+    <v-divider class="mt-4 mb-2" />
+    <div class="subtitle-2 text-right mb-4">Folders</div>
+
+    <v-checkbox
+      v-model="sets.watchFolders"
+      @change="setOption($event, 'watchFolders')"
+      false-value="0"
+      true-value="1"
+      class="mt-0"
+    >
+      <template v-slot:label>
+        <div class="d-flex flex-column ml-2">
+          <div class="text--primary">Watch folders</div>
+          <div class="subtitle-2 mt-1">
+            Watch for changes in the folder. New and lost files will be shown.
+          </div>
+        </div>
+      </template>
+    </v-checkbox>
+
+    <v-list v-if="sets.watchFolders == '1'" dense rounded class="px-0">
+      <v-btn
+        @click="addFolder"
+        color="success"
+        class="pr-4 mb-4"
+        rounded
+        depressed
+      >
+        <v-icon left>mdi-plus</v-icon> Add Folder
       </v-btn>
-      <v-spacer></v-spacer>
-      <div class="d-flex align-center">
-        <div class="mr-6">Watch:</div>
-        <v-switch
-          v-model="watchFolders"
-          inset
-          class="d-inline"
-          :disabled="folders.length == 0"
+
+      <v-list-item v-for="f in folders" :key="f.id" @click="toggle(f)">
+        <v-list-item-avatar>
+          <v-icon v-text="`mdi-eye${f.watch == 1 ? '-off' : ''}`" />
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="f.name" />
+          <v-list-item-subtitle v-text="f.path" />
+        </v-list-item-content>
+
+        <v-list-item-action>
+          <v-btn-toggle dense rounded>
+            <v-btn @click.stop="edit(f)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn @click.stop="confirmRemoving(f)">
+              <v-icon color="error">mdi-close</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
+
+    <v-dialog v-model="dialogFolder" scrollable width="600">
+      <v-card>
+        <DialogHeader
+          @close="dialogFolder = false"
+          :header="`Adding folder`"
+          :buttons="buttons"
+          closable
         />
-      </div>
-    </v-card-actions>
-  </v-card>
+
+        <v-card-text class="pa-sm-4 pa-2">
+          <v-form ref="form" v-model="valid">
+            <v-text-field
+              v-model="folderPath"
+              :rules="[
+                (v) => !!v || 'Path is required',
+                (v) => /\\|\/.*/gm.test(v) || 'Wrong path',
+              ]"
+              label="Path to folder"
+              required
+              autofocus
+            />
+            <v-text-field
+              v-model="folderName"
+              label="Name of folder (optional)"
+            />
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <DialogDeleteConfirm
+      v-if="dialogDelete"
+      @close="dialogDelete = false"
+      @delete="remove"
+      :dialog="dialogDelete"
+      :text="text"
+    />
+  </div>
 </template>
 
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 
 export default {
   name: "WatchedFolders",
   components: {
-    WatchedFolder: () =>
-      import("@/components/settings/folders/WatchedFolder.vue"),
+    DialogHeader: () => import("@/components/elements/DialogHeader.vue"),
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
   },
   mounted() {
-    this.$nextTick(async () => {
-      await this.getFolders();
-    });
+    this.getFolders();
   },
   data: () => ({
     folders: [],
-    watchFolders: false,
     folderName: "",
-    folderNameEdit: -1,
+    folderPath: "",
+    folder: null,
+    buttons: [],
+    valid: false,
+    dialogFolder: false,
+    dialogDelete: false,
+    text: "This folder will be removed from watchlists. \r Are you sure?",
   }),
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
     },
+    sets: {
+      get() {
+        return this.$store.state.settings;
+      },
+      set(value) {
+        this.$store.state.settings = value;
+      },
+    },
   },
   methods: {
+    async setOption(value, option) {
+      this.sets[option] = value;
+      await Vue.prototype.$setOption(option, value);
+    },
+    addFolder() {
+      this.buttons = [
+        {
+          icon: "plus",
+          text: "Add",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.add();
+          },
+        },
+      ];
+      this.dialogFolder = true;
+    },
     async getFolders() {
       await axios
         .get(this.apiUrl + "/api/WatchedFolder")
@@ -84,14 +162,17 @@ export default {
           console.log(e);
         });
     },
-    async addFolder() {
+    async add() {
+      await this.$refs.form.validate();
+      if (!this.valid) return;
+
       await axios({
         method: "post",
         url: this.apiUrl + "/api/WatchedFolder",
         data: {
-          path: "D:\\torrents",
-          name: "D:\\torrents",
-          typeId: 1,
+          path: this.folderPath,
+          name: this.folderName || this.folderPath,
+          watch: 1,
         },
       })
         .then(() => {
@@ -100,84 +181,75 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+      this.dialogFolder = false;
     },
-    async rename(i) {
-      const folder = this.folders[i];
+    edit(folder) {
+      this.folder = folder;
+      this.folderPath = folder.path;
+      this.folderName = folder.name;
+      this.buttons = [
+        {
+          icon: "content-save",
+          text: "Save",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.save();
+          },
+        },
+      ];
+      this.dialogFolder = true;
+    },
+    async save() {
       await axios({
         method: "put",
-        url: this.apiUrl + "/api/WatchedFolder/" + folder.id,
+        url: this.apiUrl + "/api/WatchedFolder/" + this.folder.id,
         data: {
           name: this.folderName,
+          path: this.folderPath,
         },
       })
         .then(async () => {
           await this.getFolders();
-          this.folderNameEdit = -1;
         })
         .catch((e) => {
-          this.folderNameEdit = -1;
           console.log(e);
         });
+      this.dialogFolder = false;
     },
-    async remove(i) {
-      const folder = this.folders[i];
+    confirmRemoving(folder) {
+      this.folder = folder;
+      this.dialogDelete = true;
+    },
+    async remove() {
       await axios({
         method: "delete",
+        url: this.apiUrl + "/api/WatchedFolder/" + this.folder.id,
+      })
+        .then(async () => {
+          await this.getFolders();
+          // if (this.folders.length == 0) this.setOption("0", "watchFolders");
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      this.dialogDelete = false;
+    },
+    toggle(folder) {
+      axios({
+        method: "put",
         url: this.apiUrl + "/api/WatchedFolder/" + folder.id,
+        data: {
+          watch: folder.watch == 1 ? 0 : 1,
+        },
       })
         .then(() => {
           this.getFolders();
-          this.folders.splice(i, 1);
-          if (this.folders.length == 0) this.watchFolders = false;
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    updateFolders() {},
-    open() {},
-    toggle() {},
   },
 };
 </script>
-
-
-<style lang="scss">
-.folder-list {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  background-color: rgba(150, 150, 150, 0.1);
-  padding-left: 5px;
-  padding-right: 3px;
-  margin-bottom: 3px;
-  .folder-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: calc(100% - 40px);
-    .v-input__slot {
-      min-height: 32px !important;
-    }
-    .name {
-      display: flex;
-      align-items: center;
-      max-width: calc(50% - 40px);
-    }
-    .path {
-      max-width: 40%;
-      .icon-open {
-        display: none;
-      }
-      &:hover {
-        .icon-closed {
-          display: none;
-        }
-        .icon-open {
-          display: inline-flex;
-        }
-      }
-    }
-  }
-}
-</style>
