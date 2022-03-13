@@ -44,6 +44,7 @@
       :item="$store.state.Dialogs.itemEditing.item"
       :meta="$store.state.Dialogs.itemEditing.meta"
     />
+    <DialogFolder v-if="$store.state.Watcher.dialogFolder" />
   </v-app>
 </template>
 
@@ -52,6 +53,7 @@
 import Vue from "vue";
 import axios from "axios";
 import AddingMedia from "@/mixins/AddingMedia.vue";
+import Watcher from "@/mixins/Watcher.vue";
 /* TODO
  * countries array
  * playlists: remake as meta
@@ -76,8 +78,9 @@ export default {
       import("@/components/dialogs/DialogMediaEditing.vue"),
     DialogItemEditing: () =>
       import("@/components/dialogs/DialogItemEditing.vue"),
+    DialogFolder: () => import("@/components/dialogs/DialogFolder.vue"),
   },
-  mixins: [AddingMedia],
+  mixins: [AddingMedia, Watcher],
   async mounted() {
     await Vue.prototype.$getLocalhost();
     this.isApiReady = true;
@@ -89,6 +92,8 @@ export default {
     this.checkLogin();
     this.checkElectronRunning();
     await this.getMachineId();
+    await this.getFolders();
+    this.runWatcher();
     this.$root.$on("getItems", () => {
       this.getItems();
     });
@@ -196,6 +201,16 @@ export default {
         })
         .catch((e) => {
           // console.log(e);
+        });
+    },
+    async getFolders() {
+      await axios
+        .get(this.apiUrl + "/api/WatchedFolder")
+        .then((res) => {
+          this.$store.state.Watcher.folders = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
         });
     },
     checkElectronRunning() {

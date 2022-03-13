@@ -186,10 +186,6 @@ export default {
   border-radius: 10px;
   line-height: 1;
 }
-.virtual-scroller {
-  white-space: nowrap;
-  overflow-x: hidden;
-}
 
 @keyframes cssProgressActive {
   0% {

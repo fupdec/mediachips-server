@@ -110,7 +110,6 @@ export default {
     this.getFolders();
   },
   data: () => ({
-    folders: [],
     folderName: "",
     folderPath: "",
     folder: null,
@@ -130,6 +129,14 @@ export default {
       },
       set(value) {
         this.$store.state.settings = value;
+      },
+    },
+    folders: {
+      get() {
+        return this.$store.state.Watcher.folders;
+      },
+      set(value) {
+        this.$store.state.Watcher.folders = value;
       },
     },
   },

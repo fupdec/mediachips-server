@@ -99,6 +99,48 @@
             </template>
             <span>Settings</span>
           </v-tooltip>
+
+          <div
+            v-if="watcher.folders.length && sets.watchFolders == '1'"
+            @mouseover="folderHovered = true"
+            @mouseleave="folderHovered = false"
+            class="folders"
+          >
+            <v-tooltip v-for="folder in watcher.folders" :key="folder.id" top>
+              <template v-slot:activator="{ on, attrs }">
+                <div class="folder-wrapper">
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="openDialogFolder(folder.path)"
+                    color="secondary"
+                    class="folder"
+                    text
+                  >
+                    <v-icon v-if="watcher.updated">mdi-folder-outline</v-icon>
+                    <v-icon v-else>mdi-folder-sync-outline</v-icon>
+                  </v-btn>
+                  <v-badge
+                    :value="getNewFiles(folder.path)"
+                    :content="getNewFiles(folder.path)"
+                    :offset-x="folderHovered ? 70 : 58"
+                    :offset-y="folderHovered ? -6 : -8"
+                    :dot="!folderHovered"
+                    color="info"
+                  />
+                  <v-badge
+                    :value="getLostFiles(folder.path)"
+                    :content="getLostFiles(folder.path)"
+                    :offset-x="folderHovered ? 70 : 58"
+                    :offset-y="folderHovered ? 18 : 10"
+                    :dot="!folderHovered"
+                    color="warning"
+                  />
+                </div>
+              </template>
+              <span>{{ folder.name }}</span>
+            </v-tooltip>
+          </div>
         </div>
       </div>
     </div>
@@ -113,8 +155,8 @@ export default {
     folderHovered: false,
   }),
   computed: {
-    apiUrl() {
-      return this.$store.state.localhost;
+    sets() {
+      return this.$store.state.settings;
     },
     mediaTypes() {
       return this.$store.state.mediaTypes;
@@ -128,6 +170,33 @@ export default {
       return this.$store.state.meta.filter(
         (i) => i.type == "array" && i.metaSetting.hidden
       );
+    },
+    watcher: {
+      get() {
+        return this.$store.state.Watcher;
+      },
+      set(value) {
+        this.$store.state.Watcher = value;
+      },
+    },
+  },
+  methods: {
+    getLostFiles(folder) {
+      if (_.filter(this.watcher.files, { folder }).length) {
+        const index = _.findIndex(this.watcher.files, { folder });
+        return this.watcher.files[index].lostFiles.length;
+      } else return "";
+    },
+    getNewFiles(folder) {
+      if (_.filter(this.watcher.files, { folder }).length) {
+        const index = _.findIndex(this.watcher.files, { folder });
+        return this.watcher.files[index].newFiles.length;
+      } else return "";
+    },
+    openDialogFolder(folder) {
+      const index = _.findIndex(this.watcher.files, { folder });
+      this.watcher.folder = this.watcher.files[index];
+      this.watcher.dialogFolder = true;
     },
   },
 };
@@ -164,6 +233,7 @@ export default {
   }
   .bottom-menu {
     height: 56px;
+    display: inline-flex;
     &-wrap {
       text-align: center;
       white-space: nowrap;

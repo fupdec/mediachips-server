@@ -5,6 +5,7 @@ import Page from './modules/page.js'
 import Player from './modules/player.js'
 import Reg from './modules/reg.js'
 import Tasks from './modules/tasks.js'
+import Watcher from './modules/watcher.js'
 const Settings = require('./../../default-settings.js')
 
 Vue.use(Vuex)
@@ -103,5 +104,6 @@ export default new Vuex.Store({
     Player,
     Reg,
     Tasks,
+    Watcher,
   }
 })

@@ -7,6 +7,8 @@ const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
 const db = require("./api");
+const expressWs = require('express-ws')(app)
+const chokidar = require("chokidar");
 
 app.use(express.json({
   limit: '100mb'
@@ -90,7 +92,7 @@ db.sequelize.sync().then(async () => {
     },
     include: [db.PageSetting]
   })
-  
+
   if (createdVideo) {
     const [filter, createdFilter] = await db.SavedFilter.findOrCreate({
       where: {
@@ -102,7 +104,7 @@ db.sequelize.sync().then(async () => {
     if (createdFilter) {
       await db.PageSetting.update({
         filterId: filter.id
-      },{
+      }, {
         where: {
           typeId: videoType.id
         }
@@ -155,6 +157,7 @@ app.post('/api/get-file', jsonParser, (req, res) => {
     root: __dirname
   })
 })
+// Stream video
 router.get('/api/video/:id', (req, res) => {
   db.Media.findOne({
     where: {
@@ -203,6 +206,65 @@ router.get('/api/video/:id', (req, res) => {
   })
 })
 
+
+// file watcher
+app.ws('/watcher', (ws, req) => {
+  let watcher, watchedFolders, extensions
+
+  const getAllFiles = async (dirs) => {
+    let files = []
+    for (let d in dirs) { // get all paths from watched directories
+      if (dirs[d].length == 0) continue
+      for (let i = 0; i < dirs[d].length; i++) {
+        let filePath = path.join(d, dirs[d][i])
+        let ext = path.extname(filePath.toLowerCase())
+        if (extensions.includes(ext.replace('.', ''))) files.push(filePath)
+      }
+    }
+    const videos = await db.Media.findAll({
+      where: {
+        typeId: 1
+      },
+      raw: true,
+    })
+    let foldersData = []
+    for (let fp of watchedFolders) {
+      let filesInDb = videos.filter(x => x.path.includes(fp)).map(i => i.path)
+      let filesInFolder = files.filter(x => x.includes(fp))
+      let lostFiles = filesInDb.filter(x => !filesInFolder.includes(x))
+      let newFiles = filesInFolder.filter(x => !filesInDb.includes(x))
+      foldersData.push({
+        folder: fp,
+        lostFiles: lostFiles.sort((a, b) => a.localeCompare(b)),
+        newFiles: newFiles.sort((a, b) => a.localeCompare(b))
+      })
+    }
+    ws.send(JSON.stringify(foldersData))
+  }
+
+  const init = () => {
+    watcher = chokidar.watch(watchedFolders)
+    watcher.on('ready', () => {
+      let watchedFilesList = watcher.getWatched()
+      getAllFiles(watchedFilesList)
+    })
+  }
+
+  ws.on('message', (msg) => {
+    msg = JSON.parse(msg)
+    switch (msg.type) {
+      case 'init':
+        extensions = msg.extensions
+        watchedFolders = msg.data.map(i => i.path)
+        watchedFolders = [...new Set(watchedFolders)]
+        init()
+        break;
+    }
+  });
+  ws.on('close', () => {
+    watcher.close()
+  })
+});
 
 // starting server
 app.listen(config.port, () => {
