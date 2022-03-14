@@ -37,24 +37,25 @@
     <v-tabs-items v-model="tab" class="fullwidth-tabs transparent-tabs">
       <v-tab-item value="appearance">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <Appearance />
+          <SettingsAppearance />
         </v-card>
       </v-tab-item>
       <v-tab-item value="app">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <General />
-          <WatchedFolders />
-          <Login />
+          <SettingsGeneral />
+          <SettingsVideoPlayer />
+          <SettingsWatchedFolders />
+          <SettingsLogin />
         </v-card>
       </v-tab-item>
       <v-tab-item value="meta">
-        <MetaList />
+        <SettingsMeta />
       </v-tab-item>
       <v-tab-item value="media">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <div class="headline text-center pb-2">Meta assigned to media</div>
           <TableMetaInMediaTypes />
-          <VideoPreview />
+          <SettingsVideoPreview />
         </v-card>
       </v-tab-item>
       <v-tab-item value="database">
@@ -63,7 +64,7 @@
       </v-tab-item>
       <v-tab-item value="about">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <Registration />
+          <SettingsRegistration />
           <About />
         </v-card>
       </v-tab-item>
@@ -78,21 +79,25 @@
 export default {
   name: "Settings",
   components: {
-    Appearance: () => import("@/components/settings/Appearance.vue"),
-    WatchedFolders: () => import("@/components/settings/WatchedFolders.vue"),
-    MetaList: () => import("@/components/settings/MetaList.vue"),
-    VideoPreview: () => import("@/components/settings/VideoPreview.vue"),
+    SettingsAppearance: () =>
+      import("@/components/settings/SettingsAppearance.vue"),
+    SettingsWatchedFolders: () =>
+      import("@/components/settings/SettingsWatchedFolders.vue"),
+    SettingsMeta: () => import("@/components/settings/SettingsMeta.vue"),
+    SettingsVideoPreview: () =>
+      import("@/components/settings/SettingsVideoPreview.vue"),
+    SettingsVideoPlayer: () =>
+      import("@/components/settings/SettingsVideoPlayer.vue"),
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
-    Login: () => import("@/components/settings/Login.vue"),
-    General: () => import("@/components/settings/General.vue"),
-    Registration: () => import("@/components/settings/Registration.vue"),
+    SettingsLogin: () => import("@/components/settings/SettingsLogin.vue"),
+    SettingsGeneral: () => import("@/components/settings/SettingsGeneral.vue"),
+    SettingsRegistration: () =>
+      import("@/components/settings/SettingsRegistration.vue"),
     About: () => import("@/components/app/About.vue"),
   },
   mounted() {
-    this.$nextTick(() => {
-      if (this.$route.query.tab == "about") this.tab = "about";
-    });
+    if (this.$route.query.tab == "about") this.tab = "about";
   },
   data: () => ({
     tab: "appearance",

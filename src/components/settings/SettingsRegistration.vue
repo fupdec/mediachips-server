@@ -232,7 +232,7 @@ const axios = require("axios");
 // const shell = require("electron").shell; // TODO check it
 
 export default {
-  name: "Registration",
+  name: "SettingsRegistration",
   mounted() {
     if (this.regInfo.length == 0) this.regInfo = JSON.stringify(this.cleanObj);
   },

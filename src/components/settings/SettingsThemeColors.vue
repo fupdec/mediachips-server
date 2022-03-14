@@ -136,7 +136,7 @@
       </v-card>
     </v-dialog>
 
-    <HeaderGradient
+    <SettingsHeaderGradient
       v-if="dialogHeaderGradient"
       :themeDark="gradientThemeDark"
       @close="dialogHeaderGradient = false"
@@ -150,9 +150,10 @@
 import Vue from "vue";
 
 export default {
-  name: "ThemeColors",
+  name: "SettingsThemeColors",
   components: {
-    HeaderGradient: () => import("@/components/settings/HeaderGradient.vue"),
+    SettingsHeaderGradient: () =>
+      import("@/components/settings/SettingsHeaderGradient.vue"),
   },
   data: () => ({
     dialogHeaderGradient: false,

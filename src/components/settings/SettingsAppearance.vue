@@ -68,7 +68,7 @@
       </template>
     </v-checkbox>
 
-    <ThemeColors />
+    <SettingsThemeColors />
 
     <v-divider class="mt-8 mb-2" />
     <div class="subtitle-2 text-right mb-4">Page</div>
@@ -217,9 +217,10 @@
 import Vue from "vue";
 
 export default {
-  name: "Appearance",
+  name: "SettingsAppearance",
   components: {
-    ThemeColors: () => import("@/components/settings/ThemeColors.vue"),
+    SettingsThemeColors: () =>
+      import("@/components/settings/SettingsThemeColors.vue"),
   },
   computed: {
     sets: {

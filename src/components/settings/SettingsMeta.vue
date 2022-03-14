@@ -103,7 +103,7 @@ import Vue from "vue";
 import axios from "axios";
 
 export default {
-  name: "MetaList",
+  name: "SettingsMeta",
   components: {
     DialogMetaAdd: () => import("@/components/dialogs/DialogMetaAdd.vue"),
     DialogMetaEdit: () => import("@/components/dialogs/DialogMetaEdit.vue"),

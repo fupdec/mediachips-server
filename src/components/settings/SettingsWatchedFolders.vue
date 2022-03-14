@@ -101,7 +101,7 @@ import Vue from "vue";
 import axios from "axios";
 
 export default {
-  name: "WatchedFolders",
+  name: "SettingsWatchedFolders",
   components: {
     DialogHeader: () => import("@/components/elements/DialogHeader.vue"),
     DialogDeleteConfirm: () =>

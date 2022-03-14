@@ -55,7 +55,7 @@
 import Vue from "vue";
 
 export default {
-  name: "Login",
+  name: "SettingsLogin",
   components: {},
   data: () => ({
     password: "",

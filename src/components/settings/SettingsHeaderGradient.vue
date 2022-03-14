@@ -110,7 +110,7 @@
 import draggable from "vuedraggable";
 
 export default {
-  name: "HeaderGradient",
+  name: "SettingsHeaderGradient",
   props: {
     themeDark: Boolean,
   },

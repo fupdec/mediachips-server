@@ -146,7 +146,7 @@
 import Vue from "vue";
 
 export default {
-  name: "VideoPreview",
+  name: "SettingsVideoPreview",
   computed: {
     sets: {
       get() {
