@@ -6,6 +6,7 @@
     <v-checkbox
       v-model="sets.watchFolders"
       @change="setOption($event, 'watchFolders')"
+      :disabled="watcher.busy"
       false-value="0"
       true-value="1"
       class="mt-0"
@@ -31,7 +32,7 @@
         <v-icon left>mdi-plus</v-icon> Add Folder
       </v-btn>
 
-      <v-list-item v-for="f in folders" :key="f.id" @click="toggle(f)">
+      <v-list-item v-for="f in watcher.folders" :key="f.id" @click="toggle(f)">
         <v-list-item-avatar>
           <v-icon v-text="`mdi-eye${f.watch == 1 ? '-off' : ''}`" />
         </v-list-item-avatar>
@@ -131,12 +132,12 @@ export default {
         this.$store.state.settings = value;
       },
     },
-    folders: {
+    watcher: {
       get() {
-        return this.$store.state.Watcher.folders;
+        return this.$store.state.Watcher;
       },
       set(value) {
-        this.$store.state.Watcher.folders = value;
+        this.$store.state.Watcher = value;
       },
     },
   },
@@ -157,13 +158,15 @@ export default {
           },
         },
       ];
+      this.folderPath = "";
+      this.folderName = "";
       this.dialogFolder = true;
     },
     async getFolders() {
       await axios
         .get(this.apiUrl + "/api/WatchedFolder")
         .then((res) => {
-          this.folders = res.data;
+          this.watcher.folders = res.data;
         })
         .catch((e) => {
           console.log(e);

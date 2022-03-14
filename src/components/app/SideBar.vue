@@ -94,11 +94,13 @@
               v-for="folder in watcher.folders"
               :key="folder.id"
               @click="openDialogFolder(folder.path)"
+              :disabled="watcher.busy"
             >
               <v-list-item-icon>
-                <v-icon v-if="watcher.updated">mdi-folder-outline</v-icon>
-                <v-icon v-else>mdi-folder-sync-outline</v-icon>
+                <v-icon v-if="watcher.busy">mdi-folder-sync-outline</v-icon>
+                <v-icon v-else>mdi-folder-outline</v-icon>
                 <v-badge
+                  v-if="!watcher.busy"
                   :value="getNewFiles(folder.path)"
                   :content="getNewFiles(folder.path)"
                   :offset-x="folderHovered ? 35 : 30"
@@ -107,6 +109,7 @@
                   color="info"
                 />
                 <v-badge
+                  v-if="!watcher.busy"
                   :value="getLostFiles(folder.path)"
                   :content="getLostFiles(folder.path)"
                   :offset-x="folderHovered ? 35 : 30"

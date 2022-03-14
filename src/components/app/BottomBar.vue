@@ -50,13 +50,7 @@
 
           <v-menu v-if="hiddenMeta.length" offset-y top open-on-hover>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                v-bind="attrs"
-                v-on="on"
-                text
-                color="secondary"
-                class="folder btn-hidden"
-              >
+              <v-btn v-on="on" v-bind="attrs" class="folder btn-hidden" text>
                 <span>Hidden</span>
                 <v-icon>mdi-chevron-up</v-icon>
               </v-btn>
@@ -113,14 +107,15 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="openDialogFolder(folder.path)"
-                    color="secondary"
+                    :disabled="watcher.busy"
                     class="folder"
                     text
                   >
-                    <v-icon v-if="watcher.updated">mdi-folder-outline</v-icon>
-                    <v-icon v-else>mdi-folder-sync-outline</v-icon>
+                    <v-icon v-if="watcher.busy">mdi-folder-sync-outline</v-icon>
+                    <v-icon v-else>mdi-folder-outline</v-icon>
                   </v-btn>
                   <v-badge
+                    v-if="!watcher.busy"
                     :value="getNewFiles(folder.path)"
                     :content="getNewFiles(folder.path)"
                     :offset-x="folderHovered ? 70 : 58"
@@ -129,6 +124,7 @@
                     color="info"
                   />
                   <v-badge
+                    v-if="!watcher.busy"
                     :value="getLostFiles(folder.path)"
                     :content="getLostFiles(folder.path)"
                     :offset-x="folderHovered ? 70 : 58"
@@ -253,6 +249,9 @@ export default {
   .btn-meta {
     display: flex;
     height: 100%;
+  }
+  .v-badge__badge {
+    pointer-events: none;
   }
 }
 </style>

@@ -46,21 +46,49 @@ export default {
           data: this.watcher.folders,
           extensions,
         });
+        this.watcher.busy = true;
         this.watcher.ws.send(folders);
       };
 
       // event emmited when receiving message
       this.watcher.ws.onmessage = (msg) => {
-        let data = JSON.parse(msg.data);
-        this.watcher.updated = true;
-        this.watcher.files = data;
+        this.watcher.busy = false;
+        msg = JSON.parse(msg.data);
+        switch (msg.type) {
+          case "files":
+            this.watcher.files = msg.data;
+            break;
+          case "closed":
+            this.watcher.ws.close();
+            break;
+        }
       };
+    },
+    updateWatcher() {
+      if (this.sets.watchFolders !== "1") return;
+      const folders = JSON.stringify({
+        type: "update",
+        data: this.watcher.folders,
+      });
+      this.watcher.busy = true;
+      this.watcher.ws.send(folders);
+    },
+    stopWatcher() {
+      const msg = JSON.stringify({
+        type: "stop",
+      });
+      this.watcher.busy = true;
+      this.watcher.ws.send(msg);
     },
   },
   watch: {
-    "sets.watchFolders"() {
-      if (this.watcher.ws) this.watcher.ws.close();
+    "sets.watchFolders"(val) {
+      if (val == "0" && this.watcher.ws && this.watcher.ws.readyState == 1)
+        this.stopWatcher();
       else this.runWatcher();
+    },
+    "watcher.folders"() {
+      this.updateWatcher();
     },
   },
 };

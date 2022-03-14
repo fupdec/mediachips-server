@@ -2,9 +2,9 @@ const Watcher = {
   state: () => ({
     folders: [],
     files: [],
-    updated: false,
     dialogFolder: false,
     folder: null,
+    busy: false,
     ws: null, // WebSocket
   }),
   mutations: {},

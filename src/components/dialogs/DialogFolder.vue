@@ -8,7 +8,7 @@
     <v-card>
       <DialogHeader
         @close="watcher.dialogFolder = false"
-        :header="folder.folder"
+        :header="`Watched folder: ${folder.folder}`"
         closable
       />
 

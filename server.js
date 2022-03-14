@@ -209,16 +209,19 @@ router.get('/api/video/:id', (req, res) => {
 
 // file watcher
 app.ws('/watcher', (ws, req) => {
-  let watcher, watchedFolders, extensions
+  let watcher, watchedFolders, extensions, foldersData
 
+  const getExt = (filePath) => {
+    let ext = path.extname(filePath.toLowerCase())
+    return ext.replace('.', '')
+  }
   const getAllFiles = async (dirs) => {
     let files = []
     for (let d in dirs) { // get all paths from watched directories
       if (dirs[d].length == 0) continue
       for (let i = 0; i < dirs[d].length; i++) {
         let filePath = path.join(d, dirs[d][i])
-        let ext = path.extname(filePath.toLowerCase())
-        if (extensions.includes(ext.replace('.', ''))) files.push(filePath)
+        if (extensions.includes(getExt(filePath))) files.push(filePath)
       }
     }
     const videos = await db.Media.findAll({
@@ -227,7 +230,7 @@ app.ws('/watcher', (ws, req) => {
       },
       raw: true,
     })
-    let foldersData = []
+    foldersData = []
     for (let fp of watchedFolders) {
       let filesInDb = videos.filter(x => x.path.includes(fp)).map(i => i.path)
       let filesInFolder = files.filter(x => x.includes(fp))
@@ -239,15 +242,38 @@ app.ws('/watcher', (ws, req) => {
         newFiles: newFiles.sort((a, b) => a.localeCompare(b))
       })
     }
-    ws.send(JSON.stringify(foldersData))
+    ws.send(JSON.stringify({
+      type: 'files',
+      data: foldersData,
+    }))
+  }
+
+  const addFile = (filePath) => {
+    if (!extensions.includes(getExt(filePath))) return
+    for (let i of foldersData || [])
+      if (i.newFiles.includes(filePath)) return // checking for duplicates
+    getAllFiles(watcher.getWatched())
+  }
+
+  const removeFile = (filePath) => {
+    if (!extensions.includes(getExt(filePath))) return
+    for (let i of foldersData || [])
+      if (i.lostFiles.includes(filePath)) return // checking for duplicates
+    getAllFiles(watcher.getWatched())
   }
 
   const init = () => {
-    watcher = chokidar.watch(watchedFolders)
-    watcher.on('ready', () => {
-      let watchedFilesList = watcher.getWatched()
-      getAllFiles(watchedFilesList)
+    watcher = chokidar.watch(watchedFolders, {
+      ignoreInitial: true
     })
+    watcher
+      .on('add', path => addFile(path))
+      .on('change', path => removeFile(path))
+      .on('unlink', path => removeFile(path))
+      .on('ready', () => {
+        let watchedFilesList = watcher.getWatched()
+        getAllFiles(watchedFilesList)
+      })
   }
 
   ws.on('message', (msg) => {
@@ -259,10 +285,25 @@ app.ws('/watcher', (ws, req) => {
         watchedFolders = [...new Set(watchedFolders)]
         init()
         break;
+      case 'update':
+        watchedFolders = msg.data.map(i => i.path)
+        watchedFolders = [...new Set(watchedFolders)]
+        getAllFiles(watcher.getWatched())
+        break;
+      case 'stop':
+        watcher.close().then(() => {
+          ws.send(JSON.stringify({
+            type: 'closed',
+          }))
+        })
+        break;
     }
   });
   ws.on('close', () => {
-    watcher.close()
+    let msgc = {
+      'message': 'closed'
+    }
+    watcher.close().then(() => ws.send(JSON.stringify(msgc)))
   })
 });
 
