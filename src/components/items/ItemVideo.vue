@@ -102,6 +102,8 @@
         </v-btn>
       </v-responsive>
 
+      <v-progress-linear :value="progress" />
+
       <div class="description">
         <div class="video-card-title" :title="fileName" v-html="fileName" />
 
@@ -252,10 +254,14 @@ export default {
     this.$root.$on("updateVideoFrames", (id) => {
       if (this.video.id === id) this.initFrames();
     });
+    this.$root.$on("updateVideoMetadata", (id) => {
+      if (this.video.id === id) this.getMetadata();
+    });
   },
   beforeDestroy() {
     this.$root.$off("updateVideoThumb");
     this.$root.$off("updateVideoFrames");
+    this.$root.$off("updateVideoMetadata");
   },
   data: () => ({
     metadata: {},
@@ -295,6 +301,10 @@ export default {
     },
     duration() {
       return Vue.prototype.$getReadableDuration(this.metadata.duration);
+    },
+    progress() {
+      if (!this.metadata.time) return 0;
+      return (Number(this.metadata.time || 0) / this.metadata.duration) * 100;
     },
     fileName() {
       return Vue.prototype.$getFileNameFromPath(this.video.path);

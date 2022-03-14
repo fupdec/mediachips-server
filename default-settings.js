@@ -157,6 +157,10 @@ const Settings = [{
   {
     "option": "databaseVersion",
     "value": ""
+  },
+  {
+    "option": "restorePlaybackTime",
+    "value": "1"
   }
 ]
 

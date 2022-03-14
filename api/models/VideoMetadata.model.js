@@ -21,6 +21,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      time: Sequelize.INTEGER,
       codec: Sequelize.TEXT,
     }, {
       name: {
@@ -30,6 +31,6 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: false
     }
   )
-  
+
   return VideoMetadata;
 };

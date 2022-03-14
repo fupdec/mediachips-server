@@ -25,7 +25,22 @@ exports.findOne = (req, res) => {
 };
 
 // Update a VideoMetadata by the id in the request
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  VideoMetadata
+    .update(req.body, {
+      where: {
+        mediaId: parseInt(req.params.id)
+      }
+    })
+    .then(() => {
+      res.sendStatus(201)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while performing query."
+      })
+    })
+};
 
 // Delete a VideoMetadata with the specified id in the request
 exports.delete = (req, res) => {};

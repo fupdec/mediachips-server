@@ -101,6 +101,9 @@ export default {
     reg() {
       return this.$store.getters.reg;
     },
+    video() {
+      return this.p.playlist[this.p.nowPlaying];
+    },
   },
   methods: {
     async getThumbs() {
@@ -114,6 +117,7 @@ export default {
     },
     play(index) {
       this.p.paused = false;
+      let current = this.video;
       if (this.p.playlistMode.includes("shuffle")) {
         let indexes = [];
         for (let i = 0; i < this.p.playlist.length; i++) indexes.push(i);
@@ -121,10 +125,10 @@ export default {
         const i = this.p.playlistShuffle.indexOf(index);
         this.p.playlistShuffle.splice(i, 1);
         this.p.playlistShuffle.unshift(index);
-        this.p.player.playlist.playItem(index);
-
+        this.$emit("play", { n: this.p.playlistShuffle[index], o: current });
         if (this.p.playlistVisible) this.scrollToNowPlaying();
-      } else this.$emit("play", this.p.playlist[index]);
+        // TODO fix shuffle
+      } else this.$emit("play", { n: this.p.playlist[index], o: current });
     },
     getFileName(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
@@ -145,10 +149,11 @@ export default {
     "p.playlistMode"(mode, oldMode) {
       if (!mode.includes("shuffle") && oldMode.includes("shuffle")) return;
       let index = [];
+      let current = this.video;
       for (let i = 0; i < this.p.playlist.length; i++) index.push(i);
       this.p.playlistShuffle = _.shuffle(index);
       this.p.nowPlaying = this.p.playlistShuffle[0];
-      this.$emit("play", this.p.playlist[this.p.nowPlaying]);
+      this.$emit("play", { n: this.video, o: current });
       if (this.p.playlistVisible) this.scrollToNowPlaying();
     },
   },

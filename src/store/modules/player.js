@@ -23,6 +23,7 @@ const Player = {
     seeking: false,
     playbackError: null,
     timeRemain: false,
+    metadata: {},
     // Playlist
     isPlaylistVisible: false,
     nowPlaying: 0,

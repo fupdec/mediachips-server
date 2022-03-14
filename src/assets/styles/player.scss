@@ -124,9 +124,13 @@
     .v-slider {
       margin: 0;
     }
+    .v-slider__thumb-container,
+    .v-slider__track-background,
+    .v-slider__track-fill {
+      transition: 0.1s all;
+    }
   }
   .v-slider__track-container {
-    transition: 0.3s all ease;
     box-shadow: 0 0 7px 1px #0000007a;
   }
   .v-slider__thumb-container {

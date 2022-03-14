@@ -339,6 +339,9 @@ export default {
       if (this.p.volume > 0.3) return "volume-medium";
       return "volume-low";
     },
+    video() {
+      return this.p.playlist[this.p.nowPlaying];
+    },
   },
   methods: {
     msToTime(time) {
@@ -373,6 +376,7 @@ export default {
       if (this.isPrevDisabled) return;
       this.p.paused = false;
       let isLoopMode = this.p.playlistMode.includes("loop");
+      let current = this.video;
 
       if (this.p.playlistMode.includes("shuffle")) {
         let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
@@ -385,13 +389,14 @@ export default {
         if (isLoopMode && this.p.nowPlaying < 0)
           this.p.nowPlaying = this.p.playlist.length - 1; // if loop
       }
-      this.$emit("play", this.p.playlist[this.p.nowPlaying]);
+      this.$emit("play", { n: this.video, o: current });
       if (this.p.playlistVisible) this.$root.$emit("scrollToNowPlaying");
     },
     next() {
       if (this.isNextDisabled) return;
       this.p.paused = false;
       let isLoopMode = this.p.playlistMode.includes("loop");
+      let current = this.video;
 
       if (this.p.playlistMode.includes("shuffle")) {
         let shuffleIndex = this.p.playlistShuffle.indexOf(this.p.nowPlaying);
@@ -404,7 +409,7 @@ export default {
         if (isLoopMode && this.p.nowPlaying > this.p.playlist.length - 1)
           this.p.nowPlaying = 0; // if loop mode
       }
-      this.$emit("play", this.p.playlist[this.p.nowPlaying]);
+      this.$emit("play", { n: this.video, o: current });
 
       if (this.p.playlistVisible) this.$root.$emit("scrollToNowPlaying");
     },
@@ -501,22 +506,21 @@ export default {
       this.p.player.playbackRate = e;
       this.$store.dispatch("changePlayerStatusText", {
         text: `Playback speed: ${e == 1 ? "normal" : e}`,
-        icon: 'play-speed',
+        icon: "play-speed",
       });
     },
     addMark(type) {
       this.$emit("addMark", type);
     },
     async setAsThumb() {
-      let video = this.p.playlist[this.p.nowPlaying];
-      let imgPath = "/userfiles/media/thumbs/" + video.id + ".jpg";
+      let imgPath = "/userfiles/media/thumbs/" + this.video.id + ".jpg";
       let time = new Date(this.p.currentTime * 1000)
         .toISOString()
         .substr(11, 8);
       await Vue.prototype
-        .$createThumb(time, video.path, imgPath, 320, true)
+        .$createThumb(time, this.video.path, imgPath, 320, true)
         .then(() => {
-          this.$root.$emit("updateVideoThumb", video.id);
+          this.$root.$emit("updateVideoThumb", this.video.id);
         })
         .catch((e) => console.log(e));
     },

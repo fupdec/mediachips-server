@@ -1,12 +1,12 @@
 <template>
   <v-dialog :value="p.active" @input="closePlayer" eager width="2000">
     <div
-      ref="player"
-      class="player"
-      :class="{ fullscreen: p.fullscreen }"
-      id="player"
       @mousedown="stopSmoothScroll($event)"
       @mousemove="moveOverPlayer"
+      :class="{ fullscreen: p.fullscreen }"
+      class="player"
+      ref="player"
+      id="player"
     >
       <div class="player-wrapper">
         <div
@@ -133,6 +133,9 @@ export default {
     page() {
       return this.$store.state.Page;
     },
+    sets() {
+      return this.$store.state.settings;
+    },
     markAdding: {
       get() {
         return this.$store.state.Dialogs.markAdding;
@@ -144,9 +147,13 @@ export default {
     reg() {
       return this.$store.getters.reg;
     },
+    video() {
+      return this.p.playlist[this.p.nowPlaying];
+    },
   },
   methods: {
-    closePlayer() {
+    async closePlayer() {
+      await this.updatePlaybackTime(this.video);
       this.p.player.pause();
       this.p.player.src = null;
       this.p.currentTime = 0;
@@ -166,21 +173,24 @@ export default {
         this.p.playbackError = true;
       });
     },
-    loadSrc(video) {
+    async loadSrc(video) {
       this.p.player.src = this.apiUrl + "/api/video/" + video.id;
       this.getMarks(video);
+      await this.getMetadata(video);
       this.$store.commit("trackCurrentTime");
       let fileName = this.getFileNameFromPath(video.path);
       this.p.nowPlaying = _.findIndex(this.p.playlist, (i) => i.id == video.id);
+      this.p.player.playbackRate = this.p.speed;
+      if (this.sets.restorePlaybackTime == "1")
+        this.p.player.currentTime = this.p.metadata.time || 0;
+      this.p.playbackError = false;
+      this.markAdding.show = false;
+      document.title = `Playing: ${fileName}` + " - mediaChips";
+      if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
       this.$store.dispatch("changePlayerStatusText", {
         text: `${this.p.nowPlaying + 1}. ${fileName}`,
         icon: "playlist-play",
       });
-      document.title = `Playing: ${fileName}` + " - mediaChips";
-      this.p.playbackError = false;
-      if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
-      this.markAdding.show = false;
-      this.p.player.playbackRate = this.p.speed;
     },
     getFileNameFromPath(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
@@ -212,8 +222,7 @@ export default {
       }
     },
     openPath() {
-      let filePath = this.p.playlist[this.p.nowPlaying].path;
-      Vue.prototype.$openPath(filePath, false);
+      Vue.prototype.$openPath(this.video.path, false);
     },
     stopSmoothScroll(event) {
       if (event.button != 1) return;
@@ -332,8 +341,11 @@ export default {
           break;
       }
     },
-    playVideoObject(video) {
-      this.loadSrc(video);
+    playVideoObject(videos) {
+      const { n, o } = videos;
+      this.updatePlaybackTime(o).then(() => {
+        this.loadSrc(n);
+      });
     },
     togglePause() {
       this.$refs.controls.togglePause();
@@ -366,11 +378,10 @@ export default {
       }
     },
     addMark(data) {
-      let video = this.p.playlist[this.p.nowPlaying];
       let mark = {
         type: this.markAdding.type,
         time: this.markAdding.time,
-        mediaId: video.id,
+        mediaId: this.video.id,
       };
       if (data === "favorite") {
         mark.time = this.p.currentTime;
@@ -386,7 +397,7 @@ export default {
             text: `Mark added`,
             icon: "tooltip-plus",
           });
-          this.getMarks(video);
+          this.getMarks(this.video);
         })
         .catch((e) => {
           // console.log(e);
@@ -402,8 +413,38 @@ export default {
       );
       await axios.delete(this.apiUrl + "/api/mark/" + id);
       await Vue.prototype.$deleteLocalImage(imgPath);
-      let video = this.p.playlist[this.p.nowPlaying];
-      await this.getMarks(video);
+      await this.getMarks(this.video);
+    },
+    getMetadata(video) {
+      return new Promise((resolve, reject) => {
+        axios
+          .get(this.apiUrl + "/api/videoMetadata/" + video.id)
+          .then((res) => {
+            this.p.metadata = res.data;
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    },
+    updatePlaybackTime(video) {
+      return new Promise((resolve, reject) => {
+        axios({
+          method: "put",
+          url: this.apiUrl + "/api/videoMetadata/" + video.id,
+          data: {
+            time: this.p.currentTime,
+          },
+        })
+          .then(() => {
+            this.$root.$emit("updateVideoMetadata", video.id);
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
     },
   },
   watch: {
