@@ -58,11 +58,9 @@ export default {
   name: "AppBar",
   components: {
     // Tabs: () => import('@/components/elements/Tabs.vue'),
-    GlobalSearch: () =>
-      import("@/components/app/appbar/elements/GlobalSearch.vue"),
-    Tasks: () => import("@/components/app/appbar/elements/Tasks.vue"),
-    Notifications: () =>
-      import("@/components/app/appbar/elements/Notifications.vue"),
+    GlobalSearch: () => import("@/components/app/appbar/GlobalSearch.vue"),
+    Tasks: () => import("@/components/app/appbar/Tasks.vue"),
+    Notifications: () => import("@/components/app/appbar/Notifications.vue"),
   },
   mounted() {},
   data: () => ({
