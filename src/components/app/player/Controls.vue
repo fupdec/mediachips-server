@@ -190,49 +190,72 @@
       </v-chip>
 
       <!-- PLAYLIST -->
-      <v-chip outlined dark class="playlist-buttons px-0 mx-2">
-        <v-btn @click="togglePlaylist" icon dark>
-          <v-icon>mdi-playlist-play</v-icon>
-          <div class="tip">
-            <span class="mr-2">Playlist</span>
-            <b class="kbd" v-html="'p'" />
-          </div>
-        </v-btn>
-      </v-chip>
+      <v-btn @click="togglePlaylist" class="playlist-buttons mx-2" icon dark>
+        <v-icon>mdi-playlist-play</v-icon>
+        <div class="tip">
+          <span class="mr-2">Playlist</span>
+          <b class="kbd" v-html="'p'" />
+        </div>
+      </v-btn>
 
-      <v-chip outlined dark class="action-buttons px-0">
-        <v-btn @click="setAsThumb" icon dark>
-          <v-icon>mdi-image-outline</v-icon>
-          <div class="tip" v-html="'Set Frame as Thumb'" />
-        </v-btn>
-      </v-chip>
+      <div class="speed">
+        <v-menu
+          attach=".speed"
+          nudge-top="45"
+          nudge-left="10"
+          min-width="150"
+          top
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn v-bind="attrs" v-on="on" icon dark>
+              <v-icon>mdi-play-speed</v-icon>
+              <div class="tip" v-html="'Playback speed'" />
+            </v-btn>
+          </template>
+
+          <v-list dense class="py-1">
+            <v-list-item-group
+              :value="p.speed"
+              @change="changeSpeed($event)"
+              color="primary"
+            >
+              <v-list-item v-for="i in speeds" :key="i" :value="i">
+                <v-list-item-title v-text="i == 1 ? 'Normal' : i" />
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-menu>
+      </div>
+
+      <v-btn @click="setAsThumb" class="action-buttons mx-2" icon dark>
+        <v-icon>mdi-image-outline</v-icon>
+        <div class="tip" v-html="'Set Frame as Thumb'" />
+      </v-btn>
 
       <v-spacer></v-spacer>
 
       <!-- SCREEN -->
-      <v-chip outlined dark class="px-0 mx-2">
-        <v-btn @click="toggleFullscreen" icon dark>
-          <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
-          <v-icon v-else>mdi-fullscreen</v-icon>
-          <div class="tip">
-            <span
-              class="mr-2"
-              v-html="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
-            />
-            <b class="kbd" v-html="'f'" />
-          </div>
-        </v-btn>
+      <v-btn @click="toggleFullscreen" icon dark>
+        <v-icon v-if="p.fullscreen">mdi-fullscreen-exit</v-icon>
+        <v-icon v-else>mdi-fullscreen</v-icon>
+        <div class="tip">
+          <span
+            class="mr-2"
+            v-html="p.fullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+          />
+          <b class="kbd" v-html="'f'" />
+        </div>
+      </v-btn>
 
-        <v-btn
-          @click="togglePictureInPicture"
-          class="toggle-picture-in-picture"
-          icon
-          dark
-        >
-          <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
-          <div class="tip" v-html="'Picture-in-Picture Mode'" />
-        </v-btn>
-      </v-chip>
+      <v-btn
+        @click="togglePictureInPicture"
+        class="toggle-picture-in-picture mr-2"
+        icon
+        dark
+      >
+        <v-icon size="20">mdi-picture-in-picture-bottom-right</v-icon>
+        <div class="tip" v-html="'Picture-in-Picture Mode'" />
+      </v-btn>
 
       <!-- VOLUME -->
       <v-chip @wheel="changeVolume" outlined dark class="volume px-0">
@@ -265,10 +288,12 @@ import Mark from "./Mark.vue";
 
 export default {
   name: "Controls",
-  props: {},
   components: {
     Mark,
   },
+  data: () => ({
+    speeds: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+  }),
   computed: {
     assigned() {
       let list = this.$store.state.Page.assigned;
@@ -470,6 +495,14 @@ export default {
     },
     changeVolume(e) {
       this.$emit("changeVolume", e);
+    },
+    changeSpeed(e) {
+      this.p.speed = e;
+      this.p.player.playbackRate = e;
+      this.$store.dispatch("changePlayerStatusText", {
+        text: `Playback speed: ${e == 1 ? "normal" : e}`,
+        icon: 'play-speed',
+      });
     },
     addMark(type) {
       this.$emit("addMark", type);

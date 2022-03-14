@@ -14,6 +14,7 @@ const Player = {
     // Video 
     duration: 1,
     volume: 1,
+    speed: 1,
     muted: false,
     paused: false,
     currentTime: 0,

@@ -429,10 +429,17 @@
   .player {
     .time,
     .volume,
+    .speed,
     .mark-buttons,
     .playlist-buttons,
     .action-buttons {
       display: none;
+    }
+    .controls {
+      padding: 0 10px !important;
+      .buttons {
+        padding-bottom: 10px !important;
+      }
     }
   }
 }

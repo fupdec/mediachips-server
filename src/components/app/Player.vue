@@ -180,6 +180,7 @@ export default {
       this.p.playbackError = false;
       if (!this.reg && this.p.nowPlaying > 9) this.p.player.src = "";
       this.markAdding.show = false;
+      this.p.player.playbackRate = this.p.speed;
     },
     getFileNameFromPath(filePath) {
       return Vue.prototype.$getFileNameFromPath(filePath);
