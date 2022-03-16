@@ -6,7 +6,7 @@
         <div class="bottom-menu">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" to="/" exact text color="secondary" title="Home">
+              <v-btn v-on="on" to="/" exact text color="secondary">
                 <span>Home</span>
                 <v-icon>mdi-home-outline</v-icon>
               </v-btn>
@@ -14,21 +14,24 @@
             <span>Home</span>
           </v-tooltip>
 
-          <v-tooltip v-for="type in mediaTypes" :key="type.name + type.id" top>
+          <v-tooltip
+            v-for="media in mediaTypes"
+            :key="media.name + media.id"
+            top
+          >
             <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
-                :to="`/media?typeId=${type.id}`"
-                :title="type.name"
+                :to="`/media?typeId=${media.id}`"
                 color="secondary"
                 exact
                 text
               >
-                <span>{{ type.name }}</span>
-                <v-icon>mdi-{{ type.icon }}</v-icon>
+                <span v-html="media.name" />
+                <v-icon>mdi-{{ media.icon }}</v-icon>
               </v-btn>
             </template>
-            <span>Videos</span>
+            <span v-text="media.name" />
           </v-tooltip>
 
           <v-tooltip v-for="i in meta" :key="i.id" top>
@@ -36,7 +39,6 @@
               <v-btn
                 v-on="on"
                 :to="`/meta?metaId=${i.id}`"
-                :title="i.name"
                 color="secondary"
                 exact
                 text
@@ -80,13 +82,7 @@
 
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-btn
-                v-on="on"
-                to="/settings"
-                title="Settings"
-                color="secondary"
-                text
-              >
+              <v-btn v-on="on" to="/settings" color="secondary" text>
                 <span>Settings</span>
                 <v-icon>mdi-cog-outline</v-icon>
               </v-btn>
