@@ -40,7 +40,7 @@ const Settings = [{
   },
   {
     "option": "appColorLightHeader",
-    "value": "#e1d6eb"
+    "value": "#FFAF00"
   },
   {
     "option": "appColorDarkPrimary",
@@ -56,15 +56,15 @@ const Settings = [{
   },
   {
     "option": "appColorDarkHeader",
-    "value": "#13505C"
+    "value": "#B76A29"
   },
   {
     "option": "headerGradientLight",
-    "value": "linear-gradient(to right,#FFA400,#FF00C1)"
+    "value": "linear-gradient(to right,#ffb458,#6868eb)"
   },
   {
     "option": "headerGradientDark",
-    "value": "linear-gradient(to right,#0E227C,#910C3E)"
+    "value": "linear-gradient(to right,#a9743d,#4a3c81)"
   },
   {
     "option": "darkMode",
