@@ -5,6 +5,15 @@ module.exports = (sequelize, Sequelize) => {
       nameSingular: Sequelize.TEXT,
       icon: Sequelize.TEXT,
       extensions: Sequelize.TEXT,
+      order: Sequelize.INTEGER,
+      hidden: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      custom: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
     }
   )
 

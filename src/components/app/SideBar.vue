@@ -47,7 +47,7 @@
           </v-list-item>
 
           <v-list-item
-            v-if="hiddenMeta.length"
+            v-if="mediaTypesHidden.length || hiddenMeta.length"
             @click="showHidden = !showHidden"
             draggable="false"
           >
@@ -58,6 +58,21 @@
           </v-list-item>
 
           <div v-if="showHidden">
+            <v-list-item
+              v-for="i in mediaTypesHidden"
+              :key="i.id + 1"
+              :to="`/media?typeId=${i.id}`"
+              active-class="secondary--text"
+              color="secondary"
+              draggable="false"
+              exact
+              link
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-{{ i.icon }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>{{ i.name }}</v-list-item-title>
+            </v-list-item>
             <v-list-item
               v-for="i in hiddenMeta"
               :key="i.id + 1"
@@ -140,7 +155,10 @@ export default {
       return this.$store.state.settings;
     },
     mediaTypes() {
-      return this.$store.state.mediaTypes;
+      return this.$store.state.mediaTypes.filter((i) => !i.hidden);
+    },
+    mediaTypesHidden() {
+      return this.$store.state.mediaTypes.filter((i) => i.hidden);
     },
     meta() {
       return this.$store.state.meta.filter(

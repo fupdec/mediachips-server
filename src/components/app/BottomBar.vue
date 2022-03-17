@@ -50,7 +50,12 @@
             <span>{{ i.name }}</span>
           </v-tooltip>
 
-          <v-menu v-if="hiddenMeta.length" offset-y top open-on-hover>
+          <v-menu
+            v-if="mediaTypesHidden.length || hiddenMeta.length"
+            open-on-hover
+            offset-y
+            top
+          >
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-on="on" v-bind="attrs" class="folder btn-hidden" text>
                 <span>Hidden</span>
@@ -60,6 +65,22 @@
 
             <v-list dense>
               <v-list-item-group>
+                <v-list-item
+                  v-for="i in mediaTypesHidden"
+                  :key="i.id + 1"
+                  :to="`/media?typeId=${i.id}`"
+                  color="secondary"
+                  link
+                  exact
+                  text
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-icon left>mdi-{{ i.icon }}</v-icon>
+                      {{ i.name }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
                 <v-list-item
                   v-for="i in hiddenMeta"
                   :key="i.id + 1"
@@ -151,7 +172,10 @@ export default {
       return this.$store.state.settings;
     },
     mediaTypes() {
-      return this.$store.state.mediaTypes;
+      return this.$store.state.mediaTypes.filter((i) => !i.hidden);
+    },
+    mediaTypesHidden() {
+      return this.$store.state.mediaTypes.filter((i) => i.hidden);
     },
     meta() {
       return this.$store.state.meta.filter(
