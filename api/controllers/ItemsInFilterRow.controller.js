@@ -1,9 +1,7 @@
-const db = require("../index.js");
 const {
   Item,
   ItemsInFilterRow
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
 // Create and Save a new ItemsInFilterRow
 exports.create = (req, res) => {};

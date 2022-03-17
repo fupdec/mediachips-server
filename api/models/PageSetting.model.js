@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       sortBy: {
         type: Sequelize.TEXT,
-        defaultValue: 'name',
+        defaultValue: 'createdAt',
       },
       sortDir: {
         type: Sequelize.TEXT,

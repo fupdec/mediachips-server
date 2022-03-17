@@ -250,45 +250,81 @@ export default {
     async init() {
       if (this.isMetaPage) await this.getMeta();
       else if (this.isMediaPage || this.isItemPage) await this.getMedia();
+      await this.getFilters();
       await this.getPageSettings();
       await this.getAssignedMeta();
-      await this.getFilters();
       await this.getItemsFromDb();
     },
     async getFilters() {
-      let query = "?";
-      if (this.isMediaPage) {
-        if (this.typeId) query += `typeId=${this.typeId}`;
-      } else if (this.isItemPage) {
-        if (this.itemId) query += `itemId=${this.itemId}`;
-        if (this.typeId) query += `&typeId=${this.typeId}`;
-      } else if (this.isMetaPage) {
-        if (this.metaId) query += `metaId=${this.metaId}`;
-      }
-      await axios
-        .get(this.apiUrl + "/api/SavedFilter/page" + query)
+      let savedFilter = {};
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/SavedFilter",
+        data: {
+          itemId: this.itemId || null,
+          typeId: this.typeId || null,
+          metaId: this.metaId || null,
+        },
+      })
         .then((res) => {
-          const filters =
-            res.data.filters.map((i) => {
-              let by = i.filterRow.by;
-              if (/\d/.test(by)) i.filterRow.by = +by;
-              delete i.filterRow.createdAt;
-              delete i.filterRow.updatedAt;
-              return i.filterRow;
-            }) || [];
-          this.$store.commit("updateStatePage", {
-            key: "filters",
-            value: filters,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "savedFilter",
-            value: res.data.savedFilter || {},
-          });
-          if (this.isItemPage) this.initFilterForItemPage();
+          savedFilter = res.data[0];
         })
         .catch((e) => {
           console.log(e);
         });
+
+      let filterRows = [];
+      await axios
+        .get(
+          this.apiUrl +
+            "/api/FilterRowsInSavedFilter" +
+            "?filterId=" +
+            savedFilter.id
+        )
+        .then((res) => {
+          filterRows = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      for (let i of filterRows) {
+        if (i.filterRow.type !== "array") continue;
+        let vals = [];
+
+        await axios
+          .get(
+            this.apiUrl + "/api/ItemsInFilterRow" + "?rowId=" + i.filterRow.id
+          )
+          .then((res) => {
+            vals = res.data;
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+
+        if (vals.length > 0) i.filterRow.val = vals.map((i) => i.itemId);
+      }
+
+      filterRows = filterRows.map((i) => {
+        let by = i.filterRow.by;
+        if (/\d/.test(by)) i.filterRow.by = +by;
+        delete i.filterRow.createdAt;
+        delete i.filterRow.updatedAt;
+        return i.filterRow;
+      });
+
+      this.$store.commit("updateStatePage", {
+        key: "filters",
+        value: filterRows,
+      });
+
+      this.$store.commit("updateStatePage", {
+        key: "savedFilter",
+        value: savedFilter,
+      });
+
+      if (this.isItemPage) this.initFilterForItemPage();
     },
     initFilterForItemPage() {
       const index = this.page.filters.findIndex(
@@ -309,58 +345,44 @@ export default {
         });
     },
     async getPageSettings() {
-      let query = "";
-      if (this.isMetaPage) {
-        query = `?metaId=${this.meta.id}`;
-      } else if (this.isMediaPage) {
-        query = `?typeId=${this.typeId}`;
-      } else if (this.isItemPage) {
-        query = `?typeId=${this.typeId}&itemId=${this.itemId}`;
-      }
-      let url = "/api/PageSetting";
-      await axios
-        .get(this.apiUrl + url + query)
+      let data = {};
+      data.itemId = this.itemId || null;
+      data.typeId = this.typeId || null;
+      data.metaId = this.metaId || null;
+
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/PageSetting",
+        data: data,
+      })
         .then((res) => {
-          this.$store.commit("updateStatePage", {
-            key: "page",
-            value: res.data.page,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "limit",
-            value: res.data.limit,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "size",
-            value: res.data.size,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "view",
-            value: res.data.view,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "sortBy",
-            value: res.data.sortBy,
-          });
-          this.$store.commit("updateStatePage", {
-            key: "sortDir",
-            value: res.data.sortDir,
-          });
+          let vals = ["page", "limit", "size", "view", "sortBy", "sortDir"];
+          for (let i of vals)
+            this.$store.commit("updateStatePage", {
+              key: i,
+              value: res.data[0][i],
+            });
+
+          // if page settings created then update filter id for it
+          if (res.data[1])
+            this.updatePageSetting({ filterId: this.page.savedFilter.id });
         })
         .catch((e) => {
           console.log(e);
         });
     },
     updatePageSetting(data) {
-      let query = "";
-      if (this.isMetaPage) {
-        query = `?metaId=${this.metaId}`;
-      } else if (this.isMediaPage) {
-        query = `?typeId=${this.typeId}`;
-      }
+      let query = {};
+      query.itemId = this.itemId || null;
+      query.typeId = this.typeId || null;
+      query.metaId = this.metaId || null;
       axios({
         method: "put",
-        url: this.apiUrl + "/api/PageSetting" + query,
-        data: data,
+        url: this.apiUrl + "/api/PageSetting",
+        data: {
+          data,
+          query,
+        },
       });
     },
     async getMeta() {

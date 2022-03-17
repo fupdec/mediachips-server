@@ -8,9 +8,6 @@ module.exports = app => {
 
   // Retrieve all SavedFilter
   router.get("/", SavedFilter.findAll);
-  
-  // Retrieve a single SavedFilter with item id
-  router.get("/page", SavedFilter.findOneForPage);
 
   // Retrieve a single SavedFilter with id
   router.get("/:id", SavedFilter.findOne);

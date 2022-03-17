@@ -35,11 +35,8 @@ exports.findOne = (req, res) => {
 
 // Update a single option with a name and value in the request
 exports.update = (req, res) => {
-  PageSetting.update(req.body, {
-    where: {
-      metaId: req.query.metaId || null,
-      typeId: req.query.typeId || null
-    }
+  PageSetting.update(req.body.data, {
+    where: req.body.query
   }).then((data) => {
     res.status(201).send(data)
   }).catch(err => {

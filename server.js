@@ -7,6 +7,10 @@ const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
 const db = require("./api");
+const {
+  Umzug,
+  SequelizeStorage
+} = require('umzug');
 const expressWs = require('express-ws')(app)
 const chokidar = require("chokidar");
 
@@ -75,46 +79,22 @@ try {
 }
 
 // sequelize.sync({force: true}) // drop existing tables on start
-const Settings = require('./default-settings.js')
-db.sequelize.sync().then(async () => {
-  // create media type: videos
-  const [videoType, createdVideo] = await db.MediaType.findOrCreate({
-    where: {
-      name: 'Videos',
+db.sequelize.sync({
+  // force: true
+}).then(async () => {
+  // migration system
+  const umzug = new Umzug({
+    migrations: {
+      glob: 'api/migrations/*.js'
     },
-    defaults: {
-      nameSingular: 'Video',
-      icon: 'video-outline',
-      extensions: '.mp4, .wmv, .mkv',
-      pageSetting: {
-        sortBy: 'path'
-      },
-    },
-    include: [db.PageSetting]
-  })
+    context: db.sequelize.getQueryInterface(),
+    storage: new SequelizeStorage({
+      sequelize: db.sequelize
+    }),
+    // logger: console,
+  });
 
-  if (createdVideo) {
-    const [filter, createdFilter] = await db.SavedFilter.findOrCreate({
-      where: {
-        name: null,
-        typeId: videoType.id
-      }
-    })
-
-    if (createdFilter) {
-      await db.PageSetting.update({
-        filterId: filter.id
-      }, {
-        where: {
-          typeId: videoType.id
-        }
-      })
-    }
-  }
-
-  await db.Setting.bulkCreate(Settings, {
-    ignoreDuplicates: true
-  })
+  await umzug.up();
 })
 
 

@@ -155,7 +155,7 @@ export default {
       let sets = {};
       sets.metaId = this.metaId;
       sets.page = 0;
-      sets.limit = 10000;
+      sets.limit = -1;
       sets.sortBy = "name";
       sets.sortDir = "asc";
       sets.filters = [];

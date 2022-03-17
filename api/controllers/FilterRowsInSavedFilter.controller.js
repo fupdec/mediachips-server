@@ -1,9 +1,7 @@
-const db = require("../index.js");
 const {
-  Item,
+  FilterRow,
   FilterRowsInSavedFilter
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
 // Create and Save a new FilterRowsInSavedFilter
 exports.create = (req, res) => {};
@@ -12,10 +10,9 @@ exports.create = (req, res) => {};
 exports.findAll = (req, res) => {
   FilterRowsInSavedFilter.findAll({
     where: {
-      rowId: req.query.rowId
+      filterId: req.query.filterId
     },
-    include: [Item],
-    raw: true
+    include: [FilterRow],
   }).then((data) => {
     res.status(201).send(data)
   }).catch(err => {

@@ -44,6 +44,7 @@
     "sequelize": "^6.11.0",
     "sqlite3": "^5.0.2",
     "string-crypto": "^2.0.2",
+    "umzug": "^3.0.0",
     "vue": "^2.6.11",
     "vue-advanced-cropper": "^1.10.1",
     "vue-filepond": "^6.0.3",
