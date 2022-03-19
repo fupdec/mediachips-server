@@ -13,6 +13,7 @@ const {
 } = require('umzug');
 const expressWs = require('express-ws')(app)
 const chokidar = require("chokidar");
+const _ = require('lodash')
 
 app.use(express.json({
   limit: '100mb'
@@ -122,6 +123,7 @@ require("./api/routes/Media.routes")(app)
 require("./api/routes/MediaType.routes")(app)
 require("./api/routes/Meta.routes")(app)
 require("./api/routes/MetaInMediaType.routes")(app)
+require("./api/routes/MediaTypesInWatchedFolders.routes")(app)
 require("./api/routes/MetaSetting.routes")(app)
 require("./api/routes/PageSetting.routes")(app)
 require("./api/routes/SavedFilter.routes")(app)
@@ -189,61 +191,70 @@ router.get('/api/video/:id', (req, res) => {
 
 // file watcher
 app.ws('/watcher', (ws, req) => {
-  let watcher, watchedFolders, extensions, foldersData
+  let watcher, watchedFolders, foldersMasked, filesList
 
-  const getExt = (filePath) => {
-    let ext = path.extname(filePath.toLowerCase())
-    return ext.replace('.', '')
-  }
-  const getAllFiles = async (dirs) => {
-    let files = []
+  const getFilesList = async (dirs) => {
+    let watchedFiles = []
+
     for (let d in dirs) { // get all paths from watched directories
       if (dirs[d].length == 0) continue
-      for (let i = 0; i < dirs[d].length; i++) {
-        let filePath = path.join(d, dirs[d][i])
-        if (extensions.includes(getExt(filePath))) files.push(filePath)
-      }
+      for (let i = 0; i < dirs[d].length; i++)
+        watchedFiles.push(path.join(d, dirs[d][i]))
     }
-    const videos = await db.Media.findAll({
-      where: {
-        typeId: 1
-      },
-      raw: true,
-    })
-    foldersData = []
-    for (let fp of watchedFolders) {
-      let filesInDb = videos.filter(x => x.path.includes(fp)).map(i => i.path)
-      let filesInFolder = files.filter(x => x.includes(fp))
-      let lostFiles = filesInDb.filter(x => !filesInFolder.includes(x))
-      let newFiles = filesInFolder.filter(x => !filesInDb.includes(x))
-      foldersData.push({
-        folder: fp,
-        lostFiles: lostFiles.sort((a, b) => a.localeCompare(b)),
-        newFiles: newFiles.sort((a, b) => a.localeCompare(b))
+
+    filesList = []
+    for (let i of watchedFolders) {
+      const types = i.types
+      const fp = i.path
+      let filesByType = []
+      for (let t of types) {
+        const media = await db.Media.findAll({
+          where: {
+            typeId: t.id
+          },
+          raw: true,
+        })
+
+        let exts = t.extensions.replaceAll(',', '|')
+        let regex = new RegExp('^.*\.(' + exts + ')$', "gm")
+        let filesInFolder = _.cloneDeep(watchedFiles)
+        filesInFolder = filesInFolder.filter(x =>
+          regex.test(x.toLowerCase()) && x.includes(fp)
+        )
+        let filesInDb = media.filter(x => x.path.includes(fp)).map(i => i.path)
+        let lostFiles = filesInDb.filter(x => !filesInFolder.includes(x))
+        let newFiles = filesInFolder.filter(x => !filesInDb.includes(x))
+        filesByType.push({
+          type: t,
+          lost: lostFiles.sort((a, b) => a.localeCompare(b)),
+          new: newFiles.sort((a, b) => a.localeCompare(b))
+        })
+      }
+      filesList.push({
+        folder: i,
+        files: filesByType,
       })
     }
     ws.send(JSON.stringify({
       type: 'files',
-      data: foldersData,
+      data: filesList,
     }))
   }
 
   const addFile = (filePath) => {
-    if (!extensions.includes(getExt(filePath))) return
-    for (let i of foldersData || [])
+    for (let i of filesList || [])
       if (i.newFiles.includes(filePath)) return // checking for duplicates
-    getAllFiles(watcher.getWatched())
+    getFilesList(watcher.getWatched())
   }
 
   const removeFile = (filePath) => {
-    if (!extensions.includes(getExt(filePath))) return
-    for (let i of foldersData || [])
+    for (let i of filesList || [])
       if (i.lostFiles.includes(filePath)) return // checking for duplicates
-    getAllFiles(watcher.getWatched())
+    getFilesList(watcher.getWatched())
   }
 
-  const init = () => {
-    watcher = chokidar.watch(watchedFolders, {
+  const startWatcher = () => {
+    watcher = chokidar.watch(foldersMasked, {
       ignoreInitial: true
     })
     watcher
@@ -251,24 +262,32 @@ app.ws('/watcher', (ws, req) => {
       .on('change', path => removeFile(path))
       .on('unlink', path => removeFile(path))
       .on('ready', () => {
-        let watchedFilesList = watcher.getWatched()
-        getAllFiles(watchedFilesList)
+        getFilesList(watcher.getWatched())
       })
+  }
+
+  const getFoldersMasked = (folders) => {
+    foldersMasked = []
+    for (let folder in folders) {
+      for (let ext of folders[folder]) {
+        foldersMasked.push(path.join(folder, '**', `*.${ext}`))
+      }
+    }
   }
 
   ws.on('message', (msg) => {
     msg = JSON.parse(msg)
     switch (msg.type) {
-      case 'init':
-        extensions = msg.extensions
-        watchedFolders = msg.data.map(i => i.path)
-        watchedFolders = [...new Set(watchedFolders)]
-        init()
+      case 'start':
+        watchedFolders = msg.folders
+        getFoldersMasked(msg.extensions)
+        startWatcher()
         break;
       case 'update':
-        watchedFolders = msg.data.map(i => i.path)
-        watchedFolders = [...new Set(watchedFolders)]
-        getAllFiles(watcher.getWatched())
+        watchedFolders = msg.folders
+        getFoldersMasked(msg.extensions)
+        watcher.add(foldersMasked)
+        getFilesList(watcher.getWatched())
         break;
       case 'stop':
         watcher.close().then(() => {

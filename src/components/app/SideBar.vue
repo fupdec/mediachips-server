@@ -100,15 +100,15 @@
           </v-list-item>
 
           <div
-            v-if="watcher.folders.length && sets.watchFolders == '1'"
+            v-if="watcher.files.length && sets.watchFolders == '1'"
             @mouseover="folderHovered = true"
             @mouseleave="folderHovered = false"
           >
             <v-divider class="my-1" />
             <v-list-item
-              v-for="folder in watcher.folders"
-              :key="folder.id"
-              @click="openDialogFolder(folder.path)"
+              v-for="i in watcher.files"
+              :key="i.folder.id"
+              @click="openDialogFolder(i)"
               :disabled="watcher.busy"
             >
               <v-list-item-icon>
@@ -116,8 +116,8 @@
                 <v-icon v-else>mdi-folder-outline</v-icon>
                 <v-badge
                   v-if="!watcher.busy"
-                  :value="getNewFiles(folder.path)"
-                  :content="getNewFiles(folder.path)"
+                  :value="getBadgeVal(i.files, 'new')"
+                  :content="getBadgeVal(i.files, 'new')"
                   :offset-x="folderHovered ? 35 : 30"
                   :offset-y="folderHovered ? 12 : 6"
                   :dot="!folderHovered"
@@ -125,15 +125,15 @@
                 />
                 <v-badge
                   v-if="!watcher.busy"
-                  :value="getLostFiles(folder.path)"
-                  :content="getLostFiles(folder.path)"
+                  :value="getBadgeVal(i.files, 'lost')"
+                  :content="getBadgeVal(i.files, 'lost')"
                   :offset-x="folderHovered ? 35 : 30"
                   :offset-y="folderHovered ? 35 : 26"
                   :dot="!folderHovered"
                   color="warning"
                 />
               </v-list-item-icon>
-              <v-list-item-title>{{ folder.name }}</v-list-item-title>
+              <v-list-item-title v-text="i.folder.name" />
             </v-list-item>
           </div>
         </v-list>
@@ -180,22 +180,14 @@ export default {
     },
   },
   methods: {
-    getLostFiles(folder) {
-      if (_.filter(this.watcher.files, { folder }).length) {
-        const index = _.findIndex(this.watcher.files, { folder });
-        return this.watcher.files[index].lostFiles.length;
-      } else return "";
-    },
-    getNewFiles(folder) {
-      if (_.filter(this.watcher.files, { folder }).length) {
-        const index = _.findIndex(this.watcher.files, { folder });
-        return this.watcher.files[index].newFiles.length;
-      } else return "";
-    },
     openDialogFolder(folder) {
-      const index = _.findIndex(this.watcher.files, { folder });
-      this.watcher.folder = this.watcher.files[index];
+      this.watcher.folder = folder;
       this.watcher.dialogFolder = true;
+    },
+    getBadgeVal(files, type) {
+      let value = 0;
+      for (let i of files) value += i[type].length;
+      return value;
     },
   },
 };

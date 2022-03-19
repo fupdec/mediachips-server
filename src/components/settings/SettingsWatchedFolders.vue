@@ -32,22 +32,27 @@
         <v-icon left>mdi-plus</v-icon> Add Folder
       </v-btn>
 
-      <v-list-item v-for="f in watcher.folders" :key="f.id" @click="toggle(f)">
+      <v-list-item v-for="i in watcher.folders" :key="i.id" @click="toggle(i)">
         <v-list-item-avatar>
-          <v-icon v-text="`mdi-eye${f.watch == 1 ? '-off' : ''}`" />
+          <v-icon v-text="`mdi-eye${i.watch ? '' : '-off'}`" />
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title v-text="f.name" />
-          <v-list-item-subtitle v-text="f.path" />
+          <v-list-item-title>
+            <v-icon v-for="type in i.types" :key="type.id" small>
+              mdi-{{ type.icon }}
+            </v-icon>
+            <span v-text="i.name" class="ml-2" />
+          </v-list-item-title>
+          <v-list-item-subtitle v-text="i.path" />
         </v-list-item-content>
 
         <v-list-item-action>
           <v-btn-toggle dense rounded>
-            <v-btn @click.stop="edit(f)">
+            <v-btn @click.stop="edit(i)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn @click.stop="confirmRemoving(f)">
+            <v-btn @click.stop="confirmRemoving(i)">
               <v-icon color="error">mdi-close</v-icon>
             </v-btn>
           </v-btn-toggle>
@@ -55,7 +60,12 @@
       </v-list-item>
     </v-list>
 
-    <v-dialog v-model="dialogFolder" scrollable width="600">
+    <v-dialog
+      v-model="dialogFolder"
+      :fullscreen="$vuetify.breakpoint.xs"
+      scrollable
+      width="600"
+    >
       <v-card>
         <DialogHeader
           @close="dialogFolder = false"
@@ -80,6 +90,27 @@
               v-model="folderName"
               label="Name of folder (optional)"
             />
+
+            <div>Media types</div>
+            <v-alert type="error" :value="mediaTypesError" text dense>
+              Please select at least one media type
+            </v-alert>
+            <v-chip-group
+              v-model="folderMediaTypes"
+              active-class="primary--text"
+              multiple
+              column
+            >
+              <v-chip
+                v-for="i in mediaTypes"
+                :key="i.id"
+                @click="mediaTypesError = false"
+                outlined
+              >
+                <v-icon size="20" left>mdi-{{ i.icon }}</v-icon>
+                {{ i.name }}
+              </v-chip>
+            </v-chip-group>
           </v-form>
         </v-card-text>
       </v-card>
@@ -116,6 +147,8 @@ export default {
     folder: null,
     buttons: [],
     valid: false,
+    mediaTypesError: false,
+    folderMediaTypes: [],
     dialogFolder: false,
     dialogDelete: false,
     text: "This folder will be removed from watchlists. \r Are you sure?",
@@ -123,6 +156,9 @@ export default {
   computed: {
     apiUrl() {
       return this.$store.state.localhost;
+    },
+    mediaTypes() {
+      return this.$store.state.mediaTypes;
     },
     sets: {
       get() {
@@ -160,29 +196,29 @@ export default {
       ];
       this.folderPath = "";
       this.folderName = "";
+      this.folderMediaTypes = [];
       this.dialogFolder = true;
     },
     async getFolders() {
-      await axios
-        .get(this.apiUrl + "/api/WatchedFolder")
-        .then((res) => {
-          this.watcher.folders = res.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.watcher.folders = await Vue.prototype.$getWatchedFolders();
     },
     async add() {
       await this.$refs.form.validate();
       if (!this.valid) return;
+      if (this.folderMediaTypes.length == 0) {
+        this.mediaTypesError = true;
+        return;
+      }
 
       await axios({
         method: "post",
         url: this.apiUrl + "/api/WatchedFolder",
         data: {
-          path: this.folderPath,
-          name: this.folderName || this.folderPath,
-          watch: 1,
+          folder: {
+            path: this.folderPath,
+            name: this.folderName || this.folderPath,
+          },
+          types: this.folderMediaTypes.map((i) => this.mediaTypes[i].id),
         },
       })
         .then(() => {
@@ -195,6 +231,9 @@ export default {
     },
     edit(folder) {
       this.folder = folder;
+      this.folderMediaTypes = folder.types.map((i) =>
+        this.mediaTypes.findIndex((x) => x.id == i.id)
+      );
       this.folderPath = folder.path;
       this.folderName = folder.name;
       this.buttons = [
@@ -204,28 +243,11 @@ export default {
           color: "success",
           outlined: false,
           function: () => {
-            this.save();
+            this.add();
           },
         },
       ];
       this.dialogFolder = true;
-    },
-    async save() {
-      await axios({
-        method: "put",
-        url: this.apiUrl + "/api/WatchedFolder/" + this.folder.id,
-        data: {
-          name: this.folderName,
-          path: this.folderPath,
-        },
-      })
-        .then(async () => {
-          await this.getFolders();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-      this.dialogFolder = false;
     },
     confirmRemoving(folder) {
       this.folder = folder;
@@ -250,7 +272,7 @@ export default {
         method: "put",
         url: this.apiUrl + "/api/WatchedFolder/" + folder.id,
         data: {
-          watch: folder.watch == 1 ? 0 : 1,
+          watch: !folder.watch,
         },
       })
         .then(() => {

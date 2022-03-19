@@ -351,6 +351,18 @@ const Readable = {
         };
       });
     }
+    Vue.prototype.$getWatchedFoldersExtensions = (watchedFolders) => {
+      let extensions = {};
+      for (let folder of watchedFolders) {
+        let arr = []
+        const types = folder.types
+        for (let j of types) {
+          arr = arr.concat(j.extensions.split(','))
+        }
+        extensions[folder.path] = arr
+      }
+      return extensions;
+    }
   }
 }
 

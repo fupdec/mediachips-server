@@ -1,4 +1,6 @@
 <script>
+import Vue from "vue";
+
 export default {
   computed: {
     watcher: {
@@ -13,41 +15,21 @@ export default {
   methods: {
     runWatcher() {
       if (this.sets.watchFolders !== "1") return;
-      let extensions = [
-        "3gp",
-        "avi",
-        "f4v",
-        "flv",
-        "m4v",
-        "mkv",
-        "mod",
-        "mov",
-        "mp4",
-        "mpeg",
-        "mpg",
-        "mts",
-        "rm",
-        "rmvb",
-        "swf",
-        "ts",
-        "vob",
-        "webm",
-        "wmv",
-        "yuv",
-      ];
 
       this.watcher.ws = new WebSocket(
         this.apiUrl.replace("http", "ws") + "/watcher"
       );
 
       this.watcher.ws.onopen = () => {
-        const folders = JSON.stringify({
-          type: "init",
-          data: this.watcher.folders,
-          extensions,
+        const watchedFolders = this.watcher.folders.filter((x) => x.watch);
+        let exts = Vue.prototype.$getWatchedFoldersExtensions(watchedFolders);
+        const data = JSON.stringify({
+          type: "start",
+          folders: watchedFolders,
+          extensions: exts,
         });
         this.watcher.busy = true;
-        this.watcher.ws.send(folders);
+        this.watcher.ws.send(data);
       };
 
       // event emmited when receiving message
@@ -64,14 +46,16 @@ export default {
         }
       };
     },
-    updateWatcher() {
+    updateWatcher(watchedFolders) {
       if (this.sets.watchFolders !== "1") return;
-      const folders = JSON.stringify({
+      let exts = Vue.prototype.$getWatchedFoldersExtensions(watchedFolders);
+      const data = JSON.stringify({
         type: "update",
-        data: this.watcher.folders,
+        folders: watchedFolders,
+        extensions: exts,
       });
       this.watcher.busy = true;
-      this.watcher.ws.send(folders);
+      this.watcher.ws.send(data);
     },
     stopWatcher() {
       const msg = JSON.stringify({
@@ -87,8 +71,8 @@ export default {
         this.stopWatcher();
       else this.runWatcher();
     },
-    "watcher.folders"() {
-      this.updateWatcher();
+    "watcher.folders"(val) {
+      this.updateWatcher(val.filter((x) => x.watch));
     },
   },
 };

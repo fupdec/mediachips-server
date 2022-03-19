@@ -1,42 +1,52 @@
-const db = require("../index.js");
 const {
-  WatchedFolder,
-  MediaType
+  MediaTypesInWatchedFolders,
+  WatchedFolder
 } = require("../index.js");
-const Op = db.Sequelize.Op;
 
 // Create and Save a new Folder
-exports.create = (req, res) => {
-  WatchedFolder
-    .create(req.body)
-    .then(data => {
-      res.status(201).send(data)
+exports.create = async (req, res) => {
+  const {
+    folder,
+    types
+  } = req.body
+
+  const [folderRow, isCreated] = await WatchedFolder.findOrCreate({
+    where: {
+      path: folder.path,
+    },
+    defaults: {
+      name: folder.name
+    },
+  })
+
+  if (!isCreated) WatchedFolder
+    .update({
+      name: folder.name
+    }, {
+      where: {
+        id: folderRow.id
+      }
     })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
-      })
+
+  await MediaTypesInWatchedFolders.destroy({
+    where: {
+      folderId: folderRow.id
+    }
+  })
+
+  for (let i of types) {
+    await MediaTypesInWatchedFolders.findOrCreate({
+      where: {
+        folderId: folderRow.id,
+        typeId: i
+      }
     })
+  }
+  res.sendStatus(201)
 };
 
 // Retrieve all Folders from the database.
-exports.findAll = (req, res) => {
-  WatchedFolder
-    .findAll({
-      include: [{
-        model: MediaType,
-      }],
-      raw: true
-    })
-    .then(data => {
-      res.status(201).send(data)
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
-      })
-    })
-};
+exports.findAll = (req, res) => {};
 
 // Find a single Folder with an id
 exports.findOne = (req, res) => {};

@@ -119,6 +119,30 @@ const ApiCalls = {
         },
       });
     }
+    Vue.prototype.$getWatchedFolders = async () => {
+      let result = [];
+      await axios
+        .get(options.store.state.localhost + "/api/MediaTypesInWatchedFolders")
+        .then((res) => {
+          let watchedFolders = res.data;
+          let types = {}
+          for (let i of watchedFolders) {
+            let id = i.folderId
+            if (!types[id]) types[id] = []
+            types[id].push(i.mediaType);
+          }
+          let folders = _.uniqBy(watchedFolders, (i) => i.folderId);
+          for (let i of folders) {
+            let obj = i.watchedFolder
+            obj.types = types[i.folderId]
+            result.push(obj)
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      return result;
+    }
   }
 }
 

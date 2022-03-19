@@ -50,29 +50,11 @@ export default {
         },
       });
 
-      let exts = [
-        "3gp",
-        "avi",
-        "f4v",
-        "flv",
-        "m4v",
-        "mkv",
-        "mod",
-        "mov",
-        "mp4",
-        "mpeg",
-        "mpg",
-        "mts",
-        "rm",
-        "rmvb",
-        "swf",
-        "ts",
-        "vob",
-        "webm",
-        "wmv",
-        "yuv",
-      ];
-      const regex = "." + exts.join("$|.") + "$";
+      const mediaTypes = this.$store.state.mediaTypes;
+      const typeId = +this.$route.query.typeId;
+      const mt = _.find(mediaTypes, i=>i.id == typeId);
+      const extensions = mt.extensions.split(",");
+      const regex = "." + extensions.join("$|.") + "$";
       const regexString = JSON.stringify(regex);
       const paths = Vue.prototype.$transformTextToArray(this.task.paths);
       let files = [];

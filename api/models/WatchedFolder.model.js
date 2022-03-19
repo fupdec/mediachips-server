@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
       name: Sequelize.TEXT,
       watch: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
       },
     }
   )

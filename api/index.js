@@ -23,6 +23,7 @@ const ItemsInMedia = require("./models/ItemsInMedia.model")(sequelize, Sequelize
 const Mark = require("./models/Mark.model")(sequelize, Sequelize);
 const Media = require("./models/Media.model")(sequelize, Sequelize);
 const MediaType = require("./models/MediaType.model")(sequelize, Sequelize);
+const MediaTypesInWatchedFolders = require("./models/MediaTypesInWatchedFolders.model")(sequelize, Sequelize);
 const Meta = require("./models/Meta.model")(sequelize, Sequelize);
 const MetaInMediaType = require("./models/MetaInMediaType.model")(sequelize, Sequelize);
 const MetaSetting = require("./models/MetaSetting.model")(sequelize, Sequelize);
@@ -218,11 +219,19 @@ ChildMeta.belongsTo(Meta, {
   foreignKey: 'childMetaId'
 })
 
-MediaType.hasMany(WatchedFolder, {
+MediaTypesInWatchedFolders.removeAttribute('id')
+WatchedFolder.hasMany(MediaTypesInWatchedFolders, {
+  foreignKey: 'folderId',
+  onDelete: "cascade"
+})
+MediaTypesInWatchedFolders.belongsTo(WatchedFolder, {
+  foreignKey: 'folderId'
+})
+MediaType.hasMany(MediaTypesInWatchedFolders, {
   foreignKey: 'typeId',
   onDelete: "cascade"
 })
-WatchedFolder.belongsTo(MediaType, {
+MediaTypesInWatchedFolders.belongsTo(MediaType, {
   foreignKey: 'typeId'
 })
 
@@ -313,6 +322,7 @@ db.ItemsInMedia = ItemsInMedia
 db.Mark = Mark
 db.Media = Media
 db.MediaType = MediaType
+db.MediaTypesInWatchedFolders = MediaTypesInWatchedFolders
 db.Meta = Meta
 db.MetaInMediaType = MetaInMediaType
 db.MetaSetting = MetaSetting

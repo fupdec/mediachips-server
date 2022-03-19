@@ -112,18 +112,18 @@
           </v-tooltip>
 
           <div
-            v-if="watcher.folders.length && sets.watchFolders == '1'"
+            v-if="watcher.files.length && sets.watchFolders == '1'"
             @mouseover="folderHovered = true"
             @mouseleave="folderHovered = false"
             class="folders"
           >
-            <v-tooltip v-for="folder in watcher.folders" :key="folder.id" top>
+            <v-tooltip v-for="i in watcher.files" :key="i.folder.id" top>
               <template v-slot:activator="{ on, attrs }">
                 <div class="folder-wrapper">
                   <v-btn
                     v-bind="attrs"
                     v-on="on"
-                    @click="openDialogFolder(folder.path)"
+                    @click="openDialogFolder(i)"
                     :disabled="watcher.busy"
                     class="folder"
                     text
@@ -133,8 +133,8 @@
                   </v-btn>
                   <v-badge
                     v-if="!watcher.busy"
-                    :value="getNewFiles(folder.path)"
-                    :content="getNewFiles(folder.path)"
+                    :value="getBadgeVal(i.files, 'new')"
+                    :content="getBadgeVal(i.files, 'new')"
                     :offset-x="folderHovered ? 70 : 58"
                     :offset-y="folderHovered ? -6 : -8"
                     :dot="!folderHovered"
@@ -142,8 +142,8 @@
                   />
                   <v-badge
                     v-if="!watcher.busy"
-                    :value="getLostFiles(folder.path)"
-                    :content="getLostFiles(folder.path)"
+                    :value="getBadgeVal(i.files, 'lost')"
+                    :content="getBadgeVal(i.files, 'lost')"
                     :offset-x="folderHovered ? 70 : 58"
                     :offset-y="folderHovered ? 18 : 10"
                     :dot="!folderHovered"
@@ -151,7 +151,7 @@
                   />
                 </div>
               </template>
-              <span>{{ folder.name }}</span>
+              <span>{{ i.folder.name }}</span>
             </v-tooltip>
           </div>
         </div>
@@ -197,22 +197,14 @@ export default {
     },
   },
   methods: {
-    getLostFiles(folder) {
-      if (_.filter(this.watcher.files, { folder }).length) {
-        const index = _.findIndex(this.watcher.files, { folder });
-        return this.watcher.files[index].lostFiles.length;
-      } else return "";
-    },
-    getNewFiles(folder) {
-      if (_.filter(this.watcher.files, { folder }).length) {
-        const index = _.findIndex(this.watcher.files, { folder });
-        return this.watcher.files[index].newFiles.length;
-      } else return "";
-    },
     openDialogFolder(folder) {
-      const index = _.findIndex(this.watcher.files, { folder });
-      this.watcher.folder = this.watcher.files[index];
+      this.watcher.folder = folder;
       this.watcher.dialogFolder = true;
+    },
+    getBadgeVal(files, type) {
+      let value = 0;
+      for (let i of files) value += i[type].length;
+      return value;
     },
   },
 };

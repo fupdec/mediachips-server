@@ -93,7 +93,6 @@ export default {
     this.checkElectronRunning();
     await this.getMachineId();
     await this.getFolders();
-    this.runWatcher();
     this.$root.$on("getItems", () => {
       this.getItems();
     });
@@ -204,14 +203,8 @@ export default {
         });
     },
     async getFolders() {
-      await axios
-        .get(this.apiUrl + "/api/WatchedFolder")
-        .then((res) => {
-          this.$store.state.Watcher.folders = res.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.$store.state.Watcher.folders =
+        await Vue.prototype.$getWatchedFolders();
     },
     checkElectronRunning() {
       const ua = navigator.userAgent.toLowerCase();
