@@ -13,7 +13,9 @@ const {
   PageSetting,
   Mark,
   ChildMeta,
-  SavedFilter
+  SavedFilter,
+  WatchedFolder, 
+  MediaTypesInWatchedFolders
 } = require("../index.js");
 
 const os = require('os')
@@ -87,7 +89,8 @@ exports.importDatabase = async (req, res) => {
         onlyMeta: [],
         metaInItems: [],
         childMeta: [],
-        settings: Settings
+        settings: Settings,
+        watchedFolders: []
       }
       obj.videos = Videos.videos.map(i => ({
         oldId: i.id,
@@ -242,6 +245,7 @@ exports.importDatabase = async (req, res) => {
           else if (z[y] === null) delete z[y]
         }
       }
+      obj.watchedFolders = Settings.folders
       resolve(obj)
     })
   }
@@ -481,6 +485,24 @@ exports.importDatabase = async (req, res) => {
     }
     await ItemsInItem.bulkCreate(itemsInItem)
     await ValuesInItem.bulkCreate(valuesInItem)
+  }).then(async () => { // watched Folders
+    for (let folder of obj.watchedFolders) {
+      const [folderRow] = await WatchedFolder.findOrCreate({
+        where: {
+          path: folder.path,
+        },
+        defaults: {
+          name: folder.name,
+          watch: folder.watch,
+        },
+      })
+      await MediaTypesInWatchedFolders.findOrCreate({
+        where: {
+          folderId: folderRow.id,
+          typeId: 1
+        }
+      })
+    }
   }).then(() => {
     for (let id of metaIds) { // creating folders for meta images
       let folderMetaOldId = path.join(metaNew, id.oldId)

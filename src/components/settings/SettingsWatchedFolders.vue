@@ -32,7 +32,12 @@
         <v-icon left>mdi-plus</v-icon> Add Folder
       </v-btn>
 
-      <v-list-item v-for="i in watcher.folders" :key="i.id" @click="toggle(i)">
+      <v-list-item
+        v-for="i in watcher.folders"
+        :key="i.id"
+        @click="toggle(i)"
+        style="background-color: #6a6a6a12"
+      >
         <v-list-item-avatar>
           <v-icon v-text="`mdi-eye${i.watch ? '' : '-off'}`" />
         </v-list-item-avatar>
