@@ -187,6 +187,55 @@ export default {
     },
     showMenu(e) {
       e.preventDefault();
+      let contextMenu = [];
+      contextMenu.push({
+        name: `Edit`,
+        type: "item",
+        icon: "pencil",
+        action: () => {
+          this.edit();
+        },
+      });
+      contextMenu.push({ type: "divider" });
+      if (!this.page.isSelect)
+        contextMenu.push({
+          name: `Open File`,
+          type: "item",
+          icon: "file",
+          disabled: !this.isFileExists,
+          action: () => {
+            this.openPath(this.media.path);
+          },
+        });
+      if (!this.page.isSelect)
+        contextMenu.push({
+          name: `Open file folder`,
+          type: "item",
+          icon: "folder-open",
+          disabled: !this.isFileExists,
+          action: () => {
+            this.openPath(this.media.path, true);
+          },
+        });
+      contextMenu.push({ type: "divider" });
+      contextMenu.push({
+        name: `Delete`,
+        type: "item",
+        icon: "delete",
+        color: "red",
+        action: () => {
+          this.dialogDeleting = true;
+        },
+      });
+      this.$store.dispatch("showContextMenu", {
+        x: e.clientX,
+        y: e.clientY,
+        content: contextMenu,
+      });
+    },
+    openPath(entryPath, isDir) {
+      if (!this.isFileExists) return;
+      Vue.prototype.$openPath(entryPath, isDir);
     },
   },
   watch: {
