@@ -6,12 +6,12 @@
       {{ metadata.resolution }}
     </v-chip>
 
-    <v-chip v-if="type == 'video'" label outlined>
+    <v-chip v-if="type !== 'meta'" label outlined>
       <v-icon>mdi-harddisk</v-icon>
       {{ metadata.filesize }}
     </v-chip>
 
-    <v-chip v-if="type == 'video'" label outlined>
+    <v-chip v-if="type !== 'meta'" label outlined>
       <v-icon>mdi-file-video-outline</v-icon>
       {{ metadata.fileExtension }}
     </v-chip>

@@ -80,7 +80,7 @@
     </v-container>
 
     <v-container
-      v-if="mediaType.type == 'image'"
+      v-if="['image', 'audio', 'text'].includes(mediaType.type)"
       :class="[`item-size-${page.size}`, `gap-size-${sets.gapSize}`]"
       class="card-grid"
       fluid

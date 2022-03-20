@@ -14,7 +14,7 @@ const {
   Mark,
   ChildMeta,
   SavedFilter,
-  WatchedFolder, 
+  WatchedFolder,
   MediaTypesInWatchedFolders
 } = require("../index.js");
 
@@ -666,6 +666,26 @@ exports.getFileList = async (req, res) => {
   res.status(201).send(fileList)
 }
 
+const addMediaToDb = async (pathToFile, mediaType) => {
+  let stats = fs.statSync(pathToFile)
+  let filesize = stats.size;
+
+  const [media, isCreated] = await Media.findOrCreate({
+    where: {
+      path: pathToFile,
+    },
+    defaults: {
+      filesize: filesize,
+      typeId: mediaType.id,
+    },
+  })
+
+  return {
+    media,
+    isCreated
+  }
+}
+
 exports.addMediaVideo = async (req, res) => {
   function getVideoMetadata(pathToFile) {
     return new Promise((resolve, reject) => {
@@ -723,7 +743,6 @@ exports.addMediaVideo = async (req, res) => {
     }
 
     return {
-      filesize: info.format.size,
       duration: duration,
       bitrate: info.format.bit_rate,
       width,
@@ -734,7 +753,6 @@ exports.addMediaVideo = async (req, res) => {
   }
 
   const {
-    filesize,
     duration,
     bitrate,
     width,
@@ -743,15 +761,11 @@ exports.addMediaVideo = async (req, res) => {
     fps,
   } = getVideoInfo(videoInfo)
 
-  const [media, isCreated] = await Media.findOrCreate({
-    where: {
-      path: pathToFile,
-    },
-    defaults: {
-      filesize,
-      typeId: mediaType.id,
-    },
-  })
+  const {
+    media,
+    isCreated
+  } = await addMediaToDb(pathToFile, mediaType)
+
 
   if (isCreated) {
     await VideoMetadata.create({
@@ -782,18 +796,55 @@ exports.addMediaVideo = async (req, res) => {
 };
 
 exports.addMediaImage = async (req, res) => {
-  let pathToFile = req.body.path
-  let mediaType = req.body.type
+  const {
+    media,
+    isCreated
+  } = await addMediaToDb(req.body.path, req.body.type)
 
-  const [media, isCreated] = await Media.findOrCreate({
-    where: {
-      path: pathToFile,
-    },
-    defaults: {
-      filesize: 0,
-      typeId: mediaType.id,
-    },
-  })
+  if (isCreated) {
+    res.status(201).send(media)
+  } else {
+    res.status(400).send({
+      message: "Media already added."
+    })
+  }
+};
+
+exports.addMediaAudio = async (req, res) => {
+  const {
+    media,
+    isCreated
+  } = await addMediaToDb(req.body.path, req.body.type)
+
+  if (isCreated) {
+    res.status(201).send(media)
+  } else {
+    res.status(400).send({
+      message: "Media already added."
+    })
+  }
+};
+
+exports.addMediaText = async (req, res) => {
+  const {
+    media,
+    isCreated
+  } = await addMediaToDb(req.body.path, req.body.type)
+
+  if (isCreated) {
+    res.status(201).send(media)
+  } else {
+    res.status(400).send({
+      message: "Media already added."
+    })
+  }
+};
+
+exports.addMedia = async (req, res) => {
+  const {
+    media,
+    isCreated
+  } = await addMediaToDb(req.body.path, req.body.type)
 
   if (isCreated) {
     res.status(201).send(media)

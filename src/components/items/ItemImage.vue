@@ -6,7 +6,7 @@
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'primary--text' }"
       :class="{ favorite: media.favorite }"
-      class="image-card meta-card"
+      class="media-card meta-card"
       outlined
       hover
     >
@@ -57,12 +57,13 @@
       </v-img>
 
       <div class="description">
-        <div class="video-card-title" :title="fileName" v-html="fileName" />
+        <div class="media-card-title" :title="fileName" v-html="fileName" />
 
         <NestedItems
           :item="media"
           :items="items"
           :values="values"
+          :metadata="nestedMetadata"
           type="image"
         />
       </div>
@@ -132,6 +133,12 @@ export default {
     },
     sets() {
       return this.$store.state.settings;
+    },
+    nestedMetadata() {
+      return {
+        filesize: Vue.prototype.$getReadableFileSize(this.media.filesize),
+        fileExtension: Vue.prototype.$getFileExtensionFromPath(this.media.path),
+      };
     },
   },
   methods: {

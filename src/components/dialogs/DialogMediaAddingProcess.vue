@@ -35,34 +35,47 @@
         <div class="text--secondary caption">{{ task.processed }}</div>
       </div>
 
-      <v-card-text class="pa-2 pa-sm-4">
-        <div>
-          <div class="green--text">Added: {{ task.added.length }}</div>
-          <v-virtual-scroll
-            v-if="task.added.length > 0"
-            :items="task.added"
-            class="virtual-scroller"
-            item-height="20"
-            height="100"
-          >
-            <template v-slot:default="{ item }">
-              <div>{{ item }}</div>
-            </template>
-          </v-virtual-scroll>
+      <v-card-text class="pa-4">
+        <div v-if="task.added.length > 0" class="mb-4">
+          <v-chip
+            v-text="`Added: ${task.added.length}`"
+            color="success"
+            class="mb-2"
+            small
+          />
+          <v-card outlined class="pa-2">
+            <v-virtual-scroll
+              :height="task.added.length > 10 ? 150 : task.added.length * 15"
+              :items="task.added"
+              class="virtual-scroller"
+              item-height="15"
+            >
+              <template v-slot:default="{ item }">
+                <div class="caption">{{ item }}</div>
+              </template>
+            </v-virtual-scroll>
+          </v-card>
         </div>
-        <div>
-          <div class="error--text">Error: {{ task.errors.length }}</div>
-          <v-virtual-scroll
-            v-if="task.errors.length > 0"
-            :items="task.errors"
-            class="virtual-scroller"
-            item-height="20"
-            height="100"
-          >
-            <template v-slot:default="{ item }">
-              <div>{{ item }}</div>
-            </template>
-          </v-virtual-scroll>
+
+        <div v-if="task.errors.length > 0">
+          <v-chip
+            v-text="`Errors: ${task.errors.length}`"
+            color="error"
+            class="mb-2"
+            small
+          />
+          <v-card outlined class="pa-2">
+            <v-virtual-scroll
+              :height="task.errors.length > 10 ? 150 : task.errors.length * 15"
+              :items="task.errors"
+              class="virtual-scroller"
+              item-height="15"
+            >
+              <template v-slot:default="{ item }">
+                <div class="caption">{{ item }}</div>
+              </template>
+            </v-virtual-scroll>
+          </v-card>
         </div>
       </v-card-text>
     </v-card>

@@ -27,6 +27,15 @@ module.exports = app => {
   // adding image with metadata to database
   router.post("/addMediaImage", Task.addMediaImage);
 
+  // adding media with type audio to database
+  router.post("/addMediaAudio", Task.addMediaAudio);
+
+  // adding media with type text to database
+  router.post("/addMediaText", Task.addMediaText);
+
+  // adding other type of media with metadata to database
+  router.post("/addMedia", Task.addMedia);
+
   // creating thumbnail for video
   router.post("/createThumb", Task.createThumb);
 

@@ -7,7 +7,7 @@
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'primary--text' }"
       :class="{ favorite: media.favorite }"
-      class="video-card meta-card"
+      class="media-card meta-card"
       outlined
       hover
     >
@@ -105,7 +105,7 @@
       <v-progress-linear :value="progress" />
 
       <div class="description">
-        <div class="video-card-title" :title="fileName" v-html="fileName" />
+        <div class="media-card-title" :title="fileName" v-html="fileName" />
 
         <NestedItems
           :item="media"
@@ -146,7 +146,7 @@
       :disabled="!reg && x > 9"
       outlined
       hover
-      class="video-card meta-card"
+      class="media-card meta-card"
     >
       <div
         @click="play"
@@ -155,7 +155,7 @@
         ref="story"
         class="story"
       >
-        <v-sheet class="video-card-title">
+        <v-sheet class="media-card-title">
           <v-icon v-if="!isFileExists" color="error">mdi-file-alert</v-icon>
           {{ fileName }}
         </v-sheet>
