@@ -69,8 +69,6 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
-
-    <div v-show="appSets.navigationSide == '2'" class="py-6"></div>
   </div>
 </template>
 

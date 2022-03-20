@@ -15,7 +15,7 @@
       <v-text-field
         v-model="backup"
         label="Place here full path to the backup archive"
-      ></v-text-field>
+      />
       <v-btn @click="importData" :disabled="!backup" color="success">
         <v-icon left> mdi-database-import </v-icon> Import Database
       </v-btn>
@@ -34,7 +34,7 @@
           <div class="headline">{{ importStatus }}</div>
         </v-card-text>
         <v-btn
-          @click="dialogImport = false"
+          @click="finish"
           :disabled="isImportRun"
           color="success"
           class="mt-4"
@@ -84,6 +84,10 @@ export default {
           this.importStatus = e;
           this.isImportRun = false;
         });
+    },
+    finish() {
+      this.dialogImport = false;
+      document.location.reload();
     },
   },
 };

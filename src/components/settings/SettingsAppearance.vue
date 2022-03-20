@@ -16,10 +16,10 @@
     </v-checkbox>
 
     <v-checkbox
-      v-model="sets.navigationSide"
-      @change="setOption($event, 'navigationSide')"
-      false-value="1"
-      true-value="2"
+      v-model="sets.bottomBar"
+      @change="setOption($event, 'bottomBar')"
+      false-value="0"
+      true-value="1"
       class="mt-0"
     >
       <template v-slot:label>

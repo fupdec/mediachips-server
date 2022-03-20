@@ -1,11 +1,11 @@
 <template>
   <v-app v-if="isApiReady">
-    <SideBar v-if="sets.navigationSide == '1'" />
-    <BottomBar v-if="sets.navigationSide == '2'" />
+    <SideBar v-if="sets.bottomBar == '0'" />
+    <BottomBar v-if="sets.bottomBar == '1'" />
 
     <Player v-show="isPlayerActive" />
 
-    <v-main app>
+    <v-main app :class="[{ 'bottom-bar': sets.bottomBar == '1' }]">
       <AppBar />
       <router-view :key="$route.fullPath" />
     </v-main>

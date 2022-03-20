@@ -87,8 +87,8 @@ const Settings = [{
     "value": "Roboto"
   },
   {
-    "option": "navigationSide",
-    "value": 1
+    "option": "bottomBar",
+    "value": 0
   },
   {
     "option": "numberOfPagesLimit",

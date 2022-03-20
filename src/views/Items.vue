@@ -150,8 +150,6 @@
         Scroll to top
       </v-btn>
     </div>
-
-    <div v-show="sets.navigationSide == '2'" class="py-6"></div>
   </div>
 </template>
 
