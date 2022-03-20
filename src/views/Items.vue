@@ -59,20 +59,36 @@
     <Loading v-show="isQueryRun" />
 
     <v-container
-      v-if="isMediaPage || isItemPage"
-      fluid
-      class="wide-image videos-selection"
+      v-if="mediaType.type == 'video' || isItemPage"
       :class="[
         `item-size-${page.size}`,
         `gap-size-${sets.gapSize}`,
         { 'card-grid': page.view == '1' },
         { 'line-grid': page.view == '2' },
       ]"
+      class="wide-image"
+      fluid
     >
       <ItemVideo
         v-for="(i, x) in itemsOnPage"
         :key="i.id"
-        :video="i"
+        :media="i"
+        :reg="reg"
+        :upd="upd"
+        :x="x"
+      />
+    </v-container>
+
+    <v-container
+      v-if="mediaType.type == 'image'"
+      :class="[`item-size-${page.size}`, `gap-size-${sets.gapSize}`]"
+      class="card-grid"
+      fluid
+    >
+      <ItemImage
+        v-for="(i, x) in itemsOnPage"
+        :key="i.id"
+        :media="i"
         :reg="reg"
         :upd="upd"
         :x="x"
@@ -150,6 +166,7 @@ export default {
   name: "Items",
   components: {
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
+    ItemImage: () => import("@/components/items/ItemImage.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),

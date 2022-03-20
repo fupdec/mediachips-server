@@ -18,7 +18,7 @@ export default {
       return this.selection.includes(this.id);
     },
     id() {
-      return this.item ? this.item.id : this.video.id;
+      return this.item ? this.item.id : this.media.id;
     },
   },
   methods: {

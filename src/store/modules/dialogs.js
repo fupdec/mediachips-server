@@ -3,6 +3,9 @@ const Dialogs = {
     mediaEditing: {
       show: false,
       media: null,
+      mediaType: {
+        type: null
+      },
     },
     itemEditing: {
       show: false,

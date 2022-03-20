@@ -6,7 +6,7 @@
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'primary--text' }"
-      :class="{ favorite: video.favorite }"
+      :class="{ favorite: media.favorite }"
       class="video-card meta-card"
       outlined
       hover
@@ -34,7 +34,7 @@
         </v-btn>
 
         <v-rating
-          :value="video.rating"
+          :value="media.rating"
           @input="setVal($event, 'rating')"
           color="yellow darken-2"
           background-color="#eee"
@@ -48,7 +48,7 @@
         />
 
         <v-checkbox
-          v-model="video.favorite"
+          v-model="media.favorite"
           @change="setVal($event, 'favorite')"
           :false-value="0"
           :true-value="1"
@@ -108,7 +108,7 @@
         <div class="video-card-title" :title="fileName" v-html="fileName" />
 
         <NestedItems
-          :item="video"
+          :item="media"
           :items="items"
           :values="values"
           :metadata="nestedMetadata"
@@ -117,10 +117,10 @@
       </div>
 
       <v-icon
-        v-if="video.bookmark"
+        v-if="media.bookmark"
         class="bookmark"
         color="red"
-        :title="video.bookmark"
+        :title="media.bookmark"
         v-html="'mdi-bookmark'"
       />
 
@@ -142,7 +142,7 @@
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
-      :class="{ favorite: video.favorite }"
+      :class="{ favorite: media.favorite }"
       :disabled="!reg && x > 9"
       outlined
       hover
@@ -189,7 +189,7 @@
 
       <div class="description">
         <NestedItems
-          :item="video"
+          :item="media"
           :items="items"
           :values="values"
           :metadata="nestedMetadata"
@@ -198,10 +198,10 @@
       </div>
 
       <v-icon
-        v-if="video.bookmark"
+        v-if="media.bookmark"
         class="bookmark"
         color="red"
-        :title="video.bookmark"
+        :title="media.bookmark"
         v-html="'mdi-bookmark'"
       />
 
@@ -230,7 +230,7 @@ const path = require("path");
 export default {
   name: "ItemVideo",
   props: {
-    video: Object,
+    media: Object,
     reg: Boolean,
     upd: Array,
     x: Number,
@@ -249,13 +249,13 @@ export default {
   },
   mounted() {
     this.$root.$on("updateVideoThumb", (id) => {
-      if (this.video.id === id) this.getImg();
+      if (this.media.id === id) this.getImg();
     });
     this.$root.$on("updateVideoFrames", (id) => {
-      if (this.video.id === id) this.initFrames();
+      if (this.media.id === id) this.initFrames();
     });
     this.$root.$on("updateVideoMetadata", (id) => {
-      if (this.video.id === id) this.getMetadata();
+      if (this.media.id === id) this.getMetadata();
     });
   },
   beforeDestroy() {
@@ -294,8 +294,8 @@ export default {
     },
     nestedMetadata() {
       return {
-        filesize: Vue.prototype.$getReadableFileSize(this.video.filesize),
-        fileExtension: Vue.prototype.$getFileExtensionFromPath(this.video.path),
+        filesize: Vue.prototype.$getReadableFileSize(this.media.filesize),
+        fileExtension: Vue.prototype.$getFileExtensionFromPath(this.media.path),
         resolution: this.metadata.width + "x" + this.metadata.height,
       };
     },
@@ -307,7 +307,7 @@ export default {
       return (Number(this.metadata.time || 0) / this.metadata.duration) * 100;
     },
     fileName() {
-      return Vue.prototype.$getFileNameFromPath(this.video.path);
+      return Vue.prototype.$getFileNameFromPath(this.media.path);
     },
     page() {
       return this.$store.state.Page;
@@ -340,15 +340,15 @@ export default {
       let imgPath = path.join(
         __dirname,
         "/userfiles/media/thumbs/",
-        this.video.id + ".jpg"
+        this.media.id + ".jpg"
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },
     // mountSrc() {
-    //   this.$refs.video.src = this.video.path
+    //   this.$refs.video.src = this.media.path
     // },
     getMetadata() {
-      let url = `/api/VideoMetadata/${this.video.id}`;
+      let url = `/api/VideoMetadata/${this.media.id}`;
       axios
         .get(this.apiUrl + url)
         .then((res) => {
@@ -359,7 +359,7 @@ export default {
         });
     },
     getItems() {
-      let url = `/api/ItemsInMedia?mediaId=${this.video.id}`;
+      let url = `/api/ItemsInMedia?mediaId=${this.media.id}`;
       axios
         .get(this.apiUrl + url)
         .then((res) => {
@@ -370,7 +370,7 @@ export default {
         });
     },
     getValues() {
-      let url = `/api/ValuesInMedia?mediaId=${this.video.id}`;
+      let url = `/api/ValuesInMedia?mediaId=${this.media.id}`;
       axios
         .get(this.apiUrl + url)
         .then((res) => {
@@ -382,17 +382,17 @@ export default {
     },
     edit() {
       this.$store.state.Dialogs.mediaEditing.show = true;
-      this.$store.state.Dialogs.mediaEditing.media = this.video;
+      this.$store.state.Dialogs.mediaEditing.media = this.media;
     },
     play(inApp) {
       if (!this.isFileExists) {
         this.$store.state.Dialogs.error.show = true;
-        let text = `File not found on path: \n"${this.video.path}"`;
+        let text = `File not found on path: \n"${this.media.path}"`;
         this.$store.state.Dialogs.error.text = text;
         return;
       }
       if (this.sets.isPlayVideoInSystemPlayer == "1" && !inApp) {
-        this.openPath(this.video.path, false);
+        this.openPath(this.media.path, false);
         return;
       }
       this.$store.state.Player.active = true;
@@ -402,7 +402,7 @@ export default {
         if (this.x > 10) start = this.x - 10;
         items = items.slice(start, this.x + 50);
       }
-      this.$root.$emit("playVideo", this.video, items);
+      this.$root.$emit("playVideo", this.media, items);
     },
     playPreview() {
       if (this.isHovered) return;
@@ -411,7 +411,7 @@ export default {
       // this.timeouts.z = setTimeout(() => {
       //   // play original video
       //   if (!this.isVideoExist) return;
-      //   this.$refs.video.src = this.video.path;
+      //   this.$refs.video.src = this.media.path;
       //   this.setVideoProgress(0.2);
       //   this.timeouts.a = setTimeout(this.setVideoProgress, 3000, 0.4);
       //   this.timeouts.b = setTimeout(this.setVideoProgress, 6000, 0.6);
@@ -433,7 +433,7 @@ export default {
       return path.join(
         __dirname,
         "/userfiles/media/timelines/",
-        `${this.video.id}_${progress}.jpg`
+        `${this.media.id}_${progress}.jpg`
       );
     },
     scrollStory(e) {
@@ -465,13 +465,13 @@ export default {
       return Vue.prototype.$getReadableDuration(secs);
     },
     async checkFileExists() {
-      let res = await Vue.prototype.$checkFileExists(this.video.path);
+      let res = await Vue.prototype.$checkFileExists(this.media.path);
       this.isFileExists = res.status == 201;
     },
     async setVal(val, key) {
       await axios({
         method: "put",
-        url: this.apiUrl + "/api/media/" + this.video.id,
+        url: this.apiUrl + "/api/media/" + this.media.id,
         data: {
           [key]: val,
         },
@@ -520,7 +520,7 @@ export default {
               icon: "cog-play",
               disabled: !this.isFileExists,
               action: () => {
-                this.openPath(this.video.path);
+                this.openPath(this.media.path);
               },
             },
           ],
@@ -532,7 +532,7 @@ export default {
           icon: "folder-open",
           disabled: !this.isFileExists,
           action: () => {
-            this.openPath(this.video.path, true);
+            this.openPath(this.media.path, true);
           },
         });
       contextMenu.push({ type: "divider" });
@@ -560,7 +560,7 @@ export default {
           const x = items.findIndex((i) => i.id === id);
           if (x > -1) videos.push(items[x]);
         }
-      } else videos.push(this.video);
+      } else videos.push(this.media);
 
       let vals = [];
       let updated = [];
@@ -600,7 +600,7 @@ export default {
       if (view == "2") this.initFrames();
     },
     upd(arr) {
-      if (arr.includes(this.video.id)) {
+      if (arr.includes(this.media.id)) {
         this.getItems();
         this.getValues();
       }

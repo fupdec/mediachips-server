@@ -698,6 +698,7 @@ exports.addMediaVideo = async (req, res) => {
   }
 
   let pathToFile = req.body.path
+  let mediaType = req.body.type
   let videoInfo = {}
   try {
     videoInfo = await getVideoMetadata(pathToFile)
@@ -748,7 +749,7 @@ exports.addMediaVideo = async (req, res) => {
     },
     defaults: {
       filesize,
-      typeId: 1,
+      typeId: mediaType.id,
     },
   })
 
@@ -772,7 +773,29 @@ exports.addMediaVideo = async (req, res) => {
       return
     }
 
-    // TODO parse Path For Meta items 
+    res.status(201).send(media)
+  } else {
+    res.status(400).send({
+      message: "Media already added."
+    })
+  }
+};
+
+exports.addMediaImage = async (req, res) => {
+  let pathToFile = req.body.path
+  let mediaType = req.body.type
+
+  const [media, isCreated] = await Media.findOrCreate({
+    where: {
+      path: pathToFile,
+    },
+    defaults: {
+      filesize: 0,
+      typeId: mediaType.id,
+    },
+  })
+
+  if (isCreated) {
     res.status(201).send(media)
   } else {
     res.status(400).send({

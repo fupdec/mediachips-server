@@ -33,7 +33,7 @@ const ApiCalls = {
       }
       return res
     }
-    Vue.prototype.$getLocalImage = async function (imgPath) {
+    Vue.prototype.$getLocalImage = async function (imgPath, outside) {
       let result
       await axios({
           method: 'post',
@@ -41,6 +41,7 @@ const ApiCalls = {
           responseType: 'blob',
           data: {
             url: imgPath,
+            outside: outside,
           }
         })
         .then(res => {

@@ -16,12 +16,12 @@
           closable
         />
 
-        <v-card-text class="item-about pa-2 pa-sm-4">
-          <v-hover v-slot="{ hover }">
-            <v-img
-              @click="dialogImageEditing = true"
-              :src="img"
-            >
+        <v-card-text
+          :class="[{ 'item-about': mediaType.type == 'video' }]"
+          class="pa-2 pa-sm-4"
+        >
+          <v-hover v-if="mediaType.type == 'video'" v-slot="{ hover }">
+            <v-img @click="dialogImageEditing = true" :src="img">
               <v-fade-transition>
                 <v-overlay v-if="hover" absolute>
                   <v-icon size="80">mdi-image-edit-outline</v-icon>
@@ -58,6 +58,7 @@ export default {
   props: {
     dialog: Boolean,
     media: Object,
+    mediaType: Object,
   },
   components: {
     DialogHeader,

@@ -52,8 +52,8 @@ export default {
 
       const mediaTypes = this.$store.state.mediaTypes;
       const typeId = +this.$route.query.typeId;
-      const mt = _.find(mediaTypes, i=>i.id == typeId);
-      const extensions = mt.extensions.split(",");
+      const mediaType = _.find(mediaTypes, i=>i.id == typeId);
+      const extensions = mediaType.extensions.split(",");
       const regex = "." + extensions.join("$|.") + "$";
       const regexString = JSON.stringify(regex);
       const paths = Vue.prototype.$transformTextToArray(this.task.paths);
@@ -88,9 +88,10 @@ export default {
 
         await axios({
           method: "post",
-          url: this.apiUrl + "/api/Task/addMediaVideo",
+          url: this.apiUrl + "/api/Task/addMedia" + mediaType.type,
           data: {
             path: filePath,
+            type: mediaType,
           },
         })
           .then((res) => {

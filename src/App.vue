@@ -36,6 +36,7 @@
       @close="$store.state.Dialogs.mediaEditing.show = false"
       :dialog="$store.state.Dialogs.mediaEditing.show"
       :media="$store.state.Dialogs.mediaEditing.media"
+      :mediaType="$store.state.Dialogs.mediaEditing.mediaType"
     />
     <DialogItemEditing
       v-if="$store.state.Dialogs.itemEditing.show"

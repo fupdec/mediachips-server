@@ -135,9 +135,11 @@ require("./api/routes/VideoMetadata.routes")(app)
 require("./api/routes/WatchedFolder.routes")(app)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
-  res.sendFile(req.body.url, {
-    root: __dirname
-  })
+  if (req.body.outside) res.sendFile(req.body.url)
+  else
+    res.sendFile(req.body.url, {
+      root: __dirname
+    })
 })
 // Stream video
 router.get('/api/video/:id', (req, res) => {
