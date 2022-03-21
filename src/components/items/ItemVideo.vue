@@ -396,12 +396,12 @@ export default {
         return;
       }
       this.$store.state.Player.active = true;
-      let items = _.cloneDeep(this.$store.state.Page.items);
-      if (items.length > this.x + 50) {
-        let start = 0;
-        if (this.x > 10) start = this.x - 10;
-        items = items.slice(start, this.x + 50);
-      }
+      let items = _.cloneDeep(this.$store.state.Page.itemsOnPage);
+      // if (items.length > this.x + 50) {
+      //   let start = 0;
+      //   if (this.x > 10) start = this.x - 10;
+      //   items = items.slice(start, this.x + 50);
+      // }
       this.$root.$emit("playVideo", this.media, items);
     },
     playPreview() {

@@ -11,6 +11,7 @@ const Page = {
     sortBy: "name",
     sortDir: "asc",
     items: [],
+    itemsOnPage: [],
     name: "Items",
     nameSingular: "Item",
     icon: "shape",

@@ -17,7 +17,7 @@
     </v-container>
 
     <v-container
-      v-if="itemsOnPage.length && !isInfiniteScroll"
+      v-if="page.itemsOnPage.length && !isInfiniteScroll"
       class="d-flex justify-center align-center"
       fluid
     >
@@ -70,7 +70,7 @@
       fluid
     >
       <ItemVideo
-        v-for="(i, x) in itemsOnPage"
+        v-for="(i, x) in page.itemsOnPage"
         :key="i.id"
         :media="i"
         :reg="reg"
@@ -86,7 +86,7 @@
       fluid
     >
       <ItemImage
-        v-for="(i, x) in itemsOnPage"
+        v-for="(i, x) in page.itemsOnPage"
         :key="i.id"
         :media="i"
         :reg="reg"
@@ -106,7 +106,7 @@
       ]"
     >
       <ItemMeta
-        v-for="i in itemsOnPage"
+        v-for="i in page.itemsOnPage"
         :key="i.id"
         :item="i"
         :meta="meta"
@@ -115,7 +115,7 @@
     </v-container>
 
     <v-pagination
-      v-show="itemsOnPage.length && !isInfiniteScroll"
+      v-show="page.itemsOnPage.length && !isInfiniteScroll"
       :value="page.page"
       @input="changePage($event)"
       :length="pages"
@@ -133,7 +133,10 @@
       <div>There is no items matching the filters</div>
     </div>
 
-    <div v-if="itemsOnPage.length && isInfiniteScroll" class="text-center py-6">
+    <div
+      v-if="page.itemsOnPage.length && isInfiniteScroll"
+      class="text-center py-6"
+    >
       <Loading
         v-if="loader.show && page.page != pages"
         v-intersect="infiniteScrolling"
@@ -171,7 +174,7 @@ export default {
   },
   mixins: [GeneratingThumbsForVideos, ComputedForItemsPage],
   async beforeMount() {
-    this.itemsOnPage = [];
+    this.page.itemsOnPage = [];
     this.$store.commit("updateStatePage", {
       key: "isSelect",
       value: false,
@@ -200,7 +203,7 @@ export default {
         key: "page",
         value: 1,
       });
-      if (val == 101) this.itemsOnPage = [];
+      if (val == 101) this.page.itemsOnPage = [];
       this.updatePageSetting({
         page: 1,
         limit: val,
@@ -242,7 +245,6 @@ export default {
   },
   data: () => ({
     meta: null,
-    itemsOnPage: [],
     total: 1,
     totalInDb: 0,
     pages: 0,
@@ -460,7 +462,7 @@ export default {
           });
           this.total = res.data.items.length;
           this.totalInDb = res.data.total;
-          this.itemsOnPage = [];
+          this.page.itemsOnPage = [];
           this.page.page = 1;
           this.getItemsOnPage();
         })
@@ -477,9 +479,12 @@ export default {
       const pages = Math.ceil(this.total / limit);
       this.pages = pages;
       if (this.isInfiniteScroll) {
-        this.itemsOnPage = [...this.itemsOnPage, ...items.slice(start, end)];
+        this.page.itemsOnPage = [
+          ...this.page.itemsOnPage,
+          ...items.slice(start, end),
+        ];
       } else {
-        this.itemsOnPage = items.slice(start, end);
+        this.page.itemsOnPage = items.slice(start, end);
       }
       // TODO jump to the fisrt page if current page greater than total pages
     },

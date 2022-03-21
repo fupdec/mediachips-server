@@ -169,7 +169,7 @@ export default {
     },
   },
   watch: {
-    itemsOnPage(videos) {
+    'page.itemsOnPage'(videos) {
       if (this.isMediaPage || this.isItemPage) this.generateImages(videos);
     },
   },
