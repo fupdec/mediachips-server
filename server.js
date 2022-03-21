@@ -84,9 +84,10 @@ db.sequelize.sync({
   // force: true
 }).then(async () => {
   // migration system
+  const migrationsPath = path.join(__dirname, 'api/migrations/*.js')
   const umzug = new Umzug({
     migrations: {
-      glob: 'api/migrations/*.js'
+      glob: migrationsPath
     },
     context: db.sequelize.getQueryInterface(),
     storage: new SequelizeStorage({
