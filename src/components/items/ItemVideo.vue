@@ -316,7 +316,7 @@ export default {
       return this.$store.state.settings;
     },
     frameLost() {
-      if (this.frame) return this.frame.includes("ghost.png");
+      if (this.frame) return this.frame.includes("unavailable.png");
       else return true;
     },
     framesLost() {
@@ -454,7 +454,7 @@ export default {
         const progress = this.timelines[i];
         const imgPath = this.getFrameImgUrl(progress);
         let img = await Vue.prototype.$getLocalImage(imgPath);
-        if (i == 0 && img.includes("ghost.png")) {
+        if (i == 0 && img.includes("unavailable.png")) {
           this.frames = [];
           for (let j of this.timelines) this.frames.push(this.thumb);
           break;

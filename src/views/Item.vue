@@ -126,7 +126,8 @@ export default {
   name: "Item",
   components: {
     Items: () => import("@/views/Items.vue"),
-    DialogImageEditing: () => import("@/components/dialogs/DialogImageEditing.vue"),
+    DialogImageEditing: () =>
+      import("@/components/dialogs/DialogImageEditing.vue"),
   },
   async beforeMount() {
     const filter = await Vue.prototype.$createDbEntry(
@@ -258,14 +259,14 @@ export default {
     },
     async getGradient() {
       let bg = "background-image: ";
-      if (this.images.header && !this.images.header.includes("ghost")) {
+      if (this.images.header && !this.images.header.includes("unavailable")) {
         bg += `linear-gradient(0deg,`;
         if (this.$vuetify.theme.dark) this.bgc = "#121212";
         else this.bgc = "#fff";
         bg += `${this.bgc}, transparent, transparent), url(${this.images.header})`;
       } else {
         if (this.item.color) this.bgc = this.item.color;
-        else if (this.images.main && !this.images.main.includes("ghost"))
+        else if (this.images.main && !this.images.main.includes("unavailable"))
           this.bgc = await Vue.prototype.$getAverageColor(this.images.main);
         bg += `linear-gradient(180deg, ${this.bgc}, transparent)`;
       }

@@ -48,7 +48,7 @@ const ApiCalls = {
           result = URL.createObjectURL(res.data)
         })
         .catch(e => {
-          result = path.join(__dirname, '/images/ghost.png')
+          result = path.join(__dirname, '/images/unavailable.png')
           // console.log(e)
         })
       return result

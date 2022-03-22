@@ -75,13 +75,7 @@
           v-html="'mdi-bookmark'"
         />
 
-        <v-btn
-          @click.stop="edit"
-          color="primary"
-          class="btn-edit"
-          small
-          fab
-        >
+        <v-btn @click.stop="edit" color="primary" class="btn-edit" small fab>
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
       </div>
@@ -215,7 +209,8 @@ export default {
           `${this.item.id}_${i}.jpg`
         );
         let src = await Vue.prototype.$getLocalImage(imgPath);
-        if (i !== "main" && src.includes("ghost.png")) this.images[i] = null;
+        if (i !== "main" && src.includes("unavailable.png"))
+          this.images[i] = null;
         else this.images[i] = src;
       }
     },

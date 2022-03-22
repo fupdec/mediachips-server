@@ -106,7 +106,7 @@ export default {
     this.$root.$on("playVideo", (video, videos) => {
       this.p.playlist = videos.map((i) => ({
         ...i,
-        ...{ thumb: path.join(__dirname, "/images/ghost.png") },
+        ...{ thumb: path.join(__dirname, "/images/unavailable.png") },
       }));
       this.loadSrc(video);
     });
