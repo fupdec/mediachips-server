@@ -101,11 +101,16 @@
       <v-progress-linear :value="progress" />
 
       <div class="description">
-        <div class="media-card-title" :title="fileName">
-          <v-icon v-if="!isFileExists" color="error" left>
+        <div class="media-card-title">
+          <v-icon
+            v-if="!isFileExists"
+            title="File not found"
+            color="error"
+            left
+          >
             mdi-file-alert
           </v-icon>
-          <span v-text="fileName" />
+          <span v-text="fileName" :title="fileName" />
         </div>
 
         <NestedItems

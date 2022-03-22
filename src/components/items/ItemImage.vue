@@ -48,7 +48,17 @@
       </v-img>
 
       <div class="description">
-        <div class="media-card-title" :title="fileName" v-html="fileName" />
+        <div class="media-card-title">
+          <v-icon
+            v-if="!isFileExists"
+            title="File not found"
+            color="error"
+            left
+          >
+            mdi-file-alert
+          </v-icon>
+          <span v-text="fileName" :title="fileName" />
+        </div>
 
         <NestedItems
           :item="media"

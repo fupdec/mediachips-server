@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="$store.state.Dialogs.error.show" @input="close" scrollable>
+  <v-dialog
+    v-model="$store.state.Dialogs.error.show"
+    @input="close"
+    width="400"
+    scrollable
+  >
     <v-card>
       <v-card-text class="text-center">
         <v-icon large color="error" class="py-6"> mdi-alert-octagon </v-icon>

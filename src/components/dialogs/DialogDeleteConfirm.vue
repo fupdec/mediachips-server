@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-if="dialog" :value="dialog" @input="close" width="400">
+  <v-dialog v-if="dialog" :value="dialog" @input="close" width="400" scrollable>
     <v-card>
       <v-card-text class="text-center">
         <v-icon large color="error" class="py-6"> mdi-alert-outline </v-icon>
