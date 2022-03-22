@@ -1,6 +1,5 @@
-module.exports = app => {
-  const ValuesInItem = require("../controllers/ValuesInItem.controller");
-
+module.exports = (app, db) => {
+  const ValuesInItem = require("../controllers/ValuesInItem.controller")(db);
   const router = require("express").Router();
 
   // Create a new ValuesInItem
@@ -9,17 +8,8 @@ module.exports = app => {
   // Retrieve all ValuesInItem
   router.get("/", ValuesInItem.findAll);
 
-  // Retrieve a single ValuesInItem with id
-  router.get("/:id", ValuesInItem.findOne);
-
-  // Update a ValuesInItem with id
-  router.put("/:id", ValuesInItem.update);
-
   // Delete a ValuesInItem with id
-  router.delete("/:id", ValuesInItem.delete);
-
-  // Delete all ValuesInItem
-  router.delete("/", ValuesInItem.deleteAll);
+  router.delete("/:id", ValuesInItem.deleteOne);
 
   app.use('/api/ValuesInItem', router);
 };

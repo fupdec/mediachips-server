@@ -1,13 +1,9 @@
-module.exports = app => {
-  const FilterRow = require("../controllers/FilterRow.controller");
-
+module.exports = (app, db) => {
+  const FilterRow = require("../controllers/FilterRow.controller")(db);
   const router = require("express").Router();
 
   // Create a new FilterRow
   router.post("/", FilterRow.create);
-
-  // Retrieve all FilterRow
-  router.get("/", FilterRow.findAll);
 
   // Retrieve a single FilterRow with id
   router.get("/:id", FilterRow.findOne);
@@ -16,10 +12,7 @@ module.exports = app => {
   router.put("/:id", FilterRow.update);
 
   // Delete a FilterRow with id
-  router.delete("/:id", FilterRow.delete);
-
-  // Delete all FilterRow
-  router.delete("/", FilterRow.deleteAll);
+  router.delete("/:id", FilterRow.deleteOne);
 
   app.use('/api/FilterRow', router);
 };

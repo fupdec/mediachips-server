@@ -1,6 +1,5 @@
-module.exports = app => {
-  const ItemsInMedia = require("../controllers/ItemsInMedia.controller");
-
+module.exports = (app, db) => {
+  const ItemsInMedia = require("../controllers/ItemsInMedia.controller")(db);
   const router = require("express").Router();
 
   // Create many ItemsInMedia
@@ -12,17 +11,8 @@ module.exports = app => {
   // Retrieve all ItemsInMedia
   router.get("/", ItemsInMedia.findAll);
 
-  // Retrieve a single ItemsInMedia with id
-  router.get("/:id", ItemsInMedia.findOne);
-
-  // Update a ItemsInMedia with id
-  router.put("/:id", ItemsInMedia.update);
-
   // Delete a ItemsInMedia with id
-  router.delete("/:id", ItemsInMedia.delete);
-
-  // Delete all ItemsInMedia
-  router.delete("/", ItemsInMedia.deleteAll);
+  router.delete("/:id", ItemsInMedia.deleteOne);
 
   app.use('/api/ItemsInMedia', router);
 };

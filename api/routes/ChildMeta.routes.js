@@ -1,6 +1,5 @@
-module.exports = app => {
-  const ChildMeta = require("../controllers/ChildMeta.controller");
-
+module.exports = (app, db) => {
+  const ChildMeta = require("../controllers/ChildMeta.controller")(db);
   const router = require("express").Router();
 
   // Create a new ChildMeta
@@ -9,17 +8,11 @@ module.exports = app => {
   // Retrieve all ChildMeta
   router.get("/", ChildMeta.findAll);
 
-  // Retrieve all ChildMeta with parent metaId
-  router.get("/:id", ChildMeta.findAll);
-
   // Update a ChildMeta with id
   router.put("/", ChildMeta.update);
 
   // Delete a ChildMeta with ChildMetaId
-  router.delete("/:id", ChildMeta.delete);
-
-  // Delete all ChildMeta
-  router.delete("/", ChildMeta.deleteAll);
+  router.delete("/:id", ChildMeta.deleteOne);
 
   app.use('/api/ChildMeta', router);
 };

@@ -1,6 +1,5 @@
-module.exports = app => {
-  const Item = require("../controllers/Item.controller");
-
+module.exports = (app, db) => {
+  const Item = require("../controllers/Item.controller")(db);
   const router = require("express").Router();
 
   // Create a new Item
@@ -9,8 +8,6 @@ module.exports = app => {
   // Retrieve all Items that match the filter
   router.post("/filter", Item.findAll);
 
-  // Retrieve all Items that with name
-  router.post("/search", Item.rawQuery);
 
   // Retrieve a single Item with id
   router.get("/:id", Item.findOne);
@@ -18,14 +15,11 @@ module.exports = app => {
   // Retrieve all Items
   router.get("/", Item.getAll);
 
+  // Retrieve all Items that with name
+  router.post("/search", Item.rawQuery);
+
   // Update a Item with id
   router.put("/:id", Item.update);
-
-  // Delete a Item with id
-  router.delete("/:id", Item.delete);
-
-  // Delete all Item
-  router.delete("/", Item.deleteAll);
 
   app.use('/api/Item', router);
 };

@@ -1,47 +1,50 @@
-const {
-  PageSetting
-} = require("../index.js");
+module.exports = function (db) {
+  // Create and Save a new SavedFilter
+  const create = function (req, res) {
+    db.PageSetting.findOrCreate({
+        where: req.body
+      })
+      .then(data => {
+        res.status(201).send(data)
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while performing query."
+        })
+      })
+  };
 
-// Create and Save a new SavedFilter
-exports.create = (req, res) => {
-  PageSetting.findOrCreate({
-      where: req.body
-    })
-    .then(data => {
+  // Find a single option with a name in the request
+  const findOne = function (req, res) {
+    db.PageSetting.findOne({
+      where: {
+        metaId: req.query.metaId || null,
+        typeId: req.query.typeId || null
+      }
+    }).then(async (data) => {
       res.status(201).send(data)
-    })
-    .catch(err => {
+    }).catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
+        message: err.message || "Some error occurred while retrieving media."
       })
     })
-};
+  };
 
-// Find a single option with a name in the request
-exports.findOne = (req, res) => {
-  PageSetting.findOne({
-    where: {
-      metaId: req.query.metaId || null,
-      typeId: req.query.typeId || null
-    }
-  }).then(async (data) => {
-    res.status(201).send(data)
-  }).catch(err => {
-    res.status(500).send({
-      message: err.message || "Some error occurred while retrieving media."
+  // Update a single option with a name and value in the request
+  const update = function (req, res) {
+    db.PageSetting.update(req.body.data, {
+      where: req.body.query
+    }).then((data) => {
+      res.status(201).send(data)
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving media."
+      })
     })
-  })
-};
-
-// Update a single option with a name and value in the request
-exports.update = (req, res) => {
-  PageSetting.update(req.body.data, {
-    where: req.body.query
-  }).then((data) => {
-    res.status(201).send(data)
-  }).catch(err => {
-    res.status(500).send({
-      message: err.message || "Some error occurred while retrieving media."
-    })
-  })
-};
+  };
+  return {
+    create,
+    findOne,
+    update,
+  }
+}

@@ -1,6 +1,5 @@
-module.exports = app => {
-  const Task = require("../controllers/Task.controller");
-
+module.exports = (app, db) => {
+  const Task = require("../controllers/Task.controller")(db);
   const router = require("express").Router();
 
   // importing old database from JSON
@@ -9,17 +8,11 @@ module.exports = app => {
   // check if file exists on local machine
   router.post("/checkFileExists", Task.checkFileExists);
 
-  // creating image that recived from cropper
-  router.post("/createImage", Task.createImage);
-
-  // deleting image from userfiles directory
-  router.post("/deleteImage", Task.deleteImage);
+  // open folder in file explorer
+  router.post("/openPath", Task.openPath);
 
   // getting file list with specific extension in directory
   router.post("/getFileList", Task.getFileList);
-
-  // open folder in file explorer
-  router.post("/openPath", Task.openPath);
 
   // adding video with metadata to database
   router.post("/addMediaVideo", Task.addMediaVideo);
@@ -47,6 +40,12 @@ module.exports = app => {
 
   // check serial key
   router.get("/getMachineId", Task.getMachineId);
+
+  // creating image that recived from cropper
+  router.post("/createImage", Task.createImage);
+
+  // deleting image from userfiles directory
+  router.post("/deleteImage", Task.deleteImage);
 
   app.use('/api/Task', router);
 };

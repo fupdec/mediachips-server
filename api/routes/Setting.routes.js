@@ -1,6 +1,5 @@
-module.exports = app => {
-  const Setting = require("../controllers/Setting.controller");
-
+module.exports = (app, db) => {
+  const Setting = require("../controllers/Setting.controller")(db);
   const router = require("express").Router();
 
   // Retrieve all options from the database

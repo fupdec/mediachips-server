@@ -1,49 +1,40 @@
-const db = require("../index.js");
-const VideoMetadata = db.VideoMetadata;
-const Op = db.Sequelize.Op;
-
-// Create and Save a new VideoMetadata
-exports.create = (req, res) => {};
-
-// Retrieve all VideoMetadata from the database.
-exports.findAll = (req, res) => {};
-
-// Find a single VideoMetadata with an id
-exports.findOne = (req, res) => {
-  VideoMetadata.findOne({
-    where: {
-      mediaId: req.params.id,
-    },
-    raw: true
-  }).then(async (data) => {
-    res.status(201).send(data)
-  }).catch(err => {
-    res.status(500).send({
-      message: err.message || "Some error occurred while retrieving media."
-    })
-  })
-};
-
-// Update a VideoMetadata by the id in the request
-exports.update = (req, res) => {
-  VideoMetadata
-    .update(req.body, {
+module.exports = function (db) {
+  // Find a single VideoMetadata with an id
+  const findOne = function (req, res) {
+    db.VideoMetadata.findOne({
       where: {
-        mediaId: parseInt(req.params.id)
-      }
-    })
-    .then(() => {
-      res.sendStatus(201)
-    })
-    .catch(err => {
+        mediaId: req.params.id,
+      },
+      raw: true
+    }).then(async (data) => {
+      res.status(201).send(data)
+    }).catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while performing query."
+        message: err.message || "Some error occurred while retrieving media."
       })
     })
-};
+  };
 
-// Delete a VideoMetadata with the specified id in the request
-exports.delete = (req, res) => {};
+  // Update a VideoMetadata by the id in the request
+  const update = function (req, res) {
+    db.VideoMetadata
+      .update(req.body, {
+        where: {
+          mediaId: parseInt(req.params.id)
+        }
+      })
+      .then(() => {
+        res.sendStatus(201)
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while performing query."
+        })
+      })
+  };
 
-// Delete all VideoMetadata from the database.
-exports.deleteAll = (req, res) => {};
+  return {
+    findOne,
+    update,
+  }
+}

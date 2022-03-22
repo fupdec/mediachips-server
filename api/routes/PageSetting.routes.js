@@ -1,6 +1,5 @@
-module.exports = app => {
-  const PageSetting = require("../controllers/PageSetting.controller");
-
+module.exports = (app, db) => {
+  const PageSetting = require("../controllers/PageSetting.controller")(db);
   const router = require("express").Router();
 
   // Find or Create a new PageSetting

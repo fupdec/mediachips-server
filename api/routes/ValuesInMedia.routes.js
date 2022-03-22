@@ -1,6 +1,5 @@
-module.exports = app => {
-  const ValuesInMedia = require("../controllers/ValuesInMedia.controller");
-
+module.exports = (app, db) => {
+  const ValuesInMedia = require("../controllers/ValuesInMedia.controller")(db);
   const router = require("express").Router();
 
   // Create a new ValuesInMedia
@@ -9,17 +8,8 @@ module.exports = app => {
   // Retrieve all ValuesInMedia
   router.get("/", ValuesInMedia.findAll);
 
-  // Retrieve a single ValuesInMedia with id
-  router.get("/:id", ValuesInMedia.findOne);
-
-  // Update a ValuesInMedia with id
-  router.put("/:id", ValuesInMedia.update);
-
   // Delete a ValuesInMedia with id
-  router.delete("/:id", ValuesInMedia.delete);
-
-  // Delete all ValuesInMedia
-  router.delete("/", ValuesInMedia.deleteAll);
+  router.delete("/:id", ValuesInMedia.deleteOne);
 
   app.use('/api/ValuesInMedia', router);
 };

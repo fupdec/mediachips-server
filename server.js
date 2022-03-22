@@ -6,7 +6,6 @@ const fs = require('fs')
 const history = require('connect-history-api-fallback')
 const app = express()
 const cors = require('cors')
-const db = require("./api");
 const {
   Umzug,
   SequelizeStorage
@@ -71,6 +70,17 @@ if (!fs.existsSync(marksPath)) fs.mkdirSync(marksPath)
 // if (!fs.existsSync(metaPath)) fs.mkdirSync(metaPath)
 
 
+// creating connection for database
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize({
+  storage: path.join(__dirname, 'userfiles/databases', 'db.sqlite'),
+  dialect: 'sqlite',
+  dialectOptions: {
+    multipleStatements: true
+  }
+})
+const db = require("./api")(sequelize);
+
 // testing database connection
 try {
   db.sequelize.authenticate()
@@ -112,28 +122,28 @@ app.use(staticFileMiddleware)
 
 
 // REST api
-require("./api/routes/ChildMeta.routes")(app)
-require("./api/routes/FilterRow.routes")(app)
-require("./api/routes/FilterRowsInSavedFilter.routes")(app)
-require("./api/routes/Item.routes")(app)
-require("./api/routes/ItemsInFilterRow.routes")(app)
-require("./api/routes/ItemsInItem.routes")(app)
-require("./api/routes/ItemsInMedia.routes")(app)
-require("./api/routes/Mark.routes")(app)
-require("./api/routes/Media.routes")(app)
-require("./api/routes/MediaType.routes")(app)
-require("./api/routes/Meta.routes")(app)
-require("./api/routes/MetaInMediaType.routes")(app)
-require("./api/routes/MediaTypesInWatchedFolders.routes")(app)
-require("./api/routes/MetaSetting.routes")(app)
-require("./api/routes/PageSetting.routes")(app)
-require("./api/routes/SavedFilter.routes")(app)
-require("./api/routes/Setting.routes")(app)
-require("./api/routes/Task.routes")(app)
-require("./api/routes/ValuesInItem.routes")(app)
-require("./api/routes/ValuesInMedia.routes")(app)
-require("./api/routes/VideoMetadata.routes")(app)
-require("./api/routes/WatchedFolder.routes")(app)
+require("./api/routes/ChildMeta.routes")(app, db)
+require("./api/routes/FilterRow.routes")(app, db)
+require("./api/routes/FilterRowsInSavedFilter.routes")(app, db)
+require("./api/routes/Item.routes")(app, db)
+require("./api/routes/ItemsInFilterRow.routes")(app, db)
+require("./api/routes/ItemsInItem.routes")(app, db)
+require("./api/routes/ItemsInMedia.routes")(app, db)
+require("./api/routes/Mark.routes")(app, db)
+require("./api/routes/Media.routes")(app, db)
+require("./api/routes/MediaType.routes")(app, db)
+require("./api/routes/Meta.routes")(app, db)
+require("./api/routes/MetaInMediaType.routes")(app, db)
+require("./api/routes/MediaTypesInWatchedFolders.routes")(app, db)
+require("./api/routes/MetaSetting.routes")(app, db)
+require("./api/routes/PageSetting.routes")(app, db)
+require("./api/routes/SavedFilter.routes")(app, db)
+require("./api/routes/Setting.routes")(app, db)
+require("./api/routes/Task.routes")(app, db)
+require("./api/routes/ValuesInItem.routes")(app, db)
+require("./api/routes/ValuesInMedia.routes")(app, db)
+require("./api/routes/VideoMetadata.routes")(app, db)
+require("./api/routes/WatchedFolder.routes")(app, db)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   if (req.body.outside) res.sendFile(req.body.url)
