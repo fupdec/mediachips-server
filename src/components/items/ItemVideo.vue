@@ -21,17 +21,12 @@
           <div>App not registered</div>
         </div>
 
-        <v-img :src="thumb" :aspect-ratio="16 / 9" />
-
-        <v-btn
+        <v-img
           @click="play"
-          :color="isFileExists ? 'white' : 'error'"
-          class="btn-play"
-          icon
-          fab
-        >
-          <v-icon x-large>mdi-play</v-icon>
-        </v-btn>
+          :src="thumb"
+          :aspect-ratio="16 / 9"
+          class="thumb"
+        />
 
         <v-rating
           :value="media.rating"
@@ -75,6 +70,7 @@
 
         <div
           v-if="isHovered && sets.videoPreviewHover == 'timeline'"
+          @click="play"
           :class="[
             { 'no-file': frameLost && !isFileExists },
             { 'no-frame': frameLost },
@@ -105,7 +101,12 @@
       <v-progress-linear :value="progress" />
 
       <div class="description">
-        <div class="media-card-title" :title="fileName" v-html="fileName" />
+        <div class="media-card-title" :title="fileName">
+          <v-icon v-if="!isFileExists" color="error" left>
+            mdi-file-alert
+          </v-icon>
+          <span v-text="fileName" />
+        </div>
 
         <NestedItems
           :item="media"
@@ -157,7 +158,7 @@
       >
         <v-sheet class="media-card-title">
           <v-icon v-if="!isFileExists" color="error">mdi-file-alert</v-icon>
-          {{ fileName }}
+          <span v-text="fileName" />
         </v-sheet>
         <div v-if="framesLost && isFileExists" class="message">
           <v-sheet v-html="'Creation of frames in progress...'" />

@@ -210,8 +210,8 @@ export default {
         );
         let src = await Vue.prototype.$getLocalImage(imgPath);
         if (i !== "main" && src.includes("unavailable.png"))
-          this.images[i] = null;
-        else this.images[i] = src;
+          Vue.set(this.images, i, null);
+        else Vue.set(this.images, i, src);
       }
     },
     getItems() {

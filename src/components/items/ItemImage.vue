@@ -10,19 +10,10 @@
       outlined
       hover
     >
-      <v-img @click="openPath(media.path)" :src="thumb">
+      <v-img @click="openPath(media.path)" :src="thumb" class="thumb">
         <div v-if="!reg && x > 9" class="reg-block">
           <div>App not registered</div>
         </div>
-
-        <v-btn
-          :color="isFileExists ? 'white' : 'error'"
-          class="btn-play"
-          icon
-          fab
-        >
-          <v-icon x-large>mdi-play</v-icon>
-        </v-btn>
 
         <v-rating
           :value="media.rating"
