@@ -38,7 +38,7 @@
         @click="toggle(i)"
         style="background-color: #6a6a6a12"
       >
-        <v-list-item-avatar>
+        <v-list-item-avatar :color="i.watch ? 'success' : ''">
           <v-icon v-text="`mdi-eye${i.watch ? '' : '-off'}`" />
         </v-list-item-avatar>
 

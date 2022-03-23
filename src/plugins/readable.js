@@ -52,6 +52,10 @@ const Readable = {
     Vue.prototype.$getFileExtensionFromPath = function (fullPath) {
       return fullPath.split('.').pop().toLowerCase()
     }
+    Vue.prototype.$getDateFromMs = function (ms) {
+      let date = new Date(ms)
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+    }
     Vue.prototype.$getIconDataType = function (type) {
       if (type === "string") return "mdi-alphabetical";
       if (type === "date") return "mdi-calendar";
