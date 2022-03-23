@@ -35,11 +35,41 @@
       </v-list-item>
     </v-list>
 
+    <v-dialog v-model="dialogEditing" width="600" scrollable>
+      <v-card>
+        <DialogHeader
+          @close="dialogEditing = false"
+          :header="`Editing database`"
+          :buttons="buttons"
+          closable
+        />
+
+        <v-card-text class="pa-sm-4 pa-2">
+          <v-form ref="form" v-model="valid">
+            <v-text-field
+              v-model="dbName"
+              :rules="[(v) => !!v || 'Name is required', nameRules]"
+              label="Name"
+              autofocus
+            />
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <DialogConfirm
       @close="dialogActivateConfirm = false"
-      @confirm="activate"
+      @confirm="activateDb"
       :dialog="dialogActivateConfirm"
       :text="confirmText"
+    />
+
+    <DialogDeleteConfirm
+      v-if="dialogDeleteConfirm"
+      @close="dialogDeleteConfirm = false"
+      @delete="deleteDb"
+      :dialog="dialogDeleteConfirm"
+      :text="deleteText"
     />
   </div>
 </template>
@@ -51,11 +81,24 @@ import Vue from "vue";
 export default {
   name: "SettingsDatabases",
   components: {
+    DialogHeader: () => import("@/components/elements/DialogHeader.vue"),
     DialogConfirm: () => import("@/components/dialogs/DialogConfirm.vue"),
+    DialogDeleteConfirm: () =>
+      import("@/components/dialogs/DialogDeleteConfirm.vue"),
+  },
+  mounted() {
+    this.initButtons();
   },
   data: () => ({
+    dbName: "",
+    dbEditing: null,
+    valid: false,
+    buttons: [],
+    dialogEditing: false,
     dialogActivateConfirm: false,
-    confirmText: "",
+    dialogDeleteConfirm: false,
+    confirmText: "Activate database?",
+    deleteText: "The database will be permanently deleted. \r Are you sure?",
   }),
   computed: {
     databases() {
@@ -71,19 +114,47 @@ export default {
     },
   },
   methods: {
+    initButtons() {
+      this.buttons.push({
+        icon: "content-save",
+        text: "Save",
+        color: "success",
+        outlined: false,
+        function: () => {
+          this.updateDb();
+        },
+      });
+    },
     getDate(ms) {
       return Vue.prototype.$getDateFromMs(ms);
     },
     addDb() {},
+    edit(db) {
+      this.dbEditing = db;
+      this.dbName = db.name;
+      this.dialogEditing = true;
+    },
+    updateDb() {
+      this.$refs.form.validate();
+      if (!this.valid) return;
+      this.dialogEditing = false;
+    },
     openDialogConfirm() {
-      this.confirmText = "Activate database?";
       this.dialogActivateConfirm = true;
     },
-    activate() {
+    activateDb() {
       this.dialogActivateConfirm = false;
     },
-    edit() {},
-    confirmRemoving() {},
+    confirmRemoving(db) {
+      this.dbEditing = db;
+      this.dialogDeleteConfirm = true;
+    },
+    deleteDb() {
+      this.dialogDeleteConfirm = false;
+    },
+    nameRules(string) {
+      return Vue.prototype.$validateName(string);
+    },
   },
 };
 </script>

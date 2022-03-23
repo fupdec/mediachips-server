@@ -1,5 +1,4 @@
 module.exports = function (db) {
-  console.log(db.Media)
   // Retrieve all Media from the database.
   const findAll = function (req, res) {
     db.sequelize.query(req.body.query, {
