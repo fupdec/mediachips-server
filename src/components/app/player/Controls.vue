@@ -513,7 +513,11 @@ export default {
       this.$emit("addMark", type);
     },
     async setAsThumb() {
-      let imgPath = "/userfiles/media/thumbs/" + this.video.id + ".jpg";
+      let imgPath = path.join(
+        this.$store.state.mediaPath,
+        "thumbs",
+        `${this.video.id}.jpg`
+      );
       let time = new Date(this.p.currentTime * 1000)
         .toISOString()
         .substr(11, 8);

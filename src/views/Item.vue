@@ -198,8 +198,8 @@ export default {
       await this.getValues();
       this.cropperOps.aspectRatio = this.meta.metaSetting.imageAspectRatio;
       this.imgPath = path.join(
-        __dirname,
-        "/userfiles/media/meta/",
+        this.$store.state.mediaPath,
+        "meta/",
         this.metaId + "/" + this.itemId + "_main.jpg"
       );
     },
@@ -227,8 +227,8 @@ export default {
       const imageTypes = ["main", "header"];
       for (let i of imageTypes) {
         let imgPath = path.join(
-          __dirname,
-          "/userfiles/media/meta/",
+          this.$store.state.mediaPath,
+          "meta",
           `${this.meta.id}`,
           `${this.item.id}_${i}.jpg`
         );

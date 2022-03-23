@@ -91,9 +91,9 @@ export default {
   methods: {
     async getImg() {
       let imgPath = path.join(
-        __dirname,
-        "/userfiles/media/marks/",
-        this.mark.id + ".jpg"
+        this.$store.state.mediaPath,
+        "marks",
+        `${this.mark.id}.jpg`
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
     },

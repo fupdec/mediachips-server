@@ -9,6 +9,11 @@ const ApiCalls = {
           .then(res => {
             const config = res.data
             options.store.state.localhost = `http://${config.ip}:${config.port}`;
+            const db = config.databases.find(i => i.active);
+            const dbPath = path.join(__dirname, "userfiles", "databases", db.id);
+            options.store.state.dbPath = dbPath;
+            options.store.state.mediaPath = path.join(dbPath, 'media');
+            options.store.state.databases = config.databases;
             resolve(res)
           })
           .catch(e => {
@@ -25,7 +30,6 @@ const ApiCalls = {
           url: options.store.state.localhost + '/api/Task/checkFileExists',
           data: {
             path: filePath,
-            isMedia: isMedia,
           }
         })
       } catch (error) {

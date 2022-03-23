@@ -109,8 +109,9 @@ export default {
     async getThumbs() {
       for (let i of this.p.playlist) {
         let imgPath = path.join(
-          __dirname,
-          `/userfiles/media/thumbs/${i.id}.jpg`
+          this.$store.state.mediaPath,
+          "thumbs",
+          `${i.id}.jpg`
         );
         i.thumb = await Vue.prototype.$getLocalImage(imgPath);
       }

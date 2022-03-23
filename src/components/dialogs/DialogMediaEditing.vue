@@ -98,8 +98,8 @@ export default {
     },
     async getImage() {
       this.imgPath = path.join(
-        __dirname,
-        "/userfiles/media/thumbs/",
+        this.$store.state.mediaPath,
+        "thumbs",
         `${this.media.id}.jpg`
       );
       this.img = await Vue.prototype.$getLocalImage(this.imgPath);

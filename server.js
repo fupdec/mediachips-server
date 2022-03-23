@@ -24,8 +24,15 @@ app.use(router)
 // creating default config
 const configPath = path.join(__dirname, 'dist/config.json')
 let defaultConfig = {
-  port: 5555
+  port: 5555,
+  databases: []
 }
+defaultConfig.databases.push({
+  id: Date.now().toString(16),
+  name: 'Default',
+  active: true,
+  createdAt: Date.now(),
+})
 try {
   fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), {
     flag: 'wx'
@@ -57,29 +64,33 @@ fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
 })
 
 
-// Creating default folders
+// creating default folders for databases
 const userfiles = path.join(__dirname, 'userfiles')
-const mediaPath = path.join(userfiles, 'media')
-const marksPath = path.join(mediaPath, 'marks')
-// const thumbsPath = path.join(mediaPath, 'thumbs')
-// const metaPath = path.join(mediaPath, 'meta')
 if (!fs.existsSync(userfiles)) fs.mkdirSync(userfiles)
-if (!fs.existsSync(mediaPath)) fs.mkdirSync(mediaPath)
-if (!fs.existsSync(marksPath)) fs.mkdirSync(marksPath)
-// if (!fs.existsSync(thumbsPath)) fs.mkdirSync(thumbsPath)
-// if (!fs.existsSync(metaPath)) fs.mkdirSync(metaPath)
+const databasesPath = path.join(userfiles, 'databases')
+if (!fs.existsSync(databasesPath)) fs.mkdirSync(databasesPath)
+for (let i of config.databases) {
+  const dbPath = path.join(databasesPath, i.id)
+  if (!fs.existsSync(dbPath)) fs.mkdirSync(dbPath)
+  const mediaPath = path.join(dbPath, 'media')
+  if (!fs.existsSync(mediaPath)) fs.mkdirSync(mediaPath)
+  const marksPath = path.join(mediaPath, 'marks')
+  if (!fs.existsSync(marksPath)) fs.mkdirSync(marksPath)
+}
 
+const dbConfig = config.databases.find(i => i.active)
 
 // creating connection for database
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize({
-  storage: path.join(__dirname, 'userfiles/databases', 'db.sqlite'),
+  storage: path.join(databasesPath, dbConfig.id, 'db.sqlite'),
   dialect: 'sqlite',
   dialectOptions: {
     multipleStatements: true
   }
 })
 const db = require("./api")(sequelize);
+db.config = dbConfig
 
 // testing database connection
 try {

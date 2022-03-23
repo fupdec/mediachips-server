@@ -115,8 +115,8 @@ export default {
       ];
       for (let i of imageTypes) {
         let imgPath = path.join(
-          __dirname,
-          "/userfiles/media/meta/",
+          this.$store.state.mediaPath,
+          "meta",
           `${this.meta.id}`,
           `${this.item.id}_${i}.jpg`
         );

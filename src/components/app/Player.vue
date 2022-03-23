@@ -207,7 +207,11 @@ export default {
       // creating mark thumb
       for (let mark of this.p.marks) {
         let time = new Date(1000 * mark.time).toISOString().substr(11, 12);
-        let imgPath = "/userfiles/media/marks/" + mark.id + ".jpg";
+        let imgPath = path.join(
+          this.$store.state.mediaPath,
+          "marks",
+          `${mark.id}.jpg`
+        );
         let res = await Vue.prototype.$checkFileExists(imgPath, true);
         if (res.status == 201) {
           this.$root.$emit("updateMarkImage", mark.id);
@@ -407,8 +411,8 @@ export default {
       this.p.markDel.show = false;
       let id = this.p.markDel.mark.id;
       let imgPath = path.join(
-        __dirname,
-        "/userfiles/media/marks/",
+        this.$store.state.mediaPath,
+        "marks",
         `${id}.jpg`
       );
       await axios.delete(this.apiUrl + "/api/mark/" + id);

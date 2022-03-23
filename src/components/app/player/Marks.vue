@@ -106,8 +106,12 @@ export default {
   methods: {
     async getThumbs() {
       for (let i of this.p.marks) {
-        let p = path.join(__dirname, `/userfiles/media/marks/${i.id}.jpg`);
-        i.thumb = await Vue.prototype.$getLocalImage(p);
+        let imgPath = path.join(
+          this.$store.state.mediaPath,
+          "marks",
+          `${i.id}.jpg`
+        );
+        i.thumb = await Vue.prototype.$getLocalImage(imgPath);
       }
     },
     getIcon(mark) {

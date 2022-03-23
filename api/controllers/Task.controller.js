@@ -10,6 +10,8 @@ ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
 module.exports = function (db) {
+  const databasesPath = path.join(__dirname, '../../userfiles', 'databases')
+  const dbPath = path.join(databasesPath, db.config.id)
   // importing old database from JSON
   const importDatabase = async function (req, res) {
     if (!req.body) return res.sendStatus(400)
@@ -19,8 +21,7 @@ module.exports = function (db) {
     let metaIds = []
     let mediaIds = []
 
-    const userfiles = path.join(__dirname, '../../userfiles')
-    const tempPath = path.join(userfiles, '/temp')
+    const tempPath = path.join(dbPath, 'temp')
     if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath)
 
     const backupPath = path.join(req.body.path)
@@ -44,9 +45,9 @@ module.exports = function (db) {
 
     // move thumbs and meta images
     const thumbsOld = path.join(tempPath, 'media/thumbs')
-    const thumbsNew = path.join(userfiles, 'media/thumbs')
+    const thumbsNew = path.join(dbPath, 'media/thumbs')
     const metaOld = path.join(tempPath, 'media/meta')
-    const metaNew = path.join(userfiles, 'media/meta')
+    const metaNew = path.join(dbPath, 'media/meta')
     if (fs.existsSync(thumbsOld)) {
       fs.rename(thumbsOld, thumbsNew, function (err) {
         if (err) console.log(err)
@@ -679,7 +680,7 @@ module.exports = function (db) {
 
     function createThumb(pathToFile, id) {
       return new Promise((resolve, reject) => {
-        let outputPathThumbs = getMediaPath("/userfiles/media/thumbs/")
+        let outputPathThumbs = path.join(dbPath, 'media', 'thumbs')
         ffmpeg()
           .input(pathToFile)
           .screenshots({
@@ -885,8 +886,7 @@ module.exports = function (db) {
   };
 
   const createGrid = async function (req, res) {
-    const userfiles = path.join(__dirname, '../../userfiles')
-    const gridsPath = path.join(userfiles, "/media/grids/");
+    const gridsPath = path.join(dbPath, "/media/grids/");
     if (!fs.existsSync(gridsPath)) fs.mkdirSync(gridsPath);
 
     if (!fs.existsSync(req.body.input)) {
@@ -1025,8 +1025,7 @@ module.exports = function (db) {
   };
 
   const createTimeline = async function (req, res) {
-    const userfiles = path.join(__dirname, '../../userfiles')
-    const timelinesPath = path.join(userfiles, "/media/timelines/");
+    const timelinesPath = path.join(dbPath, "/media/timelines/");
     if (!fs.existsSync(timelinesPath)) fs.mkdirSync(timelinesPath);
 
     if (!fs.existsSync(req.body.path)) {
@@ -1159,8 +1158,6 @@ module.exports = function (db) {
       }
     })
   };
-
-  
 
   return {
     importDatabase,

@@ -2,6 +2,9 @@ const fs = require("fs")
 const path = require('path')
 
 module.exports = function (db) {
+  const databasesPath = path.join(__dirname, '../../userfiles', 'databases')
+  const metaFolder = path.join(databasesPath, db.config.id, 'media', 'meta')
+  if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
   // Create and Save a new Meta
   const create = function (req, res) {
     db.Meta.create(req.body, {
@@ -11,9 +14,8 @@ module.exports = function (db) {
       .then(async data => {
         const m = data.dataValues
         if (m.type == 'array') {
-          const userfiles = path.join(__dirname, '../../userfiles')
-          const metaFolder = path.join(userfiles, `media/meta/${m.id}`, );
-          if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
+          const dir = path.join(metaFolder, m.id.toString())
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
           const [cf, isC] = await db.SavedFilter.findOrCreate({
             where: {
@@ -124,8 +126,7 @@ module.exports = function (db) {
         }
       })
       .then(() => {
-        const userfiles = path.join(__dirname, '../../userfiles')
-        const dir = path.join(userfiles, 'media/meta', req.params.id)
+        const dir = path.join(metaFolder, req.params.id)
         fs.rmSync(dir, {
           recursive: true,
           force: true
