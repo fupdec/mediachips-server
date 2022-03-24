@@ -47,5 +47,17 @@ module.exports = (app, db) => {
   // deleting image from userfiles directory
   router.post("/deleteImage", Task.deleteImage);
 
+  // creating new database
+  router.post("/createDb", Task.createDb);
+
+  // editing database
+  router.post("/editDb", Task.editDb);
+
+  // selecting database
+  router.post("/selectDb", Task.selectDb);
+
+  // deleting database
+  router.post("/deleteDb", Task.deleteDb);
+
   app.use('/api/Task', router);
 };

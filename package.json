@@ -42,6 +42,7 @@
     "lodash": "^4.17.21",
     "node-machine-id": "^1.1.12",
     "node-stream-zip": "^1.15.0",
+    "rimraf": "^3.0.2",
     "sequelize": "^6.11.0",
     "sqlite3": "^5.0.2",
     "string-crypto": "^2.0.2",

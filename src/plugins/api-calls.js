@@ -3,7 +3,7 @@ const path = require('path')
 
 const ApiCalls = {
   install(Vue, options) {
-    Vue.prototype.$getLocalhost = function () {
+    Vue.prototype.$initConfig = function () {
       return new Promise((resolve, reject) => {
         axios.get('/config.json')
           .then(res => {

@@ -1,6 +1,7 @@
 const os = require('os')
 const fs = require("fs")
 const path = require('path')
+const rimraf = require("rimraf")
 const StreamZip = require('node-stream-zip')
 // FFMPEG
 const ffmpeg = require('fluent-ffmpeg')
@@ -1159,6 +1160,66 @@ module.exports = function (db) {
     })
   };
 
+  const configPath = path.join(__dirname, '../../dist/config.json')
+
+  const createDb = function (req, res) {
+    let config = require(configPath)
+    config.databases.push({
+      id: Date.now().toString(16),
+      name: req.body.name,
+      active: false,
+      createdAt: Date.now(),
+    })
+
+    try {
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      res.status(201).send(config.databases)
+    } catch (err) {
+      res.status(500).send(err)
+    }
+  };
+
+  const editDb = function (req, res) {
+    let config = require(configPath)
+    const dbEdit = config.databases.find(i => (i.id == req.body.id))
+    dbEdit.name = req.body.name
+
+    try {
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      res.status(201).send(config.databases)
+    } catch (err) {
+      res.status(500).send(err)
+    }
+  };
+
+  const selectDb = function (req, res) {
+    let config = require(configPath)
+    config.databases = config.databases.map(i => {
+      i.active = false
+      if (i.id == req.body.id) i.active = true
+      return i
+    })
+
+    try {
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      res.status(201).send(config.databases)
+    } catch (err) {
+      res.status(500).send(err)
+    }
+  };
+
+  const deleteDb = function (req, res) {
+    let config = require(configPath)
+    config.databases = config.databases.filter(i => (i.id !== req.body.id))
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+    const dbDir = path.join(databasesPath, req.body.id)
+    rimraf(dbDir, (err) => {
+      if (err) res.status(400).send(err)
+      else res.status(201).send(config.databases)
+    })
+  };
+
   return {
     importDatabase,
     checkFileExists,
@@ -1175,5 +1236,9 @@ module.exports = function (db) {
     getMachineId,
     createImage,
     deleteImage,
+    createDb,
+    editDb,
+    selectDb,
+    deleteDb,
   }
 }

@@ -83,7 +83,7 @@ export default {
   },
   mixins: [AddingMedia, Watcher],
   async mounted() {
-    await Vue.prototype.$getLocalhost();
+    await Vue.prototype.$initConfig();
     this.isApiReady = true;
     await this.initSettings();
     await this.applyTheme();
