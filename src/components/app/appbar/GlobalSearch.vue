@@ -24,14 +24,18 @@
             placeholder="Enter text..."
             append-icon="mdi-magnify"
             class="mt-3"
-            outlined
-            dense
+            rounded
+            filled
             autofocus
             hide-details
           />
         </v-card-actions>
 
         <v-card-text class="pa-4">
+          <div class="text-center font-italic mb-2">
+            <span v-if="!query" v-text="`Start typing to see the result...`" />
+            <span v-if="query && isEmptyObj(items)" v-text="`Nothing found`" />
+          </div>
           <v-card v-for="(group, x) in items" :key="x" class="mb-4" outlined>
             <v-btn
               @click="openMeta(group[0].metaId)"
@@ -64,7 +68,7 @@ export default {
     dialog: false,
     query: null,
     debounce: 0,
-    items: [],
+    items: {},
   }),
   computed: {
     apiUrl() {
@@ -73,6 +77,10 @@ export default {
   },
   methods: {
     async search() {
+      if (!this.query) {
+        this.items = {};
+        return;
+      }
       let url = "/api/item/search";
       let query = `SELECT * FROM items WHERE name LIKE '%${this.query}%'`;
       await axios({
@@ -115,6 +123,9 @@ export default {
       this.dialog = false;
       this.items = [];
       this.query = null;
+    },
+    isEmptyObj(obj) {
+      return _.isEmpty(obj);
     },
   },
 };
