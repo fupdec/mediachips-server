@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="pa-4 mx-2">
+  <div class="mx-4">
     <div class="d-flex">
       <div>
         <div>mediaChips-server v0.5.0-alpha</div>
@@ -11,14 +11,15 @@
         <span>2022</span>
       </div>
     </div>
-    <div>Links</div>
+
     <div class="d-flex flex-wrap mt-2">
       <v-btn
         @click="openLink('https://mediaChips.app/')"
         class="px-5 mb-2 mr-2"
-        color="#1da6ff"
+        color="#7059b7"
         rounded
         depressed
+        dark
       >
         <v-icon left>mdi-web</v-icon> Website
       </v-btn>
@@ -60,75 +61,79 @@
         <v-icon left>mdi-patreon</v-icon> Patreon
       </v-btn>
     </div>
+
     <v-divider class="my-4"></v-divider>
+
     <div class="d-flex flex-column">
-      <div>Thanks to the people who worked on these wonderful libraries:</div>
+      <div class="mb-4">
+        Thanks to the people who worked on these wonderful libraries:
+      </div>
       <div class="d-flex flex-wrap">
         <span @click="openLink('https://github.com/electron')" class="mr-2">
-          Electron
+          electron,
         </span>
         <span @click="openLink('https://github.com/vuejs/vue')" class="mr-2">
-          vue
+          vue,
         </span>
         <span
           @click="openLink('https://github.com/vuetifyjs/vuetify')"
           class="mr-2"
         >
-          vuetify
+          vuetify,
         </span>
         <span @click="openLink('https://github.com/vuejs/vuex')" class="mr-2">
-          vuex
+          vuex,
         </span>
         <span @click="openLink('https://www.ffmpeg.org/')" class="mr-2">
-          FFmpeg
+          ffmpeg,
         </span>
         <span
           @click="openLink('https://github.com/whyboris/Video-Hub-App')"
           class="mr-2"
         >
-          VideoHubApp
+          videohubapp,
         </span>
         <span @click="openLink('https://github.com/apexcharts')" class="mr-2">
-          apexcharts
+          apexcharts,
         </span>
         <span
           @click="openLink('https://github.com/archiverjs/node-archiver')"
           class="mr-2"
         >
-          archiver
+          archiver,
         </span>
         <span @click="openLink('https://github.com/axios/axios')" class="mr-2">
-          axios
+          axios,
         </span>
         <span
           @click="openLink('https://github.com/cheeriojs/cheerio')"
           class="mr-2"
         >
-          cheerio
+          cheerio,
         </span>
         <span
           @click="openLink('https://github.com/zloirock/core-js')"
           class="mr-2"
         >
-          core-js
+          core-js,
         </span>
         <span
           @click="openLink('https://github.com/eugeneware/ffmpeg-static')"
           class="mr-2"
         >
-          ffmpeg-static
+          ffmpeg-static,
         </span>
         <span
           @click="openLink('https://github.com/joshwnj/ffprobe-static')"
           class="mr-2"
         >
-          ffprobe-static
+          ffprobe-static,
         </span>
         <span
           @click="openLink('https://github.com/pqina/filepond')"
           class="mr-2"
         >
-          filepond
+          filepond,
         </span>
         <span
           @click="
@@ -136,79 +141,79 @@
           "
           class="mr-2"
         >
-          fluent-ffmpeg
+          fluent-ffmpeg,
         </span>
         <span
           @click="openLink('https://github.com/jprichardson/node-fs-extra')"
           class="mr-2"
         >
-          fs-extra
+          fs-extra,
         </span>
         <span
           @click="openLink('https://github.com/oliver-moran/jimp')"
           class="mr-2"
         >
-          jimp
+          jimp,
         </span>
         <span
           @click="openLink('https://github.com/typicode/lowdb')"
           class="mr-2"
         >
-          lowdb
+          lowdb,
         </span>
         <span
           @click="openLink('https://github.com/cristiammercado/node-disk-info')"
           class="mr-2"
         >
-          node-disk-info
+          node-disk-info,
         </span>
         <span
           @click="openLink('https://github.com/antelle/node-stream-zip')"
           class="mr-2"
         >
-          node-stream-zip
+          node-stream-zip,
         </span>
         <span
           @click="openLink('https://github.com/dylang/shortid')"
           class="mr-2"
         >
-          shortid
+          shortid,
         </span>
         <span
           @click="openLink('https://github.com/Norserium/vue-advanced-cropper')"
           class="mr-2"
         >
-          vue-advanced-cropper
+          vue-advanced-cropper,
         </span>
         <span
           @click="openLink('https://github.com/P3trur0/vue-country-flag')"
           class="mr-2"
         >
-          vue-country-flag
+          vue-country-flag,
         </span>
         <span
           @click="openLink('https://github.com/vuejs/vue-router')"
           class="mr-2"
         >
-          vue-router
+          vue-router,
         </span>
         <span
           @click="openLink('https://www.npmjs.com/package/vue-the-mask')"
           class="mr-2"
         >
-          vue-the-mask
+          vue-the-mask,
         </span>
         <span
           @click="openLink('https://github.com/SortableJS/Vue.Draggable')"
           class="mr-2"
         >
-          vuedraggable
+          vuedraggable,
         </span>
         <span
           @click="openLink('https://github.com/Simonwep/selection')"
           class="mr-2"
         >
-          selection
+          selection,
         </span>
         <span
           @click="openLink('https://github.com/mirari/v-viewer')"
@@ -221,7 +226,7 @@
         Thanks to Aardvark Hosting
       </div>
     </div>
-  </v-card>
+  </div>
 </template>
 
 
@@ -238,7 +243,8 @@ export default {
   },
   methods: {
     openLink(link) {
-      shell.openExternal(link);
+      window.open(link, "_newtab");
+      // shell.openExternal(link);
     },
   },
 };
