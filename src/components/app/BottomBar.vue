@@ -104,11 +104,11 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn v-on="on" to="/settings" color="secondary" text>
-                <span>Settings</span>
+                <span>{{ $t("headings.settings") }}</span>
                 <v-icon>mdi-cog-outline</v-icon>
               </v-btn>
             </template>
-            <span>Settings</span>
+            <span>{{ $t("headings.settings") }}</span>
           </v-tooltip>
 
           <div

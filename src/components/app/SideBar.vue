@@ -96,7 +96,7 @@
             <v-list-item-icon>
               <v-icon>mdi-cog-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Settings</v-list-item-title>
+            <v-list-item-title>{{ $t("headings.settings") }}</v-list-item-title>
           </v-list-item>
 
           <div

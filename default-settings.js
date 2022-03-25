@@ -161,6 +161,10 @@ const Settings = [{
   {
     "option": "restorePlaybackTime",
     "value": "1"
+  },
+  {
+    "option": "locale",
+    "value": "en"
   }
 ]
 

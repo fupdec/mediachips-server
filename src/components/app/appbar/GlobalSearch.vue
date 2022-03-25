@@ -6,7 +6,7 @@
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
       </template>
-      <span> Global Search </span>
+      <span> {{ $t("appbar.globalSearch") }} </span>
     </v-tooltip>
 
     <v-dialog
@@ -21,7 +21,7 @@
           <v-text-field
             v-model="query"
             @input="run"
-            placeholder="Enter text..."
+            :placeholder="$t('globalSearch.enterText')"
             append-icon="mdi-magnify"
             class="mt-3"
             rounded
@@ -33,8 +33,11 @@
 
         <v-card-text class="pa-4">
           <div class="text-center font-italic mb-2">
-            <span v-if="!query" v-text="`Start typing to see the result...`" />
-            <span v-if="query && isEmptyObj(items)" v-text="`Nothing found`" />
+            <span v-if="!query" v-text="$t('globalSearch.startTyping')" />
+            <span
+              v-if="query && isEmptyObj(items)"
+              v-text="$t('globalSearch.noResult')"
+            />
           </div>
           <v-card v-for="(group, x) in items" :key="x" class="mb-4" outlined>
             <v-btn

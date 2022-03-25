@@ -141,6 +141,7 @@ export default {
             sets[i.option] = i.value;
           }
           this.sets = sets;
+          this.$root.$i18n.locale = this.sets.locale;
         })
         .catch((e) => {
           this.isServerError = true;

@@ -9,12 +9,12 @@
             </v-btn>
           </v-badge>
         </template>
-        <span>Tasks</span>
+        <span> {{ $t("appbar.tasks") }} </span>
       </v-tooltip>
     </template>
 
     <v-card width="450">
-      <v-card-actions> Tasks </v-card-actions>
+      <v-card-actions> {{ $t("appbar.tasks") }} </v-card-actions>
 
       <v-divider></v-divider>
 
@@ -51,7 +51,7 @@
 
       <v-card-text v-else class="text-center">
         <v-icon class="mb-2">mdi-ghost-outline</v-icon>
-        <div class="caption">No tasks in progress</div>
+        <div class="caption">{{ $t("appbar.noTasks") }}</div>
       </v-card-text>
     </v-card>
   </v-menu>

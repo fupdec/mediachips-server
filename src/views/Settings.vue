@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="headline text-h4 d-flex align-center justify-center pt-4 pb-2">
-      <v-icon left>mdi-cog-outline</v-icon> Settings
+      <v-icon left>mdi-cog-outline</v-icon> {{ $t("headings.settings") }}
     </div>
 
     <v-tabs
@@ -12,40 +12,41 @@
       icons-and-text
       class="fullwidth-tabs transparent-tabs"
     >
-      <v-tab href="#appearance" draggable="false">
-        Appearance <v-icon>mdi-brush-variant</v-icon>
+      <v-tab href="#general" draggable="false">
+        {{ $t("settings.tabs.general") }}
+        <v-icon>mdi-application-cog-outline</v-icon>
       </v-tab>
-      <v-tab href="#app" draggable="false">
-        Application <v-icon>mdi-application-cog-outline</v-icon>
+      <v-tab href="#appearance" draggable="false">
+        {{ $t("settings.tabs.appearance") }} <v-icon>mdi-brush-variant</v-icon>
       </v-tab>
       <v-tab href="#meta" draggable="false">
-        Meta <v-icon>mdi-shape-outline</v-icon>
+        {{ $t("settings.tabs.meta") }} <v-icon>mdi-shape-outline</v-icon>
       </v-tab>
       <v-tab href="#media" draggable="false">
-        Media <v-icon>mdi-file-outline</v-icon>
+        {{ $t("settings.tabs.media") }} <v-icon>mdi-file-outline</v-icon>
       </v-tab>
       <v-tab href="#database" draggable="false">
-        Database <v-icon>mdi-database-outline</v-icon>
+        {{ $t("settings.tabs.database") }} <v-icon>mdi-database-outline</v-icon>
       </v-tab>
       <v-tab href="#about" draggable="false">
-        About <v-icon>mdi-information-variant</v-icon>
+        {{ $t("settings.tabs.about") }} <v-icon>mdi-information-variant</v-icon>
       </v-tab>
     </v-tabs>
 
     <v-divider></v-divider>
 
     <v-tabs-items v-model="tab" class="fullwidth-tabs transparent-tabs">
-      <v-tab-item value="appearance">
-        <v-card flat max-width="800" style="margin: auto" class="py-6">
-          <SettingsAppearance />
-        </v-card>
-      </v-tab-item>
-      <v-tab-item value="app">
+      <v-tab-item value="general">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <SettingsGeneral />
           <SettingsVideoPlayer />
           <SettingsWatchedFolders />
           <SettingsLogin />
+        </v-card>
+      </v-tab-item>
+      <v-tab-item value="appearance">
+        <v-card flat max-width="800" style="margin: auto" class="py-6">
+          <SettingsAppearance />
         </v-card>
       </v-tab-item>
       <v-tab-item value="meta">
@@ -91,7 +92,8 @@ export default {
     TableMetaInMediaTypes: () =>
       import("@/components/settings/TableMetaInMediaTypes.vue"),
     SettingsLogin: () => import("@/components/settings/SettingsLogin.vue"),
-    SettingsDatabases: () => import("@/components/settings/SettingsDatabases.vue"),
+    SettingsDatabases: () =>
+      import("@/components/settings/SettingsDatabases.vue"),
     SettingsGeneral: () => import("@/components/settings/SettingsGeneral.vue"),
     SettingsRegistration: () =>
       import("@/components/settings/SettingsRegistration.vue"),
@@ -101,7 +103,7 @@ export default {
     if (this.$route.query.tab == "about") this.tab = "about";
   },
   data: () => ({
-    tab: "appearance",
+    tab: "general",
   }),
   computed: {
     appSets: {

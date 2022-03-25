@@ -9,13 +9,13 @@
             </v-btn>
           </v-badge>
         </template>
-        <span>Notifications</span>
+        <span>{{ $t("appbar.notifications") }}</span>
       </v-tooltip>
     </template>
 
     <v-card width="450">
       <v-card-actions>
-        <div>Notifications</div>
+        <div>{{ $t("appbar.notifications") }}</div>
         <v-spacer></v-spacer>
         <v-btn v-if="notifications.length > 0" @click="clearAll" icon x-small>
           <v-icon>mdi-notification-clear-all</v-icon>
@@ -45,7 +45,7 @@
 
         <div v-else class="text-center py-2">
           <v-icon class="mb-2">mdi-ghost-outline</v-icon>
-          <div class="caption">No new notifications</div>
+          <div class="caption">{{ $t("appbar.noNotifications") }}</div>
         </div>
       </v-card-text>
     </v-card>

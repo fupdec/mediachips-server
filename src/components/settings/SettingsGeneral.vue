@@ -1,5 +1,17 @@
 <template>
   <div class="mx-4">
+    <v-select
+      :value="sets.locale"
+      @change="setLang($event)"
+      :items="locales"
+      :menu-props="{ offsetY: true }"
+      item-text="name"
+      item-value="value"
+      label="Language"
+      rounded
+      outlined
+    ></v-select>
+
     <v-checkbox
       v-model="sets.typingFiltersDefault"
       @change="setOption($event, 'typingFiltersDefault')"
@@ -64,6 +76,18 @@ import Vue from "vue";
 
 export default {
   name: "SettingsGeneral",
+  data: () => ({
+    locales: [
+      {
+        value: "en",
+        name: "English",
+      },
+      {
+        value: "ru",
+        name: "Русский",
+      },
+    ],
+  }),
   computed: {
     sets: {
       get() {
@@ -78,6 +102,10 @@ export default {
     async setOption(value, option) {
       this.sets[option] = value;
       await Vue.prototype.$setOption(option, value);
+    },
+    async setLang(locale) {
+      this.$root.$i18n.locale = locale;
+      await this.setOption(locale, "locale");
     },
   },
 };
