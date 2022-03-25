@@ -99,7 +99,7 @@ export default {
     async getImage() {
       this.imgPath = path.join(
         this.$store.state.mediaPath,
-        "thumbs",
+        "videos/thumbs",
         `${this.media.id}.jpg`
       );
       this.img = await Vue.prototype.$getLocalImage(this.imgPath);

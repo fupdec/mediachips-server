@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="login" @input="close" width="500" overlay-opacity="1">
+  <v-dialog :value="login" @input="close" width="500" overlay-opacity="1" persistent>
     <v-card>
       <DialogHeader @close="close" header="Welcome!" :buttons="buttons" />
 

@@ -26,7 +26,7 @@ export default {
   methods: {
     async getHoveredImage() {
       let imgPath = path.join(
-        this.$store.state.mediaPath,
+        this.$store.state.dbPath,
         "meta",
         `${this.hover.metaId}`,
         `${this.hover.itemId}_main.jpg`

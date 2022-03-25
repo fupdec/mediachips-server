@@ -108,7 +108,7 @@ export default {
       for (let i of this.p.marks) {
         let imgPath = path.join(
           this.$store.state.mediaPath,
-          "marks",
+          "videos/marks",
           `${i.id}.jpg`
         );
         i.thumb = await Vue.prototype.$getLocalImage(imgPath);

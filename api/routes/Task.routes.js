@@ -44,7 +44,7 @@ module.exports = (app, db) => {
   // creating image that recived from cropper
   router.post("/createImage", Task.createImage);
 
-  // deleting image from userfiles directory
+  // deleting image from database
   router.post("/deleteImage", Task.deleteImage);
 
   // creating new database

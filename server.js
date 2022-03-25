@@ -65,17 +65,30 @@ fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
 
 
 // creating default folders for databases
-const userfiles = path.join(__dirname, 'userfiles')
-if (!fs.existsSync(userfiles)) fs.mkdirSync(userfiles)
-const databasesPath = path.join(userfiles, 'databases')
-if (!fs.existsSync(databasesPath)) fs.mkdirSync(databasesPath)
+const databasesPath = path.join(__dirname, 'databases')
+let userDirs = [databasesPath]
 for (let i of config.databases) {
   const dbPath = path.join(databasesPath, i.id)
-  if (!fs.existsSync(dbPath)) fs.mkdirSync(dbPath)
   const mediaPath = path.join(dbPath, 'media')
-  if (!fs.existsSync(mediaPath)) fs.mkdirSync(mediaPath)
-  const marksPath = path.join(mediaPath, 'marks')
-  if (!fs.existsSync(marksPath)) fs.mkdirSync(marksPath)
+  const metaPath = path.join(dbPath, 'meta')
+  const videoPath = path.join(mediaPath, 'videos')
+  const imagePath = path.join(mediaPath, 'images')
+  const audioPath = path.join(mediaPath, 'audios')
+  const textPath = path.join(mediaPath, 'texts')
+  let videoDirs = ['thumbs', 'marks', 'grids', 'timelines'].map(i => (
+    path.join(videoPath, i)
+  ))
+  userDirs = [...userDirs, ...[dbPath, mediaPath, metaPath]]
+  userDirs = [...userDirs, ...[videoPath, imagePath, audioPath, textPath]]
+  userDirs = [...userDirs, ...videoDirs]
+}
+for (let i of userDirs) {
+  if (!fs.existsSync(i))
+    try {
+      fs.mkdirSync(i)
+    } catch (err) {
+      console.log(err)
+    }
 }
 
 const dbConfig = config.databases.find(i => i.active)

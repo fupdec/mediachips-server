@@ -515,7 +515,7 @@ export default {
     async setAsThumb() {
       let imgPath = path.join(
         this.$store.state.mediaPath,
-        "thumbs",
+        "videos/thumbs",
         `${this.video.id}.jpg`
       );
       let time = new Date(this.p.currentTime * 1000)

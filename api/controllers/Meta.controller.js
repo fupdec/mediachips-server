@@ -2,9 +2,8 @@ const fs = require("fs")
 const path = require('path')
 
 module.exports = function (db) {
-  const databasesPath = path.join(__dirname, '../../userfiles', 'databases')
-  const metaFolder = path.join(databasesPath, db.config.id, 'media', 'meta')
-  if (!fs.existsSync(metaFolder)) fs.mkdirSync(metaFolder);
+  const databasesPath = path.join(__dirname, '../../databases')
+  const metaFolder = path.join(databasesPath, db.config.id, 'meta')
   // Create and Save a new Meta
   const create = function (req, res) {
     db.Meta.create(req.body, {

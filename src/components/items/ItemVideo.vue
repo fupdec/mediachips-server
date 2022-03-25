@@ -345,7 +345,7 @@ export default {
     async getImg() {
       let imgPath = path.join(
         this.$store.state.mediaPath,
-        "thumbs",
+        "videos/thumbs",
         this.media.id + ".jpg"
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
@@ -438,7 +438,7 @@ export default {
     getFrameImgUrl(progress) {
       return path.join(
         this.$store.state.mediaPath,
-        "timelines",
+        "videos/timelines",
         `${this.media.id}_${progress}.jpg`
       );
     },

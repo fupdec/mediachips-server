@@ -203,7 +203,7 @@ export default {
       const imageTypes = ["main", "alt", "custom1", "custom2"];
       for (let i of imageTypes) {
         let imgPath = path.join(
-          this.$store.state.mediaPath,
+          this.$store.state.dbPath,
           "meta",
           `${this.meta.id}`,
           `${this.item.id}_${i}.jpg`

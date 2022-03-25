@@ -11,7 +11,7 @@ ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
 
 module.exports = function (db) {
-  const databasesPath = path.join(__dirname, '../../userfiles', 'databases')
+  const databasesPath = path.join(__dirname, '../../databases')
   const dbPath = path.join(databasesPath, db.config.id)
   // importing old database from JSON
   const importDatabase = async function (req, res) {
@@ -46,17 +46,31 @@ module.exports = function (db) {
 
     // move thumbs and meta images
     const thumbsOld = path.join(tempPath, 'media/thumbs')
-    const thumbsNew = path.join(dbPath, 'media/thumbs')
+    const thumbsNew = path.join(dbPath, 'media/videos/thumbs')
     const metaOld = path.join(tempPath, 'media/meta')
-    const metaNew = path.join(dbPath, 'media/meta')
+    const metaNew = path.join(dbPath, 'meta')
     if (fs.existsSync(thumbsOld)) {
-      fs.rename(thumbsOld, thumbsNew, function (err) {
+      rimraf(thumbsNew, (err) => {
         if (err) console.log(err)
+        else
+          try {
+            fs.renameSync(thumbsOld, thumbsNew)
+            console.log("Successfully renamed the thumbs directory.")
+          } catch (err) {
+            console.log(err)
+          }
       })
     }
     if (fs.existsSync(metaOld)) {
-      fs.rename(metaOld, metaNew, function (err) {
+      rimraf(metaNew, (err) => {
         if (err) console.log(err)
+        else
+          try {
+            fs.renameSync(metaOld, metaNew)
+            console.log("Successfully renamed the meta directory.")
+          } catch (err) {
+            console.log(err)
+          }
       })
     }
 
@@ -274,7 +288,6 @@ module.exports = function (db) {
       let options = []
       for (let option in filteredOptions) {
         let value = filteredOptions[option]
-        console.log(typeof value)
         options.push({
           option: option,
           value: value
@@ -497,9 +510,8 @@ module.exports = function (db) {
         let folderMetaOldId = path.join(metaNew, id.oldId)
         let folderMetaNewId = path.join(metaNew, `${id.id}`)
 
-        if (fs.existsSync(folderMetaOldId)) {
-          fs.rename(folderMetaOldId, folderMetaNewId, function () {})
-        }
+        if (fs.existsSync(folderMetaOldId))
+          fs.renameSync(folderMetaOldId, folderMetaNewId)
       }
     }).then(() => {
       let tree = [];
@@ -533,9 +545,7 @@ module.exports = function (db) {
         // finding new id of meta
         let nameNew = replaceMetaId(nameOld)
         let newPath = imgPath.replace(nameOld, nameNew)
-        if (fs.existsSync(imgPath)) {
-          fs.rename(imgPath, newPath, function () {})
-        }
+        if (fs.existsSync(imgPath)) fs.renameSync(imgPath, newPath)
       }
 
       mapDir(thumbsNew)
@@ -550,14 +560,11 @@ module.exports = function (db) {
         let nameOld = path.basename(imgPath, path.extname(imgPath))
         let nameNew = replaceMediaId(nameOld)
         let newPath = imgPath.replace(nameOld, nameNew)
-        if (fs.existsSync(imgPath)) {
-          fs.rename(imgPath, newPath, function () {})
-        }
+        if (fs.existsSync(imgPath)) fs.renameSync(imgPath, newPath)
       }
 
-      fs.rmSync(tempPath, {
-        recursive: true,
-        force: true
+      rimraf(tempPath, (err) => {
+        if (err) console.log(err)
       })
 
       res.status(201).send({
@@ -887,8 +894,7 @@ module.exports = function (db) {
   };
 
   const createGrid = async function (req, res) {
-    const gridsPath = path.join(dbPath, "/media/grids/");
-    if (!fs.existsSync(gridsPath)) fs.mkdirSync(gridsPath);
+    const gridsPath = path.join(dbPath, "/media/videos/grids/");
 
     if (!fs.existsSync(req.body.input)) {
       res.status(400).send({
@@ -1026,8 +1032,7 @@ module.exports = function (db) {
   };
 
   const createTimeline = async function (req, res) {
-    const timelinesPath = path.join(dbPath, "/media/timelines/");
-    if (!fs.existsSync(timelinesPath)) fs.mkdirSync(timelinesPath);
+    const timelinesPath = path.join(dbPath, "/media/videos/timelines/");
 
     if (!fs.existsSync(req.body.path)) {
       res.status(400).send({
@@ -1086,8 +1091,8 @@ module.exports = function (db) {
       }
     }
 
-    const firstFrame = path.join(timelinesPath, req.body.id + "_5.jpg");
-    if (!fs.existsSync(firstFrame)) {
+    const lastFrame = path.join(timelinesPath, req.body.id + "_95.jpg");
+    if (!fs.existsSync(lastFrame)) {
       const timeline = new Timeline(req.body)
       let result
       try {

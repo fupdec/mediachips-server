@@ -110,7 +110,7 @@ export default {
       for (let i of this.p.playlist) {
         let imgPath = path.join(
           this.$store.state.mediaPath,
-          "thumbs",
+          "videos/thumbs",
           `${i.id}.jpg`
         );
         i.thumb = await Vue.prototype.$getLocalImage(imgPath);

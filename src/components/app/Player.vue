@@ -209,7 +209,7 @@ export default {
         let time = new Date(1000 * mark.time).toISOString().substr(11, 12);
         let imgPath = path.join(
           this.$store.state.mediaPath,
-          "marks",
+          "videos/marks",
           `${mark.id}.jpg`
         );
         let res = await Vue.prototype.$checkFileExists(imgPath, true);
@@ -412,7 +412,7 @@ export default {
       let id = this.p.markDel.mark.id;
       let imgPath = path.join(
         this.$store.state.mediaPath,
-        "marks",
+        "videos/marks",
         `${id}.jpg`
       );
       await axios.delete(this.apiUrl + "/api/mark/" + id);

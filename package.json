@@ -79,7 +79,7 @@
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "asar": false,
     "files": [
-      "!userfiles",
+      "!databases",
       "!src"
     ],
     "win": {
