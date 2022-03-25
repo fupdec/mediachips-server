@@ -1,75 +1,66 @@
 <template>
-  <v-card outlined class="mb-6 pa-4 mx-2">
-    <div class="headline text-h5 text-center pb-4">Registration</div>
+  <div class="mx-4">
+    <div class="subtitle-2 text-right mb-4">
+      <v-chip :color="reg ? 'success' : 'error'" outlined label>
+        <span>Application {{ reg ? "" : "not " }} registered</span>
+      </v-chip>
+    </div>
 
-    <v-row>
-      <v-col cols="12" sm="6" align="center">
-        <v-btn @click="openDialog" color="primary" rounded depressed>
-          <v-icon left>mdi-key-variant</v-icon> Register with a license key
-        </v-btn>
-      </v-col>
-
-      <v-col cols="12" sm="6" align="center">
-        <v-btn
-          v-if="regInfo.license_type !== 'Lifetime'"
-          @click="openLink('https://mediachips.app/')"
-          color="primary"
-          class="mb-2"
-          rounded
-          depressed
-        >
-          <v-icon left>mdi-cart</v-icon> Buy lifetime license key
-        </v-btn>
-
-        <v-btn
-          v-if="regInfo.license_type !== 'Month'"
-          @click="openLink('https://patreon.com/mediachips')"
-          color="#ff424d"
-          rounded
-          depressed
-        >
-          <v-icon left>mdi-patreon</v-icon>
-          {{
-            regInfo.license_type !== "Lifetime"
-              ? "Subscribe monthly"
-              : "Support development"
-          }}
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    <div v-if="regInfo" class="d-flex justify-space-between flex-wrap mt-4">
-      <div class="">
-        <div>
-          License key:
-          <span class="user-select">{{ regInfo.license_code || "??" }}</span>
-        </div>
-        <div>Expiration date: {{ regInfo.license_expiry || "??" }}</div>
+    <div v-if="regInfo" class="d-flex justify-space-between flex-wrap mb-4">
+      <div>
+        Activation key:
+        <b class="user-select">{{ regInfo.license_code || "??" }}</b>
       </div>
+      <div>
+        Expiration date: <b>{{ regInfo.license_expiry || "??" }}</b>
+      </div>
+    </div>
 
-      <span class="d-flex flex-column align-center">
-        <v-chip
-          :color="reg ? 'success' : 'error'"
-          class="text-uppercase"
-          outlined
-          label
-        >
-          <span>Application {{ reg ? "registered" : "not registered" }}</span>
-        </v-chip>
+    <div class="mb-4">
+      <v-btn @click="openDialog" color="primary" rounded depressed>
+        <v-icon left>mdi-key</v-icon> Enter activation key
+      </v-btn>
+    </div>
 
-        <v-btn
-          v-if="reg"
-          @click="deactivateKey"
-          color="error"
-          class="mt-2"
-          small
-          rounded
-          depressed
-          dark
-        >
-          <v-icon left>mdi-cancel</v-icon> Deactivate key
-        </v-btn>
-      </span>
+    <div v-if="reg" class="mb-4">
+      <v-btn
+        @click="dialogDeactivateConfirm = true"
+        color="error"
+        rounded
+        depressed
+        dark
+      >
+        <v-icon left>mdi-cancel</v-icon>
+        <span v-text="`Deactivate key on this device`" />
+      </v-btn>
+    </div>
+
+    <div v-if="regInfo.license_type !== 'Lifetime'" class="mb-4">
+      <v-btn
+        @click="openLink('https://mediachips.app/')"
+        color="primary"
+        rounded
+        depressed
+      >
+        <v-icon left>mdi-cart</v-icon> Buy activation key for life
+      </v-btn>
+    </div>
+
+    <div v-if="regInfo.license_type !== 'Month'" class="mb-4">
+      <v-btn
+        @click="openLink('https://patreon.com/mediachips')"
+        color="#ff424d"
+        rounded
+        depressed
+        dark
+      >
+        <v-icon left>mdi-patreon</v-icon>
+        {{
+          regInfo.license_type !== "Lifetime"
+            ? "Subscribe monthly"
+            : "Support development"
+        }}
+      </v-btn>
     </div>
 
     <v-dialog
@@ -101,7 +92,7 @@
                 <v-form
                   v-model="valid"
                   @submit.prevent
-                  ref="license"
+                  ref="form"
                   class="d-flex"
                 >
                   <v-text-field
@@ -109,7 +100,7 @@
                     @keyup.enter="checkLicenseKey"
                     :rules="[(value) => !!value || 'Key is required']"
                     hint="XXXXXX-XXXXXX-XXXXXX-XXXXXX"
-                    label="License key"
+                    label="Activation key"
                     outlined
                     rounded
                     autofocus
@@ -148,10 +139,10 @@
           <v-stepper-content step="2" class="pa-0">
             <v-card :loading="isQueryRun">
               <v-card-text class="text-center body-1 pt-8">
-                <div>
+                <div class="mb-2">
                   Key: <b>{{ licenseKey }}</b>
                 </div>
-                <div>
+                <div class="mb-2">
                   Remaining number of devices for registration:
                   <b>{{ numberOfActivations }}</b>
                 </div>
@@ -176,8 +167,8 @@
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn @click="step = 1" class="ma-2 pr-4" text rounded>
-                  <v-icon large left>mdi-chevron-left</v-icon> 
-                  <span v-html="`Back to entering key`"/>
+                  <v-icon large left>mdi-chevron-left</v-icon>
+                  <span v-html="`Back to entering key`" />
                 </v-btn>
                 <v-btn
                   @click="register"
@@ -197,7 +188,7 @@
           </v-stepper-content>
 
           <v-stepper-content step="3" class="pa-0">
-            <v-card :loading="isQueryRun">
+            <v-card :loading="isQueryRun" class="pt-4">
               <v-card-text class="text-center body-1">
                 <b v-if="reg" class="green--text">Congratulations!</b>
                 <b v-else class="red--text">
@@ -223,7 +214,15 @@
         </v-stepper-items>
       </v-stepper>
     </v-dialog>
-  </v-card>
+
+    <DialogConfirm
+      v-if="dialogDeactivateConfirm"
+      @close="dialogDeactivateConfirm = false"
+      @confirm="deactivateKey"
+      :dialog="dialogDeactivateConfirm"
+      text="Deactivate the key for this device?"
+    />
+  </div>
 </template>
 
 
@@ -233,11 +232,15 @@ const axios = require("axios");
 
 export default {
   name: "SettingsRegistration",
+  components: {
+    DialogConfirm: () => import("@/components/dialogs/DialogConfirm.vue"),
+  },
   mounted() {
     if (this.regInfo.length == 0) this.regInfo = JSON.stringify(this.cleanObj);
   },
   data: () => ({
     dialog: false,
+    dialogDeactivateConfirm: false,
     step: 1,
     licenseKey: "",
     valid: false,
@@ -294,9 +297,10 @@ export default {
     },
     openLink(link) {
       // shell.openExternal(link);
+      window.open(link, "_newtab");
     },
     checkLicenseKey() {
-      this.$refs.license.validate();
+      this.$refs.form.validate();
       if (!this.valid) return;
       this.isQueryRun = true;
       let query =

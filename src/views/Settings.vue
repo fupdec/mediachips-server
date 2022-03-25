@@ -66,6 +66,7 @@
       <v-tab-item value="about">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <SettingsRegistration />
+          <v-divider class="my-8"></v-divider>
           <About />
         </v-card>
       </v-tab-item>
