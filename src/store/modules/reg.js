@@ -24,7 +24,7 @@ const Reg = {
       } = new StringCrypto(state.secretOptions);
       value = encryptString(value, state.secret);
       rootState.settings.registration = value;
-      await Vue.prototype.$setOption("regInfo", value);
+      await Vue.prototype.$setOption("registration", value);
     },
   },
   getters: {
