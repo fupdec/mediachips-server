@@ -10,7 +10,16 @@
       label="Language"
       rounded
       outlined
-    ></v-select>
+    >
+      <template v-slot:selection="data">
+        <country-flag :country="data.item.flag" size="big" class="lang-flag" />
+        <span class="pl-2">{{ data.item.name }}</span>
+      </template>
+      <template v-slot:item="data">
+        <country-flag :country="data.item.flag" size="big" class="lang-flag" />
+        <span class="pl-2">{{ data.item.name }}</span>
+      </template>
+    </v-select>
 
     <v-checkbox
       v-model="sets.typingFiltersDefault"
@@ -73,17 +82,33 @@
 
 <script>
 import Vue from "vue";
+import CountryFlag from "vue-country-flag";
 
 export default {
   name: "SettingsGeneral",
+  components: {
+    CountryFlag,
+  },
   data: () => ({
     locales: [
       {
+        value: "cn",
+        flag: "cn",
+        name: "漢語",
+      },
+      {
         value: "en",
+        flag: "gb",
         name: "English",
       },
       {
+        value: "es",
+        flag: "es",
+        name: "Español",
+      },
+      {
         value: "ru",
+        flag: "ru",
         name: "Русский",
       },
     ],
@@ -117,5 +142,9 @@ export default {
   b {
     color: var(--v-primary-base);
   }
+}
+.lang-flag {
+  transform: scale(0.6);
+  box-shadow: 0 0 10px 0 #7e7e7e79;
 }
 </style>

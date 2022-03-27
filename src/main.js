@@ -8,7 +8,9 @@ import App from './App.vue'
 import _ from 'lodash'
 
 import VueI18n from 'vue-i18n'
+import cn from './i18n/cn.js'
 import en from './i18n/en.js'
+import es from './i18n/es.js'
 import ru from './i18n/ru.js'
 
 Vue.set(Vue.prototype, '$_', _)
@@ -28,7 +30,9 @@ const i18n = new VueI18n({
   locale: 'en',
   fallbackLocale: 'en',
   messages: {
+    cn,
     en,
+    es,
     ru
   },
 })
