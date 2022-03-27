@@ -20,7 +20,7 @@
         <v-img
           :src="images.main"
           :aspect-ratio="meta.metaSetting.imageAspectRatio"
-          :class="{ show: !images.alt }"
+          :class="[{ static: images.alt }]"
           position="top"
           class="main-img"
         />

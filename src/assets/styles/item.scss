@@ -55,6 +55,13 @@
       }
     }
   }
+  .main-img {
+    &.static {
+      .v-image__image {
+        transform: none !important;
+      }
+    }
+  }
   .main-img,
   .thumb {
     cursor: pointer;
