@@ -16,7 +16,13 @@
           :color="item.color"
           v-html="'mdi-circle'"
         />
-        <!-- <div v-if="meta.metaSetting.country" class="country"> <div v-for="c in item.country.split(',')" :key="c" class="flag-icon"> {{c}} </div> </div> -->
+
+        <div v-if="meta.metaSetting.country" class="country">
+          <div v-for="i in countries" :key="i" class="flag-icon">
+            <country-flag :country="getFlag(i)" size="normal" :title="i" />
+          </div>
+        </div>
+
         <v-img
           :src="images.main"
           :aspect-ratio="meta.metaSetting.imageAspectRatio"
@@ -146,6 +152,8 @@ import Vue from "vue";
 import axios from "axios";
 import ComputedForItem from "@/mixins/ComputedForItem";
 import NestedItems from "@/components/items/NestedItems.vue";
+import CountryFlag from "vue-country-flag";
+import Countries from "@/assets/Countries.js";
 
 const path = require("path");
 
@@ -158,6 +166,7 @@ export default {
   },
   components: {
     NestedItems,
+    CountryFlag,
   },
   mixins: [ComputedForItem],
   mounted() {
@@ -182,6 +191,11 @@ export default {
     },
     page() {
       return this.$store.state.Page;
+    },
+    countries() {
+      let str = this.item.country;
+      if (str) return str.split(",");
+      else return "";
     },
   },
   methods: {
@@ -272,6 +286,11 @@ export default {
         y: e.clientY,
         content: contextMenu,
       });
+    },
+    getFlag(name) {
+      let country = Countries.find((i) => i.name == name);
+      if (country) return country.code;
+      else return null;
     },
   },
   watch: {
