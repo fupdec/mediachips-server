@@ -132,6 +132,7 @@ export default {
     }
   },
   mounted() {
+    this.val = this.value;
     this.getItems();
   },
   data: () => ({
