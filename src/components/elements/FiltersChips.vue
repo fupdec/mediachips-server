@@ -3,14 +3,14 @@
     <v-tooltip v-if="!isTooltip" top>
       <template v-slot:activator="{ on }">
         <v-btn
-          @click="removeAll"
           v-on="on"
-          fab
-          x-small
-          depressed
-          dark
+          @click="removeAll"
           color="error"
           class="mr-4"
+          depressed
+          x-small
+          dark
+          fab
         >
           <v-icon>mdi-filter-off</v-icon>
         </v-btn>
@@ -19,33 +19,32 @@
     </v-tooltip>
 
     <v-chip
-      v-for="(filter, i) in filters"
-      :key="i"
-      @click="remove(i)"
-      :disabled="filter.lock && !isTooltip"
-      class="ma-1 px-2"
-      small
+      v-for="(i, x) in filters"
+      :key="x"
+      @click="remove(x)"
+      :disabled="i.lock && !isTooltip"
       :color="isTooltip ? '#fff' : 'primary'"
       :outlined="isTooltip"
       :class="[{ readonly: isTooltip }]"
       :title="isTooltip ? '' : 'Remove filter'"
+      class="ma-1 px-2"
+      small
       dark
     >
-      <span v-if="!showIcons">
-        <v-icon small class="mr-1">
-          <!-- mdi-{{ getMeta(filter.by).settings.icon }} -->
-        </v-icon>
-        <v-icon small>mdi-{{ getCondIcon(filter.type, filter.cond) }}</v-icon>
+      <span v-if="showIcons">
+        <v-icon small class="mr-1"> mdi-{{ getByIcon(i.by) }} </v-icon>
+        <v-icon small>mdi-{{ getCondIcon(i.type, i.cond) }}</v-icon>
       </span>
       <span v-else>
-        <span class="mr-1"> "{{ filter.by }}" </span>
-        <span> {{ getCondText(filter.type, filter.cond) }} </span>
+        <span class="mr-1"> "{{ getByText(i.by) }}" </span>
+        <span> {{ getCondText(i.type, i.cond) }} </span>
       </span>
-      <span v-if="filter.type == 'array'" class="ml-1">
-        "{{ filter.val }}"
+
+      <span v-if="i.type == 'array'" class="ml-1">
+        "{{ getItemName(i.by, i.val) }}"
       </span>
-      <span v-else-if="filter.type == 'boolean'"></span>
-      <span v-else class="ml-1">"{{ filter.val }}"</span>
+      <span v-else-if="i.type == 'boolean'"></span>
+      <span v-else class="ml-1">"{{ i.val }}"</span>
       <!-- TODO remove empty quotes and create function for getting values -->
     </v-chip>
   </div>
@@ -68,7 +67,15 @@ export default {
       return this.type.toLowerCase() + "Filters";
     },
     showIcons() {
-      return this.$store.state.settings.showIconsInsteadTextOnFiltersChips;
+      return (
+        this.$store.state.settings.showIconsInsteadTextOnFiltersChips == "1"
+      );
+    },
+    meta() {
+      return this.$store.state.meta;
+    },
+    items() {
+      return this.$store.state.items;
     },
   },
   methods: {
@@ -77,6 +84,16 @@ export default {
     },
     remove(index) {
       this.$root.$emit("removeFilter", index);
+    },
+    getByIcon(metaId) {
+      const meta = this.meta.find((i) => i.id == metaId);
+      if (meta) return meta.icon;
+      return "shape";
+    },
+    getByText(metaId) {
+      const meta = this.meta.find((i) => i.id == metaId);
+      if (meta) return meta.name;
+      return "";
     },
     getCondIcon(type, cond) {
       const conds = Vue.prototype.$getListCond(type);
@@ -90,25 +107,15 @@ export default {
       if (x > -1) return conds[x].text;
       return "";
     },
-    getMetaItems(metaId, val) {
-      let meta = this.getMeta(metaId);
-      if (meta.type == "specific") {
-        if (metaId == "country")
-          return val.map((name) => _.find(Countries, { name }).name).join(", ");
-      } else if (meta.type == "simple")
-        return val
-          .map((id) => {
-            let item = _.find(meta.settings.items, { id });
-            if (item) return item.name;
-          })
-          .join(", ");
-      else if (meta.type == "complex")
-        return val
-          .map((id) => {
-            let item = _.find(this.getCards(metaId), { id });
-            if (item) return item.meta.name;
-          })
-          .join(", ");
+    getItemName(metaId, val) {
+      const items = this.items.filter((i) => i.metaId == metaId);
+      return val
+        .map((id) => {
+          let item = _.find(items, { id });
+          if (item) return item.name;
+          else return "";
+        })
+        .join(", ");
     },
   },
 };
