@@ -95,6 +95,13 @@
             <v-btn @click="pickColor" outlined rounded> Change Color </v-btn>
           </v-col>
 
+          <v-col v-if="meta.metaSetting.country" cols="12" lg="6">
+            <MetaInputCountry
+              @input="setVal($event, 'country')"
+              :value="vals.country"
+            />
+          </v-col>
+
           <v-col
             v-for="(i, x) in assigned"
             :key="x"
@@ -245,7 +252,6 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import MetaInputArray from "@/components/meta/input/MetaInputArray.vue";
 
 export default {
   name: "ItemEditing",
@@ -254,17 +260,13 @@ export default {
     meta: Object,
   },
   components: {
-    MetaInputArray,
+    MetaInputArray: () => import("@/components/meta/input/MetaInputArray.vue"),
+    MetaInputCountry: () =>
+      import("@/components/meta/input/MetaInputCountry.vue"),
     ColorPicker: () => import("@/components/elements/ColorPicker.vue"),
   },
   async beforeMount() {
-    this.vals.name = this.item.name || null;
-    this.vals.color = this.item.color || "#777";
-    this.vals.synonyms = this.item.synonyms || null;
-    this.vals.rating = this.item.rating || 0;
-    this.vals.favorite = this.item.favorite || 0;
-    this.vals.country = this.item.country || null;
-    this.vals.bookmark = this.item.bookmark || null;
+    this.initValues();
     await this.getMetaValues();
   },
   data: () => ({
@@ -293,6 +295,17 @@ export default {
     },
   },
   methods: {
+    initValues() {
+      let countries = this.item.country;
+      if (countries) countries = countries.split(",");
+      this.vals.country = countries || [];
+      this.vals.name = this.item.name || null;
+      this.vals.color = this.item.color || "#777";
+      this.vals.synonyms = this.item.synonyms || null;
+      this.vals.rating = this.item.rating || 0;
+      this.vals.favorite = this.item.favorite || 0;
+      this.vals.bookmark = this.item.bookmark || null;
+    },
     async getMetaValues() {
       let urlItems = `/api/ItemsInItem?itemId=${this.item.id}`;
       let items = [];
@@ -397,6 +410,7 @@ export default {
         let v = this.vals[key];
         let tv = typeof v;
         let isMeta = /\d/.test(key);
+        if (!isMeta) continue;
         if (tv == "string") {
           v = v.trim();
           if (v.length == 0) v = null;
@@ -421,10 +435,15 @@ export default {
         }
       }
 
+      let itemVals = _.cloneDeep(this.vals);
+      if (itemVals.country && itemVals.country.length)
+        itemVals.country = itemVals.country.join();
+      else itemVals.country = null;
+
       await axios({
         method: "put",
         url: this.apiUrl + "/api/item/" + this.item.id,
-        data: this.vals,
+        data: itemVals,
       });
 
       // removing existed items of item

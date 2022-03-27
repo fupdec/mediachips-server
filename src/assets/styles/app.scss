@@ -197,6 +197,10 @@ pre {
     margin: -10px;
   }
 }
+.lang-flag {
+  transform: scale(0.6);
+  box-shadow: 0 0 10px 0 #7e7e7e79;
+}
 .hover-image {
   pointer-events: none;
   position: fixed !important;

@@ -143,8 +143,4 @@ export default {
     color: var(--v-primary-base);
   }
 }
-.lang-flag {
-  transform: scale(0.6);
-  box-shadow: 0 0 10px 0 #7e7e7e79;
-}
 </style>
