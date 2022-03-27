@@ -65,6 +65,18 @@ const Readable = {
       if (type === "rating") return "mdi-star";
       return "mdi-shape";
     }
+    Vue.prototype.$foundByChars = function (text, query) {
+      text = text.toLowerCase();
+      let foundCharIndex = 0;
+      let foundAllChars = false;
+      for (let i = 0; i < query.length; i++) {
+        const char = query.charAt(i);
+        const x = text.indexOf(char, foundCharIndex);
+        if (x > -1) (foundAllChars = true), (foundCharIndex = x + 1);
+        else return false;
+      }
+      return foundAllChars;
+    }
     Vue.prototype.$getListCond = function (type) {
       if (!type) return [];
       else if (type == "number" || type == "date")

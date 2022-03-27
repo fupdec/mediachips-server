@@ -33,41 +33,40 @@
       </v-list-item>
     </template>
     <!-- TODO add rules -->
-    <template v-slot:selection="data">
+    <template v-slot:selection="{ attrs, item }">
       <v-chip
-        v-bind="data.attrs"
-        @click="removeItem(data.item.id)"
-        @mouseover.stop="hoverImage($event, data.item.id)"
+        v-bind="attrs"
+        @click="removeItem(item.id)"
+        @mouseover.stop="hoverImage($event, item.id)"
         @mouseleave.stop="hideHoverImage"
-        :input-value="data.selected"
-        :color="data.item.color"
         :label="meta.metaSetting.chipLabel"
         :outlined="meta.metaSetting.chipOutlined"
+        :color="item.color"
       >
-        <span>{{ data.item.name }}</span>
+        <span>{{ item.name }}</span>
       </v-chip>
     </template>
-    <template v-slot:item="data">
+    <template v-slot:item="{ item, parent }">
       <div
         @click="hideHoverImage"
-        @mouseover.stop="hoverImage($event, data.item.id)"
+        @mouseover.stop="hoverImage($event, item.id)"
         @mouseleave.stop="hideHoverImage"
         class="list-item"
       >
         <span v-if="meta.metaSetting.favorite">
-          <v-icon v-if="data.item.favorite" color="pink" left small>
+          <v-icon v-if="item.favorite" color="pink" left small>
             mdi-heart
           </v-icon>
           <v-icon v-else left small> mdi-heart-outline </v-icon>
         </span>
         <span v-if="meta.metaSetting.color">
-          <v-icon :color="data.item.color || ''" left size="14">
+          <v-icon :color="item.color || ''" left size="14">
             mdi-circle
           </v-icon>
         </span>
-        <span>{{ data.item.name }}</span>
+        <span v-html="parent.genFilteredText(item.name)"/>
         <span v-if="meta.metaSetting.synonyms" class="synonyms">
-          {{ data.item.synonyms }}
+          {{ item.synonyms }}
         </span>
       </div>
     </template>
@@ -229,23 +228,11 @@ export default {
     filterItems(itemObj, queryText, itemText) {
       let item = _.cloneDeep(itemObj);
       let query = queryText.toLowerCase();
+      const foundByChars = (text, query) => {
+        return Vue.prototype.$foundByChars(text, query);
+      };
 
-      function foundByChars(text, query) {
-        text = text.toLowerCase();
-        let foundCharIndex = 0;
-        let foundAllChars = false;
-        for (let i = 0; i < query.length; i++) {
-          const char = query.charAt(i);
-          const x = text.indexOf(char, foundCharIndex);
-          if (x > -1) (foundAllChars = true), (foundCharIndex = x + 1);
-          else return false;
-        }
-        return foundAllChars;
-      }
-
-      let filtersDefault = this.$store.state.settings.typingFiltersDefault;
-
-      if (filtersDefault == "1") {
+      if (this.$store.state.settings.typingFiltersDefault == "1") {
         let x = item.name.toLowerCase().indexOf(query);
         if (x > -1) return true;
         else {
