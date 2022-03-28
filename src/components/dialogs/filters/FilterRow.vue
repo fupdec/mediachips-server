@@ -118,9 +118,20 @@
       />
 
       <MetaInputArray
-        v-if="filter.type === 'array'"
+        v-if="filter.type === 'array' && /\d/.test(filter.by)"
         @input="setVal($event)"
         :metaId="filter.by"
+        :cond="filter.cond"
+        :value="filter.val"
+        :disabled="
+          filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
+        "
+        dialog="filtering"
+      />
+
+      <MetaInputCountry
+        v-if="filter.by === 'country'"
+        @input="setVal($event)"
         :cond="filter.cond"
         :value="filter.val"
         :disabled="
@@ -175,6 +186,8 @@ export default {
   },
   components: {
     MetaInputArray: () => import("@/components/meta/input/MetaInputArray.vue"),
+    MetaInputCountry: () =>
+      import("@/components/meta/input/MetaInputCountry.vue"),
   },
   data: () => ({
     valid: false,

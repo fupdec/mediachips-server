@@ -2,8 +2,9 @@ module.exports = function (db) {
   // Create and Save a new FilterRow
   const create = async function (req, res) {
     let filterObj = req.body.filter
-    let val = filterObj.val
-    if (filterObj.type == 'array') filterObj.val = null
+    if (filterObj.type == 'array' && filterObj.by !== 'country') 
+      filterObj.val = null
+    if (filterObj.by == 'country') filterObj.val = filterObj.val.join(',')
 
     const [filterRow, isCreated] = await db.FilterRow.findOrCreate({
       where: {
@@ -25,7 +26,7 @@ module.exports = function (db) {
       })
     }
 
-    if (filterObj.type == 'array') {
+    if (filterObj.type == 'array' && filterObj.by !== 'country') {
       // deleting previously stored values
       await db.ItemsInFilterRow.destroy({
         where: {
@@ -33,7 +34,7 @@ module.exports = function (db) {
         }
       })
       if (!filterObj.cond.includes('null'))
-        for (let i of val) {
+        for (let i of filterObj.val) {
           await db.ItemsInFilterRow.findOrCreate({
             where: {
               itemId: i,

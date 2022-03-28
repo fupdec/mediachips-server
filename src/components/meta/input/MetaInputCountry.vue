@@ -4,13 +4,17 @@
     :value="val"
     :items="countries"
     :filter="filterCountry"
-    :prepend-icon="showIcons ? 'mdi-flag' : ''"
+    :rules="[rules]"
+    :disabled="disabled"
+    :prepend-icon="showIcons && !dialog ? 'mdi-flag' : ''"
+    :hide-details="dialog ? true : false"
+    :outlined="dialog ? true : false"
     append-icon="mdi-chevron-down"
     item-text="name"
     item-value="name"
     label="Country"
     ref="field"
-    class="hidden-close"
+    class="val"
     hide-selected
     multiple
     clearable
@@ -39,6 +43,14 @@ export default {
   props: {
     value: Array,
     dialog: String,
+    cond: {
+      type: String,
+      default: null,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     CountryFlag,

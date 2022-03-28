@@ -1,4 +1,4 @@
-const Cols = require('../../filter-cols')
+const Cols = require('../../filter-cols.js')
 
 const Readable = {
   install(Vue, options) {
@@ -72,7 +72,7 @@ const Readable = {
       for (let i = 0; i < query.length; i++) {
         const char = query.charAt(i);
         const x = text.indexOf(char, foundCharIndex);
-        if (x > -1) (foundAllChars = true), (foundCharIndex = x + 1);
+        if (x > -1)(foundAllChars = true), (foundCharIndex = x + 1);
         else return false;
       }
       return foundAllChars;
@@ -254,41 +254,55 @@ const Readable = {
       const isFilterTypeArray = filters.some(i => i.type === 'array')
 
       const getQueryFromFilter = (i) => {
+        let union = i.union
+        let by = i.by
+        let cond = i.cond
+        let val = i.val
         let q = ""
-        if (videoCols.includes(i.by)) i.by = 'videoMetadata.' + i.by
+        if (videoCols.includes(by)) by = 'videoMetadata.' + by
         if (i.type === 'string') {
-          q += `${i.union} ${i.by} ${i.cond} `;
-          if (!i.cond.includes('null')) {
-            q += `'%${i.val}%' `;
+          q += `${union} ${by} ${cond} `;
+          if (!cond.includes('null')) {
+            q += `'%${val}%' `;
           }
         } else if (i.type === 'number') { // TODO add rating type
-          q += `${i.union} ${i.by} ${i.cond} ${i.val} `;
+          q += `${union} ${by} ${cond} ${val} `;
         } else if (i.type === 'date') {
-          q += `${i.union} ${i.by} ${i.cond} '${i.val} 00:00:00.000' `;
+          q += `${union} ${by} ${cond} '${val} 00:00:00.000' `;
         } else if (i.type === 'boolean') {
-          q += `${i.union} ${i.by} ${i.cond} 1 `;
+          q += `${union} ${by} ${cond} 1 `;
+        } else if (by === 'country') {
+          q += `${union} `;
+          if (!cond.includes('null'))
+            for (let x = 0; x < val.length; x++) {
+              const country = val[x];
+              if (x != 0) q += `OR `;
+              cond = cond.replace('in', 'LIKE')
+              q += `items.country ${cond} '%${country}%' `;
+            }
+          else q += `items.country ${cond} `;
         } else if (i.type === 'array') {
           let parent = 'media'
           if (type == 'items') parent = 'parentItem'
-          q += `${i.union} `
-          if (i.cond == 'not in') {
+          q += `${union} `
+          if (cond == 'not in') {
             q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
               ${type}.id = itemsIn${type}.${parent}Id
-                AND itemsIn${type}.itemId IN (${i.val.join()}) ) `
-          } else if (i.cond == 'in all') {
+                AND itemsIn${type}.itemId IN (${val.join()}) ) `
+          } else if (cond == 'in all') {
             q += `( `
-            for (let j = 0; j < i.val.length; j++) {
+            for (let j = 0; j < val.length; j++) {
               if (j != 0) q += `AND `
-              q += `itemsIn${type}.itemId = ${i.val[j]} `
+              q += `itemsIn${type}.itemId = ${val[j]} `
             }
             q += `) `
-          } else if (i.cond == 'is null') {
+          } else if (cond == 'is null') {
             q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
               ${type}.id = itemsIn${type}.${parent}Id
-                AND itemsIn${type}.metaId = ${i.by} ) `
-          } else if (i.cond == 'not null') {
-            q += `itemsIn${type}.metaId = ${i.by} `
-          } else q += `itemsIn${type}.itemId ${i.cond} (${i.val.join()}) `;
+                AND itemsIn${type}.metaId = ${by} ) `
+          } else if (cond == 'not null') {
+            q += `itemsIn${type}.metaId = ${by} `
+          } else q += `itemsIn${type}.itemId ${cond} (${val.join()}) `;
         }
         return q
       }

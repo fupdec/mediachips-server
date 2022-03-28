@@ -79,7 +79,7 @@
 
 <script>
 import axios from "axios";
-import Cols from "../../../filter-cols";
+import Cols from "../../../filter-cols.js";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
 

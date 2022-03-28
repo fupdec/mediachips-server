@@ -307,6 +307,12 @@ export default {
 
       for (let i of filterRows) {
         if (i.filterRow.type !== "array") continue;
+        if (i.filterRow.by === "country") {
+          let v = i.filterRow.val;
+          i.filterRow.val = v ? v.split(',') : [];
+          continue;
+        }
+
         let vals = [];
 
         await axios
