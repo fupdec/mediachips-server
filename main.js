@@ -1,21 +1,27 @@
 const {
+  app,
   BrowserWindow,
-  Menu,
-  app
+  ipcMain
 } = require('electron')
 const server = require('./server.js')
 const path = require('path')
 
-let mainWindow = null
+let win = null
 
 function main() {
-  mainWindow = new BrowserWindow({
+  win = new BrowserWindow({
     backgroundColor: '#333',
     icon: path.join(__dirname, 'dist/icons', 'icon.png'),
+    webPreferences: {
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      nodeIntegrationInWorker: true,
+      webSecurity: false,
+      contextIsolation: false
+    }
   })
-  mainWindow.loadURL(`http://localhost:${server.config.port}/`)
-  mainWindow.on('close', () => {
-    mainWindow = null
+  win.loadURL(`http://localhost:${server.config.port}/`)
+  win.on('close', () => {
+    win = null
   })
 }
 
@@ -28,6 +34,16 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-// let systemMenu = Menu.buildFromTemplate([])
-
-// Menu.setApplicationMenu(systemMenu)
+// window events from render process
+ipcMain.on('closeApp', () => {
+  win.close()
+})
+ipcMain.handle('maximize', () => {
+  win.maximize()
+})
+ipcMain.handle('unmaximize', () => {
+  win.unmaximize()
+})
+ipcMain.handle('minimize', () => {
+  win.minimize()
+})

@@ -1,12 +1,14 @@
 <template>
   <v-app v-if="isApiReady">
+    <!-- <SystemBar v-if="showSystemBar && isElectron" :disabled="login" /> -->
+    <AppBar />
+
     <SideBar v-if="sets.bottomBar == '0'" />
     <BottomBar v-if="sets.bottomBar == '1'" />
 
     <Player v-show="isPlayerActive" />
 
     <v-main app :class="[{ 'bottom-bar': sets.bottomBar == '1' }]">
-      <AppBar />
       <router-view :key="$route.fullPath" />
     </v-main>
 
@@ -55,8 +57,8 @@ import Vue from "vue";
 import axios from "axios";
 import AddingMedia from "@/mixins/AddingMedia.vue";
 import Watcher from "@/mixins/Watcher.vue";
+import SystemBar from "@/components/app/SystemBar.vue";
 /* TODO
- * countries array
  * playlists: remake as meta
  * toggle visibility of each meta in items on page
  * settings for meta list for each meta
@@ -64,6 +66,7 @@ import Watcher from "@/mixins/Watcher.vue";
 export default {
   name: "App",
   components: {
+    SystemBar,
     AppBar: () => import("@/components/app/AppBar.vue"),
     SideBar: () => import("@/components/app/SideBar.vue"),
     BottomBar: () => import("@/components/app/BottomBar.vue"),
@@ -111,6 +114,13 @@ export default {
     login: false,
   }),
   computed: {
+    showSystemBar() {
+      console.log(process.platform);
+      return process.platform === "win32";
+    },
+    isElectron() {
+      return this.$store.state.isElectron;
+    },
     apiUrl() {
       return this.$store.state.localhost;
     },
