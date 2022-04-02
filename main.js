@@ -3,7 +3,7 @@ const {
   BrowserWindow,
   ipcMain
 } = require('electron')
-const server = require('./server.js')
+const server = require('./app/server.js')
 const path = require('path')
 
 let win = null

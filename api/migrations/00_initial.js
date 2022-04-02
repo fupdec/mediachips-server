@@ -1,7 +1,7 @@
 // const {
 // 	Sequelize
 // } = require('sequelize');
-const Settings = require('../../default-settings')
+const Settings = require('../../app/configs/default-settings')
 
 async function up({
 	context: queryInterface

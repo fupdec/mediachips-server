@@ -6,7 +6,7 @@ import Player from './modules/player.js'
 import Reg from './modules/reg.js'
 import Tasks from './modules/tasks.js'
 import Watcher from './modules/watcher.js'
-const Settings = require('./../../default-settings.js')
+const Settings = require('../../app/configs/default-settings.js')
 
 Vue.use(Vuex)
 

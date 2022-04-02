@@ -1,4 +1,4 @@
-const Cols = require('../../filter-cols.js')
+const Cols = require('../../app/configs/filter-cols.js')
 
 const Readable = {
   install(Vue, options) {

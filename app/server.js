@@ -22,7 +22,7 @@ app.use(router)
 
 
 // creating default config
-const configPath = path.join(__dirname, 'dist/config.json')
+const configPath = path.join(__dirname, '../dist/config.json')
 let defaultConfig = {
   port: 5555,
   databases: []
@@ -65,7 +65,7 @@ fs.writeFileSync(configPath, JSON.stringify(config, null, 2), (err) => {
 
 
 // creating default folders for databases
-const databasesPath = path.join(__dirname, 'databases')
+const databasesPath = path.join(__dirname, '../databases')
 let userDirs = [databasesPath]
 for (let i of config.databases) {
   const dbPath = path.join(databasesPath, i.id)
@@ -102,7 +102,7 @@ const sequelize = new Sequelize({
     multipleStatements: true
   }
 })
-const db = require("./api")(sequelize);
+const db = require("../api")(sequelize);
 db.config = dbConfig
 
 // testing database connection
@@ -118,7 +118,7 @@ db.sequelize.sync({
   // force: true
 }).then(async () => {
   // migration system
-  const migrationsPath = path.join(__dirname, 'api/migrations/*.js')
+  const migrationsPath = path.join(__dirname, '../api/migrations/*.js')
   const umzug = new Umzug({
     migrations: {
       glob: migrationsPath
@@ -135,7 +135,7 @@ db.sequelize.sync({
 
 
 // using vue's built as static files
-const src = path.join(__dirname, 'dist')
+const src = path.join(__dirname, '../dist')
 const staticFileMiddleware = express.static(src)
 app.use(staticFileMiddleware)
 app.use(history({
@@ -146,34 +146,34 @@ app.use(staticFileMiddleware)
 
 
 // REST api
-require("./api/routes/ChildMeta.routes")(app, db)
-require("./api/routes/FilterRow.routes")(app, db)
-require("./api/routes/FilterRowsInSavedFilter.routes")(app, db)
-require("./api/routes/Item.routes")(app, db)
-require("./api/routes/ItemsInFilterRow.routes")(app, db)
-require("./api/routes/ItemsInItem.routes")(app, db)
-require("./api/routes/ItemsInMedia.routes")(app, db)
-require("./api/routes/Mark.routes")(app, db)
-require("./api/routes/Media.routes")(app, db)
-require("./api/routes/MediaType.routes")(app, db)
-require("./api/routes/Meta.routes")(app, db)
-require("./api/routes/MetaInMediaType.routes")(app, db)
-require("./api/routes/MediaTypesInWatchedFolders.routes")(app, db)
-require("./api/routes/MetaSetting.routes")(app, db)
-require("./api/routes/PageSetting.routes")(app, db)
-require("./api/routes/SavedFilter.routes")(app, db)
-require("./api/routes/Setting.routes")(app, db)
-require("./api/routes/Task.routes")(app, db)
-require("./api/routes/ValuesInItem.routes")(app, db)
-require("./api/routes/ValuesInMedia.routes")(app, db)
-require("./api/routes/VideoMetadata.routes")(app, db)
-require("./api/routes/WatchedFolder.routes")(app, db)
+require("../api/routes/ChildMeta.routes")(app, db)
+require("../api/routes/FilterRow.routes")(app, db)
+require("../api/routes/FilterRowsInSavedFilter.routes")(app, db)
+require("../api/routes/Item.routes")(app, db)
+require("../api/routes/ItemsInFilterRow.routes")(app, db)
+require("../api/routes/ItemsInItem.routes")(app, db)
+require("../api/routes/ItemsInMedia.routes")(app, db)
+require("../api/routes/Mark.routes")(app, db)
+require("../api/routes/Media.routes")(app, db)
+require("../api/routes/MediaType.routes")(app, db)
+require("../api/routes/Meta.routes")(app, db)
+require("../api/routes/MetaInMediaType.routes")(app, db)
+require("../api/routes/MediaTypesInWatchedFolders.routes")(app, db)
+require("../api/routes/MetaSetting.routes")(app, db)
+require("../api/routes/PageSetting.routes")(app, db)
+require("../api/routes/SavedFilter.routes")(app, db)
+require("../api/routes/Setting.routes")(app, db)
+require("../api/routes/Task.routes")(app, db)
+require("../api/routes/ValuesInItem.routes")(app, db)
+require("../api/routes/ValuesInMedia.routes")(app, db)
+require("../api/routes/VideoMetadata.routes")(app, db)
+require("../api/routes/WatchedFolder.routes")(app, db)
 
 app.post('/api/get-file', jsonParser, (req, res) => {
   if (req.body.outside) res.sendFile(req.body.url)
   else
     res.sendFile(req.body.url, {
-      root: __dirname
+      root: path.join(__dirname, '../')
     })
 })
 // Stream video

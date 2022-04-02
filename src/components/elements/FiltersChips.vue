@@ -57,7 +57,7 @@
 
 <script>
 import Vue from "vue";
-const Cols = require("../../../filter-cols.js");
+const Cols = require("../../../app/configs/filter-cols.js");
 
 export default {
   name: "FiltersChips",

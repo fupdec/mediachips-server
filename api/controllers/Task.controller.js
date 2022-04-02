@@ -274,7 +274,7 @@ module.exports = function (db) {
       }
       await db.VideoMetadata.bulkCreate(videoMetadata)
     }).then(async () => {
-      const Settings = require('../../default-settings')
+      const Settings = require('../../app/configs/default-settings')
       const settings = obj.settings
       let allowed = Settings.map(i => i.option)
 
