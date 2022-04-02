@@ -4,7 +4,6 @@ node_modules
 /databases
 /release
 server.log
-db.sqlite
 /public/config.json
 .project
 db.vuerd.json
