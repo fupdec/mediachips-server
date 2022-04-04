@@ -1,5 +1,6 @@
 <template>
   <v-system-bar
+    v-show="os == 'Windows_NT'"
     :class="{ maximized: maximized }"
     :style="{ background: headerColor }"
     window
@@ -42,18 +43,17 @@
 
 
 <script>
-// import { ipcRenderer } from 'electron';
-
 export default {
   name: "SystemBar",
   props: {
     disabled: Boolean,
+    os: [Boolean, String],
   },
   mounted() {
-    ipcRenderer.on("maximize", () => {
+    window.ipc.on("maximize", () => {
       this.maximized = true;
     });
-    ipcRenderer.on("unmaximize", () => {
+    window.ipc.on("unmaximize", () => {
       this.maximized = false;
     });
   },
@@ -78,18 +78,18 @@ export default {
   },
   methods: {
     minimize() {
-      ipcRenderer.invoke("minimize");
+      window.ipcRenderer.invoke("minimize");
     },
     maximize() {
       this.maximized = true;
-      ipcRenderer.invoke("maximize");
+      window.ipcRenderer.invoke("maximize");
     },
     unmaximize() {
       this.maximized = false;
-      ipcRenderer.invoke("unmaximize");
+      window.ipcRenderer.invoke("unmaximize");
     },
     close() {
-      ipcRenderer.send("closeApp");
+      window.ipcRenderer.send("closeApp");
     },
   },
 };

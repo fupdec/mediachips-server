@@ -8,6 +8,12 @@ html {
 pre {
   font-family: inherit;
 }
+header {
+  -webkit-app-region: drag;
+  .v-btn {
+    -webkit-app-region: no-drag;
+  }
+}
 ::selection {
   background: var(--v-secondary-base);
 }

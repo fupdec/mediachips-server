@@ -1,6 +1,6 @@
 <template>
   <v-app v-if="isApiReady">
-    <!-- <SystemBar v-if="showSystemBar && isElectron" :disabled="login" /> -->
+    <SystemBar v-if="sysBar" :os="sysBar" :disabled="login" />
     <AppBar />
 
     <SideBar v-if="sets.bottomBar == '0'" />
@@ -114,12 +114,9 @@ export default {
     login: false,
   }),
   computed: {
-    showSystemBar() {
-      console.log(process.platform);
-      return process.platform === "win32";
-    },
-    isElectron() {
-      return this.$store.state.isElectron;
+    sysBar() {
+      if (!window.os) return false
+      else return window.os.type();
     },
     apiUrl() {
       return this.$store.state.localhost;

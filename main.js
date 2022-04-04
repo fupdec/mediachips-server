@@ -3,29 +3,35 @@ const {
   BrowserWindow,
   ipcMain
 } = require('electron')
+const os = require('os')
 const server = require('./app/server.js')
 const path = require('path')
 
 let win = null
 
-function main() {
+function createMainWindow() {
   win = new BrowserWindow({
+    frame: os.type() !== 'Windows_NT',
     backgroundColor: '#333',
     icon: path.join(__dirname, 'dist/icons', 'icon.png'),
     webPreferences: {
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      nodeIntegrationInWorker: true,
-      webSecurity: false,
-      contextIsolation: false
+      preload: path.join(__dirname, 'electron/preload.js'),
+      contextIsolation: true
     }
   })
   win.loadURL(`http://localhost:${server.config.port}/`)
   win.on('close', () => {
     win = null
   })
+  win.on('maximize', () => {
+    win.webContents.send('maximize')
+  })
+  win.on('unmaximize', () => {
+    win.webContents.send('unmaximize')
+  })
 }
 
-app.on('ready', main)
+app.on('ready', createMainWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
