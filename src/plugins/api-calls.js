@@ -8,6 +8,7 @@ const ApiCalls = {
         axios.get('/config.json')
           .then(res => {
             const config = res.data
+            // for docker image replace ip to localhost
             options.store.state.localhost = `http://${config.ip}:${config.port}`;
             const db = config.databases.find(i => i.active);
             const dbPath = path.join(__dirname, "databases", db.id);
