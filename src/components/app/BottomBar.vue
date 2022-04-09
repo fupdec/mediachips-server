@@ -52,6 +52,7 @@
 
           <v-menu
             v-if="mediaTypesHidden.length || hiddenMeta.length"
+            max-height="80vh"
             open-on-hover
             offset-y
             top
