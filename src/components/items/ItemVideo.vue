@@ -15,6 +15,7 @@
         @mouseover.capture="playPreview()"
         @mouseleave="stopPlayingPreview()"
         :aspect-ratio="16 / 9"
+        :class="[{ 'no-file': !isFileExists }]"
         class="video-preview-container"
       >
         <div v-if="!reg && x > 9" class="reg-block">
@@ -148,11 +149,11 @@
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
-      :class="{ favorite: media.favorite }"
+      :class="[{ 'no-file': !isFileExists }, { favorite: media.favorite }]"
+      class="media-card meta-card"
       :disabled="!reg && x > 9"
       outlined
       hover
-      class="media-card meta-card"
     >
       <div
         @click="play"
