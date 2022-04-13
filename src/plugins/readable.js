@@ -65,6 +65,21 @@ const Readable = {
       if (type === "rating") return "mdi-star";
       return "mdi-shape";
     }
+    Vue.prototype.$getUrlParam = function (param) {
+      let id = options.router.history.current.query[param];
+      if (id.length == 0) id = undefined
+      return id ? +id : null
+    }
+    Vue.prototype.$getTabUrl = function (tab) {
+      let params = {}
+      for (let key in tab) {
+        if (!tab[key]) continue
+        if (key === 'id') params.tabId = tab[key]
+        else if (key.toLowerCase().includes('id')) params[key] = tab[key]
+      }
+      const searchParams = new URLSearchParams(params)
+      return tab.url + '?' + searchParams.toString()
+    }
     Vue.prototype.$foundByChars = function (text, query) {
       text = text.toLowerCase();
       let foundCharIndex = 0;

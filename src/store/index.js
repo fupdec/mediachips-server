@@ -35,6 +35,7 @@ export default new Vuex.Store({
     mediaTypes: [],
     items: [],
     meta: [],
+    tabs: [],
     notifications: [],
     settings: Settings,
   }),

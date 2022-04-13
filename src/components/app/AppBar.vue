@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar :color="color" clipped-left dense app>
+  <v-app-bar :color="color" extension-height="28" clipped-left dense app>
     <template v-slot:img="{ props }">
       <v-img v-bind="props" :gradient="gradient"></v-img>
     </template>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <!-- <template v-slot:extension v-if="tabs.length>0"> <Tabs /> </template> -->
+    <template v-slot:extension v-if="tabs.length > 0"> <Tabs /> </template>
   </v-app-bar>
 </template>
 
@@ -57,7 +57,7 @@
 export default {
   name: "AppBar",
   components: {
-    // Tabs: () => import('@/components/elements/Tabs.vue'),
+    Tabs: () => import("@/components/app/appbar/Tabs.vue"),
     GlobalSearch: () => import("@/components/app/appbar/GlobalSearch.vue"),
     Tasks: () => import("@/components/app/appbar/Tasks.vue"),
     Notifications: () => import("@/components/app/appbar/Notifications.vue"),
@@ -92,7 +92,9 @@ export default {
     reg() {
       return this.$store.getters.reg;
     },
-    // tabs() { return this.$store.getters.tabs },
+    tabs() {
+      return this.$store.state.tabs;
+    },
   },
   methods: {
     toggleSelect() {

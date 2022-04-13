@@ -93,6 +93,7 @@ export default {
     await this.getMediaTypes();
     await this.getItems();
     await this.getMeta();
+    await this.getTabs();
     this.checkLogin();
     this.checkElectronRunning();
     await this.getMachineId();
@@ -103,10 +104,14 @@ export default {
     this.$root.$on("getMeta", () => {
       this.getMeta();
     });
+    this.$root.$on("getTabs", () => {
+      this.getTabs();
+    });
   },
   beforeDestroy() {
     this.$root.$off("getItems");
     this.$root.$off("getMeta");
+    this.$root.$off("getTabs");
   },
   data: () => ({
     isServerError: false,
@@ -180,6 +185,16 @@ export default {
         .get(this.apiUrl + "/api/meta")
         .then((res) => {
           this.$store.state.meta = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async getTabs() {
+      await axios
+        .get(this.apiUrl + "/api/tab")
+        .then((res) => {
+          this.$store.state.tabs = res.data;
         })
         .catch((e) => {
           console.log(e);

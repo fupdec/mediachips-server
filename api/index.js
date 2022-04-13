@@ -23,6 +23,7 @@ module.exports = function (sequelize) {
   const PageSetting = require("./models/PageSetting.model")(sequelize, Sequelize);
   const SavedFilter = require("./models/SavedFilter.model")(sequelize, Sequelize);
   const Setting = require("./models/Setting.model")(sequelize, Sequelize);
+  const Tab = require("./models/Tab.model")(sequelize, Sequelize);
   const ValuesInItem = require("./models/ValuesInItem.model")(sequelize, Sequelize);
   const ValuesInMedia = require("./models/ValuesInMedia.model")(sequelize, Sequelize);
   const VideoMetadata = require("./models/VideoMetadata.model")(sequelize, Sequelize);
@@ -304,6 +305,28 @@ module.exports = function (sequelize) {
     foreignKey: 'rowId'
   })
 
+  Meta.hasMany(Tab, {
+    foreignKey: 'metaId',
+    onDelete: "cascade"
+  })
+  Tab.belongsTo(Meta, {
+    foreignKey: 'metaId'
+  })
+  MediaType.hasMany(Tab, {
+    foreignKey: 'typeId',
+    onDelete: "cascade"
+  })
+  Tab.belongsTo(MediaType, {
+    foreignKey: 'typeId'
+  })
+  Item.hasMany(Tab, {
+    foreignKey: 'itemId',
+    onDelete: "cascade"
+  })
+  Tab.belongsTo(Item, {
+    foreignKey: 'itemId'
+  })
+
 
   db.ChildMeta = ChildMeta
   db.FilterRow = FilterRow
@@ -322,6 +345,7 @@ module.exports = function (sequelize) {
   db.PageSetting = PageSetting
   db.SavedFilter = SavedFilter
   db.Setting = Setting
+  db.Tab = Tab
   db.ValuesInItem = ValuesInItem
   db.ValuesInMedia = ValuesInMedia
   db.VideoMetadata = VideoMetadata
