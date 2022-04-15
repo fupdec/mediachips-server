@@ -67,7 +67,6 @@ const Readable = {
     }
     Vue.prototype.$getUrlParam = function (param) {
       let id = options.router.history.current.query[param];
-      if (id.length == 0) id = undefined
       return id ? +id : null
     }
     Vue.prototype.$getTabUrl = function (tab) {

@@ -50,7 +50,8 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res.data);
+          const url = Vue.prototype.$getTabUrl(res.data);
+          this.$router.push(url);
           this.$root.$emit("getTabs");
         })
         .catch((e) => {

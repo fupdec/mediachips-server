@@ -5,18 +5,16 @@
       v-bind="dragOptions"
       @start="drag = true"
       @end="drag = false"
-      class="tabs-group"
     >
-      <transition-group type="transition" style="display: flex">
+      <transition-group type="transition" class="d-flex">
         <v-tab
-          v-for="tab in tabs"
+          v-for="(tab, x) in tabs"
           @click.middle.prevent.stop="closeTab($event, tab.id)"
-          @contextmenu.stop="showContextMenu($event, tab.id)"
+          @contextmenu.stop="showContextMenu($event, tab.id, x)"
           :key="tab.id"
           :id="tab.id"
-          :to="tab.link"
+          :to="getTabUrl(tab)"
           :ripple="false"
-          class="tabs-group-item"
           exact
         >
           <div class="tab-name" :title="tab.name">
@@ -79,35 +77,44 @@ export default {
     },
   },
   methods: {
-    async closeTab(e, id) {
+    async closeTab(e, tabId) {
       e.preventDefault();
-      await axios.delete(this.apiUrl + "/api/tab/" + id);
+      if (this.tabId == tabId) this.$router.push("/");
+      await axios.delete(this.apiUrl + "/api/tab/" + tabId);
       this.$root.$emit("getTabs");
     },
-    closeTabsOnRight(tabId) {
-      this.tabs.length = this.getTabIndexById(tabId) + 1;
-      this.tabs = this.tabs;
-      if (this.getTabIndexById(this.tabId) > -1) return;
-      const link = this.tabs[this.getTabIndexById(tabId)].url;
-      this.$router.push(link);
+    async closeTabsOnRight(index) {
+      if (index < -1) return; // tab doesn't exists
+      const indexCurrent = this.tabs.findIndex((i) => i.id == this.tabId);
+      if (indexCurrent > index) this.changeRoute(index);
+      const closed = this.tabs.slice(index + 1);
+      await this.deleteTabs(closed);
+      this.$root.$emit("getTabs");
     },
-    closeTabsOther(tabId) {
-      this.tabs = this.tabs.filter((i) => i.id == tabId);
-      const tab = this.tabs[this.getTabIndexById(tabId)];
-      if (this.tabId && this.tabId !== tabId) this.changeRoute(tab);
+    async closeTabsOther(tabId, index) {
+      const closed = this.tabs.filter((i) => i.id !== tabId);
+      if (this.tabId && this.tabId !== tabId) this.changeRoute(index);
+      await this.deleteTabs(closed);
+      this.$root.$emit("getTabs");
     },
-    closeTabsAll() {
-      this.tabs = [];
-      if (this.tabId !== "default") this.$router.push("/home");
+    async closeTabsAll() {
+      if (this.tabId) this.$router.push("/");
+      await this.deleteTabs(this.tabs);
+      this.$root.$emit("getTabs");
     },
-    changeRoute(tab) {
-      const url = Vue.prototype.$getTabUrl(tab);
-      this.$router.push(this.apiUrl + url);
+    changeRoute(tabIndex) {
+      const tab = this.tabs[tabIndex];
+      const url = this.getTabUrl(tab);
+      this.$router.push(url);
     },
-    getTabIndexById(tabId) {
-      return this.tabs.findIndex((i) => i.id == tabId);
+    getTabUrl(tab) {
+      return Vue.prototype.$getTabUrl(tab);
     },
-    showContextMenu(e, tabId) {
+    async deleteTabs(tabs) {
+      for (let tab of tabs)
+        await axios.delete(this.apiUrl + "/api/tab/" + tab.id);
+    },
+    showContextMenu(e, tabId, index) {
       e.preventDefault();
       let contextMenu = [
         {
@@ -115,7 +122,7 @@ export default {
           type: "item",
           icon: "close",
           action: () => {
-            this.closeTab(tabId);
+            this.closeTab(e, tabId);
           },
         },
         {
@@ -123,18 +130,18 @@ export default {
           type: "item",
           icon: "format-horizontal-align-right",
           action: () => {
-            this.closeTabsOnRight(tabId);
+            this.closeTabsOnRight(index);
           },
-          disabled: this.tabs.length == this.getTabIndexById(tabId) + 1,
+          disabled: this.tabs.length - 1 == index,
         },
         {
           name: `Close Other Tabs`,
           type: "item",
           icon: "swap-horizontal",
           action: () => {
-            this.closeTabsOther(tabId);
+            this.closeTabsOther(tabId, index);
           },
-          disabled: this.tabs.length < 2,
+          disabled: this.tabs.length == 1,
         },
         {
           name: `Close All Tabs`,
@@ -154,20 +161,3 @@ export default {
   },
 };
 </script>
-
-
-<style lang="scss" scoped>
-.flip-tabs-move {
-  transition: transform 0.2s;
-}
-.no-move {
-  transition: transform 0s;
-}
-.ghost {
-  opacity: 0.2;
-  background: #777;
-}
-.tabs-group-item {
-  cursor: default;
-}
-</style>
