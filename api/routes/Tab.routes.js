@@ -8,6 +8,9 @@ module.exports = (app, db) => {
   // Retrieve all Tab
   router.get("/", Tab.findAll);
 
+  // Update a Tab with id
+  router.put("/:id", Tab.update);
+
   // Delete a Tab with id
   router.delete("/:id", Tab.deleteOne);
 

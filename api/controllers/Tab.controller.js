@@ -22,6 +22,24 @@ module.exports = function (db) {
       })
   }
 
+  // Update a Tab by the id in the request
+  const update = function (req, res) {
+    db.Tab
+      .update(req.body, {
+        where: {
+          id: req.params.id
+        }
+      })
+      .then(() => {
+        res.sendStatus(201)
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while performing query."
+        })
+      })
+  };
+
   // Delete a Tab with the specified id in the request
   const deleteOne = function (req, res) {
     db.Tab
@@ -43,6 +61,7 @@ module.exports = function (db) {
   return {
     create,
     findAll,
+    update,
     deleteOne
   }
 }

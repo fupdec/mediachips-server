@@ -118,6 +118,15 @@ export default {
       e.preventDefault();
       let contextMenu = [
         {
+          name: `Edit Name`,
+          type: "item",
+          icon: "pencil",
+          action: () => {
+            this.editName(index);
+          },
+        },
+        { type: "divider" },
+        {
           name: `Close Tab`,
           type: "item",
           icon: "close",
@@ -157,6 +166,10 @@ export default {
         y: e.clientY,
         content: contextMenu,
       });
+    },
+    editName(index) {
+      this.$store.state.Dialogs.tabEditing.tab = this.tabs[index];
+      this.$store.state.Dialogs.tabEditing.show = true;
     },
   },
 };

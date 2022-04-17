@@ -49,6 +49,8 @@
     </div>
 
     <template v-slot:extension v-if="tabs.length > 0"> <Tabs /> </template>
+
+    <DialogTabEditing />
   </v-app-bar>
 </template>
 
@@ -61,6 +63,7 @@ export default {
     GlobalSearch: () => import("@/components/app/appbar/GlobalSearch.vue"),
     Tasks: () => import("@/components/app/appbar/Tasks.vue"),
     Notifications: () => import("@/components/app/appbar/Notifications.vue"),
+    DialogTabEditing: () => import("@/components/dialogs/DialogTabEditing.vue"),
   },
   mounted() {},
   data: () => ({

@@ -23,6 +23,10 @@ const Dialogs = {
       show: false,
       text: null,
     },
+    tabEditing: {
+      show: false,
+      tab: null,
+    },
   }),
   mutations: {},
   actions: {},
