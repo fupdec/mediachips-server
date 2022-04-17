@@ -130,6 +130,8 @@ export default {
       import("@/components/dialogs/DialogImageEditing.vue"),
   },
   async beforeMount() {
+    this.metaId = Vue.prototype.$getUrlParam("metaId");
+    this.itemId = Vue.prototype.$getUrlParam("itemId");
     const filter = await Vue.prototype.$createDbEntry(
       {
         name: null,
@@ -151,6 +153,8 @@ export default {
     await this.init();
   },
   data: () => ({
+    metaId: null,
+    itemId: null,
     tab: null,
     meta: {
       metaSetting: {},
@@ -177,12 +181,6 @@ export default {
     },
     reg() {
       return this.$store.getters.reg;
-    },
-    metaId() {
-      return +this.$route.query.metaId;
-    },
-    itemId() {
-      return +this.$route.query.itemId;
     },
     isTextDark() {
       return Vue.prototype.$checkColorForDarkText(this.bgc);

@@ -6,6 +6,7 @@
     <ItemsSort />
     <ItemsAppearance />
     <ItemsSelect />
+    <TabAdd />
   </div>
 </template>
 
@@ -14,6 +15,7 @@
 export default {
   name: "ItemAppbar",
   components: {
+    TabAdd: () => import("@/components/app/appbar/elements/TabAdd.vue"),
     ItemsFilter: () =>
       import("@/components/app/appbar/elements/ItemsFilter.vue"),
     ItemsSearch: () =>

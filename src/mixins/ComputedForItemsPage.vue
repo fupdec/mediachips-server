@@ -21,20 +21,12 @@ export default {
     isItemPage() {
       return Vue.prototype.$checkCurrentPage("item");
     },
-    typeId() {
-      return +this.$route.query.typeId;
-    },
-    metaId() {
-      return +this.$route.query.metaId;
-    },
-    itemId() {
-      return +this.$route.query.itemId;
-    },
     mediaType() {
       const mediaTypes = this.$store.state.mediaTypes;
-      if (mediaTypes.length == 0 || !this.typeId) return { type: null };
+      const typeId = Vue.prototype.$getUrlParam("typeId")
+      if (mediaTypes.length == 0 || !typeId) return { type: null };
       else {
-        const type = _.find(mediaTypes, (i) => i.id == this.typeId);
+        const type = _.find(mediaTypes, (i) => i.id == typeId);
         this.$store.state.Dialogs.mediaEditing.mediaType = type;
         return type;
       }

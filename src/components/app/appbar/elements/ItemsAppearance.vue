@@ -73,6 +73,7 @@
 
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 
@@ -96,12 +97,12 @@ export default {
       };
       if (this.isMetaPage) {
         url += "ChildMeta";
-        data.metaId = this.metaId;
+        data.metaId = Vue.prototype.$getUrlParam("metaId");
         data.childMetaId = meta.childMetaId;
       } else if (this.isMediaPage) {
         url += "MetaInMediaType";
         data.metaId = meta.metaId;
-        data.typeId = this.typeId;
+        data.typeId = Vue.prototype.$getUrlParam("typeId");
       }
       await axios({
         method: "put",

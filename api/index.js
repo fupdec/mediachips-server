@@ -58,21 +58,21 @@ module.exports = function (sequelize) {
   })
 
   PageSetting.removeAttribute('id')
-  Meta.hasOne(PageSetting, {
+  Meta.hasMany(PageSetting, {
     foreignKey: 'metaId',
     onDelete: "cascade"
   })
   PageSetting.belongsTo(Meta, {
     foreignKey: 'metaId'
   })
-  MediaType.hasOne(PageSetting, {
+  MediaType.hasMany(PageSetting, {
     foreignKey: 'typeId',
     onDelete: "cascade"
   })
   PageSetting.belongsTo(MediaType, {
     foreignKey: 'typeId'
   })
-  Item.hasOne(PageSetting, {
+  Item.hasMany(PageSetting, {
     foreignKey: 'itemId',
     onDelete: "cascade"
   })
@@ -325,6 +325,20 @@ module.exports = function (sequelize) {
   })
   Tab.belongsTo(Item, {
     foreignKey: 'itemId'
+  })
+  Tab.hasMany(PageSetting, {
+    foreignKey: 'tabId',
+    onDelete: "cascade"
+  })
+  PageSetting.belongsTo(Tab, {
+    foreignKey: 'tabId'
+  })
+  Tab.hasMany(SavedFilter, {
+    foreignKey: 'tabId',
+    onDelete: "cascade"
+  })
+  SavedFilter.belongsTo(Tab, {
+    foreignKey: 'tabId'
   })
 
 

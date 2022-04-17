@@ -78,6 +78,7 @@
 
 
 <script>
+import Vue from "vue";
 import axios from "axios";
 import Cols from "../../../app/configs/filter-cols.js";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
@@ -185,7 +186,7 @@ export default {
         media.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
         this.listBy = [...this.listBy, ...media];
 
-        if (this.typeId == 1) {
+        if (Vue.prototype.$getUrlParam("typeId") == 1) {
           this.listBy.push({ header: "Video" });
 
           let video = this.cols.video;

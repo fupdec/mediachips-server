@@ -2,6 +2,7 @@ module.exports = function (db) {
   // Create and Save a new FilterRow
   const create = async function (req, res) {
     let filterObj = req.body.filter
+    let val = filterObj.val
     if (filterObj.type == 'array' && filterObj.by !== 'country') 
       filterObj.val = null
     if (filterObj.by == 'country') filterObj.val = filterObj.val.join(',')
@@ -33,8 +34,9 @@ module.exports = function (db) {
           rowId: filterRow.id
         }
       })
+      // TODO fix multiple filter rows with items as param 'by' 
       if (!filterObj.cond.includes('null'))
-        for (let i of filterObj.val) {
+        for (let i of val) {
           await db.ItemsInFilterRow.findOrCreate({
             where: {
               itemId: i,

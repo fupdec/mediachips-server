@@ -174,6 +174,10 @@ export default {
   },
   mixins: [GeneratingThumbsForVideos, ComputedForItemsPage],
   async beforeMount() {
+    this.typeId = Vue.prototype.$getUrlParam("typeId");
+    this.itemId = Vue.prototype.$getUrlParam("itemId");
+    this.metaId = Vue.prototype.$getUrlParam("metaId");
+    this.tabId = Vue.prototype.$getUrlParam("tabId");
     this.page.itemsOnPage = [];
     this.$store.commit("updateStatePage", {
       key: "isSelect",
@@ -244,6 +248,10 @@ export default {
     if (this.isInfiniteScroll) this.updatePageSetting({ page: 1 });
   },
   data: () => ({
+    itemId: null,
+    typeId: null,
+    metaId: null,
+    tabId: null,
     meta: null,
     total: 1,
     totalInDb: 0,
@@ -278,9 +286,10 @@ export default {
         method: "post",
         url: this.apiUrl + "/api/SavedFilter",
         data: {
-          itemId: this.itemId || null,
-          typeId: this.typeId || null,
-          metaId: this.metaId || null,
+          itemId: this.itemId,
+          typeId: this.typeId,
+          metaId: this.metaId,
+          tabId: this.tabId,
         },
       })
         .then((res) => {
@@ -309,7 +318,7 @@ export default {
         if (i.filterRow.type !== "array") continue;
         if (i.filterRow.by === "country") {
           let v = i.filterRow.val;
-          i.filterRow.val = v ? v.split(',') : [];
+          i.filterRow.val = v ? v.split(",") : [];
           continue;
         }
 
@@ -369,9 +378,10 @@ export default {
     },
     async getPageSettings() {
       let data = {};
-      data.itemId = this.itemId || null;
-      data.typeId = this.typeId || null;
-      data.metaId = this.metaId || null;
+      data.itemId = this.itemId;
+      data.typeId = this.typeId;
+      data.metaId = this.metaId;
+      data.tabId = this.tabId;
 
       await axios({
         method: "post",
@@ -396,9 +406,10 @@ export default {
     },
     updatePageSetting(data) {
       let query = {};
-      query.itemId = this.itemId || null;
-      query.typeId = this.typeId || null;
-      query.metaId = this.metaId || null;
+      query.itemId = this.itemId;
+      query.typeId = this.typeId;
+      query.metaId = this.metaId;
+      query.tabId = this.tabId;
       axios({
         method: "put",
         url: this.apiUrl + "/api/PageSetting",
