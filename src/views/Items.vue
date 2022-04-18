@@ -114,6 +114,7 @@
       />
     </v-container>
 
+    <!-- TODO init saved page number -->
     <v-pagination
       v-show="page.itemsOnPage.length && !isInfiniteScroll"
       :value="page.page"
@@ -174,10 +175,7 @@ export default {
   },
   mixins: [GeneratingThumbsForVideos, ComputedForItemsPage],
   async beforeMount() {
-    this.typeId = Vue.prototype.$getUrlParam("typeId");
-    this.itemId = Vue.prototype.$getUrlParam("itemId");
-    this.metaId = Vue.prototype.$getUrlParam("metaId");
-    this.tabId = Vue.prototype.$getUrlParam("tabId");
+    // clearing previous values
     this.page.itemsOnPage = [];
     this.$store.commit("updateStatePage", {
       key: "isSelect",
@@ -187,6 +185,15 @@ export default {
       key: "selection",
       value: [],
     });
+    this.$store.commit("updateStatePage", {
+      key: "filters",
+      value: [],
+    });
+    // getting values
+    this.typeId = Vue.prototype.$getUrlParam("typeId");
+    this.itemId = Vue.prototype.$getUrlParam("itemId");
+    this.metaId = Vue.prototype.$getUrlParam("metaId");
+    this.tabId = Vue.prototype.$getUrlParam("tabId");
     await this.init();
   },
   mounted() {
@@ -299,7 +306,9 @@ export default {
           console.log(e);
         });
 
-      let filterRows = [];
+      if (_.isEmpty(savedFilter)) return;
+
+      let filters = [];
       await axios
         .get(
           this.apiUrl +
@@ -308,16 +317,17 @@ export default {
             savedFilter.id
         )
         .then((res) => {
-          filterRows = res.data;
+          filters = res.data;
         })
         .catch((e) => {
           console.log(e);
         });
 
-      for (let i of filterRows) {
-        if (i.filterRow.type !== "array") continue;
-        if (i.filterRow.by === "country") {
-          let v = i.filterRow.val;
+      for (let i of filters) {
+        const fltr = _.cloneDeep(i.filterRow);
+        if (fltr.type !== "array") continue;
+        if (fltr.by === "country") {
+          let v = fltr.val;
           i.filterRow.val = v ? v.split(",") : [];
           continue;
         }
@@ -325,9 +335,7 @@ export default {
         let vals = [];
 
         await axios
-          .get(
-            this.apiUrl + "/api/ItemsInFilterRow" + "?rowId=" + i.filterRow.id
-          )
+          .get(this.apiUrl + "/api/ItemsInFilterRow" + "?rowId=" + fltr.id)
           .then((res) => {
             vals = res.data;
           })
@@ -338,7 +346,7 @@ export default {
         if (vals.length > 0) i.filterRow.val = vals.map((i) => i.itemId);
       }
 
-      filterRows = filterRows.map((i) => {
+      filters = filters.map((i) => {
         let by = i.filterRow.by;
         if (/\d/.test(by)) i.filterRow.by = +by;
         delete i.filterRow.createdAt;
@@ -348,7 +356,7 @@ export default {
 
       this.$store.commit("updateStatePage", {
         key: "filters",
-        value: filterRows,
+        value: filters,
       });
 
       this.$store.commit("updateStatePage", {
@@ -423,10 +431,11 @@ export default {
       await axios
         .get(this.apiUrl + "/api/meta/" + this.metaId)
         .then((res) => {
-          this.meta = res.data;
-          this.page.name = this.meta.name;
-          this.page.nameSingular = this.meta.nameSingular;
-          this.page.icon = this.meta.icon;
+          const meta = _.cloneDeep(res.data);
+          this.meta = meta;
+          this.page.name = meta.name;
+          this.page.nameSingular = meta.nameSingular;
+          this.page.icon = meta.icon;
         })
         .catch((e) => {
           console.log(e);
@@ -436,7 +445,7 @@ export default {
       await axios
         .get(this.apiUrl + "/api/MediaType/" + this.typeId)
         .then((res) => {
-          const mediaType = res.data;
+          const mediaType = _.cloneDeep(res.data);
           this.page.name = mediaType.name;
           this.page.nameSingular = mediaType.nameSingular;
           this.page.icon = mediaType.icon;

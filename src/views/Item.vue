@@ -103,7 +103,7 @@
         <Items />
       </v-tab-item>
     </v-tabs-items> -->
-    <Items />
+    <Items v-if="isLoaded" />
     <DialogImageEditing
       v-if="dialogImageEditing"
       @edited="getImages"
@@ -148,6 +148,7 @@ export default {
       },
       "PageSetting"
     );
+    this.isLoaded = true;
   },
   async mounted() {
     await this.init();
@@ -156,6 +157,7 @@ export default {
     metaId: null,
     itemId: null,
     tab: null,
+    isLoaded: false,
     meta: {
       metaSetting: {},
     },
