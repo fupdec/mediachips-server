@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="headline text-h4 d-flex align-center justify-center pt-4 pb-2">
-      <v-icon left>mdi-{{ page.icon }}</v-icon> {{ page.name }}
+      <v-icon left>mdi-{{ Items.icon }}</v-icon> {{ Items.name }}
       <span v-if="total != totalInDb" class="body-1 text--secondary ml-2">
         ({{ total }} of {{ totalInDb }})
       </span>
@@ -9,20 +9,20 @@
     </div>
 
     <v-container
-      v-if="page.filters.length > 0"
+      v-if="Items.filters.length > 0"
       class="d-flex justify-center align-start"
       fluid
     >
-      <FiltersChips :filters="page.filters" />
+      <FiltersChips :filters="Items.filters" />
     </v-container>
 
     <v-container
-      v-if="page.itemsOnPage.length && !isInfiniteScroll"
+      v-if="Items.itemsOnPage.length && !isInfiniteScroll"
       class="d-flex justify-center align-center"
       fluid
     >
       <v-pagination
-        :value="page.page"
+        :value="Items.page"
         @input="changePage($event)"
         :length="pages"
         :total-visible="$vuetify.breakpoint.xs ? 5 : sets.numberOfPagesLimit"
@@ -39,8 +39,8 @@
           <v-card-text>
             <div>Jump to page</div>
             <v-text-field
-              v-model="page.jumpPage"
-              @keypress.enter="jumpToPage(page.jumpPage)"
+              v-model="Items.jumpPage"
+              @keypress.enter="jumpToPage(Items.jumpPage)"
               type="number"
               autofocus
               dense
@@ -61,16 +61,16 @@
     <v-container
       v-if="mediaType.type == 'video' || isItemPage"
       :class="[
-        `item-size-${page.size}`,
+        `item-size-${Items.size}`,
         `gap-size-${sets.gapSize}`,
-        { 'card-grid': page.view == '1' },
-        { 'line-grid': page.view == '2' },
+        { 'card-grid': Items.view == '1' },
+        { 'line-grid': Items.view == '2' },
       ]"
       class="wide-image"
       fluid
     >
       <ItemVideo
-        v-for="(i, x) in page.itemsOnPage"
+        v-for="(i, x) in Items.itemsOnPage"
         :key="i.id"
         :media="i"
         :reg="reg"
@@ -81,12 +81,12 @@
 
     <v-container
       v-if="['image', 'audio', 'text'].includes(mediaType.type)"
-      :class="[`item-size-${page.size}`, `gap-size-${sets.gapSize}`]"
+      :class="[`item-size-${Items.size}`, `gap-size-${sets.gapSize}`]"
       class="card-grid"
       fluid
     >
       <ItemImage
-        v-for="(i, x) in page.itemsOnPage"
+        v-for="(i, x) in Items.itemsOnPage"
         :key="i.id"
         :media="i"
         :reg="reg"
@@ -99,14 +99,14 @@
       v-else-if="isMetaPage"
       fluid
       :class="[
-        `item-size-${page.size}`,
+        `item-size-${Items.size}`,
         `gap-size-${sets.gapSize}`,
-        { 'card-grid': page.view == '1' },
-        { 'chips-grid': page.view == '2' },
+        { 'card-grid': Items.view == '1' },
+        { 'chips-grid': Items.view == '2' },
       ]"
     >
       <ItemMeta
-        v-for="i in page.itemsOnPage"
+        v-for="i in Items.itemsOnPage"
         :key="i.id"
         :item="i"
         :meta="meta"
@@ -116,8 +116,8 @@
 
     <!-- TODO init saved page number -->
     <v-pagination
-      v-show="page.itemsOnPage.length && !isInfiniteScroll"
-      :value="page.page"
+      v-show="Items.itemsOnPage.length && !isInfiniteScroll"
+      :value="Items.page"
       @input="changePage($event)"
       :length="pages"
       :total-visible="$vuetify.breakpoint.xs ? 5 : sets.numberOfPagesLimit"
@@ -135,15 +135,15 @@
     </div>
 
     <div
-      v-if="page.itemsOnPage.length && isInfiniteScroll"
+      v-if="Items.itemsOnPage.length && isInfiniteScroll"
       class="text-center py-6"
     >
       <Loading
-        v-if="loader.show && page.page != pages"
+        v-if="loader.show && Items.page != pages"
         v-intersect="infiniteScrolling"
       />
       <v-btn
-        v-if="page.page == pages"
+        v-if="Items.page == pages"
         @click="scrollTop"
         class="mb-4"
         color="primary"
@@ -176,16 +176,16 @@ export default {
   mixins: [GeneratingThumbsForVideos, ComputedForItemsPage],
   async beforeMount() {
     // clearing previous values
-    this.page.itemsOnPage = [];
-    this.$store.commit("updateStatePage", {
+    this.Items.itemsOnPage = [];
+    this.$store.commit("updateStateItems", {
       key: "isSelect",
       value: false,
     });
-    this.$store.commit("updateStatePage", {
+    this.$store.commit("updateStateItems", {
       key: "selection",
       value: [],
     });
-    this.$store.commit("updateStatePage", {
+    this.$store.commit("updateStateItems", {
       key: "filters",
       value: [],
     });
@@ -210,11 +210,11 @@ export default {
       this.getItemsFromDb();
     });
     this.$root.$on("setItemsLimit", (val) => {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "page",
         value: 1,
       });
-      if (val == 101) this.page.itemsOnPage = [];
+      if (val == 101) this.Items.itemsOnPage = [];
       this.updatePageSetting({
         page: 1,
         limit: val,
@@ -272,7 +272,7 @@ export default {
   }),
   computed: {
     isInfiniteScroll() {
-      return this.page.limit === 101;
+      return this.Items.limit === 101;
     },
     reg() {
       return this.$store.getters.reg;
@@ -354,12 +354,12 @@ export default {
         return i.filterRow;
       });
 
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "filters",
         value: filters,
       });
 
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "savedFilter",
         value: savedFilter,
       });
@@ -367,11 +367,11 @@ export default {
       if (this.isItemPage) this.initFilterForItemPage();
     },
     initFilterForItemPage() {
-      const index = this.page.filters.findIndex(
+      const index = this.Items.filters.findIndex(
         (i) => i.metaId == this.metaId && i.lock == true
       );
       if (index < 0)
-        this.page.filters.push({
+        this.Items.filters.push({
           id: null,
           by: this.metaId,
           type: "array",
@@ -399,14 +399,14 @@ export default {
         .then((res) => {
           let vals = ["page", "limit", "size", "view", "sortBy", "sortDir"];
           for (let i of vals)
-            this.$store.commit("updateStatePage", {
+            this.$store.commit("updateStateItems", {
               key: i,
               value: res.data[0][i],
             });
 
           // if page settings created then update filter id for it
           if (res.data[1])
-            this.updatePageSetting({ filterId: this.page.savedFilter.id });
+            this.updatePageSetting({ filterId: this.Items.savedFilter.id });
         })
         .catch((e) => {
           console.log(e);
@@ -433,9 +433,9 @@ export default {
         .then((res) => {
           const meta = _.cloneDeep(res.data);
           this.meta = meta;
-          this.page.name = meta.name;
-          this.page.nameSingular = meta.nameSingular;
-          this.page.icon = meta.icon;
+          this.Items.name = meta.name;
+          this.Items.nameSingular = meta.nameSingular;
+          this.Items.icon = meta.icon;
         })
         .catch((e) => {
           console.log(e);
@@ -446,9 +446,9 @@ export default {
         .get(this.apiUrl + "/api/MediaType/" + this.typeId)
         .then((res) => {
           const mediaType = _.cloneDeep(res.data);
-          this.page.name = mediaType.name;
-          this.page.nameSingular = mediaType.nameSingular;
-          this.page.icon = mediaType.icon;
+          this.Items.name = mediaType.name;
+          this.Items.nameSingular = mediaType.nameSingular;
+          this.Items.icon = mediaType.icon;
         })
         .catch((e) => {
           console.log(e);
@@ -457,9 +457,9 @@ export default {
     async getItemsFromDb() {
       let url = "/api/";
       let sets = {};
-      sets.sortBy = this.page.sortBy;
-      sets.sortDir = this.page.sortDir;
-      sets.filters = _.cloneDeep(this.page.filters);
+      sets.sortBy = this.Items.sortBy;
+      sets.sortDir = this.Items.sortDir;
+      sets.filters = _.cloneDeep(this.Items.filters);
       if (this.isMetaPage) {
         url += "item/filter";
         sets.metaId = this.metaId;
@@ -482,14 +482,14 @@ export default {
             this.loader.show = true;
           }, 500);
           this.isQueryRun = false;
-          this.$store.commit("updateStatePage", {
+          this.$store.commit("updateStateItems", {
             key: "items",
             value: res.data.items,
           });
           this.total = res.data.items.length;
           this.totalInDb = res.data.total;
-          this.page.itemsOnPage = [];
-          this.page.page = 1;
+          this.Items.itemsOnPage = [];
+          this.Items.page = 1;
           this.getItemsOnPage();
         })
         .catch((e) => {
@@ -498,19 +498,19 @@ export default {
         });
     },
     getItemsOnPage() {
-      const items = _.cloneDeep(this.page.items);
-      const limit = this.isInfiniteScroll ? 25 : this.page.limit;
-      const start = (this.page.page - 1) * limit;
+      const items = _.cloneDeep(this.Items.items);
+      const limit = this.isInfiniteScroll ? 25 : this.Items.limit;
+      const start = (this.Items.page - 1) * limit;
       const end = start + limit;
       const pages = Math.ceil(this.total / limit);
       this.pages = pages;
       if (this.isInfiniteScroll) {
-        this.page.itemsOnPage = [
-          ...this.page.itemsOnPage,
+        this.Items.itemsOnPage = [
+          ...this.Items.itemsOnPage,
           ...items.slice(start, end),
         ];
       } else {
-        this.page.itemsOnPage = items.slice(start, end);
+        this.Items.itemsOnPage = items.slice(start, end);
       }
       // TODO jump to the fisrt page if current page greater than total pages
     },
@@ -524,7 +524,7 @@ export default {
       await axios
         .get(this.apiUrl + url)
         .then((res) => {
-          this.$store.commit("updateStatePage", {
+          this.$store.commit("updateStateItems", {
             key: "assigned",
             value: res.data,
           });
@@ -534,7 +534,7 @@ export default {
         });
     },
     changePage(val) {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "page",
         value: val,
       });
@@ -542,10 +542,10 @@ export default {
       this.updatePageSetting({ page: val });
     },
     infiniteScrolling() {
-      if (this.page.page >= this.pages) return;
-      this.$store.commit("updateStatePage", {
+      if (this.Items.page >= this.pages) return;
+      this.$store.commit("updateStateItems", {
         key: "page",
-        value: this.page.page + 1,
+        value: this.Items.page + 1,
       });
       this.getItemsOnPage();
     },
@@ -554,17 +554,17 @@ export default {
       main.scrollTop = 0;
     },
     jumpToPage() {
-      if (this.page.jumpPage === null) return;
-      let val = Number(this.page.jumpPage);
+      if (this.Items.jumpPage === null) return;
+      let val = Number(this.Items.jumpPage);
       if (val < 1) val = 1;
       else if (val > this.pages) val = this.pages;
-      if (val !== this.page.page) this.page.page = val;
-      this.page.jumpPage = val;
+      if (val !== this.Items.page) this.Items.page = val;
+      this.Items.jumpPage = val;
       this.changePage(val);
     },
   },
   watch: {
-    "page.size"(val, old) {
+    "Items.size"(val, old) {
       if (val === old) return;
       this.updatePageSetting({ size: val });
     },

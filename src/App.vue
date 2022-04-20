@@ -129,8 +129,8 @@ export default {
     isPlayerActive() {
       return this.$store.state.Player.active;
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets: {
       get() {
@@ -239,7 +239,7 @@ export default {
     $route(to) {
       document.title = to.name + " - mediaChips";
     },
-    "page.name"(name) {
+    "Items.name"(name) {
       document.title = name + " - mediaChips";
     },
   },

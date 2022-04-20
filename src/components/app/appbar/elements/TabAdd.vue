@@ -31,8 +31,8 @@ export default {
         });
       },
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
   },
   methods: {
@@ -41,8 +41,8 @@ export default {
         method: "post",
         url: this.apiUrl + "/api/tab",
         data: {
-          name: this.page.name,
-          icon: this.page.icon,
+          name: this.Items.name,
+          icon: this.Items.icon,
           url: this.$route.path,
           itemId: Vue.prototype.$getUrlParam("itemId"),
           typeId: Vue.prototype.$getUrlParam("typeId"),

@@ -35,11 +35,11 @@ export default {
     ],
   }),
   computed: {
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     index() {
-      return this.list.findIndex((i) => i.val == this.page.view);
+      return this.list.findIndex((i) => i.val == this.Items.view);
     },
     view() {
       return this.list[this.index] ? this.list[this.index].val : "";
@@ -68,7 +68,7 @@ export default {
       }
     },
     update(val) {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "view",
         value: val,
       });

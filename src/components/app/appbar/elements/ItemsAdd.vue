@@ -9,7 +9,7 @@
         <v-card>
           <DialogHeader
             @close="dialogNames = false"
-            :header="`Adding ${page.name}`"
+            :header="`Adding ${Items.name}`"
             :buttons="buttons"
             closable
           />
@@ -31,7 +31,7 @@
         </v-card>
       </v-dialog>
     </template>
-    <span> Add {{ page.nameSingular }} </span>
+    <span> Add {{ Items.nameSingular }} </span>
   </v-tooltip>
 </template>
 
@@ -61,8 +61,8 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
   },
   methods: {
@@ -81,7 +81,7 @@ export default {
       await this.$refs.form.validate();
       if (!this.valid) return;
       let names = Vue.prototype.$transformTextToArray(this.names);
-      const items = this.page.items;
+      const items = this.Items.all;
       this.dups = [];
       this.added = [];
 

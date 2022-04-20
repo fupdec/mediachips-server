@@ -5,7 +5,7 @@
         <v-icon>mdi-checkbox-marked-outline</v-icon>
       </v-btn>
     </template>
-    <span>Select Multiple {{ page.name }}</span>
+    <span>Select Multiple {{ Items.name }}</span>
   </v-tooltip>
 </template>
 
@@ -21,19 +21,19 @@ export default {
         return this.$store.state.isSelect;
       },
       set(value) {
-        this.$store.commit("updateStatePage", {
+        this.$store.commit("updateStateItems", {
           key: "isSelect",
           value: value,
         });
       },
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
   },
   methods: {
     toggleSelect() {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "selection",
         value: [],
       });

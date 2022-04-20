@@ -15,7 +15,7 @@
       <v-list dense>
         <v-subheader>Items Per Page</v-subheader>
         <v-btn-toggle
-          :value="page.limit"
+          :value="Items.limit"
           @change="updateLimit($event)"
           color="primary"
           mandatory
@@ -31,7 +31,7 @@
 
         <v-subheader>Item Size</v-subheader>
         <v-btn-toggle
-          :value="page.size"
+          :value="Items.size"
           @change="updateSize($event)"
           color="primary"
           mandatory
@@ -48,9 +48,9 @@
         <v-subheader>View</v-subheader>
         <ItemsView />
 
-        <v-subheader v-if="page.assigned.length">Meta</v-subheader>
+        <v-subheader v-if="Items.assigned.length">Meta</v-subheader>
         <v-list-item
-          v-for="(i, x) in page.assigned"
+          v-for="(i, x) in Items.assigned"
           :key="x"
           @click="toggle(i)"
           link
@@ -85,8 +85,8 @@ export default {
   mixins: [ComputedForItemsPage],
   data: () => ({}),
   computed: {
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
   },
   methods: {
@@ -112,14 +112,14 @@ export default {
       this.$root.$emit("updateAssignedMeta");
     },
     updateLimit(val) {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "limit",
         value: val,
       });
       this.$root.$emit("setItemsLimit", val);
     },
     updateSize(val) {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "size",
         value: val,
       });

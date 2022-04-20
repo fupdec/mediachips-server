@@ -74,7 +74,7 @@ export default {
   }),
   computed: {
     assigned() {
-      return this.$store.state.Page.assigned;
+      return this.$store.state.Items.assigned;
     },
   },
   methods: {

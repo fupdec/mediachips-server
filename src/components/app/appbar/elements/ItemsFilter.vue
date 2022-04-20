@@ -8,7 +8,7 @@
       </v-btn>
       <DialogItemsFilter :dialog="dialogFilter" @close="dialogFilter = false" />
     </template>
-    <span>Filter {{ page.name }}</span>
+    <span>Filter {{ Items.name }}</span>
   </v-tooltip>
 </template>
 
@@ -24,11 +24,11 @@ export default {
     dialogFilter: false,
   }),
   computed: {
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     badge() {
-      return this.$store.state.Page.filters.length;
+      return this.$store.state.Items.filters.length;
     },
   },
 };

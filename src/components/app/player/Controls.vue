@@ -296,7 +296,7 @@ export default {
   }),
   computed: {
     assigned() {
-      let list = this.$store.state.Page.assigned;
+      let list = this.$store.state.Items.assigned;
       return list.filter((i) => i.meta.metaSetting.marks);
     },
     p: {

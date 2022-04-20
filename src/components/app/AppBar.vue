@@ -11,15 +11,15 @@
       <img :src="logoPath" alt="mediaChips" width="28" height="28" />
     </v-btn> -->
 
-          <div v-if="page.isSelect" class="d-flex align-center">
+          <div v-if="Items.isSelect" class="d-flex align-center">
             <v-btn @click="toggleSelect" icon class="mr-2">
               <v-icon>mdi-close</v-icon>
             </v-btn>
 
             {{
-              page.selection.length
-                ? `${page.selection.length} selected`
-                : `Please select ${page.name.toLowerCase()}`
+              Items.selection.length
+                ? `${Items.selection.length} selected`
+                : `Please select ${Items.name.toLowerCase()}`
             }}
           </div>
 
@@ -86,8 +86,8 @@ export default {
       gradient = gradient.replace(")", "");
       return gradient;
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets() {
       return this.$store.state.settings;
@@ -101,11 +101,11 @@ export default {
   },
   methods: {
     toggleSelect() {
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "isSelect",
-        value: !this.page.isSelect,
+        value: !this.Items.isSelect,
       });
-      this.$store.commit("updateStatePage", {
+      this.$store.commit("updateStateItems", {
         key: "selection",
         value: [],
       });

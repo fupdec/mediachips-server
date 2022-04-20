@@ -130,8 +130,8 @@ export default {
         this.$store.state.Player = value;
       },
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets() {
       return this.$store.state.settings;
@@ -159,7 +159,7 @@ export default {
       this.p.currentTime = 0;
       this.p.active = false;
       this.p.paused = false;
-      document.title = this.page.name + " - mediaChips";
+      document.title = this.Items.name + " - mediaChips";
     },
     initPlayer() {
       this.p.player.addEventListener("loadedmetadata", () => {

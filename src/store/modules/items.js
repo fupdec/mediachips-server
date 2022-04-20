@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const Page = {
+const Items = {
   state: () => ({
     page: 1,
     jumpPage: null,
@@ -22,7 +22,7 @@ const Page = {
     assigned: [], // assigned meta
   }),
   mutations: {
-    updateStatePage(state, {
+    updateStateItems(state, {
       key,
       value
     }) {
@@ -33,4 +33,4 @@ const Page = {
   getters: {}
 }
 
-export default Page
+export default Items

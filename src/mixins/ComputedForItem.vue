@@ -5,10 +5,10 @@ export default {
   computed: {
     selection: {
       get() {
-        return this.$store.state.Page.selection;
+        return this.$store.state.Items.selection;
       },
       set(value) {
-        this.$store.commit("updateStatePage", {
+        this.$store.commit("updateStateItems", {
           key: "selection",
           value: value,
         });

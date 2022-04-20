@@ -6,8 +6,8 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets() {
       return this.$store.state.settings;

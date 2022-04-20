@@ -1,7 +1,7 @@
 <template>
   <v-lazy>
     <v-card
-      v-if="page.view == '1'"
+      v-if="Items.view == '1'"
       @contextmenu.stop="showMenu"
       v-ripple="{ class: 'primary--text' }"
       :class="{ favorite: item.favorite }"
@@ -106,7 +106,7 @@
       </div>
 
       <v-overlay
-        :value="page.isSelect"
+        :value="Items.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         z-index="1"
@@ -119,7 +119,7 @@
     </v-card>
 
     <v-chip
-      v-else-if="page.view == '2'"
+      v-else-if="Items.view == '2'"
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       class="meta-chip"
@@ -135,7 +135,7 @@
       <div class="ml-2">{{ item.name }}</div>
 
       <v-overlay
-        :value="page.isSelect"
+        :value="Items.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         z-index="1"
@@ -189,8 +189,8 @@ export default {
     apiUrl() {
       return this.$store.state.localhost;
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     countries() {
       let str = this.item.country;

@@ -12,7 +12,7 @@
       />
     </template>
 
-    <span> Add {{ page.name }} </span>
+    <span> Add {{ Items.name }} </span>
   </v-tooltip>
 </template>
 
@@ -29,8 +29,8 @@ export default {
     dialogAdd: false,
   }),
   computed: {
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     task: {
       get() {

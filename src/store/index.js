@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Dialogs from './modules/dialogs.js'
-import Page from './modules/page.js'
+import Items from './modules/items.js'
 import Player from './modules/player.js'
 import Reg from './modules/reg.js'
 import Tasks from './modules/tasks.js'
@@ -103,7 +103,7 @@ export default new Vuex.Store({
   getters: {},
   modules: {
     Dialogs,
-    Page,
+    Items,
     Player,
     Reg,
     Tasks,

@@ -67,7 +67,7 @@ export default {
       return Vue.prototype.$checkCurrentPage("meta") ? "name" : "path";
     },
     filters() {
-      return this.$store.state.Page.filters;
+      return this.$store.state.Items.filters;
     },
     index() {
       return this.filters.findIndex((i) => i.by == this.by && i.appbar == true);

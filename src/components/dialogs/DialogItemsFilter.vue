@@ -10,7 +10,7 @@
       <v-card>
         <DialogHeader
           @close="close"
-          :header="`Filter ${page.name}`"
+          :header="`Filter ${Items.name}`"
           :buttons="buttons"
           closable
         />
@@ -204,7 +204,7 @@ export default {
         this.listBy = [...this.listBy, ...metaItem];
       }
 
-      let assigned = this.$store.state.Page.assigned;
+      let assigned = this.$store.state.Items.assigned;
 
       assigned.sort((a, b) =>
         a.meta.name > b.meta.name ? 1 : b.meta.name > a.meta.name ? -1 : 0
@@ -221,7 +221,7 @@ export default {
         });
       }
 
-      this.filters = _.cloneDeep(this.$store.state.Page.filters);
+      this.filters = _.cloneDeep(this.$store.state.Items.filters);
     },
     add() {
       this.filters.push({
@@ -291,7 +291,7 @@ export default {
       this.$root.$emit("setItemsFilters");
     },
     async addFilterRows() {
-      let savedFilter = this.$store.state.Page.savedFilter;
+      let savedFilter = this.$store.state.Items.savedFilter;
       for (let f of this.filters) {
         await axios({
           method: "post",
@@ -330,7 +330,7 @@ export default {
     dialog() {
       this.init();
     },
-    "page.filters"(val) {
+    "Items.filters"(val) {
       this.filters = _.cloneDeep(val);
     },
   },

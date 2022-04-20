@@ -229,7 +229,7 @@ export default {
       return this.$store.state.settings.showIconsOfMetaInEditingDialog == 1;
     },
     assigned() {
-      return this.$store.state.Page.assigned;
+      return this.$store.state.Items.assigned;
     },
   },
   methods: {

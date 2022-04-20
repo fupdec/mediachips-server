@@ -349,7 +349,7 @@ const Readable = {
       };
       const string = fltr(filePath);
       const items = options.store.state.items;
-      let parsed = options.store.state.Page.assigned;
+      let parsed = options.store.state.Items.assigned;
       parsed = parsed.filter((i) => i.meta.metaSetting.parser);
 
       let vals = [];

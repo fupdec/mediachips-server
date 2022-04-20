@@ -78,7 +78,7 @@
       />
 
       <v-overlay
-        :value="page.isSelect"
+        :value="Items.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         z-index="1"
@@ -129,8 +129,8 @@ export default {
     fileName() {
       return Vue.prototype.$getFileNameFromPath(this.media.path);
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets() {
       return this.$store.state.settings;
@@ -198,7 +198,7 @@ export default {
         },
       });
       contextMenu.push({ type: "divider" });
-      if (!this.page.isSelect)
+      if (!this.Items.isSelect)
         contextMenu.push({
           name: `Open File`,
           type: "item",
@@ -208,7 +208,7 @@ export default {
             this.openPath(this.media.path);
           },
         });
-      if (!this.page.isSelect)
+      if (!this.Items.isSelect)
         contextMenu.push({
           name: `Open file folder`,
           type: "item",

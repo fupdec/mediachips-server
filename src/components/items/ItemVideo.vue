@@ -1,7 +1,7 @@
 <template>
   <v-lazy>
     <v-card
-      v-if="page.view == '1'"
+      v-if="Items.view == '1'"
       :disabled="!reg && x > 9"
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
@@ -132,7 +132,7 @@
       />
 
       <v-overlay
-        :value="page.isSelect"
+        :value="Items.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         z-index="1"
@@ -145,7 +145,7 @@
     </v-card>
 
     <v-card
-      v-else-if="page.view == '2'"
+      v-else-if="Items.view == '2'"
       @contextmenu.stop="showMenu"
       @mousedown="stopSmoothScroll($event)"
       v-ripple="{ class: 'accent--text' }"
@@ -213,7 +213,7 @@
       />
 
       <v-overlay
-        :value="page.isSelect"
+        :value="Items.isSelect"
         @click.stop="toggleSelect"
         :color="isSelected ? 'primary' : '#7777'"
         z-index="1"
@@ -251,7 +251,7 @@ export default {
     await this.getItems();
     await this.getValues();
     await this.getImg();
-    if (this.page.view == "2") await this.initFrames();
+    if (this.Items.view == "2") await this.initFrames();
     await this.checkFileExists();
   },
   mounted() {
@@ -316,8 +316,8 @@ export default {
     fileName() {
       return Vue.prototype.$getFileNameFromPath(this.media.path);
     },
-    page() {
-      return this.$store.state.Page;
+    Items() {
+      return this.$store.state.Items;
     },
     sets() {
       return this.$store.state.settings;
@@ -403,7 +403,7 @@ export default {
         return;
       }
       this.$store.state.Player.active = true;
-      let items = _.cloneDeep(this.$store.state.Page.itemsOnPage);
+      let items = _.cloneDeep(this.$store.state.Items.itemsOnPage);
       // if (items.length > this.x + 50) {
       //   let start = 0;
       //   if (this.x > 10) start = this.x - 10;
@@ -505,7 +505,7 @@ export default {
         },
       });
       contextMenu.push({ type: "divider" });
-      if (!this.page.isSelect)
+      if (!this.Items.isSelect)
         contextMenu.push({
           name: `Open video in`,
           type: "menu",
@@ -532,7 +532,7 @@ export default {
             },
           ],
         });
-      if (!this.page.isSelect)
+      if (!this.Items.isSelect)
         contextMenu.push({
           name: `Open file folder`,
           type: "item",
@@ -560,9 +560,9 @@ export default {
     },
     async parseMetadata() {
       let videos = [];
-      if (this.page.isSelect) {
-        let ids = this.page.selection;
-        let items = this.$store.state.Page.items;
+      if (this.Items.isSelect) {
+        let ids = this.Items.selection;
+        let items = this.$store.state.Items.items;
         for (let id of ids) {
           const x = items.findIndex((i) => i.id === id);
           if (x > -1) videos.push(items[x]);
@@ -603,7 +603,7 @@ export default {
     },
   },
   watch: {
-    "page.view"(view) {
+    "Items.view"(view) {
       if (view == "2") this.initFrames();
     },
     upd(arr) {
