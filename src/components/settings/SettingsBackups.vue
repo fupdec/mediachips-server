@@ -3,15 +3,8 @@
     <v-divider class="mt-4 mb-2" />
     <div class="subtitle-2 text-right mb-4">Backups</div>
 
-    <v-btn
-      @click="manageBackups"
-      color="primary"
-      block
-      x-large
-      rounded
-      depressed
-    >
-      <v-icon large class="mr-4">mdi-database</v-icon> Manage backups
+    <v-btn @click="manageBackups" color="primary" depressed rounded>
+      <v-icon left>mdi-database</v-icon> Manage backups
     </v-btn>
 
     <v-dialog
@@ -100,24 +93,6 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="dialogProcess"
-      :fullscreen="$vuetify.breakpoint.xs"
-      width="600"
-      scrollable
-      persistent
-    >
-      <v-card>
-        <v-card-text class="pa-4">
-          <v-alert type="info" dense text class="body-2">
-            Please wait until the end of the process. This may take several
-            minutes.
-          </v-alert>
-          <Loading />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-
     <DialogConfirm
       v-if="dialogRestoreConfirm"
       @close="dialogRestoreConfirm = false"
@@ -145,7 +120,6 @@ export default {
   name: "SettingsBackups",
   components: {
     DialogHeader: () => import("@/components/elements/DialogHeader.vue"),
-    Loading: () => import("@/components/elements/Loading.vue"),
     DialogConfirm: () => import("@/components/dialogs/DialogConfirm.vue"),
     DialogDeleteConfirm: () =>
       import("@/components/dialogs/DialogDeleteConfirm.vue"),
@@ -159,7 +133,6 @@ export default {
       { text: "Date, time", value: "date" },
       { text: "Total size (MB)", value: "size", sort: (a, b) => a - b },
     ],
-    dialogProcess: false,
     dialogRestoreConfirm: false,
     dialogDelete: false,
   }),
@@ -175,6 +148,14 @@ export default {
     },
     isSelectedSingle() {
       return this.selected.length == 1;
+    },
+    dialogProcess: {
+      get() {
+        return this.$store.state.Dialogs.process.show;
+      },
+      set(value) {
+        this.$store.state.Dialogs.process.show = value;
+      },
     },
   },
   methods: {

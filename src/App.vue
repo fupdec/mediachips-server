@@ -26,8 +26,8 @@
     </v-dialog>
 
     <DialogLogin :login="login" @close="closeApp" @success="login = false" />
-
     <DialogError v-if="$store.state.Dialogs.error.show" />
+    <DialogProcess :dialog="$store.state.Dialogs.process.show" />
     <DialogMediaAddingProcess
       v-if="$store.state.Tasks.mediaAdding.dialogProcess"
       @close="$store.state.Tasks.mediaAdding.dialogProcess = false"
@@ -76,6 +76,7 @@ export default {
     HoverImage: () => import("@/components/app/HoverImage.vue"),
     Snackbars: () => import("@/components/app/Snackbars.vue"),
     DialogError: () => import("@/components/dialogs/DialogError.vue"),
+    DialogProcess: () => import("@/components/dialogs/DialogProcess.vue"),
     DialogMediaAddingProcess: () =>
       import("@/components/dialogs/DialogMediaAddingProcess.vue"),
     DialogMediaEditing: () =>
@@ -120,7 +121,7 @@ export default {
   }),
   computed: {
     sysBar() {
-      if (!window.os) return false
+      if (!window.os) return false;
       else return window.os.type();
     },
     apiUrl() {
