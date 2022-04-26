@@ -62,6 +62,7 @@
       <v-tab-item value="database">
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <SettingsDatabases />
+          <SettingsBackups />
         </v-card>
       </v-tab-item>
       <v-tab-item value="about">
@@ -94,6 +95,8 @@ export default {
     SettingsLogin: () => import("@/components/settings/SettingsLogin.vue"),
     SettingsDatabases: () =>
       import("@/components/settings/SettingsDatabases.vue"),
+    SettingsBackups: () =>
+      import("@/components/settings/SettingsBackups.vue"),
     SettingsGeneral: () => import("@/components/settings/SettingsGeneral.vue"),
     SettingsRegistration: () =>
       import("@/components/settings/SettingsRegistration.vue"),

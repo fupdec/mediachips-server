@@ -1225,6 +1225,70 @@ module.exports = function (db) {
     })
   };
 
+  const backupsPath = path.join(dbPath, 'backups')
+
+  const createBackup = function (req, res) {
+    let currentdate = new Date(),
+      date = currentdate.getDate(),
+      month = currentdate.getMonth() + 1,
+      hours = currentdate.getHours(),
+      mins = currentdate.getMinutes(),
+      secs = currentdate.getSeconds(),
+      backupName = currentdate.getFullYear() + "." +
+      (month > 9 ? month : '0' + month) + "." +
+      (date > 9 ? date : '0' + date) + " " +
+      (hours > 9 ? hours : '0' + hours) + "-" +
+      (mins > 9 ? mins : '0' + mins) + "-" +
+      (secs > 9 ? secs : '0' + secs),
+      mediaFiles = path.join(dbPath, 'media'),
+      metaFiles = path.join(dbPath, 'meta'),
+      dbFile = path.join(dbPath, 'db.sqlite')
+
+    const archiver = require('archiver')
+    const archive = archiver('zip')
+    const outputPath = path.join(backupsPath, backupName + '.zip')
+    const output = fs.createWriteStream(outputPath)
+    output.on('close', function () {
+      res.sendStatus(201)
+    })
+    archive.on('error', function () {
+      res.sendStatus(500)
+    })
+    archive.pipe(output)
+    // include in archive folders and database file
+    archive.directory(mediaFiles, 'media')
+    archive.directory(metaFiles, 'meta')
+    archive.file(dbFile, {
+      name: 'db.sqlite'
+    })
+    archive.finalize()
+  };
+
+  const getBackups = function (req, res) {
+    let backups = []
+    fs.readdirSync(backupsPath).forEach(file => {
+      if (path.extname(file) !== '.zip') return false
+      const pathToFile = path.join(backupsPath, file)
+      const filestats = fs.statSync(pathToFile)
+      let info = {
+        date: path.parse(file).name,
+        size: (filestats.size / 1024 / 1024).toFixed(2)
+      }
+      backups.push(info)
+    })
+    res.status(201).send(backups)
+  };
+
+  const deleteBackup = function (req, res) {
+    const backupPath = path.join(backupsPath, req.body.name + '.zip')
+    fs.unlink(backupPath, (err) => {
+      if (err) {
+        console.log(err)
+        res.sendStatus(500)
+      } else res.sendStatus(201)
+    })
+  };
+
   return {
     importDatabase,
     checkFileExists,
@@ -1245,5 +1309,8 @@ module.exports = function (db) {
     editDb,
     selectDb,
     deleteDb,
+    createBackup,
+    getBackups,
+    deleteBackup,
   }
 }

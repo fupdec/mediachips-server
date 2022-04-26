@@ -71,6 +71,7 @@ for (let i of config.databases) {
   const dbPath = path.join(databasesPath, i.id)
   const mediaPath = path.join(dbPath, 'media')
   const metaPath = path.join(dbPath, 'meta')
+  const backupPath = path.join(dbPath, 'backups')
   const videoPath = path.join(mediaPath, 'videos')
   const imagePath = path.join(mediaPath, 'images')
   const audioPath = path.join(mediaPath, 'audios')
@@ -78,7 +79,7 @@ for (let i of config.databases) {
   let videoDirs = ['thumbs', 'marks', 'grids', 'timelines'].map(i => (
     path.join(videoPath, i)
   ))
-  userDirs = [...userDirs, ...[dbPath, mediaPath, metaPath]]
+  userDirs = [...userDirs, ...[dbPath, mediaPath, metaPath, backupPath]]
   userDirs = [...userDirs, ...[videoPath, imagePath, audioPath, textPath]]
   userDirs = [...userDirs, ...videoDirs]
 }
