@@ -9,6 +9,10 @@ const pathToFfmpeg = require('ffmpeg-static').replace('app.asar', 'app.asar.unpa
 const pathToFfprobe = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked')
 ffmpeg.setFfmpegPath(pathToFfmpeg)
 ffmpeg.setFfprobePath(pathToFfprobe)
+const {
+  readdir,
+  stat
+} = require('fs/promises')
 
 module.exports = function (db) {
   const databasesPath = path.join(__dirname, '../../databases')
@@ -1289,6 +1293,39 @@ module.exports = function (db) {
     })
   };
 
+  const getFolderSize = async function (req, res) {
+    const dirPath = path.join(dbPath, 'media', 'videos', req.body.folder)
+    const dirSize = async directory => {
+      const files = await readdir(directory);
+      const stats = files.map(file => stat(path.join(directory, file)));
+
+      return (await Promise.all(stats)).reduce((accumulator, {
+        size
+      }) => accumulator + size, 0);
+    }
+    const size = await dirSize(dirPath)
+    res.status(201).send({
+      size
+    })
+  };
+
+  const clearData = function (req, res) {
+    const imageType = req.body.imageType
+    let delPath = 'media/'
+    if (['marks', 'grids', 'timelines'].includes(imageType)) {
+      delPath += 'videos/' + imageType
+    }
+    delPath = path.join(dbPath, delPath)
+    rimraf(delPath, (err) => {
+      if (err) res.status(400).send(err)
+      else {
+        // create folder again if this folder for generated images
+        if (imageType && !fs.existsSync(delPath)) fs.mkdirSync(delPath)
+        res.sendStatus(201)
+      }
+    })
+  };
+
   return {
     importDatabase,
     checkFileExists,
@@ -1312,5 +1349,7 @@ module.exports = function (db) {
     createBackup,
     getBackups,
     deleteBackup,
+    getFolderSize,
+    clearData,
   }
 }

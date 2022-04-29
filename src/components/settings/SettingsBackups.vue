@@ -113,7 +113,6 @@
 
 
 <script>
-import Vue from "vue";
 import axios from "axios";
 
 export default {
@@ -159,9 +158,6 @@ export default {
     },
   },
   methods: {
-    getDate(ms) {
-      return Vue.prototype.$getDateFromMs(ms);
-    },
     manageBackups() {
       this.dialog = true;
       setTimeout(() => {
@@ -185,13 +181,8 @@ export default {
     async createBackup() {
       this.dialogProcess = true;
 
-      await axios({
-        method: "post",
-        url: this.apiUrl + "/api/task/createBackup",
-        data: {
-          path: this.dbPath,
-        },
-      })
+      await axios
+        .get(this.apiUrl + "/api/task/createBackup")
         .then(() => {
           this.getBackups();
         })

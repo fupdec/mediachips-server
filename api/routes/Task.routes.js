@@ -60,13 +60,19 @@ module.exports = (app, db) => {
   router.post("/deleteDb", Task.deleteDb);
 
   // creating backup
-  router.post("/createBackup", Task.createBackup);
+  router.get("/createBackup", Task.createBackup);
 
   // get all backups
   router.get("/getBackups", Task.getBackups);
 
   // delete backup
   router.post("/deleteBackup", Task.deleteBackup);
+
+  // get folder Size
+  router.post("/getFolderSize", Task.getFolderSize);
+
+  // clear images, tables
+  router.post("/clearData", Task.clearData);
 
   app.use('/api/Task', router);
 };
