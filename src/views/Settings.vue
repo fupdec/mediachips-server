@@ -63,14 +63,7 @@
         <v-card flat max-width="800" style="margin: auto" class="py-6">
           <SettingsDatabases />
           <SettingsBackups />
-          <v-divider class="mt-10 mb-2" />
-          <div class="subtitle-2 text-right mb-4">Clear generated images</div>
-          <SettingsClearGeneratedImages button="Marks" imageType="marks" />
-          <SettingsClearGeneratedImages button="Grids" imageType="grids" />
-          <SettingsClearGeneratedImages
-            button="Timelines"
-            imageType="timelines"
-          />
+          <SettingsClearGeneratedImages />
         </v-card>
       </v-tab-item>
       <v-tab-item value="about">
