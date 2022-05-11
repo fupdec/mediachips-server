@@ -63,10 +63,11 @@ export default {
   name: "FiltersChips",
   props: {
     filters: Array,
+    isTooltip: {
+      type: Boolean,
+      default: false,
+    },
   },
-  data: () => ({
-    isTooltip: false,
-  }),
   computed: {
     filtersState() {
       return this.type.toLowerCase() + "Filters";

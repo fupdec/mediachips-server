@@ -293,6 +293,7 @@ export default {
         method: "post",
         url: this.apiUrl + "/api/SavedFilter",
         data: {
+          name: null,
           itemId: this.itemId,
           typeId: this.typeId,
           metaId: this.metaId,
@@ -308,51 +309,7 @@ export default {
 
       if (_.isEmpty(savedFilter)) return;
 
-      let filters = [];
-      await axios
-        .get(
-          this.apiUrl +
-            "/api/FilterRowsInSavedFilter" +
-            "?filterId=" +
-            savedFilter.id
-        )
-        .then((res) => {
-          filters = res.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-
-      for (let i of filters) {
-        const fltr = _.cloneDeep(i.filterRow);
-        if (fltr.type !== "array") continue;
-        if (fltr.by === "country") {
-          let v = fltr.val;
-          i.filterRow.val = v ? v.split(",") : [];
-          continue;
-        }
-
-        let vals = [];
-
-        await axios
-          .get(this.apiUrl + "/api/ItemsInFilterRow" + "?rowId=" + fltr.id)
-          .then((res) => {
-            vals = res.data;
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-
-        if (vals.length > 0) i.filterRow.val = vals.map((i) => i.itemId);
-      }
-
-      filters = filters.map((i) => {
-        let by = i.filterRow.by;
-        if (/\d/.test(by)) i.filterRow.by = +by;
-        delete i.filterRow.createdAt;
-        delete i.filterRow.updatedAt;
-        return i.filterRow;
-      });
+      let filters = await Vue.prototype.$getFilters(savedFilter.id);
 
       this.$store.commit("updateStateItems", {
         key: "filters",

@@ -8,6 +8,9 @@ module.exports = (app, db) => {
   // Retrieve a single SavedFilter with id
   router.get("/:id", SavedFilter.findOne);
 
+  // Retrieve all SavedFilter with params
+  router.post("/findAll", SavedFilter.findAll);
+
   // Update a SavedFilter with id
   router.put("/:id", SavedFilter.update);
 

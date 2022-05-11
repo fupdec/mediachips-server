@@ -1,5 +1,7 @@
 module.exports = function (db) {
   // Create and Save a new SavedFilter
+  const Op = db.Sequelize.Op
+
   const create = function (req, res) {
     db.SavedFilter.findOrCreate({
         where: req.body
@@ -21,6 +23,32 @@ module.exports = function (db) {
         where: {
           id: req.params.id
         }
+      })
+      .then(data => {
+        res.status(201).send(data)
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while performing query."
+        })
+      })
+  };
+
+  // get all SavedFilters with params
+  const findAll = function (req, res) {
+    let conds = {
+      name: {
+        [Op.not]: null
+      }
+    }
+    conds = {
+      ...conds,
+      ...req.body
+    }
+    console.log(conds)
+    db.SavedFilter
+      .findAll({
+        where: conds
       })
       .then(data => {
         res.status(201).send(data)
@@ -71,6 +99,7 @@ module.exports = function (db) {
   return {
     create,
     findOne,
+    findAll,
     update,
     deleteOne
   }

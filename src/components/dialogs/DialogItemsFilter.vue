@@ -4,8 +4,9 @@
       v-if="dialog"
       :value="dialog"
       @input="close"
-      scrollable
+      :fullscreen="$vuetify.breakpoint.xs"
       width="1200"
+      scrollable
     >
       <v-card>
         <DialogHeader
@@ -39,7 +40,7 @@
           <div>No filters</div>
         </div>
 
-        <v-card-actions>
+        <v-card-actions class="mb-2">
           <v-spacer></v-spacer>
           <v-btn
             @click="add"
@@ -65,6 +66,49 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="dialogSave" width="800" scrollable>
+      <v-card>
+        <DialogHeader
+          @close="dialogSave = false"
+          header="Saving filter"
+          :buttons="[
+            {
+              icon: 'content-save',
+              text: 'Save',
+              color: 'success',
+              outlined: false,
+              function: () => {
+                save();
+              },
+            },
+          ]"
+          closable
+        />
+
+        <v-card-text class="text-center py-4 px-2 px-sm-4">
+          <v-form
+            v-model="validName"
+            ref="formSave"
+            class="flex-grow-1"
+            @submit.prevent
+          >
+            <v-text-field
+              v-model="filterName"
+              :rules="[nameRules]"
+              label="Name of filter"
+              autofocus
+            />
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <DialogItemsSavedFilters
+      v-if="dialogLoad"
+      :dialog="dialogLoad"
+      @close="dialogLoad = false"
+    />
+
     <v-dialog v-model="datePicker.dialog">
       <v-date-picker
         @change="setDate($event)"
@@ -85,12 +129,15 @@ import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
+  name: "DialogItemsFilter",
   props: {
     dialog: Boolean,
   },
   components: {
     DialogHeader,
     FilterRow: () => import("@/components/dialogs/filters/FilterRow.vue"),
+    DialogItemsSavedFilters: () =>
+      import("@/components/dialogs/DialogItemsSavedFilters.vue"),
   },
   mixins: [ComputedForItemsPage],
   mounted() {
@@ -139,6 +186,10 @@ export default {
       this.apply();
     });
     this.initButtons();
+    this.typeId = Vue.prototype.$getUrlParam("typeId");
+    this.itemId = Vue.prototype.$getUrlParam("itemId");
+    this.metaId = Vue.prototype.$getUrlParam("metaId");
+    this.tabId = Vue.prototype.$getUrlParam("tabId");
   },
   beforeDestroy() {
     this.$root.$off("runSearch");
@@ -147,6 +198,10 @@ export default {
     this.$root.$off("removeAllFilters");
   },
   data: () => ({
+    itemId: null,
+    typeId: null,
+    metaId: null,
+    tabId: null,
     filters: [],
     filtersForRemove: [],
     listBy: [],
@@ -158,18 +213,44 @@ export default {
     },
     cols: Cols,
     buttons: [],
+    dialogSave: false,
+    validName: false,
+    filterName: "",
+    dialogLoad: false,
+    savedFilters: [],
   }),
   methods: {
     initButtons() {
-      this.buttons.push({
-        icon: "check",
-        text: "Apply",
-        color: "success",
-        outlined: false,
-        function: () => {
-          this.apply();
+      this.buttons.push(
+        {
+          icon: "content-save",
+          text: "Save",
+          outlined: true,
+          function: () => {
+            this.validateFilters();
+            if (!this.valid) return;
+            this.filterName = "";
+            this.dialogSave = true;
+          },
         },
-      });
+        {
+          icon: "content-save-move",
+          text: "Load",
+          outlined: true,
+          function: () => {
+            this.dialogLoad = true;
+          },
+        },
+        {
+          icon: "check",
+          text: "Apply",
+          color: "success",
+          outlined: false,
+          function: () => {
+            this.apply();
+          },
+        }
+      );
     },
     async init() {
       this.listBy = [];
@@ -268,16 +349,21 @@ export default {
       this.filtersForRemove = this.filters.filter((i) => i.lock !== true);
       this.filters = this.filters.filter((i) => i.lock == true);
     },
-    async apply() {
-      if (this.dialog) {
-        if (this.filters.length) {
-          for (let i of this.$refs.filterRow) {
-            i.validate();
-          }
-        }
-        if (!this.valid) return;
+    validateFilters() {
+      if (!this.dialog || this.filters.length == 0) {
+        this.valid = true;
+        return;
       }
-      await this.addFilterRows();
+      for (let i of this.$refs.filterRow) {
+        i.validate();
+      }
+    },
+    async apply() {
+      this.validateFilters();
+      if (!this.valid) return;
+
+      let savedFilter = this.$store.state.Items.savedFilter;
+      await this.addFilterRows(savedFilter.id);
 
       for (let f of this.filtersForRemove) {
         await axios.delete(this.apiUrl + "/api/FilterRow/" + f.id);
@@ -290,25 +376,45 @@ export default {
       this.$emit("close");
       this.$root.$emit("setItemsFilters");
     },
-    async addFilterRows() {
-      let savedFilter = this.$store.state.Items.savedFilter;
+    async addFilterRows(filterId) {
       for (let f of this.filters) {
         await axios({
           method: "post",
           url: this.apiUrl + "/api/FilterRow",
           data: {
             filter: f,
-            filterId: savedFilter.id,
+            filterId: filterId,
             rowId: f.id,
           },
-        })
-          .then((res) => {
-            // console.log(res.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        });
       }
+    },
+    async save() {
+      this.$refs.formSave.validate();
+      if (!this.validName) return;
+
+      let savedFilter = {};
+
+      await axios({
+        method: "post",
+        url: this.apiUrl + "/api/SavedFilter",
+        data: {
+          name: this.filterName,
+          itemId: this.itemId,
+          typeId: this.typeId,
+          metaId: this.metaId,
+          tabId: this.tabId,
+        },
+      })
+        .then((res) => {
+          savedFilter = res.data[0];
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      if (!_.isEmpty(savedFilter)) await this.addFilterRows(savedFilter.id);
+      this.dialogSave = false;
     },
     close() {
       this.$emit("close");
@@ -324,6 +430,9 @@ export default {
     },
     validate(val) {
       this.valid = val;
+    },
+    nameRules(string) {
+      return Vue.prototype.$validateName(string);
     },
   },
   watch: {

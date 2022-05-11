@@ -149,6 +149,51 @@ const ApiCalls = {
         });
       return result;
     }
+    Vue.prototype.$getFilters = async (savedFilterId) => {
+      let filters = [];
+      await axios
+        .get(
+          options.store.state.localhost + "/api/FilterRowsInSavedFilter" +
+          "?filterId=" + savedFilterId
+        )
+        .then((res) => {
+          filters = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      for (let i of filters) {
+        const fltr = _.cloneDeep(i.filterRow);
+        if (fltr.type !== "array") continue;
+        if (fltr.by === "country") {
+          let v = fltr.val;
+          i.filterRow.val = v ? v.split(",") : [];
+          continue;
+        }
+
+        let vals = [];
+
+        await axios
+          .get(options.store.state.localhost + "/api/ItemsInFilterRow" + "?rowId=" + fltr.id)
+          .then((res) => {
+            vals = res.data;
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+
+        if (vals.length > 0) i.filterRow.val = vals.map((i) => i.itemId);
+      }
+
+      return filters.map((i) => {
+        let by = i.filterRow.by;
+        if (/\d/.test(by)) i.filterRow.by = +by;
+        delete i.filterRow.createdAt;
+        delete i.filterRow.updatedAt;
+        return i.filterRow;
+      });
+    }
   }
 }
 
