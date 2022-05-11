@@ -29,6 +29,9 @@ module.exports = (app, db) => {
   // adding other type of media with metadata to database
   router.post("/addMedia", Task.addMedia);
 
+  // creating default thumbnail for video
+  router.post("/createThumbForVideo", Task.createThumbForVideo);
+
   // creating thumbnail for video
   router.post("/createThumb", Task.createThumb);
 

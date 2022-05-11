@@ -250,9 +250,9 @@ export default {
     await this.getMetadata();
     await this.getItems();
     await this.getValues();
+    await this.checkFileExists();
     await this.getImg();
     if (this.Items.view == "2") await this.initFrames();
-    await this.checkFileExists();
   },
   mounted() {
     this.$root.$on("updateVideoThumb", (id) => {
@@ -350,10 +350,28 @@ export default {
         this.media.id + ".jpg"
       );
       this.thumb = await Vue.prototype.$getLocalImage(imgPath);
+      if (this.isFileExists && this.thumb.includes("unavailable.png"))
+        this.createThumb(imgPath);
     },
     // mountSrc() {
     //   this.$refs.video.src = this.media.path
     // },
+    createThumb(imgPath) {
+      axios({
+        method: "post",
+        url: this.apiUrl + "/api/task/createThumbForVideo",
+        data: {
+          path: this.media.path,
+          id: this.media.id,
+        },
+      })
+        .then(async (res) => {
+          this.thumb = await Vue.prototype.$getLocalImage(imgPath);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     getMetadata() {
       let url = `/api/VideoMetadata/${this.media.id}`;
       axios

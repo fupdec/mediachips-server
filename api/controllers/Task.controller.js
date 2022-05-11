@@ -679,6 +679,53 @@ module.exports = function (db) {
     }
   }
 
+  function createThumbMiddle (pathToFile, id) {
+    return new Promise((resolve, reject) => {
+      let outputPathThumbs = path.join(dbPath, 'media/videos/thumbs')
+      ffmpeg()
+        .input(pathToFile)
+        .screenshots({
+          count: 1,
+          filename: `${id}.jpg`,
+          folder: outputPathThumbs,
+          size: '?x320'
+        })
+        .on('end', () => {
+          resolve('success')
+        })
+        .on('error', (err) => {
+          reject(err.message)
+        })
+    })
+  }
+
+  function createThumbCustom(timestamp, inputPath, outputPath, width) {
+    return new Promise((resolve, reject) => {
+      ffmpeg()
+        .addOption('-ss', timestamp)
+        .addOption('-i', inputPath)
+        .addOption('-frames:v', '1')
+        .addOption('-vf', `scale=-1:${width}`)
+        .save(outputPath)
+        .on('end', (e) => {
+          resolve(e)
+        })
+        .on('error', (e) => {
+          reject(e)
+        })
+    })
+  }
+
+  const createThumbForVideo = async function (req, res) {
+    createThumbMiddle(req.body.path, req.body.id)
+      .then(result => {
+        res.status(201).send(result)
+      })
+      .catch(e => {
+        res.status(400).send(e)
+      })
+  }
+
   const addMediaVideo = async function (req, res) {
     function getVideoMetadata(pathToFile) {
       return new Promise((resolve, reject) => {
@@ -687,26 +734,6 @@ module.exports = function (db) {
           else if (info.format.duration < 1) reject('duration less than 1 sec.')
           else resolve(info)
         })
-      })
-    }
-
-    function createThumb(pathToFile, id) {
-      return new Promise((resolve, reject) => {
-        let outputPathThumbs = path.join(dbPath, 'media', 'thumbs')
-        ffmpeg()
-          .input(pathToFile)
-          .screenshots({
-            count: 1,
-            filename: `${id}.jpg`,
-            folder: outputPathThumbs,
-            size: '?x320'
-          })
-          .on('end', () => {
-            resolve('success')
-          })
-          .on('error', (err) => {
-            reject(err.message)
-          })
       })
     }
 
@@ -772,7 +799,7 @@ module.exports = function (db) {
       })
 
       try {
-        await createThumb(pathToFile, media.id)
+        await createThumbMiddle(pathToFile, media.id)
       } catch (error) {
         res.status(400).send({
           message: error
@@ -856,22 +883,6 @@ module.exports = function (db) {
      * @param {string} outputPath - full path to the generated image with the extension and file name.
      * @param {number} width - width of thumbnail in pixels.
      */
-    function createThumb(timestamp, inputPath, outputPath, width) {
-      return new Promise((resolve, reject) => {
-        ffmpeg()
-          .addOption('-ss', timestamp)
-          .addOption('-i', inputPath)
-          .addOption('-frames:v', '1')
-          .addOption('-vf', `scale=-1:${width}`)
-          .save(outputPath)
-          .on('end', (e) => {
-            resolve(e)
-          })
-          .on('error', (e) => {
-            reject(e)
-          })
-      })
-    }
 
     if (!fs.existsSync(req.body.inputPath)) {
       res.status(400).send({
@@ -888,7 +899,7 @@ module.exports = function (db) {
     }
 
     let outputPath = getMediaPath(req.body.outputPath)
-    createThumb(req.body.timestamp, req.body.inputPath, outputPath, req.body.width)
+    createThumbCustom(req.body.timestamp, req.body.inputPath, outputPath, req.body.width)
       .then(thumbResult => {
         res.status(201).send(thumbResult)
       })
@@ -1336,6 +1347,7 @@ module.exports = function (db) {
     addMediaAudio,
     addMediaText,
     addMedia,
+    createThumbForVideo,
     createThumb,
     createGrid,
     createTimeline,
