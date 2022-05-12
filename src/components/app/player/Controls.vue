@@ -285,6 +285,7 @@
 <script>
 import Vue from "vue";
 import Mark from "./Mark.vue";
+const path = require("path");
 
 export default {
   name: "Controls",
