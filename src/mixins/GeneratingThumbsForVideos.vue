@@ -7,9 +7,6 @@ export default {
     this.grid.stopped = true;
     this.timeline.stopped = true;
   },
-  mounted() {
-    this.$nextTick(() => {});
-  },
   data: () => ({
     grid: {
       active: false,
@@ -169,7 +166,7 @@ export default {
     },
   },
   watch: {
-    'page.itemsOnPage'(videos) {
+    'Items.itemsOnPage'(videos) {
       if (this.isMediaPage || this.isItemPage) this.generateImages(videos);
     },
   },

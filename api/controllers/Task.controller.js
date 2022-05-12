@@ -679,7 +679,7 @@ module.exports = function (db) {
     }
   }
 
-  function createThumbMiddle (pathToFile, id) {
+  function createThumbMiddle(pathToFile, id) {
     return new Promise((resolve, reject) => {
       let outputPathThumbs = path.join(dbPath, 'media/videos/thumbs')
       ffmpeg()
