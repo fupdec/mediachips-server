@@ -17,9 +17,13 @@
         />
 
         <v-card-text class="text-center py-4 px-2 px-sm-4">
+          <v-alert type="error" :value="!valid" text dismissible>
+            Some filters are empty. Please complete or delete
+          </v-alert>
+
           <FilterRow
             v-for="(f, i) in filters"
-            :key="i"
+            :key="i + updKey"
             :filter="f"
             :index="i"
             :listBy="listBy"
@@ -107,6 +111,7 @@
       v-if="dialogLoad"
       :dialog="dialogLoad"
       @close="dialogLoad = false"
+      @apply="loadSavedFilter($event)"
     />
 
     <v-dialog v-model="datePicker.dialog">
@@ -202,6 +207,7 @@ export default {
     typeId: null,
     metaId: null,
     tabId: null,
+    updKey: 0,
     filters: [],
     filtersForRemove: [],
     listBy: [],
@@ -369,22 +375,23 @@ export default {
         await axios.delete(this.apiUrl + "/api/FilterRow/" + f.id);
       }
       this.filtersForRemove = [];
-      this.$store.commit("updateState", {
+      this.$store.commit("updateStateItems", {
         key: "filters",
         value: _.cloneDeep(this.filters),
       });
       this.$emit("close");
       this.$root.$emit("setItemsFilters");
     },
-    async addFilterRows(filterId) {
+    async addFilterRows(filterId, isSavedFilter) {
       for (let f of this.filters) {
+        if (isSavedFilter) f.id = null;
         await axios({
           method: "post",
           url: this.apiUrl + "/api/FilterRow",
           data: {
             filter: f,
             filterId: filterId,
-            rowId: f.id,
+            rowId: isSavedFilter ? null : f.id,
           },
         });
       }
@@ -413,8 +420,17 @@ export default {
           console.log(e);
         });
 
-      if (!_.isEmpty(savedFilter)) await this.addFilterRows(savedFilter.id);
+      if (!_.isEmpty(savedFilter)) {
+        await this.addFilterRows(savedFilter.id, true);
+      }
+
       this.dialogSave = false;
+    },
+    loadSavedFilter(filters) {
+      this.dialogLoad = false;
+      this.filtersForRemove = _.cloneDeep(this.filters);
+      ++this.updKey;
+      this.filters = _.cloneDeep(filters);
     },
     close() {
       this.$emit("close");

@@ -3,7 +3,8 @@ module.exports = function (db) {
   const create = async function (req, res) {
     let filterObj = req.body.filter
     let val = filterObj.val
-    if (filterObj.type == 'array' && filterObj.by !== 'country') 
+    // getting values from filter row
+    if (filterObj.type == 'array' && filterObj.by !== 'country')
       filterObj.val = null
     if (filterObj.by == 'country') filterObj.val = filterObj.val.join(',')
 

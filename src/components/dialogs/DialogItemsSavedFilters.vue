@@ -124,7 +124,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res.data);
           this.savedFilters = res.data;
         })
         .catch((e) => {
@@ -157,10 +156,9 @@ export default {
     edit(savedFilter) {},
     rewrite(savedFilter) {},
     load(savedFilter) {
-      this.$store.commit("updateStateItems", {
-        key: "filters",
-        value: savedFilter.filters,
-      });
+      let filters = savedFilter.filters;
+      for (let i of filters) i.id = null;
+      this.$emit("apply", filters);
     },
   },
 };
