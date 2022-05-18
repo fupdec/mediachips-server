@@ -4,7 +4,7 @@
       {{ filter.union === "AND" ? "AND" : "OR" }}
     </v-btn>
 
-    <v-card outlined class="filter-row pa-2">
+    <div class="filter-row">
       <v-autocomplete
         @input="setBy($event)"
         :value="filter.by"
@@ -143,33 +143,26 @@
       <v-card-actions class="pa-0">
         <v-btn
           @click="duplicate"
+          :disabled="filter.type == 'boolean'"
           title="Duplicate filter"
           class="ma-1 ml-sm-3"
-          color="green"
-          outlined
           icon
-          fab
-          x-small
-          :disabled="filter.type == 'boolean'"
         >
-          <v-icon>mdi-content-duplicate</v-icon>
+          <v-icon size="22">mdi-content-duplicate</v-icon>
         </v-btn>
 
         <v-btn
           @click="remove"
           :disabled="filter.lock"
-          class="ma-1"
-          color="red"
-          outlined
-          icon
-          fab
-          x-small
           title="Remove filter"
+          class="ma-1"
+          color="error"
+          icon
         >
-          <v-icon>mdi-close</v-icon>
+          <v-icon size="30">mdi-close</v-icon>
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </div>
   </v-form>
 </template>
 
