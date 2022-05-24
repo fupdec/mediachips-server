@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template v-slot:activator="{ on }">
-      <v-btn @click="dialogFilter = true" v-on="on" icon>
+      <v-btn @click="toggleFilters" v-on="on" icon>
         <v-badge :value="badge" :content="badge" overlap left>
           <v-icon>mdi-filter-outline</v-icon>
         </v-badge>
@@ -29,6 +29,12 @@ export default {
     },
     badge() {
       return this.$store.state.Items.filters.length;
+    },
+  },
+  methods: {
+    toggleFilters() {
+      this.dialogFilter = true;
+      this.Items.isFilters = !this.Items.isFilters;
     },
   },
 };

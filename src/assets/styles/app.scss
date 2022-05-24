@@ -243,6 +243,15 @@ header {
   box-shadow: 0px -3px 5px 0px rgba(0, 0, 0, 0.3) !important;
 }
 
+.filter-cond {
+  flex: 0 auto;
+  .v-select__selections {
+    justify-content: center;
+    input {
+      display: none !important;
+    }
+  }
+}
 // TABS
 .v-app-bar {
   .v-image__image {

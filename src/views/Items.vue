@@ -8,6 +8,8 @@
       <span v-else class="body-1 text--secondary ml-2">({{ total }})</span>
     </div>
 
+    <Filters v-if="isFiltersReady" />
+
     <v-container
       v-if="Items.filters.length > 0"
       class="d-flex justify-center align-start"
@@ -170,6 +172,7 @@ export default {
     ItemVideo: () => import("@/components/items/ItemVideo.vue"),
     ItemImage: () => import("@/components/items/ItemImage.vue"),
     ItemMeta: () => import("@/components/items/ItemMeta.vue"),
+    Filters: () => import("@/components/app/Filters.vue"),
     FiltersChips: () => import("@/components/elements/FiltersChips.vue"),
     Loading: () => import("@/components/elements/Loading.vue"),
   },
@@ -264,6 +267,7 @@ export default {
     totalInDb: 0,
     pages: 0,
     isQueryRun: false,
+    isFiltersReady: false,
     loader: {
       show: false,
       timeout: false,
@@ -485,6 +489,7 @@ export default {
             key: "assigned",
             value: res.data,
           });
+          this.isFiltersReady = true;
         })
         .catch((e) => {
           console.log(e);

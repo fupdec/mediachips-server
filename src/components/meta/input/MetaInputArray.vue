@@ -10,7 +10,7 @@
     :disabled="disabled"
     :filter="filterItems"
     :menu-props="menuProps"
-    :label="meta.name"
+    :label="dialog == 'filtering' ? '' : meta.name"
     :hint="meta.hint"
     append-icon="mdi-chevron-down"
     :prepend-icon="prependIcon"
@@ -24,6 +24,7 @@
     hide-selected
     clearable
     class="val custom-chips-size"
+    :class="[{ 'pt-0': dialog == 'filtering' }]"
   >
     <template v-slot:no-data>
       <div v-if="dialog == 'filtering'" class="pa-3">No data available</div>
@@ -60,11 +61,9 @@
           <v-icon v-else left small> mdi-heart-outline </v-icon>
         </span>
         <span v-if="meta.metaSetting.color">
-          <v-icon :color="item.color || ''" left size="14">
-            mdi-circle
-          </v-icon>
+          <v-icon :color="item.color || ''" left size="14"> mdi-circle </v-icon>
         </span>
-        <span v-html="parent.genFilteredText(item.name)"/>
+        <span v-html="parent.genFilteredText(item.name)" />
         <span v-if="meta.metaSetting.synonyms" class="synonyms">
           {{ item.synonyms }}
         </span>
@@ -127,7 +126,7 @@ export default {
     if (this.dialog == "filtering") {
       this.view.persistentHint = false;
       this.view.hideDetails = true;
-      this.view.outlined = true;
+      this.view.outlined = false;
     }
   },
   mounted() {
