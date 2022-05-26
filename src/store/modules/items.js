@@ -16,7 +16,6 @@ const Items = {
     nameSingular: "Item",
     icon: "shape",
     isSelect: false,
-    isFilters: false,
     selection: [],
     savedFilter: {},
     filters: [],

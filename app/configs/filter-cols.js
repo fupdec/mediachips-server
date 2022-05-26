@@ -1,117 +1,117 @@
 const Cols = {
   "standart": [{
-      "by": "rating",
+      "param": "rating",
       "type": "number",
       "icon": "star",
       "text": "Rating"
     },
     {
-      "by": "favorite",
+      "param": "favorite",
       "type": "boolean",
       "icon": "heart",
       "text": "Favorite"
     },
     {
-      "by": "bookmark",
+      "param": "bookmark",
       "type": "string",
       "icon": "bookmark",
       "text": "Bookmark"
     },
     {
-      "by": "views",
+      "param": "views",
       "type": "number",
       "icon": "eye",
       "text": "Number of views"
     },
     {
-      "by": "viewedAt",
+      "param": "viewedAt",
       "type": "date",
       "icon": "calendar-clock",
       "text": "Viewed date"
     },
     {
-      "by": "createdAt",
+      "param": "createdAt",
       "type": "date",
       "icon": "calendar-plus",
       "text": "Date added"
     },
     {
-      "by": "updatedAt",
+      "param": "updatedAt",
       "type": "date",
       "icon": "calendar-edit",
       "text": "Editing date"
     },
   ],
   "metaItem": [{
-      "by": "name",
+      "param": "name",
       "type": "string",
       "icon": "alphabetical-variant",
       "text": "Name"
     },
     {
-      "by": "synonyms",
+      "param": "synonyms",
       "type": "string",
       "icon": "alphabetical",
       "text": "Synonyms"
     },
     {
-      "by": "country",
+      "param": "country",
       "type": "array",
       "icon": "flag",
       "text": "Country"
     },
     {
-      "by": "color",
+      "param": "color",
       "type": "string",
       "icon": "palette",
       "text": "Color"
     }
   ],
   "media": [{
-      "by": "path",
+      "param": "path",
       "type": "string",
       "icon": "file-search",
       "text": "File path"
     },
     {
-      "by": "filesize",
+      "param": "filesize",
       "type": "number",
       "icon": "harddisk",
       "text": "File size"
     }
   ],
   "video": [{
-      "by": "duration",
+      "param": "duration",
       "type": "number",
       "icon": "timer-outline",
       "text": "Duration"
     },
     {
-      "by": "width",
+      "param": "width",
       "type": "number",
       "icon": "monitor-screenshot",
       "text": "Width"
     },
     {
-      "by": "height",
+      "param": "height",
       "type": "number",
       "icon": "monitor-screenshot",
       "text": "Height"
     },
     {
-      "by": "bitrate",
+      "param": "bitrate",
       "type": "number",
       "icon": "filmstrip",
       "text": "Bitrate"
     },
     {
-      "by": "fps",
+      "param": "fps",
       "type": "number",
       "icon": "filmstrip",
       "text": "Frames per second"
     },
     {
-      "by": "codec",
+      "param": "codec",
       "type": "string",
       "icon": "filmstrip",
       "text": "Codec"

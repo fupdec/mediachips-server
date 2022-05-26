@@ -166,7 +166,7 @@ const ApiCalls = {
       for (let i of filters) {
         const fltr = _.cloneDeep(i.filterRow);
         if (fltr.type !== "array") continue;
-        if (fltr.by === "country") {
+        if (fltr.param === "country") {
           let v = fltr.val;
           i.filterRow.val = v ? v.split(",") : [];
           continue;
@@ -187,8 +187,8 @@ const ApiCalls = {
       }
 
       return filters.map((i) => {
-        let by = i.filterRow.by;
-        if (/\d/.test(by)) i.filterRow.by = +by;
+        let param = i.filterRow.param;
+        if (/\d/.test(param)) i.filterRow.param = +param;
         delete i.filterRow.createdAt;
         delete i.filterRow.updatedAt;
         return i.filterRow;

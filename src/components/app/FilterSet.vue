@@ -53,8 +53,7 @@
         "
         :rules="[validVal]"
         type="number"
-        label="Number"
-        class="val"
+        class="mt-0 pt-0"
         hide-details
       />
 
@@ -66,16 +65,15 @@
           filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
         :rules="[validVal]"
-        label="Date"
-        class="val"
+        class="mt-0 pt-0"
         readonly
         hide-details
       />
 
       <MetaInputArray
-        v-if="filter.type === 'array' && /\d/.test(filter.by)"
+        v-if="filter.type === 'array' && /\d/.test(filter.param)"
         @input="setVal($event)"
-        :metaId="filter.by"
+        :metaId="filter.param"
         :cond="filter.cond"
         :value="filter.val"
         :disabled="
@@ -85,7 +83,7 @@
       />
 
       <MetaInputCountry
-        v-if="filter.by === 'country'"
+        v-if="filter.param === 'country'"
         @input="setVal($event)"
         :cond="filter.cond"
         :value="filter.val"
@@ -103,7 +101,7 @@
 import Vue from "vue";
 
 export default {
-  name: "FiltersParam",
+  name: "FilterSet",
   props: {
     filter: Object,
     index: Number,
@@ -115,7 +113,7 @@ export default {
       import("@/components/meta/input/MetaInputCountry.vue"),
   },
   mounted() {
-    this.getParamData(this.filter.by);
+    this.getParamData(this.filter.param);
     console.log(this.listBy);
   },
   data: () => ({
@@ -130,10 +128,10 @@ export default {
     },
   },
   methods: {
-    getParamData(by) {
+    getParamData(data) {
       let param = _.find(this.listBy, (i) => {
-        // console.log(i.by, by);
-        return i.by === by;
+        // console.log(i.param, param);
+        return i.param === data;
       });
       if (param) {
         this.icon = param.icon;
@@ -185,7 +183,7 @@ export default {
     },
     listBy(val) {
       console.log(val);
-      this.getParamData(this.filter.by);
+      this.getParamData(this.filter.param);
     },
   },
 };

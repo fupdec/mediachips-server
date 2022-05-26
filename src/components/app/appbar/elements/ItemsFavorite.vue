@@ -27,9 +27,7 @@ export default {
       return this.$store.state.Items.filters;
     },
     index() {
-      return this.filters.findIndex(
-        (i) => i.by == "favorite" && i.appbar == true
-      );
+      return this.filters.findIndex((i) => i.param == "favorite");
     },
   },
   methods: {

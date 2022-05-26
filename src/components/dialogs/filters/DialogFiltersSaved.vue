@@ -84,7 +84,7 @@ import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
 import DialogHeader from "@/components/elements/DialogHeader.vue";
 
 export default {
-  name: "DialogItemsSavedFilters",
+  name: "DialogFiltersSaved",
   props: {
     dialog: Boolean,
   },

@@ -8,7 +8,7 @@
       <span v-else class="body-1 text--secondary ml-2">({{ total }})</span>
     </div>
 
-    <Filters v-if="isFiltersReady" />
+    <Filters :isReady="isFiltersReady"/>
 
     <v-container
       v-if="Items.filters.length > 0"
@@ -334,13 +334,12 @@ export default {
       if (index < 0)
         this.Items.filters.push({
           id: null,
-          by: this.metaId,
+          param: this.metaId,
           type: "array",
           cond: "in",
           val: [this.itemId],
           flag: null,
           lock: true,
-          appbar: false,
           union: "AND",
           metaId: this.metaId,
         });

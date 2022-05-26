@@ -4,9 +4,9 @@ module.exports = function (db) {
     let filterObj = req.body.filter
     let val = filterObj.val
     // getting values from filter row
-    if (filterObj.type == 'array' && filterObj.by !== 'country')
+    if (filterObj.type == 'array' && filterObj.param !== 'country')
       filterObj.val = null
-    if (filterObj.by == 'country') filterObj.val = filterObj.val.join(',')
+    if (filterObj.param == 'country') filterObj.val = filterObj.val.join(',')
 
     const [filterRow, isCreated] = await db.FilterRow.findOrCreate({
       where: {
@@ -28,7 +28,7 @@ module.exports = function (db) {
       })
     }
 
-    if (filterObj.type == 'array' && filterObj.by !== 'country') {
+    if (filterObj.type == 'array' && filterObj.param !== 'country') {
       // deleting previously stored values
       await db.ItemsInFilterRow.destroy({
         where: {

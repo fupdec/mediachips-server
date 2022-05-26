@@ -263,29 +263,29 @@ const Readable = {
        * @param {string} type - type of items: media or items.
        */
       let filters = sets.filters
-      let videoCols = Cols.video.map(i => i.by)
-      const isFilterByVideo = filters.some(i => videoCols.includes(i.by))
+      let videoCols = Cols.video.map(i => i.param)
+      const isFilterByVideo = filters.some(i => videoCols.includes(i.param))
       const isFilterTypeArray = filters.some(i => i.type === 'array')
 
       const getQueryFromFilter = (i) => {
         let union = i.union
-        let by = i.by
+        let param = i.param
         let cond = i.cond
         let val = i.val
         let q = ""
-        if (videoCols.includes(by)) by = 'videoMetadata.' + by
+        if (videoCols.includes(param)) param = 'videoMetadata.' + param
         if (i.type === 'string') {
-          q += `${union} ${by} ${cond} `;
+          q += `${union} ${param} ${cond} `;
           if (!cond.includes('null')) {
             q += `'%${val}%' `;
           }
         } else if (i.type === 'number') { // TODO add rating type
-          q += `${union} ${by} ${cond} ${val} `;
+          q += `${union} ${param} ${cond} ${val} `;
         } else if (i.type === 'date') {
-          q += `${union} ${by} ${cond} '${val} 00:00:00.000' `;
+          q += `${union} ${param} ${cond} '${val} 00:00:00.000' `;
         } else if (i.type === 'boolean') {
-          q += `${union} ${by} ${cond} 1 `;
-        } else if (by === 'country') {
+          q += `${union} ${param} ${cond} 1 `;
+        } else if (param === 'country') {
           q += `${union} `;
           if (!cond.includes('null'))
             for (let x = 0; x < val.length; x++) {
@@ -313,9 +313,9 @@ const Readable = {
           } else if (cond == 'is null') {
             q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
               ${type}.id = itemsIn${type}.${parent}Id
-                AND itemsIn${type}.metaId = ${by} ) `
+                AND itemsIn${type}.metaId = ${param} ) `
           } else if (cond == 'not null') {
-            q += `itemsIn${type}.metaId = ${by} `
+            q += `itemsIn${type}.metaId = ${param} `
           } else q += `itemsIn${type}.itemId ${cond} (${val.join()}) `;
         }
         return q

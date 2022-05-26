@@ -147,12 +147,12 @@ export default {
   mixins: [ComputedForItemsPage],
   mounted() {
     this.$root.$on("runSearch", (values) => {
-      const { index, by, string } = values;
+      const { index, param, string } = values;
       if (index > -1) this.filters[index].val = string;
       else
         this.filters.push({
           id: null,
-          by: by,
+          param: param,
           type: "string",
           cond: "like",
           val: string,
@@ -170,7 +170,7 @@ export default {
       else
         this.filters.push({
           id: null,
-          by: "favorite",
+          param: "favorite",
           type: "boolean",
           cond: "=",
           val: null,
@@ -301,7 +301,7 @@ export default {
 
       for (let i of assigned) {
         this.listBy.push({
-          by: i.meta.id,
+          param: i.meta.id,
           type: i.meta.type,
           icon: i.meta.icon,
           text: i.meta.name,
@@ -313,7 +313,7 @@ export default {
     add() {
       this.filters.push({
         id: null,
-        by: null,
+        param: null,
         type: null,
         cond: null,
         val: null,
@@ -325,8 +325,8 @@ export default {
       });
     },
     setBy(value, index) {
-      this.filters[index].by = value;
-      let found = this.listBy.findIndex((i) => i.by == value);
+      this.filters[index].param = value;
+      let found = this.listBy.findIndex((i) => i.param == value);
       if (found > -1) this.filters[index].type = this.listBy[found].type;
       this.filters[index].cond = null;
       this.filters[index].val = null;

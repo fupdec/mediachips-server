@@ -32,20 +32,20 @@
       dark
     >
       <span v-if="showIcons">
-        <v-icon small class="mr-1"> mdi-{{ getBy(i.by, "icon") }} </v-icon>
+        <v-icon small class="mr-1"> mdi-{{ getBy(i.param, "icon") }} </v-icon>
         <v-icon small>mdi-{{ getCond(i.type, i.cond, "icon") }}</v-icon>
       </span>
       <span v-else>
-        <span class="mr-1"> "{{ getBy(i.by, "text") }}" </span>
+        <span class="mr-1"> "{{ getBy(i.param, "text") }}" </span>
         <span> {{ getCond(i.type, i.cond, "text") }} </span>
       </span>
       <!-- TODO small avatars for items -->
 
       <span v-if="i.type == 'array'" class="ml-1">
-        <span v-if="i.by == 'country'" class="ml-1">
+        <span v-if="i.param == 'country'" class="ml-1">
           "{{ i.val.join(", ") }}"
         </span>
-        <span v-else> "{{ getItemName(i.by, i.val) }}" </span>
+        <span v-else> "{{ getItemName(i.param, i.val) }}" </span>
       </span>
       <span v-else-if="i.type == 'boolean'"></span>
       <span v-else class="ml-1">"{{ i.val }}"</span>
@@ -91,18 +91,18 @@ export default {
     remove(index) {
       this.$root.$emit("removeFilter", index);
     },
-    getBy(by, show) {
-      const isMeta = /\d/.test(by);
+    getBy(param, show) {
+      const isMeta = /\d/.test(param);
       if (isMeta) {
         if (show == "text") show = "name";
-        const meta = this.meta.find((i) => i.id == by);
+        const meta = this.meta.find((i) => i.id == param);
         return meta ? meta[show] : "";
       } else {
         let cols = [];
         for (let i in Cols) {
           cols = [...cols, ...Cols[i]];
         }
-        const col = cols.find((i) => i.by == by);
+        const col = cols.find((i) => i.param == param);
         return col ? col[show] : "";
       }
     },

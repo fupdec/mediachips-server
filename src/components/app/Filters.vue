@@ -1,61 +1,166 @@
 <template>
   <v-navigation-drawer
-    :value="Items.isFilters"
-    :class="[{ 'ml-14': sets.bottomBar == '0' }]"
+    v-model="$store.state.filters.visible"
+    :app="$store.state.filters.attached"
+    :class="[
+      { 'ml-14': sets.bottomBar == '0' },
+      { 'pb-12': sets.bottomBar == '0' },
+      { 'padding-bottom': sets.bottomBar == '1' },
+      { deattached: !$store.state.filters.attached },
+    ]"
     class="mt-12 filters-drawer"
     width="350"
     fixed
   >
-    <v-subheader>
-      <v-icon left small color="grey">mdi-filter</v-icon> Filters
+    <v-subheader class="d-flex justify-space-between">
+      <div class="d-flex align-center">
+        <v-icon left small color="grey">mdi-filter</v-icon> Filters
+      </div>
+      <v-btn @click="attach" icon>
+        <v-icon v-if="$store.state.filters.attached" small>mdi-pin</v-icon>
+        <v-icon v-else small>mdi-pin-outline</v-icon>
+      </v-btn>
     </v-subheader>
 
     <div class="px-2">
-      <v-btn color="success" class="mb-2" block depressed rounded>
+      <v-btn
+        :disabled="!isReady"
+        color="success"
+        class="mb-2"
+        block
+        depressed
+        rounded
+      >
         <v-icon left>mdi-check</v-icon> Apply
       </v-btn>
-      <v-btn class="mb-2" block depressed rounded>
+      <v-btn
+        @click="dialogSave = true"
+        :disabled="!isReady"
+        class="mb-2"
+        block
+        depressed
+        rounded
+      >
         <v-icon left>mdi-content-save</v-icon> Save
       </v-btn>
-      <v-btn class="mb-2" block depressed rounded>
+      <v-btn
+        @click="dialogLoad = true"
+        :disabled="!isReady"
+        class="mb-2"
+        block
+        depressed
+        rounded
+      >
         <v-icon left>mdi-content-save-move</v-icon> Load
       </v-btn>
-      <v-btn class="mb-4 green--text" block depressed rounded>
+      <v-btn
+        @click="dialogAdd = true"
+        :disabled="!isReady"
+        class="mb-2 green--text"
+        block
+        depressed
+        rounded
+      >
         <v-icon left>mdi-plus</v-icon> Add
       </v-btn>
-
-      <FiltersParam
-        v-for="(f, i) in filters"
-        :key="i + updKey"
-        :filter="f"
-        :index="i"
-        :listBy="listBy"
-        ref="filterRow"
-        @setBy="setBy($event, i)"
-        @setCond="setCond($event, i)"
-        @setVal="setVal($event, i)"
-        @setUnion="setUnion($event, i)"
-        @remove="remove(i)"
-        @duplicate="duplicate(i)"
-        @pickDate="pickDate(i)"
-        @valid="validate($event)"
-      />
-
-      <div v-if="filters.length == 0" class="text-center py-6 overline">
-        <v-icon large class="mb-2">mdi-filter-off-outline</v-icon>
-        <div>No filters</div>
-      </div>
-
       <v-btn
         v-if="filters.length > 1"
-        class="my-4 red--text"
+        :disabled="!isReady"
+        class="mb-2 red--text"
         block
         depressed
         rounded
       >
         <v-icon left>mdi-close</v-icon> Remove all
       </v-btn>
+
+      <v-spacer class="my-4"></v-spacer>
+
+      <div v-if="isReady">
+        <FilterSet
+          v-for="(f, i) in filters"
+          :key="i + updKey"
+          :filter="f"
+          :index="i"
+          :listBy="listBy"
+          ref="filterRow"
+          @setBy="setBy($event, i)"
+          @setCond="setCond($event, i)"
+          @setVal="setVal($event, i)"
+          @setUnion="setUnion($event, i)"
+          @remove="remove(i)"
+          @duplicate="duplicate(i)"
+          @pickDate="pickDate(i)"
+          @valid="validate($event)"
+        />
+      </div>
+
+      <div v-if="filters.length == 0" class="text-center py-6 overline">
+        <v-icon large class="mb-2">mdi-filter-off-outline</v-icon>
+        <div>No filters</div>
+      </div>
     </div>
+
+    <v-dialog v-model="dialogSave" width="600" scrollable>
+      <v-card>
+        <DialogHeader
+          @close="dialogSave = false"
+          header="Saving filter"
+          :buttons="[
+            {
+              icon: 'content-save',
+              text: 'Save',
+              color: 'success',
+              outlined: false,
+              function: () => {
+                save();
+              },
+            },
+          ]"
+          closable
+        />
+
+        <v-card-text class="text-center py-4 px-2 px-sm-4">
+          <v-form
+            v-model="validName"
+            ref="formSave"
+            class="flex-grow-1"
+            @submit.prevent
+          >
+            <v-text-field
+              v-model="filterName"
+              :rules="[nameRules]"
+              label="Name of filter"
+              autofocus
+            />
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <DialogFiltersSaved
+      v-if="dialogLoad"
+      :dialog="dialogLoad"
+      @close="dialogLoad = false"
+      @apply="loadSavedFilter($event)"
+    />
+
+    <DialogFiltersAdd
+      v-if="dialogAdd"
+      @add="add($event)"
+      @close="dialogAdd = false"
+      :dialog="dialogAdd"
+      :params="listBy"
+    />
+
+    <v-dialog v-model="datePicker.dialog" width="auto">
+      <v-date-picker
+        @change="setDate($event)"
+        :value="datePicker.value"
+        color="primary"
+        no-title
+      />
+    </v-dialog>
   </v-navigation-drawer>
 </template>
 
@@ -65,11 +170,33 @@ import Vue from "vue";
 import axios from "axios";
 import Cols from "../../../app/configs/filter-cols.js";
 import ComputedForItemsPage from "@/mixins/ComputedForItemsPage";
+import DialogHeader from "@/components/elements/DialogHeader.vue";
+
+/**
+ обозначения ключей для объекта "фильтр": 
+ id - уникальный номер взятый из таблицы БД,
+ param - параметр, по которому будет производиться фильтрация,
+ type - тип данных для фильтрации,
+ cond - условие,
+ val - значение,
+ flag - специальная метка,
+ lock - блокировка от удаления пользователем,
+ union - связка с предыдущим фильтром,
+ metaId - ???,
+ */
 
 export default {
   name: "Filters",
+  props: {
+    isReady: Boolean,
+  },
   components: {
-    FiltersParam: () => import("@/components/app/FiltersParam.vue"),
+    DialogHeader,
+    FilterSet: () => import("@/components/app/FilterSet.vue"),
+    DialogFiltersSaved: () =>
+      import("@/components/dialogs/filters/DialogFiltersSaved.vue"),
+    DialogFiltersAdd: () =>
+      import("@/components/dialogs/filters/DialogFiltersAdd.vue"),
   },
   mixins: [ComputedForItemsPage],
   async mounted() {
@@ -79,18 +206,17 @@ export default {
     this.tabId = Vue.prototype.$getUrlParam("tabId");
     this.init();
     this.$root.$on("runSearch", (values) => {
-      const { index, by, string } = values;
+      const { index, param, string } = values;
       if (index > -1) this.filters[index].val = string;
       else
         this.filters.push({
           id: null,
-          by: by,
+          param: param,
           type: "string",
           cond: "like",
           val: string,
           flag: null,
           lock: false,
-          appbar: true,
           union: "AND",
           metaId: null,
         });
@@ -102,13 +228,12 @@ export default {
       else
         this.filters.push({
           id: null,
-          by: "favorite",
+          param: "favorite",
           type: "boolean",
           cond: "=",
           val: null,
           flag: null,
           lock: false,
-          appbar: true,
           union: "AND",
           metaId: null,
         });
@@ -150,6 +275,7 @@ export default {
     validName: false,
     filterName: "",
     dialogLoad: false,
+    dialogAdd: false,
     savedFilters: [],
   }),
   computed: {
@@ -164,30 +290,36 @@ export default {
     init() {
       let listBy = [];
 
-      listBy.push({ header: "Default" });
       let defaults = this.cols.standart;
+      defaults.forEach((i) => {
+        i.group = "Default";
+      });
       defaults.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
       listBy = [...listBy, ...defaults];
 
       if (this.isMediaPage || this.isItemPage) {
-        listBy.push({ header: "File" });
-
         let media = this.cols.media;
+        media.forEach((i) => {
+          i.group = "File";
+        });
         media.sort((a, b) => (a.text > b.text ? 1 : b.text > a.text ? -1 : 0));
         listBy = [...listBy, ...media];
 
         if (Vue.prototype.$getUrlParam("typeId") == 1) {
-          listBy.push({ header: "Video" });
-
           let video = this.cols.video;
+          video.forEach((i) => {
+            i.group = "Video";
+          });
           video.sort((a, b) =>
             a.text > b.text ? 1 : b.text > a.text ? -1 : 0
           );
           listBy = [...listBy, ...video];
         }
       } else if (this.isMetaPage) {
-        listBy.push({ header: "Item" });
         let metaItem = this.cols.metaItem;
+        metaItem.forEach((i) => {
+          i.group = "Item";
+        });
         metaItem.sort((a, b) =>
           a.text > b.text ? 1 : b.text > a.text ? -1 : 0
         );
@@ -195,42 +327,43 @@ export default {
       }
 
       let assigned = this.$store.state.Items.assigned;
-
       assigned.sort((a, b) =>
         a.meta.name > b.meta.name ? 1 : b.meta.name > a.meta.name ? -1 : 0
       );
-
-      if (assigned.length) listBy.push({ header: "Meta" });
-
       for (let i of assigned) {
         listBy.push({
-          by: i.meta.id,
+          param: i.meta.id,
           type: i.meta.type,
           icon: i.meta.icon,
           text: i.meta.name,
+          group: "Meta",
         });
       }
 
       this.listBy = listBy;
       this.filters = _.cloneDeep(this.$store.state.Items.filters);
     },
-    add() {
-      this.filters.push({
-        id: null,
-        by: null,
-        type: null,
-        cond: null,
-        val: null,
-        flag: null,
-        lock: false,
-        appbar: false,
-        union: "AND",
-        metaId: null,
-      });
+    add(params) {
+      this.dialogAdd = false;
+      for (let i of params) {
+        console.log(i);
+        let cond = Vue.prototype.$getListCond(i.type);
+        this.filters.push({
+          id: null,
+          param: i.param,
+          type: i.type,
+          cond: cond[0],
+          val: null,
+          flag: null,
+          lock: false,
+          union: "AND",
+          metaId: null,
+        });
+      }
     },
     setBy(value, index) {
-      this.filters[index].by = value;
-      let found = this.listBy.findIndex((i) => i.by == value);
+      this.filters[index].param = value;
+      let found = this.listBy.findIndex((i) => i.param == value);
       if (found > -1) this.filters[index].type = this.listBy[found].type;
       this.filters[index].cond = null;
       this.filters[index].val = null;
@@ -354,6 +487,9 @@ export default {
     nameRules(string) {
       return Vue.prototype.$validateName(string);
     },
+    attach() {
+      this.$store.state.filters.attached = !this.$store.state.filters.attached;
+    },
   },
   watch: {
     "Items.filters"(val) {
@@ -367,5 +503,11 @@ export default {
 <style lang="scss" scoped>
 .filters-drawer {
   z-index: 3;
+  &.padding-bottom {
+    padding-bottom: 104px;
+  }
+  &.deattached {
+    opacity: 0.95;
+  }
 }
 </style>

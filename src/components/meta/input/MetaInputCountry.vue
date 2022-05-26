@@ -8,7 +8,6 @@
     :disabled="disabled"
     :prepend-icon="showIcons && !dialog ? 'mdi-flag' : ''"
     :hide-details="dialog ? true : false"
-    :outlined="dialog ? true : false"
     append-icon="mdi-chevron-down"
     item-text="name"
     item-value="name"

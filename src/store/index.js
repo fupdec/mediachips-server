@@ -37,6 +37,10 @@ export default new Vuex.Store({
     meta: [],
     tabs: [],
     notifications: [],
+    filters: {
+      visible: false,
+      attached: true,
+    },
     settings: Settings,
   }),
   mutations: {

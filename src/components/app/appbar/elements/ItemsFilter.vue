@@ -6,7 +6,6 @@
           <v-icon>mdi-filter-outline</v-icon>
         </v-badge>
       </v-btn>
-      <DialogItemsFilter :dialog="dialogFilter" @close="dialogFilter = false" />
     </template>
     <span>Filter {{ Items.name }}</span>
   </v-tooltip>
@@ -16,25 +15,17 @@
 <script>
 export default {
   name: "ItemsFilter",
-  components: {
-    DialogItemsFilter: () =>
-      import("@/components/dialogs/DialogItemsFilter.vue"),
-  },
-  data: () => ({
-    dialogFilter: false,
-  }),
   computed: {
     Items() {
       return this.$store.state.Items;
     },
     badge() {
-      return this.$store.state.Items.filters.length;
+      return this.Items.filters.length;
     },
   },
   methods: {
     toggleFilters() {
-      this.dialogFilter = true;
-      this.Items.isFilters = !this.Items.isFilters;
+      this.$store.state.filters.visible = !this.$store.state.filters.visible;
     },
   },
 };

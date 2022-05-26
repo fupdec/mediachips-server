@@ -19,7 +19,7 @@
             </v-btn>
           </v-badge>
         </template>
-        <span>Quick Search by {{ by }}</span>
+        <span>Quick Search by {{ param }}</span>
       </v-tooltip>
     </template>
 
@@ -63,14 +63,14 @@ export default {
         return this.searchString.substring(0, 2);
       else return "";
     },
-    by() {
+    param() {
       return Vue.prototype.$checkCurrentPage("meta") ? "name" : "path";
     },
     filters() {
       return this.$store.state.Items.filters;
     },
     index() {
-      return this.filters.findIndex((i) => i.by == this.by && i.appbar == true);
+      return this.filters.findIndex((i) => i.param == this.param && i.appbar == true);
     },
   },
   methods: {
@@ -84,7 +84,7 @@ export default {
     search() {
       const values = {
         index: this.index,
-        by: this.by,
+        param: this.param,
         string: this.searchString,
       };
       this.$root.$emit("runSearch", values);

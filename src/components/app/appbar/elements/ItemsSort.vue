@@ -36,7 +36,7 @@
           mandatory
           color="primary"
         >
-          <v-list-item v-for="i in list" :key="i.by" :value="i.by">
+          <v-list-item v-for="i in list" :key="i.param" :value="i.param">
             <v-list-item-content>
               <v-list-item-title>
                 <v-icon left>mdi-{{ i.icon }}</v-icon>
@@ -64,22 +64,22 @@ export default {
   data: () => ({
     list: [
       {
-        by: "name",
+        param: "name",
         icon: "alphabetical-variant",
         text: "Name",
       },
       {
-        by: "createdAt",
+        param: "createdAt",
         icon: "calendar-plus",
         text: "Date Added",
       },
       {
-        by: "updatedAt",
+        param: "updatedAt",
         icon: "calendar-edit",
         text: "Date of Editing",
       },
       {
-        by: "rating",
+        param: "rating",
         icon: "star",
         text: "Rating",
       },
@@ -90,10 +90,10 @@ export default {
       return this.$store.state.Items;
     },
     index() {
-      return this.list.findIndex((i) => i.by == this.Items.sortBy);
+      return this.list.findIndex((i) => i.param == this.Items.sortBy);
     },
     sortBy() {
-      return this.list[this.index] ? this.list[this.index].by : "";
+      return this.list[this.index] ? this.list[this.index].param : "";
     },
     text() {
       return this.list[this.index] ? this.list[this.index].text : "";
@@ -110,7 +110,7 @@ export default {
       if (this.isMediaPage) {
         this.list.shift();
         this.list.unshift({
-          by: "path",
+          param: "path",
           icon: "alphabetical-variant",
           text: "Path",
         });

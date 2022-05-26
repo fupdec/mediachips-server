@@ -7,13 +7,13 @@
     <div class="filter-row">
       <v-autocomplete
         @input="setBy($event)"
-        :value="filter.by"
+        :value="filter.param"
         :items="listBy"
         :disabled="filter.lock"
         :filter="filterBy"
         :rules="[(v) => !!v || 'By is required']"
-        item-value="by"
-        label="By"
+        item-value="param"
+        label="Parameter"
         class="by"
         outlined
         hide-details
@@ -118,9 +118,9 @@
       />
 
       <MetaInputArray
-        v-if="filter.type === 'array' && /\d/.test(filter.by)"
+        v-if="filter.type === 'array' && /\d/.test(filter.param)"
         @input="setVal($event)"
-        :metaId="filter.by"
+        :metaId="filter.param"
         :cond="filter.cond"
         :value="filter.val"
         :disabled="
@@ -130,7 +130,7 @@
       />
 
       <MetaInputCountry
-        v-if="filter.by === 'country'"
+        v-if="filter.param === 'country'"
         @input="setVal($event)"
         :cond="filter.cond"
         :value="filter.val"
