@@ -39,7 +39,6 @@
         :disabled="
           filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
-        :rules="[validVal]"
         class="mt-0 pt-0"
         hide-details
       />
@@ -51,7 +50,6 @@
         :disabled="
           filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
-        :rules="[validVal]"
         type="number"
         class="mt-0 pt-0"
         hide-details
@@ -64,7 +62,6 @@
         :disabled="
           filter.lock || filter.cond == 'is null' || filter.cond == 'not null'
         "
-        :rules="[validVal]"
         class="mt-0 pt-0"
         readonly
         hide-details
@@ -114,7 +111,6 @@ export default {
   },
   mounted() {
     this.getParamData(this.filter.param);
-    console.log(this.listBy);
   },
   data: () => ({
     icon: "shape",
@@ -129,34 +125,17 @@ export default {
   },
   methods: {
     getParamData(data) {
-      let param = _.find(this.listBy, (i) => {
-        // console.log(i.param, param);
-        return i.param === data;
-      });
+      let param = _.find(this.listBy, (i) => i.param === data);
       if (param) {
         this.icon = param.icon;
         this.title = param.text;
       }
-    },
-    setBy(val) {
-      if (!val) return;
-      this.$emit("setBy", val);
     },
     setCond(val) {
       this.$emit("setCond", val);
     },
     setVal(val) {
       this.$emit("setVal", val);
-    },
-    toggleUnion() {
-      const val = this.filter.union === "AND" ? "OR" : "AND";
-      this.$emit("setUnion", val);
-    },
-    duplicate() {
-      this.$emit("duplicate");
-    },
-    getIconType(type) {
-      return Vue.prototype.$getIconDataType(type);
     },
     remove() {
       this.$emit("remove");
@@ -170,20 +149,10 @@ export default {
     validate() {
       this.$refs.form.validate();
     },
-    validVal(val) {
-      const cond = this.filter.cond;
-      if (val !== null && val.length > 0) return true;
-      else if (cond !== "is null" && cond !== "null") return true;
-      else return "Value is required";
-    },
   },
   watch: {
     valid(val) {
       this.$emit("valid", val);
-    },
-    listBy(val) {
-      console.log(val);
-      this.getParamData(this.filter.param);
     },
   },
 };

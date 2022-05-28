@@ -24,6 +24,7 @@
 
     <div class="px-2">
       <v-btn
+        @click="apply"
         :disabled="!isReady"
         color="success"
         class="mb-2"
@@ -89,7 +90,6 @@
           @setVal="setVal($event, i)"
           @setUnion="setUnion($event, i)"
           @remove="remove(i)"
-          @duplicate="duplicate(i)"
           @pickDate="pickDate(i)"
           @valid="validate($event)"
         />
@@ -205,40 +205,6 @@ export default {
     this.metaId = Vue.prototype.$getUrlParam("metaId");
     this.tabId = Vue.prototype.$getUrlParam("tabId");
     this.init();
-    this.$root.$on("runSearch", (values) => {
-      const { index, param, string } = values;
-      if (index > -1) this.filters[index].val = string;
-      else
-        this.filters.push({
-          id: null,
-          param: param,
-          type: "string",
-          cond: "like",
-          val: string,
-          flag: null,
-          lock: false,
-          union: "AND",
-          metaId: null,
-        });
-      this.apply();
-    });
-    this.$root.$on("toggleFavorite", (values) => {
-      const { index, favorite } = values;
-      if (!favorite && index > -1) this.remove(index);
-      else
-        this.filters.push({
-          id: null,
-          param: "favorite",
-          type: "boolean",
-          cond: "=",
-          val: null,
-          flag: null,
-          lock: false,
-          union: "AND",
-          metaId: null,
-        });
-      this.apply();
-    });
     this.$root.$on("removeFilter", (index) => {
       this.remove(index);
       this.apply();
@@ -249,8 +215,6 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$root.$off("runSearch");
-    this.$root.$off("toggleFavorite");
     this.$root.$off("removeFilter");
     this.$root.$off("removeAllFilters");
   },
@@ -348,11 +312,12 @@ export default {
       for (let i of params) {
         console.log(i);
         let cond = Vue.prototype.$getListCond(i.type);
+        if (cond) cond = cond[0].cond;
         this.filters.push({
           id: null,
           param: i.param,
           type: i.type,
-          cond: cond[0],
+          cond: cond,
           val: null,
           flag: null,
           lock: false,
@@ -378,15 +343,11 @@ export default {
     setUnion(value, index) {
       this.filters[index].union = value;
     },
-    duplicate(index) {
-      let filter = _.cloneDeep(this.filters[index]);
-      filter.id = null;
-      this.filters.push(filter);
-    },
     remove(index) {
       const filter = _.cloneDeep(this.filters[index]);
       this.filtersForRemove.push(filter);
       this.filters.splice(index, 1);
+      ++this.updKey;
     },
     removeAll() {
       this.filtersForRemove = this.filters.filter((i) => i.lock !== true);
@@ -494,6 +455,7 @@ export default {
   watch: {
     "Items.filters"(val) {
       this.filters = _.cloneDeep(val);
+      ++this.updKey;
     },
   },
 };

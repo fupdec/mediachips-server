@@ -273,6 +273,8 @@ const Readable = {
         let cond = i.cond
         let val = i.val
         let q = ""
+        if (!cond) return "" // если не задано условие
+        if (!cond.includes('null') && !val) return "" // если условие подразумевает значение, но его нет
         if (videoCols.includes(param)) param = 'videoMetadata.' + param
         if (i.type === 'string') {
           q += `${union} ${param} ${cond} `;
