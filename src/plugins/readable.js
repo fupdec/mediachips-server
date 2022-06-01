@@ -8,6 +8,22 @@ const Readable = {
     Vue.prototype.$getRandomId = function () {
       return Math.random().toString(16).slice(2);
     }
+    Vue.prototype.$getFilterObject = function (obj) {
+      return {
+        ...{
+          id: null,
+          param: null,
+          type: null,
+          cond: null,
+          val: null,
+          note: null,
+          fav: false,
+          active: true,
+          lock: false,
+        },
+        ...obj
+      };
+    }
     Vue.prototype.$getReadableFileSize = function (bytes) {
       if (bytes > 1000000000000) bytes = (bytes / 1024 / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' TB'
       else if (bytes > 1000000000) bytes = (bytes / 1024 / 1024 / 1024 - 0.01).toFixed(2) + ' GB'
@@ -268,7 +284,6 @@ const Readable = {
       const isFilterTypeArray = filters.some(i => i.type === 'array')
 
       const getQueryFromFilter = (i) => {
-        let union = i.union
         let param = i.param
         let cond = i.cond
         let val = i.val
@@ -277,18 +292,18 @@ const Readable = {
         if (!cond.includes('null') && !val) return "" // если условие подразумевает значение, но его нет
         if (videoCols.includes(param)) param = 'videoMetadata.' + param
         if (i.type === 'string') {
-          q += `${union} ${param} ${cond} `;
+          q += `AND ${param} ${cond} `;
           if (!cond.includes('null')) {
             q += `'%${val}%' `;
           }
         } else if (i.type === 'number') { // TODO add rating type
-          q += `${union} ${param} ${cond} ${val} `;
+          q += `AND ${param} ${cond} ${val} `;
         } else if (i.type === 'date') {
-          q += `${union} ${param} ${cond} '${val} 00:00:00.000' `;
+          q += `AND ${param} ${cond} '${val} 00:00:00.000' `;
         } else if (i.type === 'boolean') {
-          q += `${union} ${param} ${cond} 1 `;
+          q += `AND ${param} ${cond} 1 `;
         } else if (param === 'country') {
-          q += `${union} `;
+          q += `AND `;
           if (!cond.includes('null'))
             for (let x = 0; x < val.length; x++) {
               const country = val[x];
@@ -300,7 +315,7 @@ const Readable = {
         } else if (i.type === 'array') {
           let parent = 'media'
           if (type == 'items') parent = 'parentItem'
-          q += `${union} `
+          q += `AND `
           if (cond == 'not in') {
             q += `NOT EXISTS ( SELECT * FROM itemsIn${type} WHERE
               ${type}.id = itemsIn${type}.${parent}Id

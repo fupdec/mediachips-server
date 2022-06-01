@@ -149,37 +149,28 @@ export default {
     this.$root.$on("runSearch", (values) => {
       const { index, param, string } = values;
       if (index > -1) this.filters[index].val = string;
-      else
-        this.filters.push({
-          id: null,
+      else {
+        let fltr = Vue.prototype.$getFilterObject({
           param: param,
           type: "string",
           cond: "like",
           val: string,
-          flag: null,
-          lock: false,
-          appbar: true,
-          union: "AND",
-          metaId: null,
-        });
+        })
+        this.filters.push(fltr);
+      }
       this.apply();
     });
     this.$root.$on("toggleFavorite", (values) => {
       const { index, favorite } = values;
       if (!favorite && index > -1) this.remove(index);
-      else
-        this.filters.push({
-          id: null,
+      else {
+        let fltr = Vue.prototype.$getFilterObject({
           param: "favorite",
           type: "boolean",
           cond: "=",
-          val: null,
-          flag: null,
-          lock: false,
-          appbar: true,
-          union: "AND",
-          metaId: null,
-        });
+        })
+        this.filters.push(fltr);
+      }
       this.apply();
     });
     this.$root.$on("removeFilter", (index) => {
@@ -317,10 +308,11 @@ export default {
         type: null,
         cond: null,
         val: null,
-        flag: null,
+        note: null,
+        favorite: false,
+        active: true,
         lock: false,
         appbar: false,
-        union: "AND",
         metaId: null,
       });
     },
@@ -337,9 +329,6 @@ export default {
     },
     setVal(value, index) {
       this.filters[index].val = value;
-    },
-    setUnion(value, index) {
-      this.filters[index].union = value;
     },
     duplicate(index) {
       let filter = _.cloneDeep(this.filters[index]);

@@ -8,7 +8,7 @@
       <span v-else class="body-1 text--secondary ml-2">({{ total }})</span>
     </div>
 
-    <Filters :isReady="isFiltersReady"/>
+    <Filters :isReady="isFiltersReady" />
 
     <v-container
       v-if="Items.filters.length > 0"
@@ -331,18 +331,15 @@ export default {
       const index = this.Items.filters.findIndex(
         (i) => i.metaId == this.metaId && i.lock == true
       );
-      if (index < 0)
-        this.Items.filters.push({
-          id: null,
+      if (index < 0) {
+        let fltr = Vue.prototype.$getFilterObject({
           param: this.metaId,
           type: "array",
           cond: "in",
           val: [this.itemId],
-          flag: null,
-          lock: true,
-          union: "AND",
-          metaId: this.metaId,
         });
+        this.Items.filters.push(fltr);
+      }
     },
     async getPageSettings() {
       let data = {};

@@ -78,7 +78,7 @@
       <v-spacer class="my-4"></v-spacer>
 
       <div v-if="isReady">
-        <FilterSet
+        <FilterRow
           v-for="(f, i) in filters"
           :key="i + updKey"
           :filter="f"
@@ -179,10 +179,10 @@ import DialogHeader from "@/components/elements/DialogHeader.vue";
  type - тип данных для фильтрации,
  cond - условие,
  val - значение,
- flag - специальная метка,
+ note - дополнительная информация,
+ favorite - избранное, отображение на панели инструментов,
+ active - состояние фильтра,
  lock - блокировка от удаления пользователем,
- union - связка с предыдущим фильтром,
- metaId - ???,
  */
 
 export default {
@@ -192,7 +192,7 @@ export default {
   },
   components: {
     DialogHeader,
-    FilterSet: () => import("@/components/app/FilterSet.vue"),
+    FilterRow: () => import("@/components/app/FilterRow.vue"),
     DialogFiltersSaved: () =>
       import("@/components/dialogs/filters/DialogFiltersSaved.vue"),
     DialogFiltersAdd: () =>
@@ -313,17 +313,12 @@ export default {
         console.log(i);
         let cond = Vue.prototype.$getListCond(i.type);
         if (cond) cond = cond[0].cond;
-        this.filters.push({
-          id: null,
+        let fltr = Vue.prototype.$getFilterObject({
           param: i.param,
           type: i.type,
           cond: cond,
-          val: null,
-          flag: null,
-          lock: false,
-          union: "AND",
-          metaId: null,
         });
+        this.filters.push(fltr);
       }
     },
     setBy(value, index) {
@@ -339,9 +334,6 @@ export default {
     },
     setVal(value, index) {
       this.filters[index].val = value;
-    },
-    setUnion(value, index) {
-      this.filters[index].union = value;
     },
     remove(index) {
       const filter = _.cloneDeep(this.filters[index]);

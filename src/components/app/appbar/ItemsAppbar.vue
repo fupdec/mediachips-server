@@ -3,8 +3,8 @@
     <ItemsAdd v-if="!isMediaPage" />
     <MediaAdd v-if="isMediaPage" />
     <ItemsFilter />
-    <ItemsSearch />
-    <ItemsFavorite />
+    <!-- <ItemsSearch />
+    <ItemsFavorite /> -->
     <ItemsSort />
     <ItemsAppearance />
     <ItemsSelect />
