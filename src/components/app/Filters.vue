@@ -204,7 +204,6 @@ export default {
     this.itemId = Vue.prototype.$getUrlParam("itemId");
     this.metaId = Vue.prototype.$getUrlParam("metaId");
     this.tabId = Vue.prototype.$getUrlParam("tabId");
-    this.init();
     this.$root.$on("removeFilter", (index) => {
       this.remove(index);
       this.apply();
@@ -448,6 +447,9 @@ export default {
     "Items.filters"(val) {
       this.filters = _.cloneDeep(val);
       ++this.updKey;
+    },
+    isReady(val) {
+      if (val) this.init();
     },
   },
 };
